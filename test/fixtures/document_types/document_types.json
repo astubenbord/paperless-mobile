@@ -1,0 +1,47 @@
+[
+    {
+        "id": 1,
+        "slug": "rechnung",
+        "name": "Rechnung",
+        "match": "rechnung",
+        "matching_algorithm": 1,
+        "is_insensitive": true,
+        "document_count": 5
+    },
+    {
+        "id": 2,
+        "slug": "vertrag",
+        "name": "Vertrag",
+        "match": "vertrag",
+        "matching_algorithm": 1,
+        "is_insensitive": true,
+        "document_count": 1
+    },
+    {
+        "id": 3,
+        "slug": "finanzunterlagen",
+        "name": "Finanzunterlagen",
+        "match": "finanz",
+        "matching_algorithm": 1,
+        "is_insensitive": true,
+        "document_count": 2
+    },
+    {
+        "id": 4,
+        "slug": "lieferschein",
+        "name": "Lieferschein",
+        "match": "lieferschein",
+        "matching_algorithm": 1,
+        "is_insensitive": true,
+        "document_count": 1
+    },
+    {
+        "id": 5,
+        "slug": "paper",
+        "name": "Paper",
+        "match": "paper",
+        "matching_algorithm": 1,
+        "is_insensitive": true,
+        "document_count": 1
+    }
+]

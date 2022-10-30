@@ -1,0 +1,28 @@
+[{
+        "id": 1,
+        "slug": "correspondent1",
+        "name": "Correspondent 1",
+        "match": "correspondent1",
+        "matching_algorithm": 1,
+        "is_insensitive": true,
+        "document_count": 3
+    },
+    {
+        "id": 2,
+        "slug": "correspondent2",
+        "name": "Correspondent 2",
+        "match": "correspondent2",
+        "matching_algorithm": 1,
+        "is_insensitive": true,
+        "document_count": 3
+    },
+    {
+        "id": 3,
+        "slug": "correspondent3",
+        "name": "Correspondent 3",
+        "match": "correspondent3",
+        "matching_algorithm": 1,
+        "is_insensitive": true,
+        "document_count": 3
+    }
+]

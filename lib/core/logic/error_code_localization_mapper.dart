@@ -1,0 +1,70 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_paperless_mobile/core/model/error_message.dart';
+import 'package:flutter_paperless_mobile/generated/l10n.dart';
+
+String translateError(BuildContext context, ErrorCode code) {
+  switch (code) {
+    case ErrorCode.unknown:
+      return S.of(context).errorMessageUnknonwnError;
+    case ErrorCode.authenticationFailed:
+      return S.of(context).errorMessageAuthenticationFailed;
+    case ErrorCode.notAuthenticated:
+      return S.of(context).errorMessageNotAuthenticated;
+    case ErrorCode.documentUploadFailed:
+      return S.of(context).errorMessageDocumentUploadFailed;
+    case ErrorCode.documentUpdateFailed:
+      return S.of(context).errorMessageDocumentUpdateFailed;
+    case ErrorCode.documentLoadFailed:
+      return S.of(context).errorMessageDocumentLoadFailed;
+    case ErrorCode.documentDeleteFailed:
+      return S.of(context).errorMessageDocumentDeleteFailed;
+    case ErrorCode.documentPreviewFailed:
+      return S.of(context).errorMessageDocumentPreviewFailed;
+    case ErrorCode.documentAsnQueryFailed:
+      return S.of(context).errorMessageDocumentAsnQueryFailed;
+    case ErrorCode.tagCreateFailed:
+      return S.of(context).errorMessageTagCreateFailed;
+    case ErrorCode.tagLoadFailed:
+      return S.of(context).errorMessageTagLoadFailed;
+    case ErrorCode.documentTypeCreateFailed:
+      return S.of(context).errorMessageDocumentTypeCreateFailed;
+    case ErrorCode.documentTypeLoadFailed:
+      return S.of(context).errorMessageDocumentTypeLoadFailed;
+    case ErrorCode.correspondentCreateFailed:
+      return S.of(context).errorMessageCorrespondentCreateFailed;
+    case ErrorCode.correspondentLoadFailed:
+      return S.of(context).errorMessageCorrespondentLoadFailed;
+    case ErrorCode.scanRemoveFailed:
+      return S.of(context).errorMessageScanRemoveFailed;
+    case ErrorCode.invalidClientCertificateConfiguration:
+      return S.of(context).errorMessageInvalidClientCertificateConfiguration;
+    case ErrorCode.documentBulkDeleteFailed:
+      return S.of(context).errorMessageBulkDeleteDocumentsFailed;
+    case ErrorCode.biometricsNotSupported:
+      return S.of(context).errorMessageBiotmetricsNotSupported;
+    case ErrorCode.biometricAuthenticationFailed:
+      return S.of(context).errorMessageBiometricAuthenticationFailed;
+    case ErrorCode.deviceOffline:
+      return S.of(context).errorMessageDeviceOffline;
+    case ErrorCode.serverUnreachable:
+      return S.of(context).errorMessageServerUnreachable;
+    case ErrorCode.similarQueryError:
+      return S.of(context).errorMessageSimilarQueryError;
+    case ErrorCode.autocompleteQueryError:
+      return S.of(context).errorMessageAutocompleteQueryError;
+    case ErrorCode.storagePathLoadFailed:
+      return S.of(context).errorMessageStoragePathLoadFailed;
+    case ErrorCode.storagePathCreateFailed:
+      return S.of(context).errorMessageStoragePathCreateFailed;
+    case ErrorCode.loadSavedViewsError:
+      return S.of(context).errorMessageLoadSavedViewsError;
+    case ErrorCode.createSavedViewError:
+      return S.of(context).errorMessageCreateSavedViewError;
+    case ErrorCode.deleteSavedViewError:
+      return S.of(context).errorMessageDeleteSavedViewError;
+    case ErrorCode.requestTimedOut:
+      return S.of(context).errorMessageRequestTimedOut;
+    default:
+      return S.of(context).errorMessageUnknonwnError;
+  }
+}

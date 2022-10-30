@@ -1,0 +1,45 @@
+[{
+        "id": 1,
+        "slug": "bar",
+        "name": "Bar",
+        "colour": 1,
+        "match": "bar",
+        "matching_algorithm": 1,
+        "is_insensitive": true,
+        "is_inbox_tag": false,
+        "document_count": 0
+    },
+    {
+        "id": 2,
+        "slug": "baz",
+        "name": "Baz",
+        "colour": 1,
+        "match": "baz",
+        "matching_algorithm": 1,
+        "is_insensitive": true,
+        "is_inbox_tag": false,
+        "document_count": 0
+    },
+    {
+        "id": 3,
+        "slug": "foo",
+        "name": "Foo",
+        "colour": 1,
+        "match": "foo",
+        "matching_algorithm": 1,
+        "is_insensitive": true,
+        "is_inbox_tag": false,
+        "document_count": 0
+    },
+    {
+        "id": 4,
+        "slug": "buzz",
+        "name": "Buzz",
+        "colour": 1,
+        "match": "buzz",
+        "matching_algorithm": 1,
+        "is_insensitive": true,
+        "is_inbox_tag": false,
+        "document_count": 0
+    }
+]
