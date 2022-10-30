@@ -49,7 +49,7 @@ app.*.map.json
 di_initializer.config.dart
 
 # mockito generated files
-*.mock.dart
+*.mocks.dart
 
 # l10n generated files:
 lib/generated/*
