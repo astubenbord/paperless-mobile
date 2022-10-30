@@ -10,7 +10,7 @@ import 'package:flutter_paperless_mobile/features/documents/model/document.model
 import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/correspondent_query.dart';
 import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/document_type_query.dart';
 import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/id_query_parameter.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/ids_query_parameter.dart';
+import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/tags_query.dart';
 import 'package:flutter_paperless_mobile/features/labels/correspondent/bloc/correspondents_cubit.dart';
 import 'package:flutter_paperless_mobile/features/labels/document_type/bloc/document_type_cubit.dart';
 import 'package:flutter_paperless_mobile/features/documents/bloc/documents_cubit.dart';
@@ -199,7 +199,7 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
               (_formKey.currentState?.value[DocumentModel.documentTypeKey] as IdQueryParameter).id,
           correspondent:
               (_formKey.currentState?.value[DocumentModel.correspondentKey] as IdQueryParameter).id,
-          tags: (_formKey.currentState?.value[DocumentModel.tagsKey] as IdsQueryParameter).ids,
+          tags: (_formKey.currentState?.value[DocumentModel.tagsKey] as TagsQuery).ids,
           createdAt: (_formKey.currentState?.value[DocumentModel.createdKey] as DateTime?),
         );
         setState(() {

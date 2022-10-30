@@ -5,19 +5,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_paperless_mobile/di_initializer.dart';
 import 'package:flutter_paperless_mobile/extensions/flutter_extensions.dart';
+import 'package:flutter_paperless_mobile/features/documents/bloc/documents_cubit.dart';
+import 'package:flutter_paperless_mobile/features/documents/model/document.model.dart';
 import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/correspondent_query.dart';
 import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/document_type_query.dart';
 import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/id_query_parameter.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/ids_query_parameter.dart';
 import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/storage_path_query.dart';
 import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/tags_query.dart';
-import 'package:flutter_paperless_mobile/features/labels/correspondent/bloc/correspondents_cubit.dart';
-import 'package:flutter_paperless_mobile/features/labels/document_type/bloc/document_type_cubit.dart';
-import 'package:flutter_paperless_mobile/features/documents/bloc/documents_cubit.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/document.model.dart';
 import 'package:flutter_paperless_mobile/features/documents/repository/document_repository.dart';
+import 'package:flutter_paperless_mobile/features/labels/correspondent/bloc/correspondents_cubit.dart';
 import 'package:flutter_paperless_mobile/features/labels/correspondent/model/correspondent.model.dart';
 import 'package:flutter_paperless_mobile/features/labels/correspondent/view/pages/add_correspondent_page.dart';
+import 'package:flutter_paperless_mobile/features/labels/document_type/bloc/document_type_cubit.dart';
 import 'package:flutter_paperless_mobile/features/labels/document_type/model/document_type.model.dart';
 import 'package:flutter_paperless_mobile/features/labels/document_type/view/pages/add_document_type_page.dart';
 import 'package:flutter_paperless_mobile/features/labels/storage_path/bloc/storage_path_cubit.dart';
@@ -28,7 +27,6 @@ import 'package:flutter_paperless_mobile/features/labels/view/widgets/label_form
 import 'package:flutter_paperless_mobile/generated/l10n.dart';
 import 'package:flutter_paperless_mobile/util.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:image/image.dart';
 import 'package:intl/intl.dart';
 
 class DocumentEditPage extends StatefulWidget {
@@ -73,7 +71,7 @@ class _DocumentEditPageState extends State<DocumentEditPage> {
               documentType: values[fkDocumentType] as IdQueryParameter,
               correspondent: values[fkCorrespondent] as IdQueryParameter,
               storagePath: values[fkStoragePath] as IdQueryParameter,
-              tags: values[fkTags] as IdsQueryParameter,
+              tags: values[fkTags] as TagsQuery,
             );
             setState(() {
               _isSubmitLoading = true;

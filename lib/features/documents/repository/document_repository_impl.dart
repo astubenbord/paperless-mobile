@@ -16,6 +16,7 @@ import 'package:flutter_paperless_mobile/features/documents/model/document.model
 import 'package:flutter_paperless_mobile/features/documents/model/document_filter.dart';
 import 'package:flutter_paperless_mobile/features/documents/model/document_meta_data.model.dart';
 import 'package:flutter_paperless_mobile/features/documents/model/paged_search_result.dart';
+import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/asn_query.dart';
 import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/sort_field.dart';
 import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/sort_order.dart';
 import 'package:flutter_paperless_mobile/features/documents/model/similar_document.model.dart';
@@ -188,6 +189,7 @@ class DocumentRepositoryImpl implements DocumentRepository {
     const DocumentFilter asnQueryFilter = DocumentFilter(
       sortField: SortField.archiveSerialNumber,
       sortOrder: SortOrder.descending,
+      asn: AsnQuery.anyAssigned(),
       page: 1,
       pageSize: 1,
     );

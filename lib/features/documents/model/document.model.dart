@@ -3,7 +3,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_paperless_mobile/core/type/json.dart';
 import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/id_query_parameter.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/ids_query_parameter.dart';
+import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/tags_query.dart';
 
 class DocumentModel extends Equatable {
   static const idKey = 'id';
@@ -86,7 +86,7 @@ class DocumentModel extends Equatable {
   DocumentModel copyWith({
     String? title,
     String? content,
-    IdsQueryParameter? tags,
+    TagsQuery? tags,
     IdQueryParameter? documentType,
     IdQueryParameter? correspondent,
     IdQueryParameter? storagePath,
@@ -121,7 +121,7 @@ class DocumentModel extends Equatable {
     return query.id;
   }
 
-  List<int> fromListQuery(IdsQueryParameter? query, List<int> previous) {
+  List<int> fromListQuery(TagsQuery? query, List<int> previous) {
     if (query == null) {
       return previous;
     }
