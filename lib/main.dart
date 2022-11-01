@@ -20,6 +20,7 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/intl_standalone.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:path_provider/path_provider.dart';
 
 void main() async {
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -30,6 +31,8 @@ void main() async {
   HttpOverrides.global = X509HttpOverrides();
 
   configureDependencies();
+  // Remove temporarily downloaded files.
+  (await getTemporaryDirectory()).deleteSync(recursive: true);
 
   kPackageInfo = await PackageInfo.fromPlatform();
   // Load application settings and stored authentication data

@@ -1,6 +1,8 @@
+import 'dart:developer' as dev;
 import 'dart:io';
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_paperless_mobile/core/bloc/label_bloc_provider.dart';
@@ -26,6 +28,7 @@ import 'package:flutter_paperless_mobile/generated/l10n.dart';
 import 'package:flutter_paperless_mobile/util.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 class DocumentDetailsPage extends StatefulWidget {
   final int documentId;
@@ -73,12 +76,16 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
                     ).padded(const EdgeInsets.symmetric(horizontal: 8.0)),
                     IconButton(
                       icon: const Icon(Icons.download),
-                      onPressed: null, //() => _onDownload(document), //TODO: FIX
+                      onPressed: Platform.isAndroid ? () => _onDownload(document) : null,
                     ),
                     IconButton(
                       icon: const Icon(Icons.open_in_new),
                       onPressed: () => _onOpen(document),
                     ).padded(const EdgeInsets.symmetric(horizontal: 8.0)),
+                    IconButton(
+                      icon: const Icon(Icons.share),
+                      onPressed: () => _onShare(document),
+                    ),
                   ],
                 ),
               ),
@@ -313,29 +320,41 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
   }
 
   Future<void> _onDownload(DocumentModel document) async {
-    setState(() {
-      _isDownloadPending = true;
-    });
+    if (!Platform.isAndroid) {
+      showSnackBar(context, "This feature is currently only supported on Android!");
+      return;
+    }
+    setState(() => _isDownloadPending = true);
     getIt<DocumentRepository>().download(document).then((bytes) async {
-      //FIXME: logic currently flawed, some error somewhere but cannot look into directory...
-      final dir = await getApplicationDocumentsDirectory();
-      final dirPath = dir.path + "/files/";
-      var filePath = dirPath + document.originalFileName;
-
-      if (File(filePath).existsSync()) {
-        final count = dir
-            .listSync()
-            .where((entity) => (entity.path.contains(document.originalFileName)))
-            .fold<int>(0, (previous, element) => previous + 1);
-        final extSeperationIdx = filePath.lastIndexOf(".");
-        filePath =
-            filePath.replaceRange(extSeperationIdx, extSeperationIdx + 1, " (${count + 1}).");
-      }
-      Directory(dirPath).createSync();
+      final Directory dir =
+          (await getExternalStorageDirectories(type: StorageDirectory.downloads))!.first;
+      String filePath = "${dir.path}/${document.originalFileName}";
+      //TODO: Add replacement mechanism here (ask user if file should be replaced if exists)
       await File(filePath).writeAsBytes(bytes);
-      _isDownloadPending = false;
-      showSnackBar(context, "Document successfully downloaded to $filePath"); //TODO: INTL
+      setState(() => _isDownloadPending = false);
+      dev.log("File downloaded to $filePath");
     });
+  }
+
+  ///
+  /// Downloads file to temporary directory, from which it can then be shared.
+  ///
+  Future<void> _onShare(DocumentModel document) async {
+    Uint8List documentBytes = await getIt<DocumentRepository>().download(document);
+    final dir = await getTemporaryDirectory();
+    final String path = "${dir.path}/${document.originalFileName}";
+    await File(path).writeAsBytes(documentBytes);
+    Share.shareXFiles(
+      [
+        XFile(
+          path,
+          name: document.originalFileName,
+          mimeType: "application/pdf",
+          lastModified: document.modified,
+        )
+      ],
+      subject: document.title,
+    );
   }
 
   Future<void> _onDelete(DocumentModel document) async {
