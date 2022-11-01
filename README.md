@@ -86,6 +86,7 @@ To get a local copy up and running follow these simple steps.
 <!-- ROADMAP -->
 ## Roadmap
 - [ ] Add download functionality (implemented, but flutter cannot download to useful directories except app directory)
+- [ ] Add document share support
 - [ ] Improvements to UX (e.g. form fields show clear button while empty)
 - [ ] Add more languages
 - [ ] Support for IOS
