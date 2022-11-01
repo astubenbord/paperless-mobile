@@ -133,7 +133,7 @@ class DocumentRepositoryImpl implements DocumentRepository {
         body: json.encode(doc.toJson()),
         headers: {"Content-Type": "application/json"}).timeout(requestTimeout);
     if (response.statusCode == 200) {
-      return DocumentModel.fromJson(jsonDecode(response.body));
+      return DocumentModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
     } else {
       throw const ErrorMessage(ErrorCode.documentUpdateFailed);
     }
@@ -147,7 +147,7 @@ class DocumentRepositoryImpl implements DocumentRepository {
     );
     if (response.statusCode == 200) {
       final searchResult = PagedSearchResult.fromJson(
-        jsonDecode(const Utf8Decoder().convert(response.body.codeUnits)),
+        jsonDecode(utf8.decode(response.bodyBytes)),
         DocumentModel.fromJson,
       );
       return searchResult;
@@ -249,7 +249,7 @@ class DocumentRepositoryImpl implements DocumentRepository {
   @override
   Future<DocumentMetaData> getMetaData(DocumentModel document) async {
     final response = await httpClient.get(Uri.parse("/api/documents/${document.id}/metadata/"));
-    return DocumentMetaData.fromJson(jsonDecode(response.body));
+    return DocumentMetaData.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
   }
 
   @override
@@ -257,7 +257,7 @@ class DocumentRepositoryImpl implements DocumentRepository {
     final response =
         await httpClient.get(Uri.parse("/api/search/autocomplete/?query=$query&limit=$limit}"));
     if (response.statusCode == 200) {
-      return json.decode(response.body) as List<String>;
+      return jsonDecode(utf8.decode(response.bodyBytes)) as List<String>;
     }
     throw const ErrorMessage(ErrorCode.autocompleteQueryError);
   }
@@ -268,7 +268,7 @@ class DocumentRepositoryImpl implements DocumentRepository {
         await httpClient.get(Uri.parse("/api/documents/?more_like=$docId&pageSize=10"));
     if (response.statusCode == 200) {
       return PagedSearchResult<SimilarDocumentModel>.fromJson(
-        json.decode(response.body),
+        jsonDecode(utf8.decode(response.bodyBytes)),
         SimilarDocumentModel.fromJson,
       ).results;
     }

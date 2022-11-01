@@ -31,7 +31,7 @@ class AuthenticationService {
       body: {"username": username, "password": password},
     );
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
+      final data = jsonDecode(utf8.decode(response.bodyBytes));
       return data['token'];
     } else if (response.statusCode == 400 &&
         response.body.toLowerCase().contains("no required certificate was sent")) {

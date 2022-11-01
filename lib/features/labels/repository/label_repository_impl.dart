@@ -75,9 +75,10 @@ class LabelRepositoryImpl implements LabelRepository {
       Uri.parse('/api/correspondents/'),
       body: json.encode(correspondent.toJson()),
       headers: {"Content-Type": "application/json"},
+      encoding: Encoding.getByName("utf-8"),
     );
     if (response.statusCode == 201) {
-      return Correspondent.fromJson(json.decode(response.body));
+      return Correspondent.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
     }
     throw ErrorMessage(ErrorCode.correspondentCreateFailed, httpStatusCode: response.statusCode);
   }
@@ -88,9 +89,10 @@ class LabelRepositoryImpl implements LabelRepository {
       Uri.parse('/api/document_types/'),
       body: json.encode(type.toJson()),
       headers: {"Content-Type": "application/json"},
+      encoding: Encoding.getByName("utf-8"),
     );
     if (response.statusCode == 201) {
-      return DocumentType.fromJson(json.decode(response.body));
+      return DocumentType.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
     }
     throw const ErrorMessage(ErrorCode.documentTypeCreateFailed);
   }
@@ -98,12 +100,17 @@ class LabelRepositoryImpl implements LabelRepository {
   @override
   Future<Tag> saveTag(Tag tag) async {
     final body = json.encode(tag.toJson());
-    final response = await httpClient.post(Uri.parse('/api/tags/'), body: body, headers: {
-      "Content-Type": "application/json",
-      "Accept": "application/json; version=2",
-    });
+    final response = await httpClient.post(
+      Uri.parse('/api/tags/'),
+      body: body,
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json; version=2",
+      },
+      encoding: Encoding.getByName("utf-8"),
+    );
     if (response.statusCode == 201) {
-      return Tag.fromJson(json.decode(response.body));
+      return Tag.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
     }
     throw const ErrorMessage(ErrorCode.tagCreateFailed);
   }
@@ -112,7 +119,7 @@ class LabelRepositoryImpl implements LabelRepository {
   Future<int> getStatistics() async {
     final response = await httpClient.get(Uri.parse('/api/statistics/'));
     if (response.statusCode == 200) {
-      return json.decode(response.body)['documents_total'];
+      return jsonDecode(utf8.decode(response.bodyBytes))['documents_total'];
     }
     throw const ErrorMessage(ErrorCode.unknown);
   }
@@ -154,9 +161,10 @@ class LabelRepositoryImpl implements LabelRepository {
       Uri.parse('/api/correspondents/${correspondent.id}/'),
       headers: {"Content-Type": "application/json"},
       body: json.encode(correspondent.toJson()),
+      encoding: Encoding.getByName("utf-8"),
     );
     if (response.statusCode == 200) {
-      return Correspondent.fromJson(json.decode(response.body));
+      return Correspondent.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
     }
     throw const ErrorMessage(ErrorCode.unknown);
   }
@@ -168,9 +176,10 @@ class LabelRepositoryImpl implements LabelRepository {
       Uri.parse('/api/document_types/${documentType.id}/'),
       headers: {"Content-Type": "application/json"},
       body: json.encode(documentType.toJson()),
+      encoding: Encoding.getByName("utf-8"),
     );
     if (response.statusCode == 200) {
-      return DocumentType.fromJson(json.decode(response.body));
+      return DocumentType.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
     }
     throw const ErrorMessage(ErrorCode.unknown);
   }
@@ -185,9 +194,10 @@ class LabelRepositoryImpl implements LabelRepository {
         "Content-Type": "application/json",
       },
       body: json.encode(tag.toJson()),
+      encoding: Encoding.getByName("utf-8"),
     );
     if (response.statusCode == 200) {
-      return Tag.fromJson(json.decode(response.body));
+      return Tag.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
     }
     throw const ErrorMessage(ErrorCode.unknown);
   }
@@ -225,7 +235,7 @@ class LabelRepositoryImpl implements LabelRepository {
       headers: {"Content-Type": "application/json"},
     );
     if (response.statusCode == 201) {
-      return StoragePath.fromJson(json.decode(response.body));
+      return StoragePath.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
     }
     throw ErrorMessage(ErrorCode.storagePathCreateFailed, httpStatusCode: response.statusCode);
   }
@@ -239,7 +249,7 @@ class LabelRepositoryImpl implements LabelRepository {
       body: json.encode(path.toJson()),
     );
     if (response.statusCode == 200) {
-      return StoragePath.fromJson(json.decode(response.body));
+      return StoragePath.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
     }
     throw const ErrorMessage(ErrorCode.unknown);
   }

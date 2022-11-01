@@ -37,7 +37,7 @@ class SavedViewRepositoryImpl implements SavedViewsRepository {
       headers: {'Content-Type': 'application/json'},
     );
     if (response.statusCode == 201) {
-      return SavedView.fromJson(jsonDecode(response.body));
+      return SavedView.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
     }
     throw ErrorMessage(ErrorCode.createSavedViewError, httpStatusCode: response.statusCode);
   }

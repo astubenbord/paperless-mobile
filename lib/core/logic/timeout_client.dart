@@ -116,7 +116,7 @@ class TimeoutClient implements BaseClient {
   Response _handle400Error(Response response) {
     if (response.statusCode == 400) {
       // try to parse contained error message, otherwise return response
-      final JSON json = jsonDecode(response.body);
+      final JSON json = jsonDecode(utf8.decode(response.bodyBytes));
       final Map<String, String> errorMessages = {};
       //TODO: This could be simplified, look at error message format of paperless-ngx
       for (final entry in json.entries) {
