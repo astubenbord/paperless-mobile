@@ -5,7 +5,6 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_paperless_mobile/core/bloc/label_cubit.dart';
 import 'package:flutter_paperless_mobile/core/logic/error_code_localization_mapper.dart';
 import 'package:flutter_paperless_mobile/core/model/error_message.dart';
-import 'package:flutter_paperless_mobile/core/type/json.dart';
 import 'package:flutter_paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:flutter_paperless_mobile/features/labels/document_type/model/matching_algorithm.dart';
 import 'package:flutter_paperless_mobile/features/labels/model/label.model.dart';
@@ -40,14 +39,17 @@ class _AddLabelPageState<T extends Label> extends State<AddLabelPage<T>> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: Text(widget.addLabelStr),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        icon: const Icon(Icons.add),
-        label: Text(S.of(context).genericActionCreateLabel),
-        onPressed: _onSubmit,
+      floatingActionButton: Visibility(
+        visible: MediaQuery.of(context).viewInsets.bottom == 0,
+        child: FloatingActionButton.extended(
+          icon: const Icon(Icons.add),
+          label: Text(S.of(context).genericActionCreateLabel),
+          onPressed: _onSubmit,
+        ),
       ),
       body: FormBuilder(
         key: _formKey,
@@ -99,7 +101,6 @@ class _AddLabelPageState<T extends Label> extends State<AddLabelPage<T>> {
   }
 
   void _onSubmit() async {
-    log("IsValid? ${_formKey.currentState?.isValid}");
     if (_formKey.currentState?.saveAndValidate() ?? false) {
       try {
         final label = await widget.cubit.add(widget.fromJson(_formKey.currentState!.value));

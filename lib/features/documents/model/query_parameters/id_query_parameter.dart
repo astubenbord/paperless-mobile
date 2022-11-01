@@ -37,7 +37,7 @@ abstract class IdQueryParameter extends Equatable {
       return "&${queryParameterKey}__isnull=$_assignmentStatus";
     }
     if (isSet) {
-      return "${queryParameterKey}__id=$id";
+      return "&${queryParameterKey}__id=$id";
     }
     return "";
   }

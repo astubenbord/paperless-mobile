@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_paperless_mobile/di_initializer.dart';
 import 'package:flutter_paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/storage_path_query.dart';
 import 'package:flutter_paperless_mobile/features/labels/storage_path/bloc/storage_path_cubit.dart';
@@ -43,15 +42,14 @@ class StoragePathWidget extends StatelessWidget {
   }
 
   void _addStoragePathToFilter(BuildContext context) {
-    final cubit = getIt<DocumentsCubit>();
+    final cubit = BlocProvider.of<DocumentsCubit>(context);
     if (cubit.state.filter.correspondent.id == pathId) {
-      cubit.updateFilter(
-          filter: cubit.state.filter.copyWith(storagePath: const StoragePathQuery.unset()));
+      cubit.updateCurrentFilter(
+        (filter) => filter.copyWith(storagePath: const StoragePathQuery.unset()),
+      );
     } else {
-      cubit.updateFilter(
-        filter: cubit.state.filter.copyWith(
-          storagePath: StoragePathQuery.fromId(pathId),
-        ),
+      cubit.updateCurrentFilter(
+        (filter) => filter.copyWith(storagePath: StoragePathQuery.fromId(pathId)),
       );
     }
     afterSelected?.call();

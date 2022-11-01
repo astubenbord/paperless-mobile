@@ -122,9 +122,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
               controller: _panelController,
               defaultPanelState: PanelState.CLOSED,
               minHeight: 48,
-              maxHeight: MediaQuery.of(context).size.height -
-                  kBottomNavigationBarHeight -
-                  2 * kToolbarHeight,
+              maxHeight: MediaQuery.of(context).size.height - kBottomNavigationBarHeight,
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),

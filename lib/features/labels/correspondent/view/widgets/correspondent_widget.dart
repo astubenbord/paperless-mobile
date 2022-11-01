@@ -43,15 +43,14 @@ class CorrespondentWidget extends StatelessWidget {
   }
 
   void _addCorrespondentToFilter(BuildContext context) {
-    final cubit = getIt<DocumentsCubit>();
+    final cubit = BlocProvider.of<DocumentsCubit>(context);
     if (cubit.state.filter.correspondent.id == correspondentId) {
-      cubit.updateFilter(
-          filter: cubit.state.filter.copyWith(correspondent: const CorrespondentQuery.unset()));
+      cubit.updateCurrentFilter(
+        (filter) => filter.copyWith(correspondent: const CorrespondentQuery.unset()),
+      );
     } else {
-      cubit.updateFilter(
-        filter: cubit.state.filter.copyWith(
-          correspondent: CorrespondentQuery.fromId(correspondentId),
-        ),
+      cubit.updateCurrentFilter(
+        (filter) => filter.copyWith(correspondent: CorrespondentQuery.fromId(correspondentId)),
       );
     }
     afterSelected?.call();

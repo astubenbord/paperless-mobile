@@ -168,5 +168,6 @@
   "errorMessageLoadSavedViewsError": "Could not load saved views.",
   "errorMessageCreateSavedViewError": "Could not create saved view, please try again.",
   "errorMessageDeleteSavedViewError": "Could not delete saved view, please try again",
-  "errorMessageRequestTimedOut": "The request to the server timed out."
+  "errorMessageRequestTimedOut": "The request to the server timed out.",
+  "labelFormFieldNoItemsFoundText": "No items found!"
 }

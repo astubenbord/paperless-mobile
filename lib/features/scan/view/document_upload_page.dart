@@ -64,108 +64,108 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
                 child: LinearProgressIndicator(), preferredSize: Size.fromHeight(4.0))
             : null,
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _onSubmit,
-        label: Text(S.of(context).genericActionUploadLabel),
-        icon: const Icon(Icons.upload),
+      floatingActionButton: Visibility(
+        visible: MediaQuery.of(context).viewInsets.bottom == 0,
+        child: FloatingActionButton.extended(
+          onPressed: _onSubmit,
+          label: Text(S.of(context).genericActionUploadLabel),
+          icon: const Icon(Icons.upload),
+        ),
       ),
-      body: SingleChildScrollView(
-        child: FormBuilder(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              FormBuilderTextField(
-                autovalidateMode: AutovalidateMode.always,
-                name: DocumentModel.titleKey,
-                initialValue: "scan_${fileNameDateFormat.format(DateTime.now())}",
-                validator: FormBuilderValidators.required(),
-                decoration: InputDecoration(
-                  labelText: S.of(context).documentTitlePropertyLabel,
-                  suffixIcon: IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () {
-                      _formKey.currentState?.fields[DocumentModel.titleKey]?.didChange("");
-                      _formKey.currentState?.fields[fkFileName]?.didChange(".pdf");
-                    },
+      body: FormBuilder(
+        key: _formKey,
+        child: ListView(
+          children: [
+            FormBuilderTextField(
+              autovalidateMode: AutovalidateMode.always,
+              name: DocumentModel.titleKey,
+              initialValue: "scan_${fileNameDateFormat.format(DateTime.now())}",
+              validator: FormBuilderValidators.required(),
+              decoration: InputDecoration(
+                labelText: S.of(context).documentTitlePropertyLabel,
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () {
+                    _formKey.currentState?.fields[DocumentModel.titleKey]?.didChange("");
+                    _formKey.currentState?.fields[fkFileName]?.didChange(".pdf");
+                  },
+                ),
+                errorText: _errors[DocumentModel.titleKey],
+              ),
+              onChanged: (value) {
+                final String? transformedValue = value?.replaceAll(RegExp(r"[\W_]"), "_");
+                _formKey.currentState?.fields[fkFileName]
+                    ?.didChange("${transformedValue ?? ''}.pdf");
+              },
+            ),
+            FormBuilderTextField(
+              autovalidateMode: AutovalidateMode.always,
+              readOnly: true,
+              enabled: false,
+              name: fkFileName,
+              decoration: InputDecoration(
+                labelText: S.of(context).documentUploadFileNameLabel,
+              ),
+              initialValue: "scan_${fileNameDateFormat.format(DateTime.now())}.pdf",
+            ),
+            FormBuilderDateTimePicker(
+              autovalidateMode: AutovalidateMode.always,
+              format: DateFormat("dd. MMMM yyyy"), //TODO: INTL
+              inputType: InputType.date,
+              name: DocumentModel.createdKey,
+              initialValue: null,
+              decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.calendar_month_outlined),
+                labelText: S.of(context).documentCreatedPropertyLabel + " *",
+              ),
+            ),
+            BlocBuilder<DocumentTypeCubit, Map<int, DocumentType>>(
+              bloc: getIt<DocumentTypeCubit>(), //TODO: Use provider
+              builder: (context, state) {
+                return LabelFormField<DocumentType, DocumentTypeQuery>(
+                  notAssignedSelectable: false,
+                  formBuilderState: _formKey.currentState,
+                  labelCreationWidgetBuilder: (initialValue) => BlocProvider.value(
+                    value: BlocProvider.of<DocumentTypeCubit>(context),
+                    child: AddDocumentTypePage(initialName: initialValue),
                   ),
-                  errorText: _errors[DocumentModel.titleKey],
-                ),
-                onChanged: (value) {
-                  final String? transformedValue = value?.replaceAll(RegExp(r"[\W_]"), "_");
-                  _formKey.currentState?.fields[fkFileName]
-                      ?.didChange("${transformedValue ?? ''}.pdf");
-                },
-              ),
-              FormBuilderTextField(
-                autovalidateMode: AutovalidateMode.always,
-                readOnly: true,
-                enabled: false,
-                name: fkFileName,
-                decoration: InputDecoration(
-                  labelText: S.of(context).documentUploadFileNameLabel,
-                ),
-                initialValue: "scan_${fileNameDateFormat.format(DateTime.now())}.pdf",
-              ),
-              FormBuilderDateTimePicker(
-                autovalidateMode: AutovalidateMode.always,
-                format: DateFormat("dd. MMMM yyyy"), //TODO: INTL
-                inputType: InputType.date,
-                name: DocumentModel.createdKey,
-                initialValue: null,
-                decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.calendar_month_outlined),
-                  labelText: S.of(context).documentCreatedPropertyLabel + " *",
-                ),
-              ),
-              BlocBuilder<DocumentTypeCubit, Map<int, DocumentType>>(
-                bloc: getIt<DocumentTypeCubit>(), //TODO: Use provider
-                builder: (context, state) {
-                  return LabelFormField<DocumentType, DocumentTypeQuery>(
-                    notAssignedSelectable: false,
-                    formBuilderState: _formKey.currentState,
-                    labelCreationWidgetBuilder: (initialValue) => BlocProvider.value(
-                      value: BlocProvider.of<DocumentTypeCubit>(context),
-                      child: AddDocumentTypePage(initialName: initialValue),
-                    ),
-                    label: S.of(context).documentDocumentTypePropertyLabel + " *",
-                    name: DocumentModel.documentTypeKey,
-                    state: state,
-                    queryParameterIdBuilder: DocumentTypeQuery.fromId,
-                    queryParameterNotAssignedBuilder: DocumentTypeQuery.notAssigned,
-                    prefixIcon: const Icon(Icons.description_outlined),
-                  );
-                },
-              ),
-              BlocBuilder<CorrespondentCubit, Map<int, Correspondent>>(
-                bloc: getIt<CorrespondentCubit>(), //TODO: Use provider
-                builder: (context, state) {
-                  return LabelFormField<Correspondent, CorrespondentQuery>(
-                    notAssignedSelectable: false,
-                    formBuilderState: _formKey.currentState,
-                    labelCreationWidgetBuilder: (initialValue) => BlocProvider.value(
-                      value: BlocProvider.of<CorrespondentCubit>(context),
-                      child: AddCorrespondentPage(initalValue: initialValue),
-                    ),
-                    label: S.of(context).documentCorrespondentPropertyLabel + " *",
-                    name: DocumentModel.correspondentKey,
-                    state: state,
-                    queryParameterIdBuilder: CorrespondentQuery.fromId,
-                    queryParameterNotAssignedBuilder: CorrespondentQuery.notAssigned,
-                    prefixIcon: const Icon(Icons.person_outline),
-                  );
-                },
-              ),
-              const TagFormField(
-                name: DocumentModel.tagsKey,
-                //Label: "Tags" + " *",
-              ),
-              Text(
-                "* " + S.of(context).uploadPageAutomaticallInferredFieldsHintText,
-                style: Theme.of(context).textTheme.caption,
-              ),
-            ].padded(),
-          ),
+                  label: S.of(context).documentDocumentTypePropertyLabel + " *",
+                  name: DocumentModel.documentTypeKey,
+                  state: state,
+                  queryParameterIdBuilder: DocumentTypeQuery.fromId,
+                  queryParameterNotAssignedBuilder: DocumentTypeQuery.notAssigned,
+                  prefixIcon: const Icon(Icons.description_outlined),
+                );
+              },
+            ),
+            BlocBuilder<CorrespondentCubit, Map<int, Correspondent>>(
+              bloc: getIt<CorrespondentCubit>(), //TODO: Use provider
+              builder: (context, state) {
+                return LabelFormField<Correspondent, CorrespondentQuery>(
+                  notAssignedSelectable: false,
+                  formBuilderState: _formKey.currentState,
+                  labelCreationWidgetBuilder: (initialValue) => BlocProvider.value(
+                    value: BlocProvider.of<CorrespondentCubit>(context),
+                    child: AddCorrespondentPage(initalValue: initialValue),
+                  ),
+                  label: S.of(context).documentCorrespondentPropertyLabel + " *",
+                  name: DocumentModel.correspondentKey,
+                  state: state,
+                  queryParameterIdBuilder: CorrespondentQuery.fromId,
+                  queryParameterNotAssignedBuilder: CorrespondentQuery.notAssigned,
+                  prefixIcon: const Icon(Icons.person_outline),
+                );
+              },
+            ),
+            const TagFormField(
+              name: DocumentModel.tagsKey,
+              //Label: "Tags" + " *",
+            ),
+            Text(
+              "* " + S.of(context).uploadPageAutomaticallInferredFieldsHintText,
+              style: Theme.of(context).textTheme.caption,
+            ),
+          ].padded(),
         ),
       ),
     );

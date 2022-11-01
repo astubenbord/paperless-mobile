@@ -100,10 +100,17 @@ class DocumentsCubit extends Cubit<DocumentsState> {
   /// Update filter state and automatically reload documents. Always resets page to 1.
   /// Use [DocumentsCubit.loadMore] to load more data.
   Future<void> updateFilter({
-    DocumentFilter filter = DocumentFilter.initial,
+    final DocumentFilter filter = DocumentFilter.initial,
   }) async {
     final result = await documentRepository.find(filter.copyWith(page: 1));
     emit(DocumentsState(filter: filter, value: [result], isLoaded: true));
+  }
+
+  ///
+  /// Convenience method which allows to directly use [DocumentFilter.copyWith] on the current filter.
+  ///
+  Future<void> updateCurrentFilter(final DocumentFilter Function(DocumentFilter) transformFn) {
+    return updateFilter(filter: transformFn(state.filter));
   }
 
   void toggleDocumentSelection(DocumentModel model) {

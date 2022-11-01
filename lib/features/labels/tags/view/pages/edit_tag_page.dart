@@ -50,12 +50,16 @@ class EditTagPage extends StatelessWidget {
       late DocumentFilter updatedFilter = currentFilter;
       if (currentFilter.tags.ids.contains(tag.id)) {
         updatedFilter = currentFilter.copyWith(
-            tags: TagsQuery.fromIds(
-                currentFilter.tags.ids.where((tagId) => tagId != tag.id).toList()));
+          tags: TagsQuery.fromIds(
+            currentFilter.tags.ids.where((tagId) => tagId != tag.id).toList(),
+          ),
+        );
       }
       cubit.updateFilter(filter: updatedFilter);
     } on ErrorMessage catch (error) {
       showError(context, error);
+    } finally {
+      Navigator.pop(context);
     }
   }
 }

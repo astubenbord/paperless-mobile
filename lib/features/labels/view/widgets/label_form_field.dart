@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/correspondent_query.dart';
 import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/id_query_parameter.dart';
 import 'package:flutter_paperless_mobile/features/labels/correspondent/model/correspondent.model.dart';
 import 'package:flutter_paperless_mobile/features/labels/document_type/model/document_type.model.dart';
@@ -9,7 +10,7 @@ import 'package:form_builder_extra_fields/form_builder_extra_fields.dart';
 
 ///
 /// Form field allowing to select labels (i.e. correspondent, documentType)
-/// [T] is the label (model) type, [R] is the return type.
+/// [T] is the label type (e.g. [DocumentType], [Correspondent], ...), [R] is the return type (e.g. [CorrespondentQuery], ...).
 ///
 class LabelFormField<T extends Label, R extends IdQueryParameter> extends StatefulWidget {
   final Widget prefixIcon;
@@ -23,6 +24,7 @@ class LabelFormField<T extends Label, R extends IdQueryParameter> extends Statef
   final R Function() queryParameterNotAssignedBuilder;
   final R Function(int? id) queryParameterIdBuilder;
   final bool notAssignedSelectable;
+  final void Function(R?)? onChanged;
 
   const LabelFormField({
     Key? key,
@@ -37,6 +39,7 @@ class LabelFormField<T extends Label, R extends IdQueryParameter> extends Statef
     required this.formBuilderState,
     required this.prefixIcon,
     this.notAssignedSelectable = true,
+    this.onChanged,
   }) : super(key: key);
 
   @override
@@ -71,6 +74,14 @@ class _LabelFormFieldState<T extends Label, R extends IdQueryParameter>
   @override
   Widget build(BuildContext context) {
     return FormBuilderTypeAhead<IdQueryParameter>(
+      noItemsFoundBuilder: (context) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: Text(
+          S.of(context).labelFormFieldNoItemsFoundText,
+          textAlign: TextAlign.center,
+          style: TextStyle(color: Theme.of(context).disabledColor, fontSize: 18.0),
+        ),
+      ),
       initialValue: widget.initialValue ?? widget.queryParameterIdBuilder(null),
       name: widget.name,
       itemBuilder: (context, suggestion) => ListTile(
@@ -90,6 +101,7 @@ class _LabelFormFieldState<T extends Label, R extends IdQueryParameter>
       },
       onChanged: (value) {
         setState(() => _showClearSuffixIcon = value?.isSet ?? false);
+        widget.onChanged?.call(value as R);
       },
       controller: _textEditingController,
       decoration: InputDecoration(

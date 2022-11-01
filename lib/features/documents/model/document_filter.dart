@@ -10,6 +10,7 @@ import 'package:flutter_paperless_mobile/features/documents/model/query_paramete
 import 'package:flutter_paperless_mobile/util.dart';
 
 class DocumentFilter with EquatableMixin {
+  static const _oneDay = Duration(days: 1);
   static const DocumentFilter initial = DocumentFilter();
 
   static const DocumentFilter latestDocument = DocumentFilter(
@@ -67,20 +68,21 @@ class DocumentFilter with EquatableMixin {
 
     sb.write("&ordering=${sortOrder.queryString}${sortField.queryString}");
 
+    // Add/subtract one day in the following because paperless uses gt/lt not gte/lte
     if (addedDateAfter != null) {
-      sb.write("&added__date__gt=${dateFormat.format(addedDateAfter!)}");
+      sb.write("&added__date__gt=${dateFormat.format(addedDateAfter!.subtract(_oneDay))}");
     }
 
     if (addedDateBefore != null) {
-      sb.write("&added__date__lt=${dateFormat.format(addedDateBefore!)}");
+      sb.write("&added__date__lt=${dateFormat.format(addedDateBefore!.add(_oneDay))}");
     }
 
     if (createdDateAfter != null) {
-      sb.write("&created__date__gt=${dateFormat.format(createdDateAfter!)}");
+      sb.write("&created__date__gt=${dateFormat.format(createdDateAfter!.subtract(_oneDay))}");
     }
 
     if (createdDateBefore != null) {
-      sb.write("&created__date__lt=${dateFormat.format(createdDateBefore!)}");
+      sb.write("&created__date__lt=${dateFormat.format(createdDateBefore!.add(_oneDay))}");
     }
 
     return sb.toString();
