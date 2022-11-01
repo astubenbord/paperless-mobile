@@ -43,7 +43,6 @@ With this app you can conveniently add, manage or simply find documents stored i
 
 ### :rocket: Features
 :heavy_check_mark: **View** your documents at a glance, in a compact list or a more detailed grid view<br>
-:heavy_check_mark: **Add**, **delete**, **edit**, **share**, **download** or just **preview** your documents<br>
 :heavy_check_mark: **Add**, **delete** or **edit** your documents
 :heavy_check_mark: **Share**, **download** and **preview** PDF files<br>
 :heavy_check_mark: **Manage** and assign correspondents, document types, tags and storage paths<br>
