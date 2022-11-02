@@ -1,7 +1,7 @@
-import 'package:flutter_paperless_mobile/core/type/json.dart';
-import 'package:flutter_paperless_mobile/extensions/dart_extensions.dart';
-import 'package:flutter_paperless_mobile/features/labels/document_type/model/matching_algorithm.dart';
-import 'package:flutter_paperless_mobile/features/labels/model/label.model.dart';
+import 'package:paperless_mobile/core/type/json.dart';
+import 'package:paperless_mobile/extensions/dart_extensions.dart';
+import 'package:paperless_mobile/features/labels/document_type/model/matching_algorithm.dart';
+import 'package:paperless_mobile/features/labels/model/label.model.dart';
 
 class Correspondent extends Label {
   static const lastCorrespondenceKey = 'last_correspondence';
@@ -20,8 +20,7 @@ class Correspondent extends Label {
   });
 
   Correspondent.fromJson(JSON json)
-      : lastCorrespondence =
-            DateTime.tryParse(json[lastCorrespondenceKey] ?? ''),
+      : lastCorrespondence = DateTime.tryParse(json[lastCorrespondenceKey] ?? ''),
         super.fromJson(json);
 
   @override

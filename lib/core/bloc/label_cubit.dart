@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_paperless_mobile/features/labels/model/label.model.dart';
-import 'package:flutter_paperless_mobile/features/labels/repository/label_repository.dart';
+import 'package:paperless_mobile/features/labels/model/label.model.dart';
+import 'package:paperless_mobile/features/labels/repository/label_repository.dart';
 
 abstract class LabelCubit<T extends Label> extends Cubit<Map<int, T>> {
   final LabelRepository labelRepository;

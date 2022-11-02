@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_paperless_mobile/core/logic/error_code_localization_mapper.dart';
-import 'package:flutter_paperless_mobile/core/model/error_message.dart';
-import 'package:flutter_paperless_mobile/features/documents/bloc/documents_cubit.dart';
-import 'package:flutter_paperless_mobile/features/documents/bloc/documents_state.dart';
-import 'package:flutter_paperless_mobile/features/documents/view/widgets/selection/bulk_delete_confirmation_dialog.dart';
-import 'package:flutter_paperless_mobile/features/documents/view/widgets/selection/saved_view_selection_widget.dart';
-import 'package:flutter_paperless_mobile/generated/l10n.dart';
-import 'package:flutter_paperless_mobile/util.dart';
+import 'package:paperless_mobile/core/logic/error_code_localization_mapper.dart';
+import 'package:paperless_mobile/core/model/error_message.dart';
+import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
+import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
+import 'package:paperless_mobile/features/documents/view/widgets/selection/bulk_delete_confirmation_dialog.dart';
+import 'package:paperless_mobile/features/documents/view/widgets/selection/saved_view_selection_widget.dart';
+import 'package:paperless_mobile/generated/l10n.dart';
+import 'package:paperless_mobile/util.dart';
 
 class DocumentsPageAppBar extends StatefulWidget with PreferredSizeWidget {
   final List<Widget> actions;

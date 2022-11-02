@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_paperless_mobile/features/documents/bloc/documents_cubit.dart';
-import 'package:flutter_paperless_mobile/features/documents/bloc/documents_state.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/tags_query.dart';
-import 'package:flutter_paperless_mobile/features/labels/tags/model/tag.model.dart';
+import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
+import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
+import 'package:paperless_mobile/features/documents/model/query_parameters/tags_query.dart';
+import 'package:paperless_mobile/features/labels/tags/model/tag.model.dart';
 
 class TagWidget extends StatelessWidget {
   final Tag tag;

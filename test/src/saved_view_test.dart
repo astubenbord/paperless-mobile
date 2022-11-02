@@ -1,13 +1,13 @@
-import 'package:flutter_paperless_mobile/features/documents/model/document_filter.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/filter_rule.model.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/document_type_query.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/query_type.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/sort_order.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/storage_path_query.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/tags_query.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/saved_view.model.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/correspondent_query.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/sort_field.dart';
+import 'package:paperless_mobile/features/documents/model/document_filter.dart';
+import 'package:paperless_mobile/features/documents/model/filter_rule.model.dart';
+import 'package:paperless_mobile/features/documents/model/query_parameters/document_type_query.dart';
+import 'package:paperless_mobile/features/documents/model/query_parameters/query_type.dart';
+import 'package:paperless_mobile/features/documents/model/query_parameters/sort_order.dart';
+import 'package:paperless_mobile/features/documents/model/query_parameters/storage_path_query.dart';
+import 'package:paperless_mobile/features/documents/model/query_parameters/tags_query.dart';
+import 'package:paperless_mobile/features/documents/model/saved_view.model.dart';
+import 'package:paperless_mobile/features/documents/model/query_parameters/correspondent_query.dart';
+import 'package:paperless_mobile/features/documents/model/query_parameters/sort_field.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

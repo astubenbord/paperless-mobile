@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/correspondent_query.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/id_query_parameter.dart';
-import 'package:flutter_paperless_mobile/features/labels/correspondent/model/correspondent.model.dart';
-import 'package:flutter_paperless_mobile/features/labels/document_type/model/document_type.model.dart';
-import 'package:flutter_paperless_mobile/features/labels/model/label.model.dart';
-import 'package:flutter_paperless_mobile/generated/l10n.dart';
+import 'package:paperless_mobile/features/documents/model/query_parameters/correspondent_query.dart';
+import 'package:paperless_mobile/features/documents/model/query_parameters/id_query_parameter.dart';
+import 'package:paperless_mobile/features/labels/correspondent/model/correspondent.model.dart';
+import 'package:paperless_mobile/features/labels/document_type/model/document_type.model.dart';
+import 'package:paperless_mobile/features/labels/model/label.model.dart';
+import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:form_builder_extra_fields/form_builder_extra_fields.dart';
 
 ///

@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_paperless_mobile/core/model/error_message.dart';
+import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:injectable/injectable.dart';
 
 @singleton

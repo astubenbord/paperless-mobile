@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_paperless_mobile/features/documents/bloc/documents_cubit.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/document_type_query.dart';
-import 'package:flutter_paperless_mobile/features/labels/document_type/bloc/document_type_cubit.dart';
-import 'package:flutter_paperless_mobile/features/labels/document_type/model/document_type.model.dart';
+import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
+import 'package:paperless_mobile/features/documents/model/query_parameters/document_type_query.dart';
+import 'package:paperless_mobile/features/labels/document_type/bloc/document_type_cubit.dart';
+import 'package:paperless_mobile/features/labels/document_type/model/document_type.model.dart';
 
 class DocumentTypeWidget extends StatelessWidget {
   final int? documentTypeId;

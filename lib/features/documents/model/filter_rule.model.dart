@@ -1,12 +1,12 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter_paperless_mobile/core/type/json.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/document_filter.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/correspondent_query.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/document_type_query.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/query_type.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/storage_path_query.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/tags_query.dart';
-import 'package:flutter_paperless_mobile/util.dart';
+import 'package:paperless_mobile/core/type/json.dart';
+import 'package:paperless_mobile/features/documents/model/document_filter.dart';
+import 'package:paperless_mobile/features/documents/model/query_parameters/correspondent_query.dart';
+import 'package:paperless_mobile/features/documents/model/query_parameters/document_type_query.dart';
+import 'package:paperless_mobile/features/documents/model/query_parameters/query_type.dart';
+import 'package:paperless_mobile/features/documents/model/query_parameters/storage_path_query.dart';
+import 'package:paperless_mobile/features/documents/model/query_parameters/tags_query.dart';
+import 'package:paperless_mobile/util.dart';
 
 class FilterRule with EquatableMixin {
   static const int titleRule = 0;

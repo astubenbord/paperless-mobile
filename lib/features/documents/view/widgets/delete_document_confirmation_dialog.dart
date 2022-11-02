@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/document.model.dart';
-import 'package:flutter_paperless_mobile/generated/l10n.dart';
+import 'package:paperless_mobile/features/documents/model/document.model.dart';
+import 'package:paperless_mobile/generated/l10n.dart';
 
 class DeleteDocumentConfirmationDialog extends StatelessWidget {
   final DocumentModel document;

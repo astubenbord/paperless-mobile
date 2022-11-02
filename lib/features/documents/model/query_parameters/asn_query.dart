@@ -1,4 +1,4 @@
-import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/id_query_parameter.dart';
+import 'package:paperless_mobile/features/documents/model/query_parameters/id_query_parameter.dart';
 
 class AsnQuery extends IdQueryParameter {
   const AsnQuery.fromId(super.id) : super.fromId();

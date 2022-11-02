@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_paperless_mobile/features/settings/bloc/application_settings_cubit.dart';
-import 'package:flutter_paperless_mobile/di_initializer.dart';
-import 'package:flutter_paperless_mobile/features/labels/correspondent/bloc/correspondents_cubit.dart';
-import 'package:flutter_paperless_mobile/features/labels/document_type/bloc/document_type_cubit.dart';
-import 'package:flutter_paperless_mobile/features/documents/bloc/documents_cubit.dart';
-import 'package:flutter_paperless_mobile/features/settings/view/settings_page.dart';
-import 'package:flutter_paperless_mobile/features/login/bloc/authentication_cubit.dart';
-import 'package:flutter_paperless_mobile/features/scan/bloc/document_scanner_cubit.dart';
-import 'package:flutter_paperless_mobile/features/labels/tags/bloc/tags_cubit.dart';
-import 'package:flutter_paperless_mobile/generated/l10n.dart';
-import 'package:flutter_paperless_mobile/util.dart';
+import 'package:paperless_mobile/features/settings/bloc/application_settings_cubit.dart';
+import 'package:paperless_mobile/di_initializer.dart';
+import 'package:paperless_mobile/features/labels/correspondent/bloc/correspondents_cubit.dart';
+import 'package:paperless_mobile/features/labels/document_type/bloc/document_type_cubit.dart';
+import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
+import 'package:paperless_mobile/features/settings/view/settings_page.dart';
+import 'package:paperless_mobile/features/login/bloc/authentication_cubit.dart';
+import 'package:paperless_mobile/features/scan/bloc/document_scanner_cubit.dart';
+import 'package:paperless_mobile/features/labels/tags/bloc/tags_cubit.dart';
+import 'package:paperless_mobile/generated/l10n.dart';
+import 'package:paperless_mobile/util.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-import 'package:flutter_paperless_mobile/extensions/flutter_extensions.dart';
+import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 
 class InfoDrawer extends StatelessWidget {
   const InfoDrawer({Key? key}) : super(key: key);

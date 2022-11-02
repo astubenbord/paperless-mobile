@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_paperless_mobile/generated/l10n.dart';
+import 'package:paperless_mobile/generated/l10n.dart';
 
 class RadioSettingsDialog<T> extends StatefulWidget {
   final List<RadioOption<T>> options;

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_paperless_mobile/features/settings/bloc/application_settings_cubit.dart';
-import 'package:flutter_paperless_mobile/features/settings/model/application_settings_state.dart';
-import 'package:flutter_paperless_mobile/features/settings/view/widgets/radio_settings_dialog.dart';
-import 'package:flutter_paperless_mobile/generated/l10n.dart';
+import 'package:paperless_mobile/features/settings/bloc/application_settings_cubit.dart';
+import 'package:paperless_mobile/features/settings/model/application_settings_state.dart';
+import 'package:paperless_mobile/features/settings/view/widgets/radio_settings_dialog.dart';
+import 'package:paperless_mobile/generated/l10n.dart';
 
 class ThemeModeSetting extends StatelessWidget {
   const ThemeModeSetting({super.key});

@@ -1,11 +1,11 @@
 import 'dart:typed_data';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_paperless_mobile/features/documents/bloc/documents_state.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/document.model.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/document_filter.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/paged_search_result.dart';
-import 'package:flutter_paperless_mobile/features/documents/repository/document_repository.dart';
+import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
+import 'package:paperless_mobile/features/documents/model/document.model.dart';
+import 'package:paperless_mobile/features/documents/model/document_filter.dart';
+import 'package:paperless_mobile/features/documents/model/paged_search_result.dart';
+import 'package:paperless_mobile/features/documents/repository/document_repository.dart';
 import 'package:injectable/injectable.dart';
 
 @singleton

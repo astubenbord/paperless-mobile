@@ -1,4 +1,4 @@
-package com.example.flutter_paperless_mobile
+package com.example.paperless_mobile
 
 import android.os.Bundle
 import android.view.WindowManager.LayoutParams

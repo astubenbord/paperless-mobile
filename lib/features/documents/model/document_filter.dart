@@ -1,13 +1,13 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/asn_query.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/correspondent_query.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/document_type_query.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/sort_field.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/query_type.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/sort_order.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/storage_path_query.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/tags_query.dart';
-import 'package:flutter_paperless_mobile/util.dart';
+import 'package:paperless_mobile/features/documents/model/query_parameters/asn_query.dart';
+import 'package:paperless_mobile/features/documents/model/query_parameters/correspondent_query.dart';
+import 'package:paperless_mobile/features/documents/model/query_parameters/document_type_query.dart';
+import 'package:paperless_mobile/features/documents/model/query_parameters/sort_field.dart';
+import 'package:paperless_mobile/features/documents/model/query_parameters/query_type.dart';
+import 'package:paperless_mobile/features/documents/model/query_parameters/sort_order.dart';
+import 'package:paperless_mobile/features/documents/model/query_parameters/storage_path_query.dart';
+import 'package:paperless_mobile/features/documents/model/query_parameters/tags_query.dart';
+import 'package:paperless_mobile/util.dart';
 
 class DocumentFilter with EquatableMixin {
   static const _oneDay = Duration(days: 1);

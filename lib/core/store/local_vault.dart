@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 import 'package:encrypted_shared_preferences/encrypted_shared_preferences.dart';
-import 'package:flutter_paperless_mobile/features/login/model/authentication_information.dart';
-import 'package:flutter_paperless_mobile/features/login/model/client_certificate.dart';
-import 'package:flutter_paperless_mobile/features/settings/model/application_settings_state.dart';
+import 'package:paperless_mobile/features/login/model/authentication_information.dart';
+import 'package:paperless_mobile/features/login/model/client_certificate.dart';
+import 'package:paperless_mobile/features/settings/model/application_settings_state.dart';
 import 'package:injectable/injectable.dart';
 
 @singleton

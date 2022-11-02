@@ -1,14 +1,14 @@
 import 'dart:io';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_paperless_mobile/core/model/error_message.dart';
-import 'package:flutter_paperless_mobile/core/store/local_vault.dart';
-import 'package:flutter_paperless_mobile/di_initializer.dart';
-import 'package:flutter_paperless_mobile/features/login/model/authentication_information.dart';
-import 'package:flutter_paperless_mobile/features/login/model/client_certificate.dart';
-import 'package:flutter_paperless_mobile/features/login/model/user_credentials.model.dart';
-import 'package:flutter_paperless_mobile/features/login/services/authentication.service.dart';
-import 'package:flutter_paperless_mobile/features/settings/model/application_settings_state.dart';
+import 'package:paperless_mobile/core/model/error_message.dart';
+import 'package:paperless_mobile/core/store/local_vault.dart';
+import 'package:paperless_mobile/di_initializer.dart';
+import 'package:paperless_mobile/features/login/model/authentication_information.dart';
+import 'package:paperless_mobile/features/login/model/client_certificate.dart';
+import 'package:paperless_mobile/features/login/model/user_credentials.model.dart';
+import 'package:paperless_mobile/features/login/services/authentication.service.dart';
+import 'package:paperless_mobile/features/settings/model/application_settings_state.dart';
 import 'package:injectable/injectable.dart';
 
 const authenticationKey = "authentication";

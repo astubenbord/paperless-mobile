@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter_paperless_mobile/core/bloc/document_status_cubit.dart';
-import 'package:flutter_paperless_mobile/core/model/document_processing_status.dart';
-import 'package:flutter_paperless_mobile/di_initializer.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/document.model.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/paged_search_result.dart';
-import 'package:flutter_paperless_mobile/features/login/model/authentication_information.dart';
-import 'package:flutter_paperless_mobile/util.dart';
+import 'package:paperless_mobile/core/bloc/document_status_cubit.dart';
+import 'package:paperless_mobile/core/model/document_processing_status.dart';
+import 'package:paperless_mobile/di_initializer.dart';
+import 'package:paperless_mobile/features/documents/model/document.model.dart';
+import 'package:paperless_mobile/features/documents/model/paged_search_result.dart';
+import 'package:paperless_mobile/features/login/model/authentication_information.dart';
+import 'package:paperless_mobile/util.dart';
 import 'package:http_interceptor/http_interceptor.dart';
 import 'package:injectable/injectable.dart';
 import 'package:web_socket_channel/io.dart';

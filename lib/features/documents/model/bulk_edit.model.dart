@@ -1,4 +1,4 @@
-import 'package:flutter_paperless_mobile/core/type/json.dart';
+import 'package:paperless_mobile/core/type/json.dart';
 
 class BulkEditAction {
   final List<int> documents;

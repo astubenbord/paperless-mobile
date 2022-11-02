@@ -1,8 +1,8 @@
 import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter_paperless_mobile/core/model/error_message.dart';
-import 'package:flutter_paperless_mobile/features/login/bloc/authentication_cubit.dart';
+import 'package:paperless_mobile/core/model/error_message.dart';
+import 'package:paperless_mobile/features/login/bloc/authentication_cubit.dart';
 import 'package:http_interceptor/http_interceptor.dart';
 import 'package:injectable/injectable.dart';
 

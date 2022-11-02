@@ -1,9 +1,9 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter_paperless_mobile/core/type/json.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/document_filter.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/filter_rule.model.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/sort_field.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/sort_order.dart';
+import 'package:paperless_mobile/core/type/json.dart';
+import 'package:paperless_mobile/features/documents/model/document_filter.dart';
+import 'package:paperless_mobile/features/documents/model/filter_rule.model.dart';
+import 'package:paperless_mobile/features/documents/model/query_parameters/sort_field.dart';
+import 'package:paperless_mobile/features/documents/model/query_parameters/sort_order.dart';
 
 class SavedView with EquatableMixin {
   final int? id;

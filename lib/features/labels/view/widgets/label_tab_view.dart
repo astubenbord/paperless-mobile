@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_paperless_mobile/core/bloc/label_cubit.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/document_filter.dart';
-import 'package:flutter_paperless_mobile/features/labels/model/label.model.dart';
-import 'package:flutter_paperless_mobile/features/labels/view/widgets/label_item.dart';
+import 'package:paperless_mobile/core/bloc/label_cubit.dart';
+import 'package:paperless_mobile/features/documents/model/document_filter.dart';
+import 'package:paperless_mobile/features/labels/model/label.model.dart';
+import 'package:paperless_mobile/features/labels/view/widgets/label_item.dart';
 
 class LabelTabView<T extends Label> extends StatelessWidget {
   final LabelCubit<T> cubit;

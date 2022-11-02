@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/query_type.dart';
-import 'package:flutter_paperless_mobile/generated/l10n.dart';
+import 'package:paperless_mobile/features/documents/model/query_parameters/query_type.dart';
+import 'package:paperless_mobile/generated/l10n.dart';
 
 class QueryTypeFormField extends StatelessWidget {
   static const fkQueryType = 'queryType';

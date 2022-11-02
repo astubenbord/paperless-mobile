@@ -1,5 +1,5 @@
-import 'package:flutter_paperless_mobile/core/type/json.dart';
-import 'package:flutter_paperless_mobile/features/login/model/client_certificate.dart';
+import 'package:paperless_mobile/core/type/json.dart';
+import 'package:paperless_mobile/features/login/model/client_certificate.dart';
 
 class AuthenticationInformation {
   static const usernameKey = 'username';
@@ -59,8 +59,8 @@ class AuthenticationInformation {
       password: password ?? this.password,
       token: token ?? this.token,
       serverUrl: serverUrl ?? this.serverUrl,
-      clientCertificate: clientCertificate ??
-          (removeClientCertificate ? null : this.clientCertificate),
+      clientCertificate:
+          clientCertificate ?? (removeClientCertificate ? null : this.clientCertificate),
     );
   }
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_paperless_mobile/generated/l10n.dart';
+import 'package:paperless_mobile/generated/l10n.dart';
 
 class OfflineBanner extends StatelessWidget with PreferredSizeWidget {
   const OfflineBanner({super.key});

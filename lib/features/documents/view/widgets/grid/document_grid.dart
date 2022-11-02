@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_paperless_mobile/core/widgets/documents_list_loading_widget.dart';
-import 'package:flutter_paperless_mobile/features/documents/bloc/documents_state.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/document.model.dart';
-import 'package:flutter_paperless_mobile/features/documents/view/widgets/grid/document_grid_item.dart';
+import 'package:paperless_mobile/core/widgets/documents_list_loading_widget.dart';
+import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
+import 'package:paperless_mobile/features/documents/model/document.model.dart';
+import 'package:paperless_mobile/features/documents/view/widgets/grid/document_grid_item.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 class DocumentGridView extends StatelessWidget {

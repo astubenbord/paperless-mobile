@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter_paperless_mobile/core/type/json.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/document.model.dart';
+import 'package:paperless_mobile/core/type/json.dart';
+import 'package:paperless_mobile/features/documents/model/document.model.dart';
 
 const pageRegex = r".*page=(\d+).*";
 

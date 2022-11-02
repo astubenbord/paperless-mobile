@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import 'package:flutter_paperless_mobile/core/model/error_message.dart';
-import 'package:flutter_paperless_mobile/core/util.dart';
-import 'package:flutter_paperless_mobile/di_initializer.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/saved_view.model.dart';
+import 'package:paperless_mobile/core/model/error_message.dart';
+import 'package:paperless_mobile/core/util.dart';
+import 'package:paperless_mobile/di_initializer.dart';
+import 'package:paperless_mobile/features/documents/model/saved_view.model.dart';
 import 'package:http/http.dart';
 import 'package:injectable/injectable.dart';
 

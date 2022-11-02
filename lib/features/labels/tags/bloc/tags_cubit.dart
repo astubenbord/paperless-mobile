@@ -1,5 +1,5 @@
-import 'package:flutter_paperless_mobile/core/bloc/label_cubit.dart';
-import 'package:flutter_paperless_mobile/features/labels/tags/model/tag.model.dart';
+import 'package:paperless_mobile/core/bloc/label_cubit.dart';
+import 'package:paperless_mobile/features/labels/tags/model/tag.model.dart';
 import 'package:injectable/injectable.dart';
 
 @singleton

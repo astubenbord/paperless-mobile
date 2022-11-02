@@ -3,10 +3,10 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:flutter_paperless_mobile/extensions/flutter_extensions.dart';
-import 'package:flutter_paperless_mobile/features/login/model/client_certificate.dart';
-import 'package:flutter_paperless_mobile/features/login/view/widgets/password_text_field.dart';
-import 'package:flutter_paperless_mobile/generated/l10n.dart';
+import 'package:paperless_mobile/extensions/flutter_extensions.dart';
+import 'package:paperless_mobile/features/login/model/client_certificate.dart';
+import 'package:paperless_mobile/features/login/view/widgets/password_text_field.dart';
+import 'package:paperless_mobile/generated/l10n.dart';
 
 class ClientCertificateFormField extends StatefulWidget {
   static const fkClientCertificate = 'clientCertificate';

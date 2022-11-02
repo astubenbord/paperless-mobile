@@ -1,7 +1,7 @@
-import 'package:flutter_paperless_mobile/core/type/json.dart';
-import 'package:flutter_paperless_mobile/extensions/dart_extensions.dart';
-import 'package:flutter_paperless_mobile/features/labels/document_type/model/matching_algorithm.dart';
-import 'package:flutter_paperless_mobile/features/labels/model/label.model.dart';
+import 'package:paperless_mobile/core/type/json.dart';
+import 'package:paperless_mobile/extensions/dart_extensions.dart';
+import 'package:paperless_mobile/features/labels/document_type/model/matching_algorithm.dart';
+import 'package:paperless_mobile/features/labels/model/label.model.dart';
 
 class StoragePath extends Label {
   static const pathKey = 'path';

@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/saved_view.model.dart';
+import 'package:paperless_mobile/features/documents/model/saved_view.model.dart';
 
 class SavedViewState with EquatableMixin {
   final Map<int, SavedView> value;

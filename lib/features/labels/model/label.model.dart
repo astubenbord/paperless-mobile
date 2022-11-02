@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter_paperless_mobile/core/type/json.dart';
-import 'package:flutter_paperless_mobile/extensions/dart_extensions.dart';
-import 'package:flutter_paperless_mobile/features/labels/document_type/model/matching_algorithm.dart';
+import 'package:paperless_mobile/core/type/json.dart';
+import 'package:paperless_mobile/extensions/dart_extensions.dart';
+import 'package:paperless_mobile/features/labels/document_type/model/matching_algorithm.dart';
 
 abstract class Label with EquatableMixin implements Comparable {
   static const idKey = "id";
@@ -37,8 +37,7 @@ abstract class Label with EquatableMixin implements Comparable {
         name = json[nameKey],
         slug = json[slugKey],
         match = json[matchKey],
-        matchingAlgorithm =
-            MatchingAlgorithm.fromInt(json[matchingAlgorithmKey]),
+        matchingAlgorithm = MatchingAlgorithm.fromInt(json[matchingAlgorithmKey]),
         isInsensitive = json[isInsensitiveKey],
         documentCount = json[documentCountKey];
 

@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_paperless_mobile/core/model/error_message.dart';
-import 'package:flutter_paperless_mobile/generated/l10n.dart';
+import 'package:paperless_mobile/core/model/error_message.dart';
+import 'package:paperless_mobile/generated/l10n.dart';
 
 String translateError(BuildContext context, ErrorCode code) {
   switch (code) {

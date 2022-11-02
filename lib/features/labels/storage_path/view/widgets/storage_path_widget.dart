@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_paperless_mobile/features/documents/bloc/documents_cubit.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/storage_path_query.dart';
-import 'package:flutter_paperless_mobile/features/labels/storage_path/bloc/storage_path_cubit.dart';
-import 'package:flutter_paperless_mobile/features/labels/storage_path/model/storage_path.model.dart';
+import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
+import 'package:paperless_mobile/features/documents/model/query_parameters/storage_path_query.dart';
+import 'package:paperless_mobile/features/labels/storage_path/bloc/storage_path_cubit.dart';
+import 'package:paperless_mobile/features/labels/storage_path/model/storage_path.model.dart';
 
 class StoragePathWidget extends StatelessWidget {
   final int? pathId;

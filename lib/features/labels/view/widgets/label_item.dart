@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_paperless_mobile/core/bloc/label_bloc_provider.dart';
-import 'package:flutter_paperless_mobile/di_initializer.dart';
-import 'package:flutter_paperless_mobile/features/documents/bloc/documents_cubit.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/document_filter.dart';
-import 'package:flutter_paperless_mobile/features/documents/repository/document_repository.dart';
-import 'package:flutter_paperless_mobile/features/labels/model/label.model.dart';
-import 'package:flutter_paperless_mobile/features/labels/view/widgets/linked_documents_preview.dart';
+import 'package:paperless_mobile/core/bloc/label_bloc_provider.dart';
+import 'package:paperless_mobile/di_initializer.dart';
+import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
+import 'package:paperless_mobile/features/documents/model/document_filter.dart';
+import 'package:paperless_mobile/features/documents/repository/document_repository.dart';
+import 'package:paperless_mobile/features/labels/model/label.model.dart';
+import 'package:paperless_mobile/features/labels/view/widgets/linked_documents_preview.dart';
 
 class LabelItem<T extends Label> extends StatelessWidget {
   final T label;

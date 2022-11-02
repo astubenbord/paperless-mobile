@@ -1,4 +1,4 @@
-name: flutter_paperless_mobile
+name: paperless_mobile
 description:
   Application to conveniently scan and share documents with a paperless-ng
   server.

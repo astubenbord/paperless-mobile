@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:flutter_paperless_mobile/core/service/connectivity_status.service.dart';
-import 'package:flutter_paperless_mobile/di_initializer.dart';
-import 'package:flutter_paperless_mobile/generated/l10n.dart';
+import 'package:paperless_mobile/core/service/connectivity_status.service.dart';
+import 'package:paperless_mobile/di_initializer.dart';
+import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 
 class ServerAddressFormField extends StatefulWidget {
@@ -30,7 +30,7 @@ class _ServerAddressFormFieldState extends State<ServerAddressFormField> {
         hintText: "http://192.168.1.50:8000",
         labelText: S.of(context).loginPageServerUrlFieldLabel,
       ),
-      onSubmitted: _updateIsAddressReachableStatus,
+      onChanged: _updateIsAddressReachableStatus,
     );
   }
 

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:flutter_paperless_mobile/core/model/error_message.dart';
-import 'package:flutter_paperless_mobile/di_initializer.dart';
-import 'package:flutter_paperless_mobile/extensions/flutter_extensions.dart';
-import 'package:flutter_paperless_mobile/features/login/bloc/authentication_cubit.dart';
-import 'package:flutter_paperless_mobile/features/login/view/widgets/client_certificate_form_field.dart';
-import 'package:flutter_paperless_mobile/features/login/view/widgets/server_address_form_field.dart';
-import 'package:flutter_paperless_mobile/features/login/view/widgets/user_credentials_form_field.dart';
-import 'package:flutter_paperless_mobile/generated/l10n.dart';
-import 'package:flutter_paperless_mobile/util.dart';
+import 'package:paperless_mobile/core/model/error_message.dart';
+import 'package:paperless_mobile/di_initializer.dart';
+import 'package:paperless_mobile/extensions/flutter_extensions.dart';
+import 'package:paperless_mobile/features/login/bloc/authentication_cubit.dart';
+import 'package:paperless_mobile/features/login/view/widgets/client_certificate_form_field.dart';
+import 'package:paperless_mobile/features/login/view/widgets/server_address_form_field.dart';
+import 'package:paperless_mobile/features/login/view/widgets/user_credentials_form_field.dart';
+import 'package:paperless_mobile/generated/l10n.dart';
+import 'package:paperless_mobile/util.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);

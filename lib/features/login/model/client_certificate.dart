@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:flutter_paperless_mobile/core/type/json.dart';
+import 'package:paperless_mobile/core/type/json.dart';
 
 class ClientCertificate {
   static const bytesKey = 'bytes';

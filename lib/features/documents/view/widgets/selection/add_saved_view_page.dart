@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/document_filter.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/saved_view.model.dart';
-import 'package:flutter_paperless_mobile/generated/l10n.dart';
+import 'package:paperless_mobile/features/documents/model/document_filter.dart';
+import 'package:paperless_mobile/features/documents/model/saved_view.model.dart';
+import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 
 class AddSavedViewPage extends StatefulWidget {

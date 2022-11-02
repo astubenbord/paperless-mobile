@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_paperless_mobile/features/documents/bloc/documents_state.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/document.model.dart';
-import 'package:flutter_paperless_mobile/generated/l10n.dart';
+import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
+import 'package:paperless_mobile/features/documents/model/document.model.dart';
+import 'package:paperless_mobile/generated/l10n.dart';
 
 class BulkDeleteConfirmationDialog extends StatelessWidget {
   static const _bulletPoint = "\u2022";
   final DocumentsState state;
-  const BulkDeleteConfirmationDialog({Key? key, required this.state})
-      : super(key: key);
+  const BulkDeleteConfirmationDialog({Key? key, required this.state}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,12 +19,8 @@ class BulkDeleteConfirmationDialog extends StatelessWidget {
           Text(
             //TODO: use plurals, didn't use because of crash... investigate later.
             state.selection.length == 1
-                ? S
-                    .of(context)
-                    .documentsPageSelectionBulkDeleteDialogWarningTextOne
-                : S
-                    .of(context)
-                    .documentsPageSelectionBulkDeleteDialogWarningTextMany,
+                ? S.of(context).documentsPageSelectionBulkDeleteDialogWarningTextOne
+                : S.of(context).documentsPageSelectionBulkDeleteDialogWarningTextMany,
           ),
           const SizedBox(height: 16),
           ConstrainedBox(
@@ -36,8 +31,7 @@ class BulkDeleteConfirmationDialog extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          Text(
-              S.of(context).documentsPageSelectionBulkDeleteDialogContinueText),
+          Text(S.of(context).documentsPageSelectionBulkDeleteDialogContinueText),
         ],
       ),
       actions: [
@@ -47,8 +41,7 @@ class BulkDeleteConfirmationDialog extends StatelessWidget {
         ),
         TextButton(
           style: ButtonStyle(
-            foregroundColor:
-                MaterialStateProperty.all(Theme.of(context).colorScheme.error),
+            foregroundColor: MaterialStateProperty.all(Theme.of(context).colorScheme.error),
           ),
           onPressed: () {
             Navigator.pop(context, true);

@@ -1,10 +1,10 @@
 import 'dart:typed_data';
 
-import 'package:flutter_paperless_mobile/features/documents/model/document.model.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/document_filter.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/document_meta_data.model.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/paged_search_result.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/similar_document.model.dart';
+import 'package:paperless_mobile/features/documents/model/document.model.dart';
+import 'package:paperless_mobile/features/documents/model/document_filter.dart';
+import 'package:paperless_mobile/features/documents/model/document_meta_data.model.dart';
+import 'package:paperless_mobile/features/documents/model/paged_search_result.dart';
+import 'package:paperless_mobile/features/documents/model/similar_document.model.dart';
 
 abstract class DocumentRepository {
   Future<void> create(

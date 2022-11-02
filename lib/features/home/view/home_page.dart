@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_paperless_mobile/core/bloc/connectivity_cubit.dart';
-import 'package:flutter_paperless_mobile/di_initializer.dart';
-import 'package:flutter_paperless_mobile/features/documents/bloc/documents_cubit.dart';
-import 'package:flutter_paperless_mobile/features/documents/bloc/saved_view_cubit.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/saved_view.model.dart';
-import 'package:flutter_paperless_mobile/features/documents/view/pages/documents_page.dart';
-import 'package:flutter_paperless_mobile/features/home/view/widget/bottom_navigation_bar.dart';
-import 'package:flutter_paperless_mobile/features/home/view/widget/info_drawer.dart';
-import 'package:flutter_paperless_mobile/features/labels/correspondent/bloc/correspondents_cubit.dart';
-import 'package:flutter_paperless_mobile/features/labels/document_type/bloc/document_type_cubit.dart';
-import 'package:flutter_paperless_mobile/features/labels/storage_path/bloc/storage_path_cubit.dart';
-import 'package:flutter_paperless_mobile/features/labels/tags/bloc/tags_cubit.dart';
-import 'package:flutter_paperless_mobile/features/labels/view/pages/labels_page.dart';
-import 'package:flutter_paperless_mobile/features/scan/bloc/document_scanner_cubit.dart';
-import 'package:flutter_paperless_mobile/features/scan/view/scanner_page.dart';
-import 'package:flutter_paperless_mobile/util.dart';
+import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
+import 'package:paperless_mobile/di_initializer.dart';
+import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
+import 'package:paperless_mobile/features/documents/bloc/saved_view_cubit.dart';
+import 'package:paperless_mobile/features/documents/model/saved_view.model.dart';
+import 'package:paperless_mobile/features/documents/view/pages/documents_page.dart';
+import 'package:paperless_mobile/features/home/view/widget/bottom_navigation_bar.dart';
+import 'package:paperless_mobile/features/home/view/widget/info_drawer.dart';
+import 'package:paperless_mobile/features/labels/correspondent/bloc/correspondents_cubit.dart';
+import 'package:paperless_mobile/features/labels/document_type/bloc/document_type_cubit.dart';
+import 'package:paperless_mobile/features/labels/storage_path/bloc/storage_path_cubit.dart';
+import 'package:paperless_mobile/features/labels/tags/bloc/tags_cubit.dart';
+import 'package:paperless_mobile/features/labels/view/pages/labels_page.dart';
+import 'package:paperless_mobile/features/scan/bloc/document_scanner_cubit.dart';
+import 'package:paperless_mobile/features/scan/view/scanner_page.dart';
+import 'package:paperless_mobile/util.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);

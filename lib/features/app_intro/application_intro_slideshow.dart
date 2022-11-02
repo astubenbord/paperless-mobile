@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_paperless_mobile/di_initializer.dart';
-import 'package:flutter_paperless_mobile/extensions/flutter_extensions.dart';
-import 'package:flutter_paperless_mobile/features/app_intro/widgets/biometric_authentication_intro_slide.dart';
-import 'package:flutter_paperless_mobile/features/app_intro/widgets/configuration_done_intro_slide.dart';
-import 'package:flutter_paperless_mobile/features/app_intro/widgets/welcome_intro_slide.dart';
-import 'package:flutter_paperless_mobile/features/home/view/home_page.dart';
-import 'package:flutter_paperless_mobile/features/settings/bloc/application_settings_cubit.dart';
+import 'package:paperless_mobile/di_initializer.dart';
+import 'package:paperless_mobile/extensions/flutter_extensions.dart';
+import 'package:paperless_mobile/features/app_intro/widgets/biometric_authentication_intro_slide.dart';
+import 'package:paperless_mobile/features/app_intro/widgets/configuration_done_intro_slide.dart';
+import 'package:paperless_mobile/features/app_intro/widgets/welcome_intro_slide.dart';
+import 'package:paperless_mobile/features/home/view/home_page.dart';
+import 'package:paperless_mobile/features/settings/bloc/application_settings_cubit.dart';
 import 'package:intro_slider/intro_slider.dart';
 
 class ApplicationIntroSlideshow extends StatelessWidget {

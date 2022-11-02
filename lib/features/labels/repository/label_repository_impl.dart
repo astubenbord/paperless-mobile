@@ -1,13 +1,13 @@
 import 'dart:convert';
 
-import 'package:flutter_paperless_mobile/core/model/error_message.dart';
-import 'package:flutter_paperless_mobile/core/util.dart';
-import 'package:flutter_paperless_mobile/di_initializer.dart';
-import 'package:flutter_paperless_mobile/features/labels/correspondent/model/correspondent.model.dart';
-import 'package:flutter_paperless_mobile/features/labels/document_type/model/document_type.model.dart';
-import 'package:flutter_paperless_mobile/features/labels/repository/label_repository.dart';
-import 'package:flutter_paperless_mobile/features/labels/storage_path/model/storage_path.model.dart';
-import 'package:flutter_paperless_mobile/features/labels/tags/model/tag.model.dart';
+import 'package:paperless_mobile/core/model/error_message.dart';
+import 'package:paperless_mobile/core/util.dart';
+import 'package:paperless_mobile/di_initializer.dart';
+import 'package:paperless_mobile/features/labels/correspondent/model/correspondent.model.dart';
+import 'package:paperless_mobile/features/labels/document_type/model/document_type.model.dart';
+import 'package:paperless_mobile/features/labels/repository/label_repository.dart';
+import 'package:paperless_mobile/features/labels/storage_path/model/storage_path.model.dart';
+import 'package:paperless_mobile/features/labels/tags/model/tag.model.dart';
 import 'package:http/http.dart';
 import 'package:injectable/injectable.dart';
 

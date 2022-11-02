@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:flutter_paperless_mobile/features/labels/storage_path/model/storage_path.model.dart';
-import 'package:flutter_paperless_mobile/generated/l10n.dart';
+import 'package:paperless_mobile/features/labels/storage_path/model/storage_path.model.dart';
+import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 
 class StoragePathAutofillFormBuilderField extends StatefulWidget {

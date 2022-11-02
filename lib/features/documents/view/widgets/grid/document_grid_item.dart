@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/document.model.dart';
-import 'package:flutter_paperless_mobile/features/documents/view/widgets/document_preview.dart';
-import 'package:flutter_paperless_mobile/features/labels/correspondent/view/widgets/correspondent_widget.dart';
-import 'package:flutter_paperless_mobile/features/labels/document_type/view/widgets/document_type_widget.dart';
-import 'package:flutter_paperless_mobile/features/labels/tags/view/widgets/tags_widget.dart';
+import 'package:paperless_mobile/features/documents/model/document.model.dart';
+import 'package:paperless_mobile/features/documents/view/widgets/document_preview.dart';
+import 'package:paperless_mobile/features/labels/correspondent/view/widgets/correspondent_widget.dart';
+import 'package:paperless_mobile/features/labels/document_type/view/widgets/document_type_widget.dart';
+import 'package:paperless_mobile/features/labels/tags/view/widgets/tags_widget.dart';
 import 'package:intl/intl.dart';
 
 class DocumentGridItem extends StatelessWidget {

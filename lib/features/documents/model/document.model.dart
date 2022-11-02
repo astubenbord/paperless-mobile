@@ -1,9 +1,9 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'package:equatable/equatable.dart';
-import 'package:flutter_paperless_mobile/core/type/json.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/id_query_parameter.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/query_parameters/tags_query.dart';
+import 'package:paperless_mobile/core/type/json.dart';
+import 'package:paperless_mobile/features/documents/model/query_parameters/id_query_parameter.dart';
+import 'package:paperless_mobile/features/documents/model/query_parameters/tags_query.dart';
 
 class DocumentModel extends Equatable {
   static const idKey = 'id';

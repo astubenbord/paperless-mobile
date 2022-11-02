@@ -2,16 +2,16 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_paperless_mobile/core/model/error_message.dart';
-import 'package:flutter_paperless_mobile/di_initializer.dart';
-import 'package:flutter_paperless_mobile/features/documents/bloc/documents_cubit.dart';
-import 'package:flutter_paperless_mobile/features/documents/bloc/saved_view_cubit.dart';
-import 'package:flutter_paperless_mobile/features/documents/bloc/saved_view_state.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/saved_view.model.dart';
-import 'package:flutter_paperless_mobile/features/documents/view/widgets/selection/add_saved_view_page.dart';
-import 'package:flutter_paperless_mobile/features/documents/view/widgets/selection/confirm_delete_saved_view_dialog.dart';
-import 'package:flutter_paperless_mobile/generated/l10n.dart';
-import 'package:flutter_paperless_mobile/util.dart';
+import 'package:paperless_mobile/core/model/error_message.dart';
+import 'package:paperless_mobile/di_initializer.dart';
+import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
+import 'package:paperless_mobile/features/documents/bloc/saved_view_cubit.dart';
+import 'package:paperless_mobile/features/documents/bloc/saved_view_state.dart';
+import 'package:paperless_mobile/features/documents/model/saved_view.model.dart';
+import 'package:paperless_mobile/features/documents/view/widgets/selection/add_saved_view_page.dart';
+import 'package:paperless_mobile/features/documents/view/widgets/selection/confirm_delete_saved_view_dialog.dart';
+import 'package:paperless_mobile/generated/l10n.dart';
+import 'package:paperless_mobile/util.dart';
 
 class SavedViewSelectionWidget extends StatelessWidget {
   const SavedViewSelectionWidget({

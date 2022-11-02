@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_paperless_mobile/features/settings/view/widgets/language_selection_setting.dart';
-import 'package:flutter_paperless_mobile/features/settings/view/widgets/theme_mode_setting.dart';
+import 'package:paperless_mobile/features/settings/view/widgets/language_selection_setting.dart';
+import 'package:paperless_mobile/features/settings/view/widgets/theme_mode_setting.dart';
 
 class ApplicationSettingsPage extends StatelessWidget {
   const ApplicationSettingsPage({super.key});

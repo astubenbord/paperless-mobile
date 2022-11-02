@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_paperless_mobile/core/type/json.dart';
+import 'package:paperless_mobile/core/type/json.dart';
 
 ///
 /// State holding the current application settings such as selected language, theme mode and more.

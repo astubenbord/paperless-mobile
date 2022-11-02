@@ -1,7 +1,7 @@
-import 'package:flutter_paperless_mobile/features/labels/correspondent/model/correspondent.model.dart';
-import 'package:flutter_paperless_mobile/features/labels/document_type/model/document_type.model.dart';
-import 'package:flutter_paperless_mobile/features/labels/storage_path/model/storage_path.model.dart';
-import 'package:flutter_paperless_mobile/features/labels/tags/model/tag.model.dart';
+import 'package:paperless_mobile/features/labels/correspondent/model/correspondent.model.dart';
+import 'package:paperless_mobile/features/labels/document_type/model/document_type.model.dart';
+import 'package:paperless_mobile/features/labels/storage_path/model/storage_path.model.dart';
+import 'package:paperless_mobile/features/labels/tags/model/tag.model.dart';
 
 abstract class LabelRepository {
   Future<Correspondent?> getCorrespondent(int id);

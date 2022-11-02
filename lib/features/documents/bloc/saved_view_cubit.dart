@@ -1,8 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_paperless_mobile/di_initializer.dart';
-import 'package:flutter_paperless_mobile/features/documents/bloc/saved_view_state.dart';
-import 'package:flutter_paperless_mobile/features/documents/model/saved_view.model.dart';
-import 'package:flutter_paperless_mobile/features/documents/repository/saved_views_repository.dart';
+import 'package:paperless_mobile/di_initializer.dart';
+import 'package:paperless_mobile/features/documents/bloc/saved_view_state.dart';
+import 'package:paperless_mobile/features/documents/model/saved_view.model.dart';
+import 'package:paperless_mobile/features/documents/repository/saved_views_repository.dart';
 import 'package:injectable/injectable.dart';
 
 @singleton
