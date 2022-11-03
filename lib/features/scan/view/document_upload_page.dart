@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
+import 'package:paperless_mobile/core/type/types.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/documents/model/document.model.dart';
@@ -44,7 +45,7 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
   static final fileNameDateFormat = DateFormat("yyyy_MM_ddTHH_mm_ss");
   final GlobalKey<FormBuilderState> _formKey = GlobalKey();
 
-  Map<String, String> _errors = {};
+  PaperlessValidationErrors _errors = {};
   bool _isUploadLoading = false;
 
   @override
@@ -61,7 +62,8 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
         title: Text(S.of(context).documentsUploadPageTitle),
         bottom: _isUploadLoading
             ? const PreferredSize(
-                child: LinearProgressIndicator(), preferredSize: Size.fromHeight(4.0))
+                child: LinearProgressIndicator(),
+                preferredSize: Size.fromHeight(4.0))
             : null,
       ),
       floatingActionButton: Visibility(
@@ -86,14 +88,17 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () {
-                    _formKey.currentState?.fields[DocumentModel.titleKey]?.didChange("");
-                    _formKey.currentState?.fields[fkFileName]?.didChange(".pdf");
+                    _formKey.currentState?.fields[DocumentModel.titleKey]
+                        ?.didChange("");
+                    _formKey.currentState?.fields[fkFileName]
+                        ?.didChange(".pdf");
                   },
                 ),
                 errorText: _errors[DocumentModel.titleKey],
               ),
               onChanged: (value) {
-                final String? transformedValue = value?.replaceAll(RegExp(r"[\W_]"), "_");
+                final String? transformedValue =
+                    value?.replaceAll(RegExp(r"[\W_]"), "_");
                 _formKey.currentState?.fields[fkFileName]
                     ?.didChange("${transformedValue ?? ''}.pdf");
               },
@@ -106,7 +111,8 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
               decoration: InputDecoration(
                 labelText: S.of(context).documentUploadFileNameLabel,
               ),
-              initialValue: "scan_${fileNameDateFormat.format(DateTime.now())}.pdf",
+              initialValue:
+                  "scan_${fileNameDateFormat.format(DateTime.now())}.pdf",
             ),
             FormBuilderDateTimePicker(
               autovalidateMode: AutovalidateMode.always,
@@ -125,7 +131,8 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
                 return LabelFormField<DocumentType, DocumentTypeQuery>(
                   notAssignedSelectable: false,
                   formBuilderState: _formKey.currentState,
-                  labelCreationWidgetBuilder: (initialValue) => BlocProvider.value(
+                  labelCreationWidgetBuilder: (initialValue) =>
+                      BlocProvider.value(
                     value: BlocProvider.of<DocumentTypeCubit>(context),
                     child: AddDocumentTypePage(initialName: initialValue),
                   ),
@@ -133,7 +140,8 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
                   name: DocumentModel.documentTypeKey,
                   state: state,
                   queryParameterIdBuilder: DocumentTypeQuery.fromId,
-                  queryParameterNotAssignedBuilder: DocumentTypeQuery.notAssigned,
+                  queryParameterNotAssignedBuilder:
+                      DocumentTypeQuery.notAssigned,
                   prefixIcon: const Icon(Icons.description_outlined),
                 );
               },
@@ -144,15 +152,18 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
                 return LabelFormField<Correspondent, CorrespondentQuery>(
                   notAssignedSelectable: false,
                   formBuilderState: _formKey.currentState,
-                  labelCreationWidgetBuilder: (initialValue) => BlocProvider.value(
+                  labelCreationWidgetBuilder: (initialValue) =>
+                      BlocProvider.value(
                     value: BlocProvider.of<CorrespondentCubit>(context),
                     child: AddCorrespondentPage(initalValue: initialValue),
                   ),
-                  label: S.of(context).documentCorrespondentPropertyLabel + " *",
+                  label:
+                      S.of(context).documentCorrespondentPropertyLabel + " *",
                   name: DocumentModel.correspondentKey,
                   state: state,
                   queryParameterIdBuilder: CorrespondentQuery.fromId,
-                  queryParameterNotAssignedBuilder: CorrespondentQuery.notAssigned,
+                  queryParameterNotAssignedBuilder:
+                      CorrespondentQuery.notAssigned,
                   prefixIcon: const Icon(Icons.person_outline),
                 );
               },
@@ -188,19 +199,27 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
                   onPressed: () {
                     getIt<DocumentsCubit>().reloadDocuments();
                   },
-                  label: S.of(context).documentUploadProcessingSuccessfulReloadActionText,
+                  label: S
+                      .of(context)
+                      .documentUploadProcessingSuccessfulReloadActionText,
                 ),
-                content: Text(S.of(context).documentUploadProcessingSuccessfulText),
+                content:
+                    Text(S.of(context).documentUploadProcessingSuccessfulText),
               ),
             );
           },
           title: _formKey.currentState?.value[DocumentModel.titleKey],
-          documentType:
-              (_formKey.currentState?.value[DocumentModel.documentTypeKey] as IdQueryParameter).id,
-          correspondent:
-              (_formKey.currentState?.value[DocumentModel.correspondentKey] as IdQueryParameter).id,
-          tags: (_formKey.currentState?.value[DocumentModel.tagsKey] as TagsQuery).ids,
-          createdAt: (_formKey.currentState?.value[DocumentModel.createdKey] as DateTime?),
+          documentType: (_formKey.currentState
+                  ?.value[DocumentModel.documentTypeKey] as IdQueryParameter)
+              .id,
+          correspondent: (_formKey.currentState
+                  ?.value[DocumentModel.correspondentKey] as IdQueryParameter)
+              .id,
+          tags:
+              (_formKey.currentState?.value[DocumentModel.tagsKey] as TagsQuery)
+                  .ids,
+          createdAt: (_formKey.currentState?.value[DocumentModel.createdKey]
+              as DateTime?),
         );
         setState(() {
           _isUploadLoading = false;
@@ -210,7 +229,7 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
         showSnackBar(context, S.of(context).documentUploadSuccessText);
       } on ErrorMessage catch (error) {
         showError(context, error);
-      } on Map<String, String> catch (errorMessages) {
+      } on PaperlessValidationErrors catch (errorMessages) {
         setState(() => _errors = errorMessages);
       } catch (other) {
         showSnackBar(context, other.toString());

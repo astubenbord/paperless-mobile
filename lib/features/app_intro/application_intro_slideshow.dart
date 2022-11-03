@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:introduction_screen/introduction_screen.dart';
 import 'package:paperless_mobile/di_initializer.dart';
-import 'package:paperless_mobile/extensions/flutter_extensions.dart';
-import 'package:paperless_mobile/features/app_intro/widgets/biometric_authentication_intro_slide.dart';
-import 'package:paperless_mobile/features/app_intro/widgets/configuration_done_intro_slide.dart';
-import 'package:paperless_mobile/features/app_intro/widgets/welcome_intro_slide.dart';
-import 'package:paperless_mobile/features/home/view/home_page.dart';
 import 'package:paperless_mobile/features/settings/bloc/application_settings_cubit.dart';
-import 'package:intro_slider/intro_slider.dart';
+import 'package:paperless_mobile/features/settings/view/widgets/biometric_authentication_setting.dart';
+import 'package:paperless_mobile/features/settings/view/widgets/language_selection_setting.dart';
+import 'package:paperless_mobile/features/settings/view/widgets/theme_mode_setting.dart';
+import 'package:paperless_mobile/generated/l10n.dart';
 
 class ApplicationIntroSlideshow extends StatelessWidget {
   const ApplicationIntroSlideshow({super.key});
@@ -16,24 +15,82 @@ class ApplicationIntroSlideshow extends StatelessWidget {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async => false,
-      child: IntroSlider(
-        renderDoneBtn: TextButton(
-          child: Text("GO"), //TODO: INTL
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        backgroundColorAllTabs: Theme.of(context).canvasColor,
-        onDonePress: () => Navigator.of(context)
-            .pushReplacement(MaterialPageRoute(builder: (context) => const HomePage())),
-        listCustomTabs: [
-          const WelcomeIntroSlide(),
-          BlocProvider.value(
-            value: getIt<ApplicationSettingsCubit>(),
-            child: const BiometricAuthenticationIntroSlide(),
+      child: BlocProvider.value(
+        value: getIt<ApplicationSettingsCubit>(),
+        child: IntroductionScreen(
+          globalBackgroundColor: Theme.of(context).canvasColor,
+          showDoneButton: true,
+          next: Text(S.of(context).onboardingNextButtonLabel),
+          done: Text(S.of(context).onboardingDoneButtonLabel),
+          onDone: () => Navigator.pop(context),
+          dotsDecorator: DotsDecorator(
+            color: Theme.of(context).colorScheme.onBackground,
+            activeColor: Theme.of(context).colorScheme.primary,
+            activeSize: Size(16.0, 8.0),
+            activeShape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(25.0)),
+            ),
           ),
-          const ConfigurationDoneIntroSlide(),
-        ].padded(const EdgeInsets.all(16.0)),
+          pages: [
+            PageViewModel(
+              titleWidget: Text(
+                "Always right at your fingertip",
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              image: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Image.asset("assets/images/organize_documents.png"),
+              ),
+              bodyWidget: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Text(
+                    "Organizing documents was never this easy",
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+            PageViewModel(
+              titleWidget: Text(
+                "Accessible only by you",
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              image: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Image.asset("assets/images/secure_documents.png"),
+              ),
+              bodyWidget: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Text(
+                    "Secure your documents with biometric authentication and client certificates",
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+            PageViewModel(
+              titleWidget: Text(
+                "You're almost done",
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              image: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Image.asset("assets/images/success.png"),
+              ),
+              bodyWidget: Column(
+                children: const [
+                  BiometricAuthenticationSetting(),
+                  LanguageSelectionSetting(),
+                  ThemeModeSetting(),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

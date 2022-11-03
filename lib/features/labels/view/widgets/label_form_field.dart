@@ -12,7 +12,8 @@ import 'package:form_builder_extra_fields/form_builder_extra_fields.dart';
 /// Form field allowing to select labels (i.e. correspondent, documentType)
 /// [T] is the label type (e.g. [DocumentType], [Correspondent], ...), [R] is the return type (e.g. [CorrespondentQuery], ...).
 ///
-class LabelFormField<T extends Label, R extends IdQueryParameter> extends StatefulWidget {
+class LabelFormField<T extends Label, R extends IdQueryParameter>
+    extends StatefulWidget {
   final Widget prefixIcon;
   final Map<int, T> state;
   final FormBuilderState? formBuilderState;
@@ -57,18 +58,19 @@ class _LabelFormFieldState<T extends Label, R extends IdQueryParameter>
   void initState() {
     super.initState();
     _showClearSuffixIcon = widget.state.containsKey(widget.initialValue?.id);
-    _textEditingController =
-        TextEditingController(text: widget.state[widget.initialValue?.id]?.name ?? '')
-          ..addListener(() {
-            setState(() {
-              _showCreationSuffixIcon = widget.state.values
-                  .where((item) => item.name.toLowerCase().startsWith(
-                        _textEditingController.text.toLowerCase(),
-                      ))
-                  .isEmpty;
-            });
-            setState(() => _showClearSuffixIcon = _textEditingController.text.isNotEmpty);
-          });
+    _textEditingController = TextEditingController(
+        text: widget.state[widget.initialValue?.id]?.name ?? '')
+      ..addListener(() {
+        setState(() {
+          _showCreationSuffixIcon = widget.state.values
+              .where((item) => item.name.toLowerCase().startsWith(
+                    _textEditingController.text.toLowerCase(),
+                  ))
+              .isEmpty;
+        });
+        setState(() =>
+            _showClearSuffixIcon = _textEditingController.text.isNotEmpty);
+      });
   }
 
   @override
@@ -79,18 +81,22 @@ class _LabelFormFieldState<T extends Label, R extends IdQueryParameter>
         child: Text(
           S.of(context).labelFormFieldNoItemsFoundText,
           textAlign: TextAlign.center,
-          style: TextStyle(color: Theme.of(context).disabledColor, fontSize: 18.0),
+          style:
+              TextStyle(color: Theme.of(context).disabledColor, fontSize: 18.0),
         ),
       ),
       initialValue: widget.initialValue ?? widget.queryParameterIdBuilder(null),
       name: widget.name,
       itemBuilder: (context, suggestion) => ListTile(
-        title: Text(widget.state[suggestion.id]?.name ?? S.of(context).labelNotAssignedText),
+        title: Text(widget.state[suggestion.id]?.name ??
+            S.of(context).labelNotAssignedText),
       ),
       suggestionsCallback: (pattern) {
         final List<IdQueryParameter> suggestions = widget.state.keys
             .where((item) =>
-                widget.state[item]!.name.toLowerCase().startsWith(pattern.toLowerCase()) ||
+                widget.state[item]!.name
+                    .toLowerCase()
+                    .startsWith(pattern.toLowerCase()) ||
                 pattern.isEmpty)
             .map((id) => widget.queryParameterIdBuilder(id))
             .toList();
@@ -117,8 +123,9 @@ class _LabelFormFieldState<T extends Label, R extends IdQueryParameter>
         return widget.state[suggestion.id]?.name ?? "";
       },
       direction: AxisDirection.up,
-      onSuggestionSelected: (suggestion) =>
-          widget.formBuilderState?.fields[widget.name]?.didChange(suggestion as R),
+      onSuggestionSelected: (suggestion) => widget
+          .formBuilderState?.fields[widget.name]
+          ?.didChange(suggestion as R),
     );
   }
 
@@ -127,8 +134,8 @@ class _LabelFormFieldState<T extends Label, R extends IdQueryParameter>
       return IconButton(
         onPressed: () => Navigator.of(context)
             .push<T>(MaterialPageRoute(
-                builder: (context) =>
-                    widget.labelCreationWidgetBuilder!(_textEditingController.text)))
+                builder: (context) => widget
+                    .labelCreationWidgetBuilder!(_textEditingController.text)))
             .then((value) {
           if (value != null) {
             // If new label has been created, set form field value and text of this form field and unfocus keyboard (we assume user is done).
@@ -155,7 +162,8 @@ class _LabelFormFieldState<T extends Label, R extends IdQueryParameter>
   }
 
   void _reset() {
-    widget.formBuilderState?.fields[widget.name]?.didChange(widget.queryParameterIdBuilder(null));
+    widget.formBuilderState?.fields[widget.name]
+        ?.didChange(widget.queryParameterIdBuilder(null));
     _textEditingController.clear();
   }
 

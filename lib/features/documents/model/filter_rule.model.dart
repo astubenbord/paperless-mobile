@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:paperless_mobile/core/type/json.dart';
+import 'package:paperless_mobile/core/type/types.dart';
 import 'package:paperless_mobile/features/documents/model/document_filter.dart';
 import 'package:paperless_mobile/features/documents/model/query_parameters/correspondent_query.dart';
 import 'package:paperless_mobile/features/documents/model/query_parameters/document_type_query.dart';
@@ -83,15 +83,20 @@ class FilterRule with EquatableMixin {
               : TagsQuery.fromIds([...filter.tags.ids, int.parse(value!)]),
         );
       case createdBeforeRule:
-        return filter.copyWith(createdDateBefore: value == null ? null : DateTime.parse(value!));
+        return filter.copyWith(
+            createdDateBefore: value == null ? null : DateTime.parse(value!));
       case createdAfterRule:
-        return filter.copyWith(createdDateAfter: value == null ? null : DateTime.parse(value!));
+        return filter.copyWith(
+            createdDateAfter: value == null ? null : DateTime.parse(value!));
       case addedBeforeRule:
-        return filter.copyWith(addedDateBefore: value == null ? null : DateTime.parse(value!));
+        return filter.copyWith(
+            addedDateBefore: value == null ? null : DateTime.parse(value!));
       case addedAfterRule:
-        return filter.copyWith(addedDateAfter: value == null ? null : DateTime.parse(value!));
+        return filter.copyWith(
+            addedDateAfter: value == null ? null : DateTime.parse(value!));
       case titleAndContentRule:
-        return filter.copyWith(queryText: value, queryType: QueryType.titleAndContent);
+        return filter.copyWith(
+            queryText: value, queryType: QueryType.titleAndContent);
       case extendedRule:
         return filter.copyWith(queryText: value, queryType: QueryType.extended);
       //TODO: Add currently unused rules
@@ -109,25 +114,29 @@ class FilterRule with EquatableMixin {
       filterRules.add(FilterRule(correspondentRule, null));
     }
     if (filter.correspondent.isSet) {
-      filterRules.add(FilterRule(correspondentRule, filter.correspondent.id!.toString()));
+      filterRules.add(
+          FilterRule(correspondentRule, filter.correspondent.id!.toString()));
     }
     if (filter.documentType.onlyNotAssigned) {
       filterRules.add(FilterRule(documentTypeRule, null));
     }
     if (filter.documentType.isSet) {
-      filterRules.add(FilterRule(documentTypeRule, filter.documentType.id!.toString()));
+      filterRules.add(
+          FilterRule(documentTypeRule, filter.documentType.id!.toString()));
     }
     if (filter.storagePath.onlyNotAssigned) {
       filterRules.add(FilterRule(storagePathRule, null));
     }
     if (filter.storagePath.isSet) {
-      filterRules.add(FilterRule(storagePathRule, filter.storagePath.id!.toString()));
+      filterRules
+          .add(FilterRule(storagePathRule, filter.storagePath.id!.toString()));
     }
     if (filter.tags.onlyNotAssigned) {
       filterRules.add(FilterRule(tagRule, null));
     }
     if (filter.tags.isSet) {
-      filterRules.addAll(filter.tags.ids.map((id) => FilterRule(tagRule, id.toString())));
+      filterRules.addAll(
+          filter.tags.ids.map((id) => FilterRule(tagRule, id.toString())));
     }
 
     if (filter.queryText != null) {
@@ -147,16 +156,20 @@ class FilterRule with EquatableMixin {
       }
     }
     if (filter.createdDateAfter != null) {
-      filterRules.add(FilterRule(createdAfterRule, dateFormat.format(filter.createdDateAfter!)));
+      filterRules.add(FilterRule(
+          createdAfterRule, dateFormat.format(filter.createdDateAfter!)));
     }
     if (filter.createdDateBefore != null) {
-      filterRules.add(FilterRule(createdBeforeRule, dateFormat.format(filter.createdDateBefore!)));
+      filterRules.add(FilterRule(
+          createdBeforeRule, dateFormat.format(filter.createdDateBefore!)));
     }
     if (filter.addedDateAfter != null) {
-      filterRules.add(FilterRule(addedAfterRule, dateFormat.format(filter.addedDateAfter!)));
+      filterRules.add(FilterRule(
+          addedAfterRule, dateFormat.format(filter.addedDateAfter!)));
     }
     if (filter.addedDateBefore != null) {
-      filterRules.add(FilterRule(addedBeforeRule, dateFormat.format(filter.addedDateBefore!)));
+      filterRules.add(FilterRule(
+          addedBeforeRule, dateFormat.format(filter.addedDateBefore!)));
     }
     return filterRules;
   }

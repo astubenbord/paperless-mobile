@@ -43,23 +43,18 @@ class EditTagPage extends StatelessWidget {
   }
 
   Future<void> _onDelete(Tag tag, BuildContext context) async {
-    try {
-      await BlocProvider.of<TagCubit>(context).remove(tag);
-      final cubit = BlocProvider.of<DocumentsCubit>(context);
-      final currentFilter = cubit.state.filter;
-      late DocumentFilter updatedFilter = currentFilter;
-      if (currentFilter.tags.ids.contains(tag.id)) {
-        updatedFilter = currentFilter.copyWith(
-          tags: TagsQuery.fromIds(
-            currentFilter.tags.ids.where((tagId) => tagId != tag.id).toList(),
-          ),
-        );
-      }
-      cubit.updateFilter(filter: updatedFilter);
-    } on ErrorMessage catch (error) {
-      showError(context, error);
-    } finally {
-      Navigator.pop(context);
+    await BlocProvider.of<TagCubit>(context).remove(tag);
+    final cubit = BlocProvider.of<DocumentsCubit>(context);
+    final currentFilter = cubit.state.filter;
+    late DocumentFilter updatedFilter = currentFilter;
+    if (currentFilter.tags.ids.contains(tag.id)) {
+      updatedFilter = currentFilter.copyWith(
+        tags: TagsQuery.fromIds(
+          currentFilter.tags.ids.where((tagId) => tagId != tag.id).toList(),
+        ),
+      );
     }
+    cubit.updateFilter(filter: updatedFilter);
+    Navigator.pop(context);
   }
 }

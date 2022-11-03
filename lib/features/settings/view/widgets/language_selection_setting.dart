@@ -9,7 +9,8 @@ class LanguageSelectionSetting extends StatefulWidget {
   const LanguageSelectionSetting({super.key});
 
   @override
-  State<LanguageSelectionSetting> createState() => _LanguageSelectionSettingState();
+  State<LanguageSelectionSetting> createState() =>
+      _LanguageSelectionSettingState();
 }
 
 class _LanguageSelectionSettingState extends State<LanguageSelectionSetting> {
@@ -34,10 +35,12 @@ class _LanguageSelectionSettingState extends State<LanguageSelectionSetting> {
                   label: _mapSubtagToLanguage('de'),
                 ),
               ],
-              initialValue:
-                  BlocProvider.of<ApplicationSettingsCubit>(context).state.preferredLocaleSubtag,
+              initialValue: BlocProvider.of<ApplicationSettingsCubit>(context)
+                  .state
+                  .preferredLocaleSubtag,
             ),
-          ).then((value) => BlocProvider.of<ApplicationSettingsCubit>(context).setLocale(value)),
+          ).then((value) => BlocProvider.of<ApplicationSettingsCubit>(context)
+              .setLocale(value)),
         );
       },
     );

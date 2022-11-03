@@ -46,12 +46,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
     super.initState();
     final documentsCubit = BlocProvider.of<DocumentsCubit>(context);
     if (!documentsCubit.state.isLoaded) {
-      documentsCubit.loadDocuments().onError<ErrorMessage>(
-            (error, stackTrace) => showSnackBar(
-              context,
-              translateError(context, error.code),
-            ),
-          );
+      documentsCubit.loadDocuments();
     }
     _pagingController.addPageRequestListener(_loadNewPage);
   }
@@ -64,8 +59,8 @@ class _DocumentsPageState extends State<DocumentsPage> {
 
   Future<void> _loadNewPage(int pageKey) async {
     final documentsCubit = BlocProvider.of<DocumentsCubit>(context);
-    final pageCount =
-        documentsCubit.state.inferPageCount(pageSize: documentsCubit.state.filter.pageSize);
+    final pageCount = documentsCubit.state
+        .inferPageCount(pageSize: documentsCubit.state.filter.pageSize);
     if (pageCount <= pageKey + 1) {
       _pagingController.nextPageKey = null;
     }
@@ -78,11 +73,8 @@ class _DocumentsPageState extends State<DocumentsPage> {
 
   Future<void> _onRefresh() {
     final documentsCubit = BlocProvider.of<DocumentsCubit>(context);
-    return documentsCubit
-        .updateFilter(filter: documentsCubit.state.filter.copyWith(page: 1))
-        .onError<ErrorMessage>((error, _) {
-      showSnackBar(context, translateError(context, error.code));
-    });
+    return documentsCubit.updateFilter(
+        filter: documentsCubit.state.filter.copyWith(page: 1));
   }
 
   @override
@@ -103,7 +95,8 @@ class _DocumentsPageState extends State<DocumentsPage> {
       },
       child: BlocConsumer<ConnectivityCubit, ConnectivityState>(
         listenWhen: (previous, current) =>
-            previous != ConnectivityState.connected && current == ConnectivityState.connected,
+            previous != ConnectivityState.connected &&
+            current == ConnectivityState.connected,
         listener: (context, state) {
           BlocProvider.of<DocumentsCubit>(context).loadDocuments();
         },
@@ -114,7 +107,6 @@ class _DocumentsPageState extends State<DocumentsPage> {
               child: const InfoDrawer(),
             ),
             resizeToAvoidBottomInset: true,
-            appBar: connectivityState == ConnectivityState.connected ? null : const OfflineBanner(),
             body: SlidingUpPanel(
               backdropEnabled: true,
               parallaxEnabled: true,
@@ -122,7 +114,8 @@ class _DocumentsPageState extends State<DocumentsPage> {
               controller: _panelController,
               defaultPanelState: PanelState.CLOSED,
               minHeight: 48,
-              maxHeight: MediaQuery.of(context).size.height - kBottomNavigationBarHeight,
+              maxHeight: MediaQuery.of(context).size.height -
+                  kBottomNavigationBarHeight,
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),
@@ -157,7 +150,8 @@ class _DocumentsPageState extends State<DocumentsPage> {
               state: state,
               onSelected: _onSelected,
               pagingController: _pagingController,
-              hasInternetConnection: connectivityState == ConnectivityState.connected,
+              hasInternetConnection:
+                  connectivityState == ConnectivityState.connected,
             );
             break;
           case ViewType.grid:
@@ -166,7 +160,8 @@ class _DocumentsPageState extends State<DocumentsPage> {
                 state: state,
                 onSelected: _onSelected,
                 pagingController: _pagingController,
-                hasInternetConnection: connectivityState == ConnectivityState.connected);
+                hasInternetConnection:
+                    connectivityState == ConnectivityState.connected);
             break;
         }
 
@@ -191,9 +186,12 @@ class _DocumentsPageState extends State<DocumentsPage> {
                     const SortDocumentsButton(),
                     IconButton(
                       icon: Icon(
-                        _viewType == ViewType.grid ? Icons.list : Icons.grid_view,
+                        _viewType == ViewType.grid
+                            ? Icons.list
+                            : Icons.grid_view,
                       ),
-                      onPressed: () => setState(() => _viewType = _viewType.toggle()),
+                      onPressed: () =>
+                          setState(() => _viewType = _viewType.toggle()),
                     ),
                   ],
                 ),

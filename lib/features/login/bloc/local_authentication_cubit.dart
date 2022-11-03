@@ -7,8 +7,8 @@ class LocalAuthenticationCubit extends Cubit<LocalAuthenticationState> {
   LocalAuthenticationCubit() : super(LocalAuthenticationState(false));
 
   Future<void> authorize(String localizedMessage) async {
-    final isAuthenticationSuccessful =
-        await getIt<LocalAuthentication>().authenticate(localizedReason: localizedMessage);
+    final isAuthenticationSuccessful = await getIt<LocalAuthentication>()
+        .authenticate(localizedReason: localizedMessage);
     if (isAuthenticationSuccessful) {
       emit(LocalAuthenticationState(true));
     } else {

@@ -7,11 +7,14 @@ const interceptedRoutes = ['thumb/'];
 @injectable
 class ResponseConversionInterceptor implements InterceptorContract {
   @override
-  Future<BaseRequest> interceptRequest({required BaseRequest request}) async => request;
+  Future<BaseRequest> interceptRequest({required BaseRequest request}) async =>
+      request;
 
   @override
-  Future<BaseResponse> interceptResponse({required BaseResponse response}) async {
-    final String requestUrl = response.request?.url.toString().split("?").first ?? '';
+  Future<BaseResponse> interceptResponse(
+      {required BaseResponse response}) async {
+    final String requestUrl =
+        response.request?.url.toString().split("?").first ?? '';
     if (response.request?.method == "GET" &&
         interceptedRoutes.any((element) => requestUrl.endsWith(element))) {
       final resp = response as Response;

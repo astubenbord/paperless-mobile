@@ -39,15 +39,18 @@ class SavedViewRepositoryImpl implements SavedViewsRepository {
     if (response.statusCode == 201) {
       return SavedView.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
     }
-    throw ErrorMessage(ErrorCode.createSavedViewError, httpStatusCode: response.statusCode);
+    throw ErrorMessage(ErrorCode.createSavedViewError,
+        httpStatusCode: response.statusCode);
   }
 
   @override
   Future<int> delete(SavedView view) async {
-    final response = await httpClient.delete(Uri.parse("/api/saved_views/${view.id}/"));
+    final response =
+        await httpClient.delete(Uri.parse("/api/saved_views/${view.id}/"));
     if (response.statusCode == 204) {
       return view.id!;
     }
-    throw ErrorMessage(ErrorCode.deleteSavedViewError, httpStatusCode: response.statusCode);
+    throw ErrorMessage(ErrorCode.deleteSavedViewError,
+        httpStatusCode: response.statusCode);
   }
 }

@@ -37,7 +37,8 @@ String? formatDateNullable(DateTime? date) {
 Future<String> writeToFile(Uint8List data) async {
   Directory tempDir = await getTemporaryDirectory();
   String tempPath = tempDir.path;
-  var filePath = tempPath + '/file_01.tmp'; // file_01.tmp is dump file, can be anything
+  var filePath =
+      tempPath + '/file_01.tmp'; // file_01.tmp is dump file, can be anything
   return (await File(filePath).writeAsBytes(data)).path;
 }
 

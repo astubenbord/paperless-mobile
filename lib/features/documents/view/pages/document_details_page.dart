@@ -32,9 +32,14 @@ import 'package:share_plus/share_plus.dart';
 
 class DocumentDetailsPage extends StatefulWidget {
   final int documentId;
+  final bool allowEdit;
+  final bool isLabelClickable;
+
   const DocumentDetailsPage({
     Key? key,
     required this.documentId,
+    this.allowEdit = true,
+    this.isLabelClickable = true,
   }) : super(key: key);
 
   @override
@@ -42,7 +47,8 @@ class DocumentDetailsPage extends StatefulWidget {
 }
 
 class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
-  static final DateFormat _detailedDateFormat = DateFormat("MMM d, yyyy HH:mm:ss");
+  static final DateFormat _detailedDateFormat =
+      DateFormat("MMM d, yyyy HH:mm:ss");
 
   bool _isDownloadPending = false;
   bool _isAssignAsnPending = false;
@@ -52,98 +58,112 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
     return BlocBuilder<DocumentsCubit, DocumentsState>(
       // buildWhen required because rebuild would happen after delete causing error.
       buildWhen: (previous, current) {
-        return current.documents.where((element) => element.id == widget.documentId).isNotEmpty;
+        return current.documents
+            .where((element) => element.id == widget.documentId)
+            .isNotEmpty;
       },
       builder: (context, state) {
-        final document = state.documents.where((doc) => doc.id == widget.documentId).first;
-        return SafeArea(
-          bottom: true,
-          child: DefaultTabController(
-            length: 3,
-            child: Scaffold(
-              floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-              floatingActionButton: FloatingActionButton(
-                child: const Icon(Icons.edit),
-                onPressed: () => _onEdit(document),
-              ),
-              bottomNavigationBar: BottomAppBar(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: () => _onDelete(document),
-                    ).padded(const EdgeInsets.symmetric(horizontal: 8.0)),
-                    IconButton(
-                      icon: const Icon(Icons.download),
-                      onPressed: Platform.isAndroid ? () => _onDownload(document) : null,
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.open_in_new),
-                      onPressed: () => _onOpen(document),
-                    ).padded(const EdgeInsets.symmetric(horizontal: 8.0)),
-                    IconButton(
-                      icon: const Icon(Icons.share),
-                      onPressed: () => _onShare(document),
-                    ),
-                  ],
-                ),
-              ),
-              body: NestedScrollView(
-                headerSliverBuilder: (context, innerBoxIsScrolled) => [
-                  SliverAppBar(
-                    leading: IconButton(
-                      icon: const Icon(
-                        Icons.arrow_back,
-                        color: Colors
-                            .black, //TODO: check if there is a way to dynamically determine color...
-                      ),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    floating: true,
-                    pinned: true,
-                    expandedHeight: 200.0,
-                    flexibleSpace: DocumentPreview(
-                      id: document.id,
-                      fit: BoxFit.cover,
-                    ),
-                    bottom: ColoredTabBar(
-                      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                      tabBar: TabBar(
-                        tabs: [
-                          Tab(
-                            child: Text(
-                              S.of(context).documentDetailsPageTabOverviewLabel,
-                              style: TextStyle(
-                                  color: Theme.of(context).colorScheme.onPrimaryContainer),
-                            ),
-                          ),
-                          Tab(
-                            child: Text(
-                              S.of(context).documentDetailsPageTabContentLabel,
-                              style: TextStyle(
-                                  color: Theme.of(context).colorScheme.onPrimaryContainer),
-                            ),
-                          ),
-                          Tab(
-                            child: Text(
-                              S.of(context).documentDetailsPageTabMetaDataLabel,
-                              style: TextStyle(
-                                  color: Theme.of(context).colorScheme.onPrimaryContainer),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+        final document =
+            state.documents.where((doc) => doc.id == widget.documentId).first;
+        return DefaultTabController(
+          length: 3,
+          child: Scaffold(
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.endDocked,
+            floatingActionButton: widget.allowEdit
+                ? FloatingActionButton(
+                    child: const Icon(Icons.edit),
+                    onPressed: () => _onEdit(document),
+                  )
+                : null,
+            bottomNavigationBar: BottomAppBar(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed:
+                        widget.allowEdit ? () => _onDelete(document) : null,
+                  ).padded(const EdgeInsets.symmetric(horizontal: 4)),
+                  IconButton(
+                    icon: const Icon(Icons.download),
+                    onPressed:
+                        Platform.isAndroid ? () => _onDownload(document) : null,
+                  ).padded(const EdgeInsets.only(right: 4)),
+                  IconButton(
+                    icon: const Icon(Icons.open_in_new),
+                    onPressed: () => _onOpen(document),
+                  ).padded(const EdgeInsets.only(right: 4)),
+                  IconButton(
+                    icon: const Icon(Icons.share),
+                    onPressed: () => _onShare(document),
                   ),
                 ],
-                body: TabBarView(
-                  children: [
-                    _buildDocumentOverview(document, state.filter.titleAndContentMatchString),
-                    _buildDocumentContentView(document, state.filter.titleAndContentMatchString),
-                    _buildDocumentMetaDataView(document),
-                  ].padded(),
+              ),
+            ),
+            body: NestedScrollView(
+              headerSliverBuilder: (context, innerBoxIsScrolled) => [
+                SliverAppBar(
+                  leading: IconButton(
+                    icon: const Icon(
+                      Icons.arrow_back,
+                      color: Colors
+                          .black, //TODO: check if there is a way to dynamically determine color...
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                  floating: true,
+                  pinned: true,
+                  expandedHeight: 200.0,
+                  flexibleSpace: DocumentPreview(
+                    id: document.id,
+                    fit: BoxFit.cover,
+                  ),
+                  bottom: ColoredTabBar(
+                    backgroundColor:
+                        Theme.of(context).colorScheme.primaryContainer,
+                    tabBar: TabBar(
+                      tabs: [
+                        Tab(
+                          child: Text(
+                            S.of(context).documentDetailsPageTabOverviewLabel,
+                            style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onPrimaryContainer),
+                          ),
+                        ),
+                        Tab(
+                          child: Text(
+                            S.of(context).documentDetailsPageTabContentLabel,
+                            style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onPrimaryContainer),
+                          ),
+                        ),
+                        Tab(
+                          child: Text(
+                            S.of(context).documentDetailsPageTabMetaDataLabel,
+                            style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onPrimaryContainer),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
+              ],
+              body: TabBarView(
+                children: [
+                  _buildDocumentOverview(
+                      document, state.filter.titleAndContentMatchString),
+                  _buildDocumentContentView(
+                      document, state.filter.titleAndContentMatchString),
+                  _buildDocumentMetaDataView(document),
+                ].padded(),
               ),
             ),
           ),
@@ -163,18 +183,25 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
         return ListView(
           children: [
             _DetailsItem.text(_detailedDateFormat.format(document.modified),
-                label: S.of(context).documentModifiedPropertyLabel, context: context),
+                label: S.of(context).documentModifiedPropertyLabel,
+                context: context),
             _separator(),
             _DetailsItem.text(_detailedDateFormat.format(document.added),
-                label: S.of(context).documentAddedPropertyLabel, context: context),
+                label: S.of(context).documentAddedPropertyLabel,
+                context: context),
             _separator(),
             _DetailsItem(
               label: S.of(context).documentArchiveSerialNumberPropertyLongLabel,
               content: document.archiveSerialNumber != null
                   ? Text(document.archiveSerialNumber.toString())
                   : OutlinedButton(
-                      child: Text(S.of(context).documentDetailsPageAssignAsnButtonLabel),
-                      onPressed: () => BlocProvider.of<DocumentsCubit>(context).assignAsn(document),
+                      child: Text(S
+                          .of(context)
+                          .documentDetailsPageAssignAsnButtonLabel),
+                      onPressed: widget.allowEdit
+                          ? () => BlocProvider.of<DocumentsCubit>(context)
+                              .assignAsn(document)
+                          : null,
                     ),
             ),
             _separator(),
@@ -191,7 +218,8 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
             ),
             _separator(),
             _DetailsItem.text(formatBytes(meta.originalSize, 2),
-                label: S.of(context).documentMetaDataOriginalFileSizeLabel, context: context),
+                label: S.of(context).documentMetaDataOriginalFileSizeLabel,
+                context: context),
             _separator(),
             _DetailsItem.text(
               meta.originalMimeType,
@@ -239,6 +267,7 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
         _separator(),
         _DetailsItem(
           content: DocumentTypeWidget(
+            isClickable: widget.isLabelClickable,
             documentTypeId: document.documentType,
             afterSelected: () {
               Navigator.pop(context);
@@ -250,6 +279,7 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
         _DetailsItem(
           label: S.of(context).documentCorrespondentPropertyLabel,
           content: CorrespondentWidget(
+            isClickable: widget.isLabelClickable,
             correspondentId: document.correspondent,
             afterSelected: () {
               Navigator.pop(context);
@@ -260,6 +290,7 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
         _DetailsItem(
           label: S.of(context).documentStoragePathPropertyLabel,
           content: StoragePathWidget(
+            isClickable: widget.isLabelClickable,
             pathId: document.storagePath,
             afterSelected: () {
               Navigator.pop(context);
@@ -272,6 +303,7 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
           content: Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: TagsWidget(
+              isClickable: widget.isLabelClickable,
               tagIds: document.tags,
             ),
           ),
@@ -321,13 +353,15 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
 
   Future<void> _onDownload(DocumentModel document) async {
     if (!Platform.isAndroid) {
-      showSnackBar(context, "This feature is currently only supported on Android!");
+      showSnackBar(
+          context, "This feature is currently only supported on Android!");
       return;
     }
     setState(() => _isDownloadPending = true);
     getIt<DocumentRepository>().download(document).then((bytes) async {
-      final Directory dir =
-          (await getExternalStorageDirectories(type: StorageDirectory.downloads))!.first;
+      final Directory dir = (await getExternalStorageDirectories(
+              type: StorageDirectory.downloads))!
+          .first;
       String filePath = "${dir.path}/${document.originalFileName}";
       //TODO: Add replacement mechanism here (ask user if file should be replaced if exists)
       await File(filePath).writeAsBytes(bytes);
@@ -340,7 +374,8 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
   /// Downloads file to temporary directory, from which it can then be shared.
   ///
   Future<void> _onShare(DocumentModel document) async {
-    Uint8List documentBytes = await getIt<DocumentRepository>().download(document);
+    Uint8List documentBytes =
+        await getIt<DocumentRepository>().download(document);
     final dir = await getTemporaryDirectory();
     final String path = "${dir.path}/${document.originalFileName}";
     await File(path).writeAsBytes(documentBytes);
@@ -359,14 +394,16 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
 
   Future<void> _onDelete(DocumentModel document) async {
     showDialog(
-        context: context,
-        builder: (context) => DeleteDocumentConfirmationDialog(document: document)).then((delete) {
+            context: context,
+            builder: (context) =>
+                DeleteDocumentConfirmationDialog(document: document))
+        .then((delete) {
       if (delete ?? false) {
-        BlocProvider.of<DocumentsCubit>(context).removeDocument(document).then((value) {
+        BlocProvider.of<DocumentsCubit>(context)
+            .removeDocument(document)
+            .then((value) {
           Navigator.pop(context);
           showSnackBar(context, S.of(context).documentDeleteSuccessMessage);
-        }).onError<ErrorMessage>((error, _) {
-          showSnackBar(context, translateError(context, error.code));
         });
       }
     });
@@ -384,14 +421,17 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
     if (bytes <= 0) return "0 B";
     const suffixes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
     var i = (log(bytes) / log(1024)).floor();
-    return ((bytes / pow(1024, i)).toStringAsFixed(decimals)) + ' ' + suffixes[i];
+    return ((bytes / pow(1024, i)).toStringAsFixed(decimals)) +
+        ' ' +
+        suffixes[i];
   }
 }
 
 class _DetailsItem extends StatelessWidget {
   final String label;
   final Widget content;
-  const _DetailsItem({Key? key, required this.label, required this.content}) : super(key: key);
+  const _DetailsItem({Key? key, required this.label, required this.content})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -402,7 +442,10 @@ class _DetailsItem extends StatelessWidget {
         children: [
           Text(
             label,
-            style: Theme.of(context).textTheme.headline5?.copyWith(fontWeight: FontWeight.bold),
+            style: Theme.of(context)
+                .textTheme
+                .headline5
+                ?.copyWith(fontWeight: FontWeight.bold),
           ),
           content,
         ],

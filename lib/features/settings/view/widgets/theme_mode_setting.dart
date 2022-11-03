@@ -14,30 +14,38 @@ class ThemeModeSetting extends StatelessWidget {
       builder: (context, settings) {
         return ListTile(
           title: Text(S.of(context).settingsPageAppearanceSettingTitle),
-          subtitle: Text(_mapThemeModeToLocalizedString(settings.preferredThemeMode, context)),
+          subtitle: Text(_mapThemeModeToLocalizedString(
+              settings.preferredThemeMode, context)),
           onTap: () => showDialog<ThemeMode>(
             context: context,
             builder: (_) => RadioSettingsDialog<ThemeMode>(
               options: [
                 RadioOption(
                   value: ThemeMode.system,
-                  label: S.of(context).settingsPageAppearanceSettingSystemThemeLabel,
+                  label: S
+                      .of(context)
+                      .settingsPageAppearanceSettingSystemThemeLabel,
                 ),
                 RadioOption(
                   value: ThemeMode.light,
-                  label: S.of(context).settingsPageAppearanceSettingLightThemeLabel,
+                  label: S
+                      .of(context)
+                      .settingsPageAppearanceSettingLightThemeLabel,
                 ),
                 RadioOption(
                   value: ThemeMode.dark,
-                  label: S.of(context).settingsPageAppearanceSettingDarkThemeLabel,
+                  label:
+                      S.of(context).settingsPageAppearanceSettingDarkThemeLabel,
                 )
               ],
-              initialValue:
-                  BlocProvider.of<ApplicationSettingsCubit>(context).state.preferredThemeMode,
+              initialValue: BlocProvider.of<ApplicationSettingsCubit>(context)
+                  .state
+                  .preferredThemeMode,
               title: Text(S.of(context).settingsPageAppearanceSettingTitle),
             ),
           ).then((value) {
-            return BlocProvider.of<ApplicationSettingsCubit>(context).setThemeMode(value);
+            return BlocProvider.of<ApplicationSettingsCubit>(context)
+                .setThemeMode(value);
           }),
         );
       },

@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
+import 'package:paperless_mobile/core/bloc/global_error_cubit.dart';
 import 'package:paperless_mobile/core/bloc/label_bloc_provider.dart';
 import 'package:paperless_mobile/core/global/http_self_signed_certificate_override.dart';
 import 'package:paperless_mobile/di_initializer.dart';
@@ -98,7 +99,8 @@ class _MyAppState extends State<MyApp> {
               Locale('en'), // Default if system locale is not available
               Locale('de'),
             ],
-            locale: Locale.fromSubtags(languageCode: settings.preferredLocaleSubtag),
+            locale: Locale.fromSubtags(
+                languageCode: settings.preferredLocaleSubtag),
             localizationsDelegates: const [
               S.delegate,
               FormBuilderLocalizations.delegate,
@@ -130,29 +132,37 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: BlocConsumer<AuthenticationCubit, AuthenticationState>(
-        listener: (context, authState) {
-          final bool showIntroSlider = authState.isAuthenticated && !authState.wasLoginStored;
-          if (showIntroSlider) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const ApplicationIntroSlideshow(),
-                fullscreenDialog: true,
-              ),
-            );
-          }
-        },
-        builder: (context, authentication) {
-          if (authentication.isAuthenticated) {
-            return const LabelBlocProvider(
-              child: HomePage(),
-            );
-          } else {
-            return const LoginPage();
-          }
-        },
+    return BlocProvider.value(
+      value: getIt<GlobalErrorCubit>(),
+      child: SafeArea(
+        top: true,
+        left: false,
+        right: false,
+        bottom: false,
+        child: BlocConsumer<AuthenticationCubit, AuthenticationState>(
+          listener: (context, authState) {
+            final bool showIntroSlider =
+                authState.isAuthenticated && !authState.wasLoginStored;
+            if (showIntroSlider) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ApplicationIntroSlideshow(),
+                  fullscreenDialog: true,
+                ),
+              );
+            }
+          },
+          builder: (context, authentication) {
+            if (authentication.isAuthenticated) {
+              return const LabelBlocProvider(
+                child: HomePage(),
+              );
+            } else {
+              return const LoginPage();
+            }
+          },
+        ),
       ),
     );
   }

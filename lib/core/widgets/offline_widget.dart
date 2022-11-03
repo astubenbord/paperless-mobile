@@ -11,7 +11,9 @@ class OfflineWidget extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.mood_bad, size: (Theme.of(context).iconTheme.size ?? 24) * 3),
+          Icon(Icons.wifi_off,
+              color: Theme.of(context).disabledColor,
+              size: (Theme.of(context).iconTheme.size ?? 24) * 3),
           Text(
             S.of(context).offlineWidgetText,
             textAlign: TextAlign.center,

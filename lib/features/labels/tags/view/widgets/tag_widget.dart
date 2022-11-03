@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
 import 'package:paperless_mobile/features/documents/model/query_parameters/tags_query.dart';
 import 'package:paperless_mobile/features/labels/tags/model/tag.model.dart';
+import 'package:paperless_mobile/util.dart';
 
 class TagWidget extends StatelessWidget {
   final Tag tag;
@@ -37,15 +39,17 @@ class TagWidget extends StatelessWidget {
   void _addTagToFilter(BuildContext context) {
     final cubit = BlocProvider.of<DocumentsCubit>(context);
     if (cubit.state.filter.tags.ids.contains(tag.id)) {
-      cubit.updateFilter(
-        filter: cubit.state.filter.copyWith(
-          tags: TagsQuery.fromIds(cubit.state.filter.tags.ids.where((id) => id != tag.id).toList()),
+      cubit.updateCurrentFilter(
+        (filter) => filter.copyWith(
+          tags: TagsQuery.fromIds(
+              cubit.state.filter.tags.ids.where((id) => id != tag.id).toList()),
         ),
       );
     } else {
-      cubit.updateFilter(
-        filter: cubit.state.filter
-            .copyWith(tags: TagsQuery.fromIds([...cubit.state.filter.tags.ids, tag.id!])),
+      cubit.updateCurrentFilter(
+        (filter) => filter.copyWith(
+          tags: TagsQuery.fromIds([...cubit.state.filter.tags.ids, tag.id!]),
+        ),
       );
     }
     if (afterTagTapped != null) {

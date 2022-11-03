@@ -7,7 +7,7 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/core/store/local_vault.dart';
-import 'package:paperless_mobile/core/type/json.dart';
+import 'package:paperless_mobile/core/type/types.dart';
 import 'package:paperless_mobile/core/util.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/extensions/dart_extensions.dart';
@@ -69,10 +69,10 @@ class DocumentRepositoryImpl implements DocumentRepository {
 
     fields.tryPutIfAbsent('title', () => title);
     fields.tryPutIfAbsent('created', () => formatDateNullable(createdAt));
-    fields.tryPutIfAbsent(
-        'correspondent', () => correspondent == null ? null : json.encode(correspondent));
-    fields.tryPutIfAbsent(
-        'document_type', () => documentType == null ? null : json.encode(documentType));
+    fields.tryPutIfAbsent('correspondent',
+        () => correspondent == null ? null : json.encode(correspondent));
+    fields.tryPutIfAbsent('document_type',
+        () => documentType == null ? null : json.encode(documentType));
 
     for (final key in fields.keys) {
       bodyBuffer.write(_buildMultipartField(key, fields[key]!, boundary));
@@ -90,7 +90,8 @@ class DocumentRepositoryImpl implements DocumentRepository {
     final closing = "\r\n--" + boundary + "--\r\n";
 
     // Set headers
-    request.headers.set(HttpHeaders.contentTypeHeader, "multipart/form-data; boundary=" + boundary);
+    request.headers.set(HttpHeaders.contentTypeHeader,
+        "multipart/form-data; boundary=" + boundary);
     request.headers.set(HttpHeaders.contentLengthHeader,
         "${bodyBuffer.length + closing.length + documentBytes.lengthInBytes}");
     request.headers.set(HttpHeaders.authorizationHeader, "Token ${auth.token}");
@@ -105,7 +106,8 @@ class DocumentRepositoryImpl implements DocumentRepository {
     final response = await request.close();
 
     if (response.statusCode != 200) {
-      throw ErrorMessage(ErrorCode.documentUploadFailed, httpStatusCode: response.statusCode);
+      throw ErrorMessage(ErrorCode.documentUploadFailed,
+          httpStatusCode: response.statusCode);
     }
   }
 
@@ -121,19 +123,23 @@ class DocumentRepositoryImpl implements DocumentRepository {
   String _boundaryString() {
     Random _random = Random();
     var prefix = 'dart-http-boundary-';
-    var list = List<int>.generate(70 - prefix.length,
-        (index) => boundaryCharacters[_random.nextInt(boundaryCharacters.length)],
+    var list = List<int>.generate(
+        70 - prefix.length,
+        (index) =>
+            boundaryCharacters[_random.nextInt(boundaryCharacters.length)],
         growable: false);
     return '$prefix${String.fromCharCodes(list)}';
   }
 
   @override
   Future<DocumentModel> update(DocumentModel doc) async {
-    final response = await httpClient.put(Uri.parse("/api/documents/${doc.id}/"),
+    final response = await httpClient.put(
+        Uri.parse("/api/documents/${doc.id}/"),
         body: json.encode(doc.toJson()),
         headers: {"Content-Type": "application/json"}).timeout(requestTimeout);
     if (response.statusCode == 200) {
-      return DocumentModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+      return DocumentModel.fromJson(
+          jsonDecode(utf8.decode(response.bodyBytes)));
     } else {
       throw const ErrorMessage(ErrorCode.documentUpdateFailed);
     }
@@ -158,7 +164,8 @@ class DocumentRepositoryImpl implements DocumentRepository {
 
   @override
   Future<int> delete(DocumentModel doc) async {
-    final response = await httpClient.delete(Uri.parse("/api/documents/${doc.id}/"));
+    final response =
+        await httpClient.delete(Uri.parse("/api/documents/${doc.id}/"));
 
     if (response.statusCode == 204) {
       return Future.value(doc.id);
@@ -221,13 +228,16 @@ class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<DocumentModel> waitForConsumptionFinished(String fileName, String title) async {
+  Future<DocumentModel> waitForConsumptionFinished(
+      String fileName, String title) async {
     // Always wait 5 seconds, processing usually takes longer...
     //await Future.delayed(const Duration(seconds: 5));
-    PagedSearchResult<DocumentModel> results = await find(DocumentFilter.latestDocument);
+    PagedSearchResult<DocumentModel> results =
+        await find(DocumentFilter.latestDocument);
 
     while ((results.results.isEmpty ||
-        (results.results[0].originalFileName != fileName && results.results[0].title != title))) {
+        (results.results[0].originalFileName != fileName &&
+            results.results[0].title != title))) {
       //TODO: maybe implement more intelligent retry logic or find workaround for websocket authentication...
       await Future.delayed(const Duration(seconds: 2));
       results = await find(DocumentFilter.latestDocument);
@@ -242,20 +252,23 @@ class DocumentRepositoryImpl implements DocumentRepository {
   @override
   Future<Uint8List> download(DocumentModel document) async {
     //TODO: Check if this works...
-    final response = await httpClient.get(Uri.parse("/api/documents/${document.id}/download/"));
+    final response = await httpClient
+        .get(Uri.parse("/api/documents/${document.id}/download/"));
     return response.bodyBytes;
   }
 
   @override
   Future<DocumentMetaData> getMetaData(DocumentModel document) async {
-    final response = await httpClient.get(Uri.parse("/api/documents/${document.id}/metadata/"));
-    return DocumentMetaData.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+    final response = await httpClient
+        .get(Uri.parse("/api/documents/${document.id}/metadata/"));
+    return DocumentMetaData.fromJson(
+        jsonDecode(utf8.decode(response.bodyBytes)));
   }
 
   @override
   Future<List<String>> autocomplete(String query, [int limit = 10]) async {
-    final response =
-        await httpClient.get(Uri.parse("/api/search/autocomplete/?query=$query&limit=$limit}"));
+    final response = await httpClient
+        .get(Uri.parse("/api/search/autocomplete/?query=$query&limit=$limit}"));
     if (response.statusCode == 200) {
       return jsonDecode(utf8.decode(response.bodyBytes)) as List<String>;
     }
@@ -264,8 +277,8 @@ class DocumentRepositoryImpl implements DocumentRepository {
 
   @override
   Future<List<SimilarDocumentModel>> findSimilar(int docId) async {
-    final response =
-        await httpClient.get(Uri.parse("/api/documents/?more_like=$docId&pageSize=10"));
+    final response = await httpClient
+        .get(Uri.parse("/api/documents/?more_like=$docId&pageSize=10"));
     if (response.statusCode == 200) {
       return PagedSearchResult<SimilarDocumentModel>.fromJson(
         jsonDecode(utf8.decode(response.bodyBytes)),

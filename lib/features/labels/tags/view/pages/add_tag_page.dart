@@ -24,6 +24,7 @@ class AddTagPage extends StatelessWidget {
             label: Text(S.of(context).tagColorPropertyLabel),
           ),
           colorPickerType: ColorPickerType.materialPicker,
+          initialValue: null,
         ),
         FormBuilderCheckbox(
           name: Tag.isInboxTagKey,

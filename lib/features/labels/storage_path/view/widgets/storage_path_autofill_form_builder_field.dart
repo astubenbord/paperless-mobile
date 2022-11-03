@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:paperless_mobile/features/labels/storage_path/model/storage_path.model.dart';
-import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:paperless_mobile/generated/l10n.dart';
 
 class StoragePathAutofillFormBuilderField extends StatefulWidget {
   final String name;
@@ -20,10 +18,10 @@ class StoragePathAutofillFormBuilderField extends StatefulWidget {
       _StoragePathAutofillFormBuilderFieldState();
 }
 
-class _StoragePathAutofillFormBuilderFieldState extends State<StoragePathAutofillFormBuilderField> {
+class _StoragePathAutofillFormBuilderFieldState
+    extends State<StoragePathAutofillFormBuilderField> {
   late final TextEditingController _textEditingController;
 
-  late String _exampleOutput;
   late bool _showClearIcon;
   @override
   void initState() {
@@ -35,7 +33,6 @@ class _StoragePathAutofillFormBuilderFieldState extends State<StoragePathAutofil
           _showClearIcon = _textEditingController.text.isNotEmpty;
         });
       });
-    _exampleOutput = _buildExampleOutput(widget.initialValue ?? '');
     _showClearIcon = widget.initialValue?.isNotEmpty ?? false;
   }
 
@@ -70,7 +67,8 @@ class _StoragePathAutofillFormBuilderFieldState extends State<StoragePathAutofil
             spacing: 8.0,
             children: [
               InputChip(
-                label: Text(S.of(context).documentArchiveSerialNumberPropertyLongLabel),
+                label: Text(
+                    S.of(context).documentArchiveSerialNumberPropertyLongLabel),
                 onPressed: () => _addParameterToInput("{asn}", field),
               ),
               InputChip(
@@ -138,22 +136,8 @@ class _StoragePathAutofillFormBuilderFieldState extends State<StoragePathAutofil
     final text = (field.value ?? "") + param;
     field.didChange(text);
     _textEditingController.text = text;
-  }
-
-  String _buildExampleOutput(String input) {
-    return input
-        .replaceAll("{asn}", "1234")
-        .replaceAll("{correspondent}", "My Bank")
-        .replaceAll("{document_type}", "Invoice")
-        .replaceAll("{tag_list}", "TODO,University,Work")
-        .replaceAll("{created}", "2020-02-10")
-        .replaceAll("{created_year}", "2020")
-        .replaceAll("{created_month}", "02")
-        .replaceAll("{created_day}", "10")
-        .replaceAll("{added}", "2029-12-24")
-        .replaceAll("{added_year}", "2029")
-        .replaceAll("{added_month}", "12")
-        .replaceAll("{added_day}", "24");
+    _textEditingController.selection = TextSelection.fromPosition(
+        TextPosition(offset: _textEditingController.text.length));
   }
 
   void _resetfield(FormFieldState<String> field) {

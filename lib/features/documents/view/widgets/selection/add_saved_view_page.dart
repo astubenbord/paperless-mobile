@@ -76,7 +76,8 @@ class _AddSavedViewPageState extends State<AddSavedViewPage> {
         SavedView.fromDocumentFilter(
           widget.currentFilter,
           name: _formKey.currentState?.value[fkName] as String,
-          showOnDashboard: _formKey.currentState?.value[fkShowOnDashboard] as bool,
+          showOnDashboard:
+              _formKey.currentState?.value[fkShowOnDashboard] as bool,
           showInSidebar: _formKey.currentState?.value[fkShowInSidebar] as bool,
         ),
       );

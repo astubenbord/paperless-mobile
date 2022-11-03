@@ -22,13 +22,19 @@ class AuthenticationInterceptor implements InterceptorContract {
     }
     return request.copyWith(
       //Append server Url
-      url: Uri.parse(authState.authentication!.serverUrl + request.url.toString()),
+      url: Uri.parse(
+          authState.authentication!.serverUrl + request.url.toString()),
       headers: authState.authentication!.token.isEmpty
           ? request.headers
-          : {...request.headers, 'Authorization': 'Token ${authState.authentication!.token}'},
+          : {
+              ...request.headers,
+              'Authorization': 'Token ${authState.authentication!.token}'
+            },
     );
   }
 
   @override
-  Future<BaseResponse> interceptResponse({required BaseResponse response}) async => response;
+  Future<BaseResponse> interceptResponse(
+          {required BaseResponse response}) async =>
+      response;
 }

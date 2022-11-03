@@ -15,10 +15,12 @@ class ObscuredInputTextFormField extends StatefulWidget {
   });
 
   @override
-  State<ObscuredInputTextFormField> createState() => _ObscuredInputTextFormFieldState();
+  State<ObscuredInputTextFormField> createState() =>
+      _ObscuredInputTextFormFieldState();
 }
 
-class _ObscuredInputTextFormFieldState extends State<ObscuredInputTextFormField> {
+class _ObscuredInputTextFormFieldState
+    extends State<ObscuredInputTextFormField> {
   bool _showPassword = false;
   final FocusNode _passwordFocusNode = FocusNode();
 

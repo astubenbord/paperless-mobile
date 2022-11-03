@@ -5,7 +5,10 @@ class BottomNavBar extends StatelessWidget {
   final int selectedIndex;
   final void Function(int) onNavigationChanged;
 
-  const BottomNavBar({Key? key, required this.selectedIndex, required this.onNavigationChanged})
+  const BottomNavBar(
+      {Key? key,
+      required this.selectedIndex,
+      required this.onNavigationChanged})
       : super(key: key);
 
   @override

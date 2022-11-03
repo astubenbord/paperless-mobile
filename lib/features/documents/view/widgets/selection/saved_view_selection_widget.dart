@@ -44,7 +44,8 @@ class SavedViewSelectionWidget extends StatelessWidget {
                     child: FilterChip(
                       label: Text(state.value.values.toList()[index].name),
                       selected: view.id == state.selectedSavedViewId,
-                      onSelected: (isSelected) => _onSelected(isSelected, context, view),
+                      onSelected: (isSelected) =>
+                          _onSelected(isSelected, context, view),
                     ),
                   );
                 },
@@ -76,21 +77,19 @@ class SavedViewSelectionWidget extends StatelessWidget {
   void _onCreatePressed(BuildContext context) async {
     final newView = await Navigator.of(context).push<SavedView?>(
       MaterialPageRoute(
-        builder: (context) => AddSavedViewPage(currentFilter: getIt<DocumentsCubit>().state.filter),
+        builder: (context) => AddSavedViewPage(
+            currentFilter: getIt<DocumentsCubit>().state.filter),
       ),
     );
     if (newView != null) {
-      try {
-        BlocProvider.of<SavedViewCubit>(context).add(newView);
-      } on ErrorMessage catch (error) {
-        showError(context, error);
-      }
+      BlocProvider.of<SavedViewCubit>(context).add(newView);
     }
   }
 
   void _onSelected(bool isSelected, BuildContext context, SavedView view) {
     if (isSelected) {
-      BlocProvider.of<DocumentsCubit>(context).updateFilter(filter: view.toDocumentFilter());
+      BlocProvider.of<DocumentsCubit>(context)
+          .updateFilter(filter: view.toDocumentFilter());
       BlocProvider.of<SavedViewCubit>(context).selectView(view);
     } else {
       BlocProvider.of<DocumentsCubit>(context).updateFilter();
@@ -106,11 +105,7 @@ class SavedViewSelectionWidget extends StatelessWidget {
           ) ??
           false;
       if (delete) {
-        try {
-          BlocProvider.of<SavedViewCubit>(context).remove(view);
-        } on ErrorMessage catch (error) {
-          showError(context, error);
-        }
+        BlocProvider.of<SavedViewCubit>(context).remove(view);
       }
     }
   }

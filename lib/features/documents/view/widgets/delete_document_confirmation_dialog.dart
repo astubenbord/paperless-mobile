@@ -26,7 +26,8 @@ class DeleteDocumentConfirmationDialog extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          Text(S.of(context).documentsPageSelectionBulkDeleteDialogContinueText),
+          Text(
+              S.of(context).documentsPageSelectionBulkDeleteDialogContinueText),
         ],
       ),
       actions: [
@@ -36,7 +37,8 @@ class DeleteDocumentConfirmationDialog extends StatelessWidget {
         ),
         TextButton(
           style: ButtonStyle(
-            foregroundColor: MaterialStateProperty.all(Theme.of(context).colorScheme.error),
+            foregroundColor:
+                MaterialStateProperty.all(Theme.of(context).colorScheme.error),
           ),
           onPressed: () {
             Navigator.pop(context, true);

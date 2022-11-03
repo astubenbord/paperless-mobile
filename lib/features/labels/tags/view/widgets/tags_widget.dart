@@ -8,12 +8,14 @@ class TagsWidget extends StatefulWidget {
   final List<int> tagIds;
   final bool isMultiLine;
   final void Function()? afterTagTapped;
+  final bool isClickable;
 
   const TagsWidget({
     Key? key,
     required this.tagIds,
     this.afterTagTapped,
     this.isMultiLine = true,
+    this.isClickable = true,
   }) : super(key: key);
 
   @override

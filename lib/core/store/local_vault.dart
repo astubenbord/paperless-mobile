@@ -34,11 +34,13 @@ class LocalVault {
   }
 
   Future<ClientCertificate?> loadCertificate() async {
-    return loadAuthenticationInformation().then((value) => value?.clientCertificate);
+    return loadAuthenticationInformation()
+        .then((value) => value?.clientCertificate);
   }
 
   Future<bool> storeApplicationSettings(ApplicationSettingsState settings) {
-    return sharedPreferences.setString(applicationSettingsKey, json.encode(settings.toJson()));
+    return sharedPreferences.setString(
+        applicationSettingsKey, json.encode(settings.toJson()));
   }
 
   Future<ApplicationSettingsState?> loadApplicationSettings() async {

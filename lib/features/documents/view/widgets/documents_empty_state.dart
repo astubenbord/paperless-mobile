@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:paperless_mobile/core/logic/error_code_localization_mapper.dart';
+import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/core/widgets/empty_state.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
@@ -7,6 +9,7 @@ import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
 import 'package:paperless_mobile/features/documents/bloc/saved_view_cubit.dart';
 import 'package:paperless_mobile/features/documents/model/document_filter.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
+import 'package:paperless_mobile/util.dart';
 
 class DocumentsEmptyState extends StatelessWidget {
   final DocumentsState state;

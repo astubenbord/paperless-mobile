@@ -28,7 +28,8 @@ class LabelRepositoryImpl implements LabelRepository {
 
   @override
   Future<Tag?> getTag(int id) async {
-    return getSingleResult("/api/tags/$id/", Tag.fromJson, ErrorCode.tagLoadFailed);
+    return getSingleResult(
+        "/api/tags/$id/", Tag.fromJson, ErrorCode.tagLoadFailed);
   }
 
   @override
@@ -39,7 +40,9 @@ class LabelRepositoryImpl implements LabelRepository {
       ErrorCode.tagLoadFailed,
       minRequiredApiVersion: 2,
     );
-    return results.where((element) => ids?.contains(element.id) ?? true).toList();
+    return results
+        .where((element) => ids?.contains(element.id) ?? true)
+        .toList();
   }
 
   @override
@@ -78,9 +81,11 @@ class LabelRepositoryImpl implements LabelRepository {
       encoding: Encoding.getByName("utf-8"),
     );
     if (response.statusCode == 201) {
-      return Correspondent.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+      return Correspondent.fromJson(
+          jsonDecode(utf8.decode(response.bodyBytes)));
     }
-    throw ErrorMessage(ErrorCode.correspondentCreateFailed, httpStatusCode: response.statusCode);
+    throw ErrorMessage(ErrorCode.correspondentCreateFailed,
+        httpStatusCode: response.statusCode);
   }
 
   @override
@@ -127,7 +132,8 @@ class LabelRepositoryImpl implements LabelRepository {
   @override
   Future<int> deleteCorrespondent(Correspondent correspondent) async {
     assert(correspondent.id != null);
-    final response = await httpClient.delete(Uri.parse('/api/correspondents/${correspondent.id}/'));
+    final response = await httpClient
+        .delete(Uri.parse('/api/correspondents/${correspondent.id}/'));
     if (response.statusCode == 204) {
       return correspondent.id!;
     }
@@ -137,7 +143,8 @@ class LabelRepositoryImpl implements LabelRepository {
   @override
   Future<int> deleteDocumentType(DocumentType documentType) async {
     assert(documentType.id != null);
-    final response = await httpClient.delete(Uri.parse('/api/document_types/${documentType.id}/'));
+    final response = await httpClient
+        .delete(Uri.parse('/api/document_types/${documentType.id}/'));
     if (response.statusCode == 204) {
       return documentType.id!;
     }
@@ -164,7 +171,8 @@ class LabelRepositoryImpl implements LabelRepository {
       encoding: Encoding.getByName("utf-8"),
     );
     if (response.statusCode == 200) {
-      return Correspondent.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+      return Correspondent.fromJson(
+          jsonDecode(utf8.decode(response.bodyBytes)));
     }
     throw const ErrorMessage(ErrorCode.unknown);
   }
@@ -205,7 +213,8 @@ class LabelRepositoryImpl implements LabelRepository {
   @override
   Future<int> deleteStoragePath(StoragePath path) async {
     assert(path.id != null);
-    final response = await httpClient.delete(Uri.parse('/api/storage_paths/${path.id}/'));
+    final response =
+        await httpClient.delete(Uri.parse('/api/storage_paths/${path.id}/'));
     if (response.statusCode == 204) {
       return path.id!;
     }
@@ -214,8 +223,8 @@ class LabelRepositoryImpl implements LabelRepository {
 
   @override
   Future<StoragePath?> getStoragePath(int id) {
-    return getSingleResult("/api/storage_paths/?page=1&page_size=100000", StoragePath.fromJson,
-        ErrorCode.storagePathLoadFailed);
+    return getSingleResult("/api/storage_paths/?page=1&page_size=100000",
+        StoragePath.fromJson, ErrorCode.storagePathLoadFailed);
   }
 
   @override
@@ -237,7 +246,8 @@ class LabelRepositoryImpl implements LabelRepository {
     if (response.statusCode == 201) {
       return StoragePath.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
     }
-    throw ErrorMessage(ErrorCode.storagePathCreateFailed, httpStatusCode: response.statusCode);
+    throw ErrorMessage(ErrorCode.storagePathCreateFailed,
+        httpStatusCode: response.statusCode);
   }
 
   @override

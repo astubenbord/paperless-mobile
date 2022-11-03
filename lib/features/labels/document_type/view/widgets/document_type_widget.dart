@@ -8,18 +8,18 @@ import 'package:paperless_mobile/features/labels/document_type/model/document_ty
 class DocumentTypeWidget extends StatelessWidget {
   final int? documentTypeId;
   final void Function()? afterSelected;
-  final bool isSelectable;
+  final bool isClickable;
   const DocumentTypeWidget({
     Key? key,
     required this.documentTypeId,
     this.afterSelected,
-    this.isSelectable = true,
+    this.isClickable = true,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return AbsorbPointer(
-      absorbing: !isSelectable,
+      absorbing: !isClickable,
       child: GestureDetector(
         onTap: () => _addDocumentTypeToFilter(context),
         child: BlocBuilder<DocumentTypeCubit, Map<int, DocumentType>>(
@@ -41,11 +41,13 @@ class DocumentTypeWidget extends StatelessWidget {
     final cubit = BlocProvider.of<DocumentsCubit>(context);
     if (cubit.state.filter.documentType.id == documentTypeId) {
       cubit.updateCurrentFilter(
-        (filter) => filter.copyWith(documentType: const DocumentTypeQuery.unset()),
+        (filter) =>
+            filter.copyWith(documentType: const DocumentTypeQuery.unset()),
       );
     } else {
       cubit.updateCurrentFilter(
-        (filter) => filter.copyWith(documentType: DocumentTypeQuery.fromId(documentTypeId)),
+        (filter) => filter.copyWith(
+            documentType: DocumentTypeQuery.fromId(documentTypeId)),
       );
     }
     afterSelected?.call();

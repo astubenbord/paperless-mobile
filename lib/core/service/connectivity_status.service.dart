@@ -17,12 +17,15 @@ class ConnectivityStatusServiceImpl implements ConnectivityStatusService {
 
   @override
   Stream<bool> connectivityChanges() {
-    return connectivity.onConnectivityChanged.map(_hasActiveInternetConnection).asBroadcastStream();
+    return connectivity.onConnectivityChanged
+        .map(_hasActiveInternetConnection)
+        .asBroadcastStream();
   }
 
   @override
   Future<bool> isConnectedToInternet() async {
-    return _hasActiveInternetConnection(await (Connectivity().checkConnectivity()));
+    return _hasActiveInternetConnection(
+        await (Connectivity().checkConnectivity()));
   }
 
   @override

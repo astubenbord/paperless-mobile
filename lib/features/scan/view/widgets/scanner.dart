@@ -25,7 +25,8 @@ class _ScannerWidgetState extends State<ScannerWidget> {
       appBar: AppBar(title: const Text("Scan document")),
       body: FutureBuilder<PermissionStatus>(
           future: Permission.camera.request(),
-          builder: (BuildContext context, AsyncSnapshot<PermissionStatus> snapshot) {
+          builder:
+              (BuildContext context, AsyncSnapshot<PermissionStatus> snapshot) {
             if (!snapshot.hasData) {
               return const Center(child: CircularProgressIndicator());
             }

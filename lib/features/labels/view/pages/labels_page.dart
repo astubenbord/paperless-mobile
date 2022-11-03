@@ -37,7 +37,8 @@ class LabelsPage extends StatefulWidget {
   State<LabelsPage> createState() => _LabelsPageState();
 }
 
-class _LabelsPageState extends State<LabelsPage> with SingleTickerProviderStateMixin {
+class _LabelsPageState extends State<LabelsPage>
+    with SingleTickerProviderStateMixin {
   late final TabController _tabController;
   int _currentIndex = 0;
 
@@ -54,100 +55,126 @@ class _LabelsPageState extends State<LabelsPage> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        drawer: const InfoDrawer(),
-        appBar: AppBar(
-          title: Text(
-            [
-              S.of(context).labelsPageCorrespondentsTitleText,
-              S.of(context).labelsPageDocumentTypesTitleText,
-              S.of(context).labelsPageTagsTitleText,
-              S.of(context).labelsPageStoragePathTitleText
-            ][_currentIndex],
+    return BlocProvider.value(
+      value: getIt<DocumentsCubit>(),
+      child: DefaultTabController(
+        length: 3,
+        child: Scaffold(
+          drawer: const InfoDrawer(),
+          appBar: AppBar(
+            title: Text(
+              [
+                S.of(context).labelsPageCorrespondentsTitleText,
+                S.of(context).labelsPageDocumentTypesTitleText,
+                S.of(context).labelsPageTagsTitleText,
+                S.of(context).labelsPageStoragePathTitleText
+              ][_currentIndex],
+            ),
+            actions: [
+              IconButton(
+                onPressed: _onAddPressed,
+                icon: const Icon(Icons.add),
+              )
+            ],
+            bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(kToolbarHeight),
+              child: ColoredBox(
+                color: Theme.of(context).bottomAppBarColor,
+                child: TabBar(
+                  indicatorColor: Theme.of(context).colorScheme.primary,
+                  controller: _tabController,
+                  tabs: [
+                    Tab(
+                      icon: Icon(
+                        Icons.person_outline,
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      ),
+                    ),
+                    Tab(
+                      icon: Icon(
+                        Icons.description_outlined,
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      ),
+                    ),
+                    Tab(
+                      icon: Icon(
+                        Icons.label_outline,
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      ),
+                    ),
+                    Tab(
+                      icon: Icon(
+                        Icons.folder_open,
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
           ),
-          actions: [
-            IconButton(
-              onPressed: _onAddPressed,
-              icon: const Icon(Icons.add),
-            )
-          ],
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(kToolbarHeight),
-            child: ColoredBox(
-              color: Theme.of(context).bottomAppBarColor,
-              child: TabBar(
-                indicatorColor: Theme.of(context).colorScheme.primary,
-                controller: _tabController,
-                tabs: [
-                  Tab(
-                    icon: Icon(
-                      Icons.person_outline,
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
-                    ),
-                  ),
-                  Tab(
-                    icon: Icon(
-                      Icons.description_outlined,
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
-                    ),
-                  ),
-                  Tab(
-                    icon: Icon(
-                      Icons.label_outline,
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
-                    ),
-                  ),
-                  Tab(
-                    icon: Icon(
-                      Icons.folder_open,
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
-                    ),
-                  )
-                ],
+          body: TabBarView(
+            controller: _tabController,
+            children: [
+              LabelTabView<Correspondent>(
+                cubit: BlocProvider.of<CorrespondentCubit>(context),
+                filterBuilder: (label) => DocumentFilter(
+                  correspondent: CorrespondentQuery.fromId(label.id),
+                  pageSize: label.documentCount ?? 0,
+                ),
+                onOpenEditPage: _openEditCorrespondentPage,
+                emptyStateActionButtonLabel:
+                    S.of(context).labelsPageCorrespondentEmptyStateAddNewLabel,
+                emptyStateDescription: S
+                    .of(context)
+                    .labelsPageCorrespondentEmptyStateDescriptionText,
+                onOpenAddNewPage: _onAddPressed,
               ),
-            ),
+              LabelTabView<DocumentType>(
+                cubit: BlocProvider.of<DocumentTypeCubit>(context),
+                filterBuilder: (label) => DocumentFilter(
+                  documentType: DocumentTypeQuery.fromId(label.id),
+                  pageSize: label.documentCount ?? 0,
+                ),
+                onOpenEditPage: _openEditDocumentTypePage,
+                emptyStateActionButtonLabel:
+                    S.of(context).labelsPageDocumentTypeEmptyStateAddNewLabel,
+                emptyStateDescription: S
+                    .of(context)
+                    .labelsPageDocumentTypeEmptyStateDescriptionText,
+                onOpenAddNewPage: _onAddPressed,
+              ),
+              LabelTabView<Tag>(
+                cubit: BlocProvider.of<TagCubit>(context),
+                filterBuilder: (label) => DocumentFilter(
+                  tags: TagsQuery.fromIds([label.id!]),
+                  pageSize: label.documentCount ?? 0,
+                ),
+                onOpenEditPage: _openEditTagPage,
+                leadingBuilder: (t) => CircleAvatar(backgroundColor: t.color),
+                emptyStateActionButtonLabel:
+                    S.of(context).labelsPageTagsEmptyStateAddNewLabel,
+                emptyStateDescription:
+                    S.of(context).labelsPageTagsEmptyStateDescriptionText,
+                onOpenAddNewPage: _onAddPressed,
+              ),
+              LabelTabView<StoragePath>(
+                cubit: BlocProvider.of<StoragePathCubit>(context),
+                onOpenEditPage: _openEditStoragePathPage,
+                filterBuilder: (label) => DocumentFilter(
+                  storagePath: StoragePathQuery.fromId(label.id),
+                  pageSize: label.documentCount ?? 0,
+                ),
+                contentBuilder: (path) => Text(path.path ?? ""),
+                emptyStateActionButtonLabel:
+                    S.of(context).labelsPageStoragePathEmptyStateAddNewLabel,
+                emptyStateDescription: S
+                    .of(context)
+                    .labelsPageStoragePathEmptyStateDescriptionText,
+                onOpenAddNewPage: _onAddPressed,
+              ),
+            ],
           ),
-        ),
-        body: TabBarView(
-          controller: _tabController,
-          children: [
-            LabelTabView<Correspondent>(
-              cubit: BlocProvider.of<CorrespondentCubit>(context),
-              filterBuilder: (label) => DocumentFilter(
-                correspondent: CorrespondentQuery.fromId(label.id),
-                pageSize: label.documentCount ?? 0,
-              ),
-              onOpenEditPage: _openEditCorrespondentPage,
-            ),
-            LabelTabView<DocumentType>(
-              cubit: BlocProvider.of<DocumentTypeCubit>(context),
-              filterBuilder: (label) => DocumentFilter(
-                documentType: DocumentTypeQuery.fromId(label.id),
-                pageSize: label.documentCount ?? 0,
-              ),
-              onOpenEditPage: _openEditDocumentTypePage,
-            ),
-            LabelTabView<Tag>(
-              cubit: BlocProvider.of<TagCubit>(context),
-              filterBuilder: (label) => DocumentFilter(
-                tags: TagsQuery.fromIds([label.id!]),
-                pageSize: label.documentCount ?? 0,
-              ),
-              onOpenEditPage: _openEditTagPage,
-              leadingBuilder: (t) => CircleAvatar(backgroundColor: t.color),
-            ),
-            LabelTabView<StoragePath>(
-              cubit: BlocProvider.of<StoragePathCubit>(context),
-              onOpenEditPage: _openEditStoragePathPage,
-              filterBuilder: (label) => DocumentFilter(
-                storagePath: StoragePathQuery.fromId(label.id),
-                pageSize: label.documentCount ?? 0,
-              ),
-              contentBuilder: (path) => Text(path.path ?? ""),
-            ),
-          ],
         ),
       ),
     );
@@ -160,7 +187,8 @@ class _LabelsPageState extends State<LabelsPage> with SingleTickerProviderStateM
         builder: (_) => MultiBlocProvider(
           providers: [
             BlocProvider.value(value: getIt<DocumentsCubit>()),
-            BlocProvider.value(value: BlocProvider.of<CorrespondentCubit>(context)),
+            BlocProvider.value(
+                value: BlocProvider.of<CorrespondentCubit>(context)),
           ],
           child: EditCorrespondentPage(correspondent: correspondent),
         ),
@@ -175,7 +203,8 @@ class _LabelsPageState extends State<LabelsPage> with SingleTickerProviderStateM
         builder: (_) => MultiBlocProvider(
           providers: [
             BlocProvider.value(value: getIt<DocumentsCubit>()),
-            BlocProvider.value(value: BlocProvider.of<DocumentTypeCubit>(context)),
+            BlocProvider.value(
+                value: BlocProvider.of<DocumentTypeCubit>(context)),
           ],
           child: EditDocumentTypePage(documentType: docType),
         ),
@@ -205,7 +234,8 @@ class _LabelsPageState extends State<LabelsPage> with SingleTickerProviderStateM
         builder: (_) => MultiBlocProvider(
           providers: [
             BlocProvider.value(value: getIt<DocumentsCubit>()),
-            BlocProvider.value(value: BlocProvider.of<StoragePathCubit>(context)),
+            BlocProvider.value(
+                value: BlocProvider.of<StoragePathCubit>(context)),
           ],
           child: EditStoragePathPage(storagePath: path),
         ),

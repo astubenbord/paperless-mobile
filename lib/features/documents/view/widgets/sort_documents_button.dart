@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:paperless_mobile/core/logic/error_code_localization_mapper.dart';
+import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
 import 'package:paperless_mobile/features/documents/model/query_parameters/sort_order.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:paperless_mobile/util.dart';
 
 class SortDocumentsButton extends StatefulWidget {
   const SortDocumentsButton({
@@ -30,16 +33,20 @@ class _SortDocumentsButtonState extends State<SortDocumentsButton> {
             ),
           );
         } else {
-          final bool isAscending = state.filter.sortOrder == SortOrder.ascending;
+          final bool isAscending =
+              state.filter.sortOrder == SortOrder.ascending;
           child = IconButton(
             icon: FaIcon(
-              isAscending ? FontAwesomeIcons.arrowDownAZ : FontAwesomeIcons.arrowUpZA,
+              isAscending
+                  ? FontAwesomeIcons.arrowDownAZ
+                  : FontAwesomeIcons.arrowUpZA,
             ),
             onPressed: () async {
               setState(() => _isLoading = true);
               BlocProvider.of<DocumentsCubit>(context)
                   .updateFilter(
-                      filter: state.filter.copyWith(sortOrder: state.filter.sortOrder.toggle()))
+                      filter: state.filter
+                          .copyWith(sortOrder: state.filter.sortOrder.toggle()))
                   .whenComplete(() => setState(() => _isLoading = false));
             },
           );

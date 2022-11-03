@@ -1,4 +1,4 @@
-import 'package:paperless_mobile/core/type/json.dart';
+import 'package:paperless_mobile/core/type/types.dart';
 import 'package:paperless_mobile/features/login/model/client_certificate.dart';
 
 class AuthenticationInformation {
@@ -59,8 +59,8 @@ class AuthenticationInformation {
       password: password ?? this.password,
       token: token ?? this.token,
       serverUrl: serverUrl ?? this.serverUrl,
-      clientCertificate:
-          clientCertificate ?? (removeClientCertificate ? null : this.clientCertificate),
+      clientCertificate: clientCertificate ??
+          (removeClientCertificate ? null : this.clientCertificate),
     );
   }
 }

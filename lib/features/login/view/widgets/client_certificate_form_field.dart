@@ -13,10 +13,12 @@ class ClientCertificateFormField extends StatefulWidget {
   const ClientCertificateFormField({Key? key}) : super(key: key);
 
   @override
-  State<ClientCertificateFormField> createState() => _ClientCertificateFormFieldState();
+  State<ClientCertificateFormField> createState() =>
+      _ClientCertificateFormFieldState();
 }
 
-class _ClientCertificateFormFieldState extends State<ClientCertificateFormField> {
+class _ClientCertificateFormFieldState
+    extends State<ClientCertificateFormField> {
   File? _selectedFile;
   @override
   Widget build(BuildContext context) {
@@ -28,14 +30,17 @@ class _ClientCertificateFormFieldState extends State<ClientCertificateFormField>
         }
         assert(_selectedFile != null);
         if (_selectedFile?.path.split(".").last != 'pfx') {
-          return S.of(context).loginPageClientCertificateSettingInvalidFileFormatValidationText;
+          return S
+              .of(context)
+              .loginPageClientCertificateSettingInvalidFileFormatValidationText;
         }
         return null;
       },
       builder: (field) {
         return ExpansionTile(
           title: Text(S.of(context).loginPageClientCertificateSettingLabel),
-          subtitle: Text(S.of(context).loginPageClientCertificateSettingDescriptionText),
+          subtitle: Text(
+              S.of(context).loginPageClientCertificateSettingDescriptionText),
           children: [
             InputDecorator(
               decoration: InputDecoration(
@@ -69,7 +74,9 @@ class _ClientCertificateFormFieldState extends State<ClientCertificateFormField>
                       onChanged: (value) => field.didChange(
                         field.value?.copyWith(passphrase: value),
                       ),
-                      label: S.of(context).loginPageClientCertificatePassphraseLabel,
+                      label: S
+                          .of(context)
+                          .loginPageClientCertificatePassphraseLabel,
                     ).padded(),
                   ] else
                     ...[]
@@ -90,8 +97,9 @@ class _ClientCertificateFormFieldState extends State<ClientCertificateFormField>
       setState(() {
         _selectedFile = file;
       });
-      final changedValue = field.value?.copyWith(bytes: file.readAsBytesSync()) ??
-          ClientCertificate(bytes: file.readAsBytesSync());
+      final changedValue =
+          field.value?.copyWith(bytes: file.readAsBytesSync()) ??
+              ClientCertificate(bytes: file.readAsBytesSync());
       field.didChange(changedValue);
     }
   }

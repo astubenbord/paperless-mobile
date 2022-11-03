@@ -20,7 +20,8 @@ class LinkedDocumentsPreview extends StatefulWidget {
 }
 
 class _LinkedDocumentsPreviewState extends State<LinkedDocumentsPreview> {
-  final PagingController<int, DocumentModel> _pagingController = PagingController(firstPageKey: 1);
+  final _pagingController =
+      PagingController<int, DocumentModel>(firstPageKey: 1);
 
   @override
   void initState() {
@@ -37,25 +38,43 @@ class _LinkedDocumentsPreviewState extends State<LinkedDocumentsPreview> {
       body: BlocBuilder<DocumentsCubit, DocumentsState>(
         builder: (context, state) {
           _pagingController.itemList = state.documents;
-          return CustomScrollView(
-            slivers: [
-              DocumentListView(
-                onTap: (doc) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (ctxt) => LabelBlocProvider(
-                        child: BlocProvider.value(
-                            value: BlocProvider.of<DocumentsCubit>(context),
-                            child: DocumentDetailsPage(documentId: doc.id)),
-                      ),
+          return Column(
+            children: [
+              Text(
+                S.of(context).referencedDocumentsReadOnlyHintText,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.caption,
+              ),
+              Expanded(
+                child: CustomScrollView(
+                  slivers: [
+                    DocumentListView(
+                      isLabelClickable: false,
+                      onTap: (doc) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (ctxt) => LabelBlocProvider(
+                              child: BlocProvider.value(
+                                value: BlocProvider.of<DocumentsCubit>(context),
+                                child: DocumentDetailsPage(
+                                  documentId: doc.id,
+                                  allowEdit: false,
+                                  isLabelClickable: false,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                      pagingController: _pagingController,
+                      state: state,
+                      onSelected: BlocProvider.of<DocumentsCubit>(context)
+                          .toggleDocumentSelection,
+                      hasInternetConnection: true,
                     ),
-                  );
-                },
-                pagingController: _pagingController,
-                state: state,
-                onSelected: BlocProvider.of<DocumentsCubit>(context).toggleDocumentSelection,
-                hasInternetConnection: true,
+                  ],
+                ),
               ),
             ],
           );

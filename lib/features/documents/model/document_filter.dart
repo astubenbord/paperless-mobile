@@ -70,19 +70,23 @@ class DocumentFilter with EquatableMixin {
 
     // Add/subtract one day in the following because paperless uses gt/lt not gte/lte
     if (addedDateAfter != null) {
-      sb.write("&added__date__gt=${dateFormat.format(addedDateAfter!.subtract(_oneDay))}");
+      sb.write(
+          "&added__date__gt=${dateFormat.format(addedDateAfter!.subtract(_oneDay))}");
     }
 
     if (addedDateBefore != null) {
-      sb.write("&added__date__lt=${dateFormat.format(addedDateBefore!.add(_oneDay))}");
+      sb.write(
+          "&added__date__lt=${dateFormat.format(addedDateBefore!.add(_oneDay))}");
     }
 
     if (createdDateAfter != null) {
-      sb.write("&created__date__gt=${dateFormat.format(createdDateAfter!.subtract(_oneDay))}");
+      sb.write(
+          "&created__date__gt=${dateFormat.format(createdDateAfter!.subtract(_oneDay))}");
     }
 
     if (createdDateBefore != null) {
-      sb.write("&created__date__lt=${dateFormat.format(createdDateBefore!.add(_oneDay))}");
+      sb.write(
+          "&created__date__lt=${dateFormat.format(createdDateBefore!.add(_oneDay))}");
     }
 
     return sb.toString();

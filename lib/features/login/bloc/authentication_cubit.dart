@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:paperless_mobile/core/bloc/global_error_cubit.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/core/store/local_vault.dart';
 import 'package:paperless_mobile/di_initializer.dart';
@@ -16,10 +17,14 @@ const authenticationKey = "authentication";
 @singleton
 class AuthenticationCubit extends Cubit<AuthenticationState> {
   final LocalVault localStore;
+  final GlobalErrorCubit errorCubit;
   final AuthenticationService authenticationService;
 
-  AuthenticationCubit(this.localStore, this.authenticationService)
-      : super(AuthenticationState.initial);
+  AuthenticationCubit(
+    this.localStore,
+    this.authenticationService,
+    this.errorCubit,
+  ) : super(AuthenticationState.initial);
 
   Future<void> initialize() {
     return restoreSessionState();
@@ -29,68 +34,90 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     required UserCredentials credentials,
     required String serverUrl,
     ClientCertificate? clientCertificate,
+    bool propagateEventOnError = true,
   }) async {
     assert(credentials.username != null && credentials.password != null);
     try {
       registerSecurityContext(clientCertificate);
-    } on TlsException catch (_) {
-      throw const ErrorMessage(ErrorCode.invalidClientCertificateConfiguration);
-    }
-    emit(
-      AuthenticationState(
-        isAuthenticated: false,
-        wasLoginStored: false,
-        authentication: AuthenticationInformation(
-          username: credentials.username!,
-          password: credentials.password!,
-          serverUrl: serverUrl,
-          token: "",
-          clientCertificate: clientCertificate,
+      emit(
+        AuthenticationState(
+          isAuthenticated: false,
+          wasLoginStored: false,
+          authentication: AuthenticationInformation(
+            username: credentials.username!,
+            password: credentials.password!,
+            serverUrl: serverUrl,
+            token: "",
+            clientCertificate: clientCertificate,
+          ),
         ),
-      ),
-    );
-    final token = await authenticationService.login(
-      username: credentials.username!,
-      password: credentials.password!,
-      serverUrl: serverUrl,
-    );
-    final auth = AuthenticationInformation(
-      username: credentials.username!,
-      password: credentials.password!,
-      token: token,
-      serverUrl: serverUrl,
-      clientCertificate: clientCertificate,
-    );
+      );
+      final token = await authenticationService.login(
+        username: credentials.username!,
+        password: credentials.password!,
+        serverUrl: serverUrl,
+      );
+      final auth = AuthenticationInformation(
+        username: credentials.username!,
+        password: credentials.password!,
+        token: token,
+        serverUrl: serverUrl,
+        clientCertificate: clientCertificate,
+      );
 
-    await localStore.storeAuthenticationInformation(auth);
+      await localStore.storeAuthenticationInformation(auth);
 
-    emit(AuthenticationState(
-      isAuthenticated: true,
-      wasLoginStored: false,
-      authentication: auth,
-    ));
+      emit(AuthenticationState(
+        isAuthenticated: true,
+        wasLoginStored: false,
+        authentication: auth,
+      ));
+    } on TlsException catch (_) {
+      const error =
+          ErrorMessage(ErrorCode.invalidClientCertificateConfiguration);
+      if (propagateEventOnError) {
+        errorCubit.add(error);
+      }
+      throw error;
+    } on ErrorMessage catch (error) {
+      if (propagateEventOnError) {
+        errorCubit.add(error);
+      }
+      rethrow;
+    }
   }
 
-  Future<void> restoreSessionState() async {
-    final storedAuth = await localStore.loadAuthenticationInformation();
-    final appSettings =
-        await localStore.loadApplicationSettings() ?? ApplicationSettingsState.defaultSettings;
+  Future<void> restoreSessionState({
+    bool propagateEventOnError = true,
+  }) async {
+    try {
+      final storedAuth = await localStore.loadAuthenticationInformation();
+      final appSettings = await localStore.loadApplicationSettings() ??
+          ApplicationSettingsState.defaultSettings;
 
-    if (storedAuth == null || !storedAuth.isValid) {
-      emit(AuthenticationState(isAuthenticated: false, wasLoginStored: false));
-    } else {
-      if (!appSettings.isLocalAuthenticationEnabled ||
-          await authenticationService.authenticateLocalUser("Authenticate to log back in")) {
-        registerSecurityContext(storedAuth.clientCertificate);
+      if (storedAuth == null || !storedAuth.isValid) {
         emit(
-          AuthenticationState(
-            isAuthenticated: true,
-            wasLoginStored: true,
-            authentication: storedAuth,
-          ),
-        );
+            AuthenticationState(isAuthenticated: false, wasLoginStored: false));
       } else {
-        emit(AuthenticationState(isAuthenticated: false, wasLoginStored: true));
+        if (!appSettings.isLocalAuthenticationEnabled ||
+            await authenticationService
+                .authenticateLocalUser("Authenticate to log back in")) {
+          registerSecurityContext(storedAuth.clientCertificate);
+          emit(
+            AuthenticationState(
+              isAuthenticated: true,
+              wasLoginStored: true,
+              authentication: storedAuth,
+            ),
+          );
+        } else {
+          emit(AuthenticationState(
+              isAuthenticated: false, wasLoginStored: true));
+        }
+      }
+    } on ErrorMessage catch (error) {
+      if (propagateEventOnError) {
+        errorCubit.add(error);
       }
     }
   }

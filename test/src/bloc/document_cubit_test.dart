@@ -1,4 +1,5 @@
 import 'package:bloc_test/bloc_test.dart';
+import 'package:paperless_mobile/core/bloc/global_error_cubit.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
 import 'package:paperless_mobile/features/documents/model/document.model.dart';
@@ -14,6 +15,7 @@ import 'package:mockito/mockito.dart';
 
 import '../../utils.dart';
 @GenerateNiceMocks([MockSpec<DocumentRepository>()])
+@GenerateNiceMocks([MockSpec<GlobalErrorCubit>()])
 import 'document_cubit_test.mocks.dart';
 
 void main() async {
@@ -34,9 +36,11 @@ void main() async {
   );
 
   final MockDocumentRepository documentRepository = MockDocumentRepository();
+  final MockGlobalErrorCubit globalErrorCubit = MockGlobalErrorCubit();
+
   group("Test DocumentsCubit reloadDocuments", () {
     test("Assert correct initial state", () {
-      expect(DocumentsCubit(documentRepository).state, DocumentsState.initial);
+      expect(DocumentsCubit(documentRepository, globalErrorCubit).state, DocumentsState.initial);
     });
 
     blocTest<DocumentsCubit, DocumentsState>(
@@ -49,7 +53,7 @@ void main() async {
           results: documents,
         ),
       ),
-      build: () => DocumentsCubit(documentRepository),
+      build: () => DocumentsCubit(documentRepository, globalErrorCubit),
       seed: () => DocumentsState.initial,
       act: (bloc) => bloc.loadDocuments(),
       expect: () => [
@@ -78,7 +82,7 @@ void main() async {
           results: documents,
         ),
       ),
-      build: () => DocumentsCubit(documentRepository),
+      build: () => DocumentsCubit(documentRepository, globalErrorCubit),
       seed: () => DocumentsState.initial,
       act: (bloc) => bloc.loadDocuments(),
       expect: () => [

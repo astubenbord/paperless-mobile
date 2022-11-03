@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/services.dart';
-import 'package:paperless_mobile/core/type/json.dart';
+import 'package:paperless_mobile/core/type/types.dart';
 
 Future<T> loadOne<T>(String filePath, T Function(JSON) transformFn, int? id) async {
   if (id != null) {

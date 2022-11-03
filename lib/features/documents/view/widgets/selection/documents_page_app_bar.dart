@@ -36,10 +36,11 @@ class _DocumentsPageAppBarState extends State<DocumentsPageAppBar> {
             expandedHeight: kToolbarHeight,
             leading: IconButton(
               icon: const Icon(Icons.close),
-              onPressed: () => BlocProvider.of<DocumentsCubit>(context).resetSelection(),
+              onPressed: () =>
+                  BlocProvider.of<DocumentsCubit>(context).resetSelection(),
             ),
-            title:
-                Text('${documentsState.selection.length} ${S.of(context).documentsSelectedText}'),
+            title: Text(
+                '${documentsState.selection.length} ${S.of(context).documentsSelectedText}'),
             actions: [
               IconButton(
                 icon: const Icon(Icons.delete),
@@ -79,9 +80,8 @@ class _DocumentsPageAppBarState extends State<DocumentsPageAppBar> {
     if (shouldDelete ?? false) {
       BlocProvider.of<DocumentsCubit>(context)
           .bulkRemoveDocuments(documentsState.selection)
-          .then((_) => showSnackBar(context, S.of(context).documentsPageBulkDeleteSuccessfulText))
-          .onError<ErrorMessage>(
-              (error, _) => showSnackBar(context, translateError(context, error.code)));
+          .then((_) => showSnackBar(
+              context, S.of(context).documentsPageBulkDeleteSuccessfulText));
     }
   }
 

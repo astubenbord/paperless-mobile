@@ -5,6 +5,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:paperless_mobile/core/bloc/label_cubit.dart';
 import 'package:paperless_mobile/core/logic/error_code_localization_mapper.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
+import 'package:paperless_mobile/core/type/types.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/labels/document_type/model/matching_algorithm.dart';
 import 'package:paperless_mobile/features/labels/model/label.model.dart';
@@ -34,7 +35,7 @@ class AddLabelPage<T extends Label> extends StatefulWidget {
 
 class _AddLabelPageState<T extends Label> extends State<AddLabelPage<T>> {
   final _formKey = GlobalKey<FormBuilderState>();
-  Map<String, String> _errors = {};
+  PaperlessValidationErrors _errors = {};
 
   @override
   Widget build(BuildContext context) {
@@ -103,11 +104,12 @@ class _AddLabelPageState<T extends Label> extends State<AddLabelPage<T>> {
   void _onSubmit() async {
     if (_formKey.currentState?.saveAndValidate() ?? false) {
       try {
-        final label = await widget.cubit.add(widget.fromJson(_formKey.currentState!.value));
+        final label = await widget.cubit
+            .add(widget.fromJson(_formKey.currentState!.value));
         Navigator.pop(context, label);
       } on ErrorMessage catch (e) {
         showSnackBar(context, translateError(context, e.code));
-      } on Map<String, String> catch (json) {
+      } on PaperlessValidationErrors catch (json) {
         setState(() => _errors = json);
       }
     }

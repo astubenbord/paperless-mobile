@@ -25,7 +25,8 @@ abstract class DocumentRepository {
   Future<List<int>> bulkDelete(List<DocumentModel> models);
   Future<Uint8List> getPreview(int docId);
   String getThumbnailUrl(int docId);
-  Future<DocumentModel> waitForConsumptionFinished(String filename, String title);
+  Future<DocumentModel> waitForConsumptionFinished(
+      String filename, String title);
   Future<Uint8List> download(DocumentModel document);
 
   Future<List<String>> autocomplete(String query, [int limit = 10]);

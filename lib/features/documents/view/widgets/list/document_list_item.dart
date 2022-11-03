@@ -5,12 +5,13 @@ import 'package:paperless_mobile/features/labels/correspondent/view/widgets/corr
 import 'package:paperless_mobile/features/labels/tags/view/widgets/tags_widget.dart';
 
 class DocumentListItem extends StatelessWidget {
-  static const a4AspectRatio = 1 / 1.4142;
+  static const _a4AspectRatio = 1 / 1.4142;
   final DocumentModel document;
-  final bool isSelected;
   final void Function(DocumentModel) onTap;
   final void Function(DocumentModel)? onSelected;
+  final bool isSelected;
   final bool isAtLeastOneSelected;
+  final bool isLabelClickable;
 
   const DocumentListItem({
     Key? key,
@@ -19,6 +20,7 @@ class DocumentListItem extends StatelessWidget {
     this.onSelected,
     required this.isSelected,
     required this.isAtLeastOneSelected,
+    this.isLabelClickable = true,
   }) : super(key: key);
 
   @override
@@ -39,6 +41,7 @@ class DocumentListItem extends StatelessWidget {
                 AbsorbPointer(
                   absorbing: isAtLeastOneSelected,
                   child: CorrespondentWidget(
+                    isClickable: isLabelClickable,
                     correspondentId: document.correspondent,
                     afterSelected: () {},
                   ),
@@ -57,6 +60,7 @@ class DocumentListItem extends StatelessWidget {
           child: AbsorbPointer(
             absorbing: isAtLeastOneSelected,
             child: TagsWidget(
+              isClickable: isLabelClickable,
               tagIds: document.tags,
               isMultiLine: false,
             ),
@@ -64,7 +68,7 @@ class DocumentListItem extends StatelessWidget {
         ),
         isThreeLine: document.tags.isNotEmpty,
         leading: AspectRatio(
-          aspectRatio: a4AspectRatio,
+          aspectRatio: _a4AspectRatio,
           child: GestureDetector(
             child: DocumentPreview(
               id: document.id,

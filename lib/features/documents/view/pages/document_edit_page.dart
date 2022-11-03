@@ -78,7 +78,8 @@ class _DocumentEditPageState extends State<DocumentEditPage> {
             });
             await getIt<DocumentsCubit>().updateDocument(updatedDocument);
             Navigator.pop(context);
-            showSnackBar(context, "Document successfully updated."); //TODO: INTL
+            showSnackBar(
+                context, "Document successfully updated."); //TODO: INTL
           }
         },
         icon: const Icon(Icons.save),
@@ -111,18 +112,21 @@ class _DocumentEditPageState extends State<DocumentEditPage> {
                 return LabelFormField<DocumentType, DocumentTypeQuery>(
                   notAssignedSelectable: false,
                   formBuilderState: _formKey.currentState,
-                  labelCreationWidgetBuilder: (currentInput) => BlocProvider.value(
+                  labelCreationWidgetBuilder: (currentInput) =>
+                      BlocProvider.value(
                     value: BlocProvider.of<DocumentTypeCubit>(context),
                     child: AddDocumentTypePage(
                       initialName: currentInput,
                     ),
                   ),
                   label: S.of(context).documentDocumentTypePropertyLabel,
-                  initialValue: DocumentTypeQuery.fromId(widget.document.documentType),
+                  initialValue:
+                      DocumentTypeQuery.fromId(widget.document.documentType),
                   state: state,
                   name: fkDocumentType,
                   queryParameterIdBuilder: DocumentTypeQuery.fromId,
-                  queryParameterNotAssignedBuilder: DocumentTypeQuery.notAssigned,
+                  queryParameterNotAssignedBuilder:
+                      DocumentTypeQuery.notAssigned,
                   prefixIcon: const Icon(Icons.description_outlined),
                 );
               },
@@ -132,16 +136,19 @@ class _DocumentEditPageState extends State<DocumentEditPage> {
                 return LabelFormField<Correspondent, CorrespondentQuery>(
                   notAssignedSelectable: false,
                   formBuilderState: _formKey.currentState,
-                  labelCreationWidgetBuilder: (initialValue) => BlocProvider.value(
+                  labelCreationWidgetBuilder: (initialValue) =>
+                      BlocProvider.value(
                     value: BlocProvider.of<CorrespondentCubit>(context),
                     child: AddCorrespondentPage(initalValue: initialValue),
                   ),
                   label: S.of(context).documentCorrespondentPropertyLabel,
                   state: state,
-                  initialValue: CorrespondentQuery.fromId(widget.document.correspondent),
+                  initialValue:
+                      CorrespondentQuery.fromId(widget.document.correspondent),
                   name: fkCorrespondent,
                   queryParameterIdBuilder: CorrespondentQuery.fromId,
-                  queryParameterNotAssignedBuilder: CorrespondentQuery.notAssigned,
+                  queryParameterNotAssignedBuilder:
+                      CorrespondentQuery.notAssigned,
                   prefixIcon: const Icon(Icons.person_outlined),
                 );
               },
@@ -151,16 +158,19 @@ class _DocumentEditPageState extends State<DocumentEditPage> {
                 return LabelFormField<StoragePath, StoragePathQuery>(
                   notAssignedSelectable: false,
                   formBuilderState: _formKey.currentState,
-                  labelCreationWidgetBuilder: (initialValue) => BlocProvider.value(
+                  labelCreationWidgetBuilder: (initialValue) =>
+                      BlocProvider.value(
                     value: BlocProvider.of<StoragePathCubit>(context),
                     child: AddStoragePathPage(initalValue: initialValue),
                   ),
                   label: S.of(context).documentStoragePathPropertyLabel,
                   state: state,
-                  initialValue: StoragePathQuery.fromId(widget.document.storagePath),
+                  initialValue:
+                      StoragePathQuery.fromId(widget.document.storagePath),
                   name: fkStoragePath,
                   queryParameterIdBuilder: StoragePathQuery.fromId,
-                  queryParameterNotAssignedBuilder: StoragePathQuery.notAssigned,
+                  queryParameterNotAssignedBuilder:
+                      StoragePathQuery.notAssigned,
                   prefixIcon: const Icon(Icons.folder_outlined),
                 );
               },

@@ -13,8 +13,8 @@ import 'package:injectable/injectable.dart';
 import 'package:web_socket_channel/io.dart';
 
 abstract class StatusService {
-  Future<void> startListeningBeforeDocumentUpload(
-      String httpUrl, AuthenticationInformation credentials, String documentFileName);
+  Future<void> startListeningBeforeDocumentUpload(String httpUrl,
+      AuthenticationInformation credentials, String documentFileName);
 }
 
 @Singleton(as: StatusService)
@@ -86,9 +86,11 @@ class LongPollingStatusService implements StatusService {
 
     do {
       final response = await httpClient.get(
-        Uri.parse('$httpUrl/api/documents/?query=$documentFileName added:${formatDate(today)}'),
+        Uri.parse(
+            '$httpUrl/api/documents/?query=$documentFileName added:${formatDate(today)}'),
       );
-      final data = PagedSearchResult.fromJson(jsonDecode(response.body), DocumentModel.fromJson);
+      final data = PagedSearchResult.fromJson(
+          jsonDecode(response.body), DocumentModel.fromJson);
       if (data.count > 0) {
         consumptionFinished = true;
         final docId = data.results[0].id;

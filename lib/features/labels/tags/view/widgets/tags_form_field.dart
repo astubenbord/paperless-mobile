@@ -72,7 +72,8 @@ class _TagFormFieldState extends State<TagFormField> {
                               ),
                             ),
                             selectedColor: tag.color,
-                            selected: field.value?.ids.contains(tag.id) ?? false,
+                            selected:
+                                field.value?.ids.contains(tag.id) ?? false,
                             onSelected: (isSelected) {
                               List<int> ids = [...field.value?.ids ?? []];
                               if (isSelected) {

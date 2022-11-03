@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:paperless_mobile/core/logic/error_code_localization_mapper.dart';
+import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
@@ -24,6 +26,7 @@ import 'package:paperless_mobile/features/labels/tags/view/widgets/tags_form_fie
 import 'package:paperless_mobile/features/labels/view/widgets/label_form_field.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:intl/intl.dart';
+import 'package:paperless_mobile/util.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 enum DateRangeSelection { before, after }
@@ -108,7 +111,8 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
                       alignment: Alignment.topRight,
                       child: TextButton.icon(
                         icon: const Icon(Icons.refresh),
-                        label: Text(S.of(context).documentsFilterPageResetFilterLabel),
+                        label: Text(
+                            S.of(context).documentsFilterPageResetFilterLabel),
                         onPressed: () => _resetFilter(context),
                       ),
                     ),
@@ -126,7 +130,8 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
                     ),
                     TextButton(
                       onPressed: _onApplyFilter,
-                      child: Text(S.of(context).documentsFilterPageApplyFilterLabel),
+                      child: Text(
+                          S.of(context).documentsFilterPageApplyFilterLabel),
                     ),
                   ],
                 ).padded(),
@@ -225,15 +230,17 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
   }
 
   Widget _buildQueryFormField(DocumentsState state) {
-    final queryType = _formKey.currentState?.getRawValue(QueryTypeFormField.fkQueryType) ??
-        QueryType.titleAndContent;
+    final queryType =
+        _formKey.currentState?.getRawValue(QueryTypeFormField.fkQueryType) ??
+            QueryType.titleAndContent;
     late String label;
     switch (queryType) {
       case QueryType.title:
         label = S.of(context).documentsFilterPageQueryOptionsTitleLabel;
         break;
       case QueryType.titleAndContent:
-        label = S.of(context).documentsFilterPageQueryOptionsTitleAndContentLabel;
+        label =
+            S.of(context).documentsFilterPageQueryOptionsTitleAndContentLabel;
         break;
       case QueryType.extended:
         label = S.of(context).documentsFilterPageQueryOptionsExtendedLabel;
@@ -255,7 +262,8 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
     ).padded();
   }
 
-  Widget _buildDateRangePickerHelper(DocumentsState state, String formFieldKey) {
+  Widget _buildDateRangePickerHelper(
+      DocumentsState state, String formFieldKey) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
@@ -279,10 +287,12 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
             ),
             onPressed: () {
               final now = DateTime.now();
-              final firstDayOfLastMonth = DateUtils.addMonthsToMonthDate(now, -1);
+              final firstDayOfLastMonth =
+                  DateUtils.addMonthsToMonthDate(now, -1);
               _formKey.currentState?.fields[formFieldKey]?.didChange(
                 DateTimeRange(
-                  start: DateTime(firstDayOfLastMonth.year, firstDayOfLastMonth.month, now.day),
+                  start: DateTime(firstDayOfLastMonth.year,
+                      firstDayOfLastMonth.month, now.day),
                   end: DateTime.now(),
                 ),
               );
@@ -294,7 +304,8 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
             ),
             onPressed: () {
               final now = DateTime.now();
-              final firstDayOfLastMonth = DateUtils.addMonthsToMonthDate(now, -3);
+              final firstDayOfLastMonth =
+                  DateUtils.addMonthsToMonthDate(now, -3);
               _formKey.currentState?.fields[formFieldKey]?.didChange(
                 DateTimeRange(
                   start: DateTime(
@@ -313,7 +324,8 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
             ),
             onPressed: () {
               final now = DateTime.now();
-              final firstDayOfLastMonth = DateUtils.addMonthsToMonthDate(now, -12);
+              final firstDayOfLastMonth =
+                  DateUtils.addMonthsToMonthDate(now, -12);
               _formKey.currentState?.fields[formFieldKey]?.didChange(
                 DateTimeRange(
                   start: DateTime(
@@ -345,7 +357,8 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
             data: Theme.of(context).copyWith(
               dialogBackgroundColor: Theme.of(context).scaffoldBackgroundColor,
               appBarTheme: Theme.of(context).appBarTheme.copyWith(
-                    iconTheme: IconThemeData(color: Theme.of(context).primaryColor),
+                    iconTheme:
+                        IconThemeData(color: Theme.of(context).primaryColor),
                   ),
               colorScheme: Theme.of(context).colorScheme.copyWith(
                     onPrimary: Theme.of(context).primaryColor,
@@ -355,8 +368,10 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
             child: child!,
           ),
           format: DateFormat.yMMMd(Localizations.localeOf(context).toString()),
-          fieldStartLabelText: S.of(context).documentsFilterPageDateRangeFieldStartLabel,
-          fieldEndLabelText: S.of(context).documentsFilterPageDateRangeFieldEndLabel,
+          fieldStartLabelText:
+              S.of(context).documentsFilterPageDateRangeFieldStartLabel,
+          fieldEndLabelText:
+              S.of(context).documentsFilterPageDateRangeFieldEndLabel,
           firstDate: DateTime.fromMicrosecondsSinceEpoch(0),
           lastDate: DateTime.now(),
           name: fkCreatedAt,
@@ -365,7 +380,8 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
             labelText: S.of(context).documentCreatedPropertyLabel,
             suffixIcon: IconButton(
               icon: const Icon(Icons.clear),
-              onPressed: () => _formKey.currentState?.fields[fkCreatedAt]?.didChange(null),
+              onPressed: () =>
+                  _formKey.currentState?.fields[fkCreatedAt]?.didChange(null),
             ),
           ),
         ),
@@ -388,7 +404,8 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
             data: Theme.of(context).copyWith(
               dialogBackgroundColor: Theme.of(context).scaffoldBackgroundColor,
               appBarTheme: Theme.of(context).appBarTheme.copyWith(
-                    iconTheme: IconThemeData(color: Theme.of(context).primaryColor),
+                    iconTheme:
+                        IconThemeData(color: Theme.of(context).primaryColor),
                   ),
               colorScheme: Theme.of(context).colorScheme.copyWith(
                     onPrimary: Theme.of(context).primaryColor,
@@ -398,8 +415,10 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
             child: child!,
           ),
           format: DateFormat.yMMMd(Localizations.localeOf(context).toString()),
-          fieldStartLabelText: S.of(context).documentsFilterPageDateRangeFieldStartLabel,
-          fieldEndLabelText: S.of(context).documentsFilterPageDateRangeFieldEndLabel,
+          fieldStartLabelText:
+              S.of(context).documentsFilterPageDateRangeFieldStartLabel,
+          fieldEndLabelText:
+              S.of(context).documentsFilterPageDateRangeFieldEndLabel,
           firstDate: DateTime.fromMicrosecondsSinceEpoch(0),
           lastDate: DateTime.now(),
           name: fkAddedAt,
@@ -408,7 +427,8 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
             labelText: S.of(context).documentAddedPropertyLabel,
             suffixIcon: IconButton(
               icon: const Icon(Icons.clear),
-              onPressed: () => _formKey.currentState?.fields[fkAddedAt]?.didChange(null),
+              onPressed: () =>
+                  _formKey.currentState?.fields[fkAddedAt]?.didChange(null),
             ),
           ),
         ),
@@ -444,16 +464,16 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
             separatorBuilder: (context, index) => const SizedBox(
               width: 8.0,
             ),
-            itemBuilder: (context, index) =>
-                _buildActionChip(_sortFields[index], state.filter.sortField, context),
+            itemBuilder: (context, index) => _buildActionChip(
+                _sortFields[index], state.filter.sortField, context),
           ),
         ),
       ],
     ).padded();
   }
 
-  Widget _buildActionChip(
-      SortField sortField, SortField? currentlySelectedOrder, BuildContext context) {
+  Widget _buildActionChip(SortField sortField,
+      SortField? currentlySelectedOrder, BuildContext context) {
     String text;
     switch (sortField) {
       case SortField.archiveSerialNumber:
@@ -488,8 +508,8 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
               color: Colors.green,
             )
           : null,
-      onPressed: () =>
-          docBloc.updateFilter(filter: docBloc.state.filter.copyWith(sortField: sortField)),
+      onPressed: () => docBloc.updateFilter(
+          filter: docBloc.state.filter.copyWith(sortField: sortField)),
     );
   }
 
@@ -510,7 +530,9 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
         addedDateAfter: (v[fkAddedAt] as DateTimeRange?)?.start,
         queryType: v[QueryTypeFormField.fkQueryType] as QueryType,
       );
-      BlocProvider.of<DocumentsCubit>(context).updateFilter(filter: newFilter).then((value) {
+      BlocProvider.of<DocumentsCubit>(context)
+          .updateFilter(filter: newFilter)
+          .then((value) {
         BlocProvider.of<SavedViewCubit>(context).resetSelection();
         FocusScope.of(context).unfocus();
         widget.panelController.close();

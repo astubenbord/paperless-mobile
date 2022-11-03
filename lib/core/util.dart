@@ -4,7 +4,7 @@ import 'dart:typed_data';
 
 import 'package:paperless_mobile/core/logic/timeout_client.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
-import 'package:paperless_mobile/core/type/json.dart';
+import 'package:paperless_mobile/core/type/types.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:http/http.dart';
 import 'package:path_provider/path_provider.dart';
@@ -45,7 +45,10 @@ Future<List<T>> getCollection<T>(
       if (body['count'] == 0) {
         return <T>[];
       } else {
-        return body['results'].cast<JSON>().map<T>((result) => fromJson(result)).toList();
+        return body['results']
+            .cast<JSON>()
+            .map<T>((result) => fromJson(result))
+            .toList();
       }
     }
   }

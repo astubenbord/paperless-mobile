@@ -4,7 +4,7 @@ import 'package:injectable/injectable.dart';
 
 @singleton
 class DocumentTypeCubit extends LabelCubit<DocumentType> {
-  DocumentTypeCubit(super.metaDataService);
+  DocumentTypeCubit(super.metaDataService, super.errorCubit);
 
   @override
   Future<void> initialize() async {
@@ -12,11 +12,14 @@ class DocumentTypeCubit extends LabelCubit<DocumentType> {
   }
 
   @override
-  Future<DocumentType> save(DocumentType item) => labelRepository.saveDocumentType(item);
+  Future<DocumentType> save(DocumentType item) =>
+      labelRepository.saveDocumentType(item);
 
   @override
-  Future<DocumentType> update(DocumentType item) => labelRepository.updateDocumentType(item);
+  Future<DocumentType> update(DocumentType item) =>
+      labelRepository.updateDocumentType(item);
 
   @override
-  Future<int> delete(DocumentType item) => labelRepository.deleteDocumentType(item);
+  Future<int> delete(DocumentType item) =>
+      labelRepository.deleteDocumentType(item);
 }

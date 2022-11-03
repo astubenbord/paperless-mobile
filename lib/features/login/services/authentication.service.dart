@@ -34,7 +34,9 @@ class AuthenticationService {
       final data = jsonDecode(utf8.decode(response.bodyBytes));
       return data['token'];
     } else if (response.statusCode == 400 &&
-        response.body.toLowerCase().contains("no required certificate was sent")) {
+        response.body
+            .toLowerCase()
+            .contains("no required certificate was sent")) {
       throw const ErrorMessage(ErrorCode.invalidClientCertificateConfiguration);
     } else {
       throw const ErrorMessage(ErrorCode.authenticationFailed);

@@ -16,14 +16,20 @@ class BiometricAuthenticationSetting extends StatelessWidget {
         return SwitchListTile(
           value: settings.isLocalAuthenticationEnabled,
           title: Text(S.of(context).appSettingsBiometricAuthenticationLabel),
-          subtitle: Text(S.of(context).appSettingsBiometricAuthenticationDescriptionText),
+          subtitle: Text(
+              S.of(context).appSettingsBiometricAuthenticationDescriptionText),
           onChanged: (val) async {
-            final settingsBloc = BlocProvider.of<ApplicationSettingsCubit>(context);
+            final settingsBloc =
+                BlocProvider.of<ApplicationSettingsCubit>(context);
             final String localizedReason = val
-                ? S.of(context).appSettingsEnableBiometricAuthenticationReasonText
-                : S.of(context).appSettingsDisableBiometricAuthenticationReasonText;
-            final changeValue =
-                await getIt<AuthenticationService>().authenticateLocalUser(localizedReason);
+                ? S
+                    .of(context)
+                    .appSettingsEnableBiometricAuthenticationReasonText
+                : S
+                    .of(context)
+                    .appSettingsDisableBiometricAuthenticationReasonText;
+            final changeValue = await getIt<AuthenticationService>()
+                .authenticateLocalUser(localizedReason);
             if (changeValue) {
               settingsBloc.setIsBiometricAuthenticationEnabled(val);
             }

@@ -14,12 +14,15 @@ class LanguageHeaderInterceptor implements InterceptorContract {
     if (appSettingsCubit.state.preferredLocaleSubtag == "en") {
       languages = "en";
     } else {
-      languages = appSettingsCubit.state.preferredLocaleSubtag + ",en;q=0.7,en-US;q=0.6";
+      languages = appSettingsCubit.state.preferredLocaleSubtag +
+          ",en;q=0.7,en-US;q=0.6";
     }
     request.headers.addAll({"Accept-Language": languages});
     return request;
   }
 
   @override
-  Future<BaseResponse> interceptResponse({required BaseResponse response}) async => response;
+  Future<BaseResponse> interceptResponse(
+          {required BaseResponse response}) async =>
+      response;
 }

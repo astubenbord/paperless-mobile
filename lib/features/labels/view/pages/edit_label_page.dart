@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:paperless_mobile/core/logic/error_code_localization_mapper.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
-import 'package:paperless_mobile/core/type/json.dart';
+import 'package:paperless_mobile/core/type/types.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/labels/document_type/model/matching_algorithm.dart';
 import 'package:paperless_mobile/features/labels/model/label.model.dart';
@@ -35,7 +35,7 @@ class EditLabelPage<T extends Label> extends StatefulWidget {
 class _EditLabelPageState<T extends Label> extends State<EditLabelPage<T>> {
   final _formKey = GlobalKey<FormBuilderState>();
 
-  Map<String, String> _errors = {};
+  PaperlessValidationErrors _errors = {};
 
   @override
   Widget build(BuildContext context) {
@@ -80,8 +80,8 @@ class _EditLabelPageState<T extends Label> extends State<EditLabelPage<T>> {
             ),
             FormBuilderDropdown<int?>(
               name: Label.matchingAlgorithmKey,
-              initialValue:
-                  widget.label.matchingAlgorithm?.value ?? MatchingAlgorithm.allWords.value,
+              initialValue: widget.label.matchingAlgorithm?.value ??
+                  MatchingAlgorithm.allWords.value,
               decoration: InputDecoration(
                 labelText: S.of(context).labelMatchingAlgorithmPropertyLabel,
                 errorText: _errors[Label.matchingAlgorithmKey],
@@ -111,12 +111,13 @@ class _EditLabelPageState<T extends Label> extends State<EditLabelPage<T>> {
   void _onSubmit() async {
     if (_formKey.currentState?.saveAndValidate() ?? false) {
       try {
-        final mergedJson = {...widget.label.toJson(), ..._formKey.currentState!.value};
+        final mergedJson = {
+          ...widget.label.toJson(),
+          ..._formKey.currentState!.value
+        };
         await widget.onSubmit(widget.fromJson(mergedJson));
         Navigator.pop(context);
-      } on ErrorMessage catch (e) {
-        showSnackBar(context, translateError(context, e.code));
-      } on Map<String, String> catch (errorMessages) {
+      } on PaperlessValidationErrors catch (errorMessages) {
         setState(() => _errors = errorMessages);
       }
     }

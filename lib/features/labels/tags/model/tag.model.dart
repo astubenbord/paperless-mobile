@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'dart:ui';
 
-import 'package:paperless_mobile/core/type/json.dart';
+import 'package:paperless_mobile/core/type/types.dart';
 import 'package:paperless_mobile/extensions/dart_extensions.dart';
 import 'package:paperless_mobile/features/labels/document_type/model/matching_algorithm.dart';
 import 'package:paperless_mobile/features/labels/model/label.model.dart';
@@ -85,7 +85,8 @@ String? _toHex(Color? color) {
   if (color == null) {
     return null;
   }
-  String val = '#${(color.value & 0xFFFFFF).toRadixString(16).padLeft(6, '0').toLowerCase()}';
+  String val =
+      '#${(color.value & 0xFFFFFF).toRadixString(16).padLeft(6, '0').toLowerCase()}';
   log("Color in Tag#_toHex is $val");
   return val;
 }

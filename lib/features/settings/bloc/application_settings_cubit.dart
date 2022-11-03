@@ -8,11 +8,12 @@ import 'package:injectable/injectable.dart';
 class ApplicationSettingsCubit extends Cubit<ApplicationSettingsState> {
   final LocalVault localVault;
 
-  ApplicationSettingsCubit(this.localVault) : super(ApplicationSettingsState.defaultSettings);
+  ApplicationSettingsCubit(this.localVault)
+      : super(ApplicationSettingsState.defaultSettings);
 
   Future<void> initialize() async {
-    final settings =
-        (await localVault.loadApplicationSettings()) ?? ApplicationSettingsState.defaultSettings;
+    final settings = (await localVault.loadApplicationSettings()) ??
+        ApplicationSettingsState.defaultSettings;
     emit(settings);
   }
 
@@ -22,7 +23,8 @@ class ApplicationSettingsCubit extends Cubit<ApplicationSettingsState> {
   }
 
   Future<void> setIsBiometricAuthenticationEnabled(bool isEnabled) async {
-    final updatedSettings = state.copyWith(isLocalAuthenticationEnabled: isEnabled);
+    final updatedSettings =
+        state.copyWith(isLocalAuthenticationEnabled: isEnabled);
     _updateSettings(updatedSettings);
   }
 

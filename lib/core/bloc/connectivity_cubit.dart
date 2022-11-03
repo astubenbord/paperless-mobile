@@ -9,13 +9,20 @@ class ConnectivityCubit extends Cubit<ConnectivityState> {
   final ConnectivityStatusService connectivityStatusService;
   late final StreamSubscription<bool> _sub;
 
-  ConnectivityCubit(this.connectivityStatusService) : super(ConnectivityState.undefined);
+  ConnectivityCubit(this.connectivityStatusService)
+      : super(ConnectivityState.undefined);
 
   Future<void> initialize() async {
-    final bool isConnected = await connectivityStatusService.isConnectedToInternet();
-    emit(isConnected ? ConnectivityState.connected : ConnectivityState.notConnected);
-    _sub = connectivityStatusService.connectivityChanges().listen((isConnected) {
-      emit(isConnected ? ConnectivityState.connected : ConnectivityState.notConnected);
+    final bool isConnected =
+        await connectivityStatusService.isConnectedToInternet();
+    emit(isConnected
+        ? ConnectivityState.connected
+        : ConnectivityState.notConnected);
+    _sub =
+        connectivityStatusService.connectivityChanges().listen((isConnected) {
+      emit(isConnected
+          ? ConnectivityState.connected
+          : ConnectivityState.notConnected);
     });
   }
 

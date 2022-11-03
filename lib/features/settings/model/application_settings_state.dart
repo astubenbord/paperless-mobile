@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:paperless_mobile/core/type/json.dart';
+import 'package:paperless_mobile/core/type/types.dart';
 
 ///
 /// State holding the current application settings such as selected language, theme mode and more.
@@ -38,10 +38,10 @@ class ApplicationSettingsState {
   }
 
   ApplicationSettingsState.fromJson(JSON json)
-      : isLocalAuthenticationEnabled =
-            json[isLocalAuthenticationEnabledKey] ?? defaultSettings.isLocalAuthenticationEnabled,
-        preferredLocaleSubtag =
-            json[preferredLocaleSubtagKey] ?? Platform.localeName.split("_").first,
+      : isLocalAuthenticationEnabled = json[isLocalAuthenticationEnabledKey] ??
+            defaultSettings.isLocalAuthenticationEnabled,
+        preferredLocaleSubtag = json[preferredLocaleSubtagKey] ??
+            Platform.localeName.split("_").first,
         preferredThemeMode = json[preferredThemeModeKey] != null
             ? ThemeMode.values[(json[preferredThemeModeKey])]
             : defaultSettings.preferredThemeMode;
@@ -54,7 +54,8 @@ class ApplicationSettingsState {
     return ApplicationSettingsState(
       isLocalAuthenticationEnabled:
           isLocalAuthenticationEnabled ?? this.isLocalAuthenticationEnabled,
-      preferredLocaleSubtag: preferredLocaleSubtag ?? this.preferredLocaleSubtag,
+      preferredLocaleSubtag:
+          preferredLocaleSubtag ?? this.preferredLocaleSubtag,
       preferredThemeMode: preferredThemeMode ?? this.preferredThemeMode,
     );
   }

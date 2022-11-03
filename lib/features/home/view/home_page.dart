@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
+import 'package:paperless_mobile/core/bloc/global_error_cubit.dart';
+import 'package:paperless_mobile/core/logic/error_code_localization_mapper.dart';
+import 'package:paperless_mobile/core/widgets/offline_banner.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/documents/bloc/saved_view_cubit.dart';
@@ -35,33 +38,46 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<ConnectivityCubit, ConnectivityState>(
-      //Only re-initialize data if the connectivity changed from not connected to connected
-      listenWhen: (previous, current) =>
-          previous != ConnectivityState.connected && current == ConnectivityState.connected,
+    return BlocListener<GlobalErrorCubit, GlobalErrorState>(
       listener: (context, state) {
-        initializeLabelData(context);
+        if (state.hasError) {
+          showSnackBar(context, translateError(context, state.error!.code));
+        }
       },
-      child: Scaffold(
-        key: rootScaffoldKey,
-        bottomNavigationBar: BottomNavBar(
-          selectedIndex: _currentIndex,
-          onNavigationChanged: (index) => setState(() => _currentIndex = index),
-        ),
-        drawer: const InfoDrawer(),
-        body: [
-          MultiBlocProvider(
-            providers: [
-              BlocProvider.value(value: getIt<DocumentsCubit>()),
-            ],
-            child: const DocumentsPage(),
-          ),
-          BlocProvider.value(
-            value: getIt<DocumentScannerCubit>(),
-            child: const ScannerPage(),
-          ),
-          const LabelsPage(),
-        ][_currentIndex],
+      child: BlocConsumer<ConnectivityCubit, ConnectivityState>(
+        //Only re-initialize data if the connectivity changed from not connected to connected
+        listenWhen: (previous, current) =>
+            current == ConnectivityState.connected,
+        listener: (context, state) {
+          initializeLabelData(context);
+        },
+        builder: (context, connectivityState) {
+          return Scaffold(
+            appBar: connectivityState == ConnectivityState.connected
+                ? null
+                : const OfflineBanner(),
+            key: rootScaffoldKey,
+            bottomNavigationBar: BottomNavBar(
+              selectedIndex: _currentIndex,
+              onNavigationChanged: (index) =>
+                  setState(() => _currentIndex = index),
+            ),
+            drawer: const InfoDrawer(),
+            body: [
+              MultiBlocProvider(
+                providers: [
+                  BlocProvider.value(value: getIt<DocumentsCubit>()),
+                ],
+                child: const DocumentsPage(),
+              ),
+              BlocProvider.value(
+                value: getIt<DocumentScannerCubit>(),
+                child: const ScannerPage(),
+              ),
+              const LabelsPage(),
+            ][_currentIndex],
+          );
+        },
       ),
     );
   }

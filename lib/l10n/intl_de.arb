@@ -168,5 +168,16 @@
   "errorMessageCreateSavedViewError": "Gespeicherte Ansicht konnte nicht erstellt werden, bitte versuche es erneut.",
   "errorMessageDeleteSavedViewError": "Gespeicherte Ansicht konnte nicht geklöscht werden, bitte versuche es erneut.",
   "errorMessageRequestTimedOut": "Bei der Anfrage an den Server kam es zu einer Zeitüberschreitung.",
-  "labelFormFieldNoItemsFoundText": "Keine Treffer gefunden!"
+  "labelFormFieldNoItemsFoundText": "Keine Treffer gefunden!",
+  "onboardingDoneButtonLabel": "Fertig",
+  "onboardingNextButtonLabel": "Weiter",
+  "labelsPageCorrespondentEmptyStateAddNewLabel": "Erstelle neuen Korrespondenten",
+  "labelsPageCorrespondentEmptyStateDescriptionText": "Es wurden noch keine Korrespondenten angelegt.",
+  "labelsPageDocumentTypeEmptyStateAddNewLabel": "Erstelle neuen Dokumenttypen",
+  "labelsPageDocumentTypeEmptyStateDescriptionText": "Es wurden noch keine Dokumenttypen angelegt.",
+  "labelsPageTagsEmptyStateAddNewLabel": "Erstelle neuen Tag",
+  "labelsPageTagsEmptyStateDescriptionText": "Es wurden noch keine Tags angelegt.",
+  "labelsPageStoragePathEmptyStateAddNewLabel": "Erstelle neuen Speicherpfad",
+  "labelsPageStoragePathEmptyStateDescriptionText": "Es wurden noch keine Speicherpfade angelegt.",
+  "referencedDocumentsReadOnlyHintText": "Dies ist eine schreibgeschützte Ansicht! Dokumente können nicht bearbeitet oder entfernt werden."
 }

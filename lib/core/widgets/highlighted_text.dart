@@ -71,8 +71,9 @@ class HighlightedText extends StatelessWidget {
     int _start = 0;
 
     String _text = caseSensitive ? text : text.toLowerCase();
-    List<String> _highlights =
-        caseSensitive ? highlights : highlights.map((e) => e.toLowerCase()).toList();
+    List<String> _highlights = caseSensitive
+        ? highlights
+        : highlights.map((e) => e.toLowerCase()).toList();
 
     while (true) {
       Map<int, String> _highlightsMap = {}; //key (index), value (highlight).
@@ -95,7 +96,8 @@ class HighlightedText extends StatelessWidget {
           _spans.add(_highlightSpan(_currentHighlight));
           _start += _currentHighlight.length;
         } else {
-          _spans.add(_normalSpan(text.substring(_start, _currentIndex), context));
+          _spans
+              .add(_normalSpan(text.substring(_start, _currentIndex), context));
           _spans.add(_highlightSpan(_currentHighlight));
           _start = _currentIndex + _currentHighlight.length;
         }

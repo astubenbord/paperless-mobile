@@ -51,8 +51,10 @@ class DocumentGridItem extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        CorrespondentWidget(correspondentId: document.correspondent),
-                        DocumentTypeWidget(documentTypeId: document.documentType),
+                        CorrespondentWidget(
+                            correspondentId: document.correspondent),
+                        DocumentTypeWidget(
+                            documentTypeId: document.documentType),
                         Text(
                           document.title,
                           maxLines: document.tags.isEmpty ? 3 : 2,
@@ -64,7 +66,8 @@ class DocumentGridItem extends StatelessWidget {
                           tagIds: document.tags,
                           isMultiLine: false,
                         ),
-                        Text(DateFormat.yMMMd(Intl.getCurrentLocale()).format(document.created)),
+                        Text(DateFormat.yMMMd(Intl.getCurrentLocale())
+                            .format(document.created)),
                       ],
                     ),
                   ),

@@ -5,9 +5,12 @@ import 'package:flutter/material.dart';
 
 class ElevatedConfirmationButton extends StatefulWidget {
   factory ElevatedConfirmationButton.icon(BuildContext context,
-      {required void Function() onPressed, required Icon icon, required Widget label}) {
+      {required void Function() onPressed,
+      required Icon icon,
+      required Widget label}) {
     final double scale = MediaQuery.maybeOf(context)?.textScaleFactor ?? 1;
-    final double gap = scale <= 1 ? 8 : lerpDouble(8, 4, math.min(scale - 1, 1))!;
+    final double gap =
+        scale <= 1 ? 8 : lerpDouble(8, 4, math.min(scale - 1, 1))!;
     return ElevatedConfirmationButton(
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -30,10 +33,12 @@ class ElevatedConfirmationButton extends StatefulWidget {
   final Widget child;
   final Widget confirmWidget;
   @override
-  State<ElevatedConfirmationButton> createState() => _ElevatedConfirmationButtonState();
+  State<ElevatedConfirmationButton> createState() =>
+      _ElevatedConfirmationButtonState();
 }
 
-class _ElevatedConfirmationButtonState extends State<ElevatedConfirmationButton> {
+class _ElevatedConfirmationButtonState
+    extends State<ElevatedConfirmationButton> {
   bool _clickedOnce = false;
   double? _originalWidth;
   final GlobalKey _originalWidgetKey = GlobalKey();
@@ -46,8 +51,10 @@ class _ElevatedConfirmationButtonState extends State<ElevatedConfirmationButton>
           backgroundColor: MaterialStateProperty.all(widget.color),
         ),
         onPressed: () {
-          _originalWidth =
-              (_originalWidgetKey.currentContext?.findRenderObject() as RenderBox).size.width;
+          _originalWidth = (_originalWidgetKey.currentContext
+                  ?.findRenderObject() as RenderBox)
+              .size
+              .width;
           setState(() => _clickedOnce = true);
         },
         child: widget.child,

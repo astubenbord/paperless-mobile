@@ -23,19 +23,16 @@ class EditCorrespondentPage extends StatelessWidget {
     );
   }
 
-  Future<void> _onDelete(Correspondent correspondent, BuildContext context) async {
-    try {
-      await BlocProvider.of<CorrespondentCubit>(context).remove(correspondent);
-      final cubit = BlocProvider.of<DocumentsCubit>(context);
-      if (cubit.state.filter.correspondent.id == correspondent.id) {
-        cubit.updateFilter(
-          filter: cubit.state.filter.copyWith(correspondent: const CorrespondentQuery.unset()),
-        );
-      }
-    } on ErrorMessage catch (e) {
-      showSnackBar(context, translateError(context, e.code));
-    } finally {
-      Navigator.pop(context);
+  Future<void> _onDelete(
+      Correspondent correspondent, BuildContext context) async {
+    await BlocProvider.of<CorrespondentCubit>(context).remove(correspondent);
+    final cubit = BlocProvider.of<DocumentsCubit>(context);
+    if (cubit.state.filter.correspondent.id == correspondent.id) {
+      cubit.updateFilter(
+        filter: cubit.state.filter
+            .copyWith(correspondent: const CorrespondentQuery.unset()),
+      );
     }
+    Navigator.pop(context);
   }
 }

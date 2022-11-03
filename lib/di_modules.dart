@@ -18,7 +18,8 @@ abstract class RegisterModule {
   @singleton
   LocalAuthentication get localAuthentication => LocalAuthentication();
   @singleton
-  EncryptedSharedPreferences get encryptedSharedPreferences => EncryptedSharedPreferences();
+  EncryptedSharedPreferences get encryptedSharedPreferences =>
+      EncryptedSharedPreferences();
   @singleton
   SecurityContext get securityContext => SecurityContext();
   @singleton
@@ -28,7 +29,8 @@ abstract class RegisterModule {
   /// Factory method creating an [HttpClient] with the currently registered [SecurityContext].
   ///
   HttpClient getHttpClient(SecurityContext securityContext) =>
-      HttpClient(context: securityContext)..connectionTimeout = const Duration(seconds: 10);
+      HttpClient(context: securityContext)
+        ..connectionTimeout = const Duration(seconds: 10);
 
   ///
   /// Factory method creating a [InterceptedClient] on top of the currently registered [HttpClient].
@@ -50,6 +52,6 @@ abstract class RegisterModule {
         client: IOClient(client),
       );
 
-  CacheManager getCacheManager(BaseClient client) =>
-      CacheManager(Config('cacheKey', fileService: HttpFileService(httpClient: client)));
+  CacheManager getCacheManager(BaseClient client) => CacheManager(
+      Config('cacheKey', fileService: HttpFileService(httpClient: client)));
 }

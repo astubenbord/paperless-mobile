@@ -45,11 +45,13 @@ class StoragePathWidget extends StatelessWidget {
     final cubit = BlocProvider.of<DocumentsCubit>(context);
     if (cubit.state.filter.correspondent.id == pathId) {
       cubit.updateCurrentFilter(
-        (filter) => filter.copyWith(storagePath: const StoragePathQuery.unset()),
+        (filter) =>
+            filter.copyWith(storagePath: const StoragePathQuery.unset()),
       );
     } else {
       cubit.updateCurrentFilter(
-        (filter) => filter.copyWith(storagePath: StoragePathQuery.fromId(pathId)),
+        (filter) =>
+            filter.copyWith(storagePath: StoragePathQuery.fromId(pathId)),
       );
     }
     afterSelected?.call();

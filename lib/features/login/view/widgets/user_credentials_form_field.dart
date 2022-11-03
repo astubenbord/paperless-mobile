@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/login/model/user_credentials.model.dart';
 import 'package:paperless_mobile/features/login/view/widgets/password_text_field.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
-import 'package:form_builder_validators/form_builder_validators.dart';
 
 class UserCredentialsFormField extends StatefulWidget {
   static const fkCredentials = 'credentials';
   const UserCredentialsFormField({Key? key}) : super(key: key);
 
   @override
-  State<UserCredentialsFormField> createState() => _UserCredentialsFormFieldState();
+  State<UserCredentialsFormField> createState() =>
+      _UserCredentialsFormFieldState();
 }
 
 class _UserCredentialsFormFieldState extends State<UserCredentialsFormField> {
@@ -28,7 +29,8 @@ class _UserCredentialsFormFieldState extends State<UserCredentialsFormField> {
               // USERNAME
               autocorrect: false,
               onChanged: (username) => field.didChange(
-                field.value?.copyWith(username: username) ?? UserCredentials(username: username),
+                field.value?.copyWith(username: username) ??
+                    UserCredentials(username: username),
               ),
               validator: FormBuilderValidators.required(
                 errorText: S.of(context).loginPageUsernameValidatorMessageText,
@@ -41,7 +43,8 @@ class _UserCredentialsFormFieldState extends State<UserCredentialsFormField> {
             ObscuredInputTextFormField(
               label: S.of(context).loginPagePasswordFieldLabel,
               onChanged: (password) => field.didChange(
-                field.value?.copyWith(password: password) ?? UserCredentials(password: password),
+                field.value?.copyWith(password: password) ??
+                    UserCredentials(password: password),
               ),
               validator: FormBuilderValidators.required(
                 errorText: S.of(context).loginPagePasswordValidatorMessageText,

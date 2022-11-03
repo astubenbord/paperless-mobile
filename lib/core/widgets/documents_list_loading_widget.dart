@@ -38,10 +38,13 @@ class DocumentsListLoadingWidget extends StatelessWidget {
                       titleLengths[r.nextInt(titleLengths.length - 1)];
                   return ListTile(
                     isThreeLine: true,
-                    leading: Container(
-                      color: Colors.white,
-                      height: 50,
-                      width: 50,
+                    leading: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Container(
+                        color: Colors.white,
+                        height: 50,
+                        width: 35,
+                      ),
                     ),
                     title: Container(
                       padding: const EdgeInsets.symmetric(vertical: 2.0),
@@ -65,7 +68,7 @@ class DocumentsListLoadingWidget extends StatelessWidget {
                             spacing: 2.0,
                             children: List.generate(
                               tagCount,
-                              (index) => Chip(
+                              (index) => InputChip(
                                 label: Text(tags[r.nextInt(tags.length)]),
                               ),
                             ),

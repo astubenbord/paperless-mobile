@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:paperless_mobile/core/type/json.dart';
+import 'package:paperless_mobile/core/type/types.dart';
 import 'package:paperless_mobile/features/documents/model/document_filter.dart';
 import 'package:paperless_mobile/features/documents/model/filter_rule.model.dart';
 import 'package:paperless_mobile/features/documents/model/query_parameters/sort_field.dart';
@@ -33,8 +33,14 @@ class SavedView with EquatableMixin {
   }
 
   @override
-  List<Object?> get props =>
-      [name, showOnDashboard, showInSidebar, sortField, sortReverse, filterRules];
+  List<Object?> get props => [
+        name,
+        showOnDashboard,
+        showInSidebar,
+        sortField,
+        sortReverse,
+        filterRules
+      ];
 
   SavedView.fromJson(JSON json)
       : this(
@@ -42,11 +48,14 @@ class SavedView with EquatableMixin {
           name: json['name'],
           showOnDashboard: json['show_on_dashboard'],
           showInSidebar: json['show_in_sidebar'],
-          sortField:
-              SortField.values.where((order) => order.queryString == json['sort_field']).first,
+          sortField: SortField.values
+              .where((order) => order.queryString == json['sort_field'])
+              .first,
           sortReverse: json['sort_reverse'],
-          filterRules:
-              json['filter_rules'].cast<JSON>().map<FilterRule>(FilterRule.fromJson).toList(),
+          filterRules: json['filter_rules']
+              .cast<JSON>()
+              .map<FilterRule>(FilterRule.fromJson)
+              .toList(),
         );
 
   DocumentFilter toDocumentFilter() {

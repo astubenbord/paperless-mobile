@@ -16,7 +16,8 @@ class BiometricAuthenticationIntroSlide extends StatefulWidget {
       _BiometricAuthenticationIntroSlideState();
 }
 
-class _BiometricAuthenticationIntroSlideState extends State<BiometricAuthenticationIntroSlide> {
+class _BiometricAuthenticationIntroSlideState
+    extends State<BiometricAuthenticationIntroSlide> {
   @override
   Widget build(BuildContext context) {
     //TODO: INTL
@@ -58,9 +59,12 @@ class _BiometricAuthenticationIntroSlideState extends State<BiometricAuthenticat
                   return ElevatedButton(
                     child: Text("Enable"),
                     onPressed: () {
-                      final settings = BlocProvider.of<ApplicationSettingsCubit>(context).state;
+                      final settings =
+                          BlocProvider.of<ApplicationSettingsCubit>(context)
+                              .state;
                       getIt<AuthenticationService>()
-                          .authenticateLocalUser("Please authenticate to secure Paperless Mobile")
+                          .authenticateLocalUser(
+                              "Please authenticate to secure Paperless Mobile")
                           .then((isEnabled) {
                         if (!isEnabled) {
                           showSnackBar(context,

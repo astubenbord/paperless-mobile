@@ -18,7 +18,8 @@ class _UploadDialogState extends State<UploadDialog> {
   void initState() {
     final DateFormat format = DateFormat("yyyy_MM_dd_hh_mm_ss");
     final today = format.format(DateTime.now());
-    _controller = TextEditingController.fromValue(TextEditingValue(text: "Scan_$today.pdf"));
+    _controller = TextEditingController.fromValue(
+        TextEditingValue(text: "Scan_$today.pdf"));
     super.initState();
   }
 

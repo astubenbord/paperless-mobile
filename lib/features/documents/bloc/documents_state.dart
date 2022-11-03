@@ -59,7 +59,8 @@ class DocumentsState extends Equatable {
   }
 
   List<DocumentModel> get documents {
-    return value.fold([], (previousValue, element) => [...previousValue, ...element.results]);
+    return value.fold(
+        [], (previousValue, element) => [...previousValue, ...element.results]);
   }
 
   DocumentsState copyWith({

@@ -23,14 +23,16 @@ class ScannerPage extends StatefulWidget {
   State<ScannerPage> createState() => _ScannerPageState();
 }
 
-class _ScannerPageState extends State<ScannerPage> with SingleTickerProviderStateMixin {
+class _ScannerPageState extends State<ScannerPage>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _fabPulsingController;
   late final Animation _animation;
   @override
   void initState() {
     super.initState();
-    _fabPulsingController = AnimationController(vsync: this, duration: const Duration(seconds: 1))
-      ..repeat(reverse: true);
+    _fabPulsingController =
+        AnimationController(vsync: this, duration: const Duration(seconds: 1))
+          ..repeat(reverse: true);
     _animation = Tween(begin: 1.0, end: 1.2).animate(_fabPulsingController)
       ..addListener(() {
         setState(() {});
@@ -113,7 +115,8 @@ class _ScannerPageState extends State<ScannerPage> with SingleTickerProviderStat
       final img = pw.MemoryImage(element.readAsBytesSync());
       doc.addPage(
         pw.Page(
-          pageFormat: PdfPageFormat(img.width!.toDouble(), img.height!.toDouble()),
+          pageFormat:
+              PdfPageFormat(img.width!.toDouble(), img.height!.toDouble()),
           build: (context) => pw.Image(img),
         ),
       );
@@ -164,7 +167,8 @@ class _ScannerPageState extends State<ScannerPage> with SingleTickerProviderStat
         itemBuilder: (context, index) {
           return GridImageItemWidget(
             file: scans[index],
-            onDelete: () => BlocProvider.of<DocumentScannerCubit>(context).removeScan(index),
+            onDelete: () => BlocProvider.of<DocumentScannerCubit>(context)
+                .removeScan(index),
             index: index,
             totalNumberOfFiles: scans.length,
           );

@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:paperless_mobile/core/type/json.dart';
+import 'package:paperless_mobile/core/type/types.dart';
 import 'package:paperless_mobile/features/documents/model/document.model.dart';
 
 const pageRegex = r".*page=(\d+).*";
@@ -45,7 +45,8 @@ class PagedSearchResult<T> extends Equatable {
     required this.results,
   });
 
-  factory PagedSearchResult.fromJson(Map<dynamic, dynamic> json, T Function(JSON) fromJson) {
+  factory PagedSearchResult.fromJson(
+      Map<dynamic, dynamic> json, T Function(JSON) fromJson) {
     return PagedSearchResult(
       count: json['count'],
       next: json['next'],

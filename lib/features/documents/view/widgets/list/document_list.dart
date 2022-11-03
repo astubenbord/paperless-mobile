@@ -7,12 +7,13 @@ import 'package:paperless_mobile/features/documents/view/widgets/list/document_l
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 class DocumentListView extends StatelessWidget {
-  final void Function(DocumentModel model) onTap;
+  final void Function(DocumentModel) onTap;
   final void Function(DocumentModel) onSelected;
+
   final PagingController<int, DocumentModel> pagingController;
   final DocumentsState state;
   final bool hasInternetConnection;
-
+  final bool isLabelClickable;
   const DocumentListView({
     super.key,
     required this.onTap,
@@ -20,24 +21,28 @@ class DocumentListView extends StatelessWidget {
     required this.state,
     required this.onSelected,
     required this.hasInternetConnection,
+    this.isLabelClickable = true,
   });
+
   @override
   Widget build(BuildContext context) {
     return PagedSliverList<int, DocumentModel>(
       pagingController: pagingController,
       builderDelegate: PagedChildBuilderDelegate(
         animateTransitions: true,
-        itemBuilder: (context, item, index) {
+        itemBuilder: (context, document, index) {
           return DocumentListItem(
-            document: item,
+            isLabelClickable: isLabelClickable,
+            document: document,
             onTap: onTap,
-            isSelected: state.selection.contains(item),
+            isSelected: state.selection.contains(document),
             onSelected: onSelected,
             isAtLeastOneSelected: state.selection.isNotEmpty,
           );
         },
-        noItemsFoundIndicatorBuilder: (context) =>
-            hasInternetConnection ? const DocumentsListLoadingWidget() : const OfflineWidget(),
+        noItemsFoundIndicatorBuilder: (context) => hasInternetConnection
+            ? const DocumentsListLoadingWidget()
+            : const OfflineWidget(),
       ),
     );
   }

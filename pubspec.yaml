@@ -68,11 +68,11 @@ dependencies:
   font_awesome_flutter: ^10.1.0
   badges: ^2.0.3
   local_auth: ^2.1.2
-  intro_slider: ^4.2.0
   connectivity_plus: ^2.3.9
 
   flutter_native_splash: ^2.2.11
   share_plus: ^6.2.0
+  introduction_screen: ^3.0.2
 
 dev_dependencies:
   integration_test:

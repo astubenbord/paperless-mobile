@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:paperless_mobile/core/bloc/global_error_cubit.dart';
 import 'package:paperless_mobile/core/bloc/label_bloc_provider.dart';
+import 'package:paperless_mobile/core/logic/error_code_localization_mapper.dart';
+import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/documents/model/document_filter.dart';
@@ -33,11 +36,11 @@ class LabelItem<T extends Label> extends StatelessWidget {
       subtitle: content,
       leading: leading,
       onTap: () => onOpenEditPage(label),
-      trailing: _buildDocumentCountWidget(context),
+      trailing: _buildReferencedDocumentsWidget(context),
     );
   }
 
-  Widget _buildDocumentCountWidget(BuildContext context) {
+  Widget _buildReferencedDocumentsWidget(BuildContext context) {
     return TextButton.icon(
       label: const Icon(Icons.link),
       icon: Text(_formatDocumentCount(label.documentCount)),
@@ -50,8 +53,10 @@ class LabelItem<T extends Label> extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (context) => LabelBlocProvider(
                     child: BlocProvider(
-                      create: (context) =>
-                          DocumentsCubit(getIt<DocumentRepository>())..updateFilter(filter: filter),
+                      create: (context) => DocumentsCubit(
+                          getIt<DocumentRepository>(),
+                          getIt<GlobalErrorCubit>())
+                        ..updateFilter(filter: filter),
                       child: LinkedDocumentsPreview(filter: filter),
                     ),
                   ),

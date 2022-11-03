@@ -29,7 +29,8 @@ class EditDocumentTypePage extends StatelessWidget {
       final cubit = BlocProvider.of<DocumentsCubit>(context);
       if (cubit.state.filter.documentType.id == docType.id) {
         cubit.updateFilter(
-          filter: cubit.state.filter.copyWith(documentType: const DocumentTypeQuery.unset()),
+          filter: cubit.state.filter
+              .copyWith(documentType: const DocumentTypeQuery.unset()),
         );
       }
     } on ErrorMessage catch (e) {

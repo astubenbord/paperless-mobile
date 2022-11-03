@@ -1,4 +1,4 @@
-import 'package:paperless_mobile/core/type/json.dart';
+import 'package:paperless_mobile/core/type/types.dart';
 import 'package:paperless_mobile/features/documents/model/document.model.dart';
 
 class SimilarDocumentModel extends DocumentModel {

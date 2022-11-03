@@ -1,11 +1,10 @@
-import 'package:paperless_mobile/core/bloc/label_cubit.dart';
-import 'package:paperless_mobile/features/labels/correspondent/model/correspondent.model.dart';
-import 'package:paperless_mobile/features/labels/storage_path/model/storage_path.model.dart';
 import 'package:injectable/injectable.dart';
+import 'package:paperless_mobile/core/bloc/label_cubit.dart';
+import 'package:paperless_mobile/features/labels/storage_path/model/storage_path.model.dart';
 
 @singleton
 class StoragePathCubit extends LabelCubit<StoragePath> {
-  StoragePathCubit(super.metaDataService);
+  StoragePathCubit(super.metaDataService, super.errorCubit);
 
   @override
   Future<void> initialize() async {
@@ -13,11 +12,14 @@ class StoragePathCubit extends LabelCubit<StoragePath> {
   }
 
   @override
-  Future<StoragePath> save(StoragePath item) => labelRepository.saveStoragePath(item);
+  Future<StoragePath> save(StoragePath item) =>
+      labelRepository.saveStoragePath(item);
 
   @override
-  Future<StoragePath> update(StoragePath item) => labelRepository.updateStoragePath(item);
+  Future<StoragePath> update(StoragePath item) =>
+      labelRepository.updateStoragePath(item);
 
   @override
-  Future<int> delete(StoragePath item) => labelRepository.deleteStoragePath(item);
+  Future<int> delete(StoragePath item) =>
+      labelRepository.deleteStoragePath(item);
 }

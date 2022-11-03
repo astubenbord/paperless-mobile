@@ -23,12 +23,14 @@ class _SettingsPageState extends State<SettingsPage> {
         children: [
           ListTile(
             title: Text(S.of(context).settingsPageApplicationSettingsLabel),
-            subtitle: Text(S.of(context).settingsPageApplicationSettingsDescriptionText),
+            subtitle: Text(
+                S.of(context).settingsPageApplicationSettingsDescriptionText),
             onTap: () => _goto(const ApplicationSettingsPage()),
           ),
           ListTile(
             title: Text(S.of(context).settingsPageSecuritySettingsLabel),
-            subtitle: Text(S.of(context).settingsPageSecuritySettingsDescriptionText),
+            subtitle:
+                Text(S.of(context).settingsPageSecuritySettingsDescriptionText),
             onTap: () => _goto(const SecuritySettingsPage()),
           ),
         ],
@@ -41,7 +43,8 @@ class _SettingsPageState extends State<SettingsPage> {
       context,
       MaterialPageRoute(
         builder: (ctxt) => BlocProvider.value(
-            value: BlocProvider.of<ApplicationSettingsCubit>(context), child: page),
+            value: BlocProvider.of<ApplicationSettingsCubit>(context),
+            child: page),
         maintainState: true,
       ),
     );

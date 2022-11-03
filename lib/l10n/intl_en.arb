@@ -169,5 +169,16 @@
   "errorMessageCreateSavedViewError": "Could not create saved view, please try again.",
   "errorMessageDeleteSavedViewError": "Could not delete saved view, please try again",
   "errorMessageRequestTimedOut": "The request to the server timed out.",
-  "labelFormFieldNoItemsFoundText": "No items found!"
+  "labelFormFieldNoItemsFoundText": "No items found!",
+  "onboardingDoneButtonLabel": "Done",
+  "onboardingNextButtonLabel": "Next",
+  "labelsPageCorrespondentEmptyStateAddNewLabel": "Add new correspondent",
+  "labelsPageCorrespondentEmptyStateDescriptionText": "You don't seem to have any correspondents set up.",
+  "labelsPageDocumentTypeEmptyStateAddNewLabel": "Add new document type",
+  "labelsPageDocumentTypeEmptyStateDescriptionText": "You don't seem to have any document types set up.",
+  "labelsPageTagsEmptyStateAddNewLabel": "Add new tag",
+  "labelsPageTagsEmptyStateDescriptionText": "You don't seem to have any tags set up.",
+  "labelsPageStoragePathEmptyStateAddNewLabel": "Add new storage path",
+  "labelsPageStoragePathEmptyStateDescriptionText": "You don't seem to have any storage paths set up.",
+  "referencedDocumentsReadOnlyHintText": "This is a read-only view! You cannot edit or remove documents."
 }
