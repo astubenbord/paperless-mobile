@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:introduction_screen/introduction_screen.dart';
+import 'package:paperless_mobile/core/global/asset_images.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/settings/bloc/application_settings_cubit.dart';
 import 'package:paperless_mobile/features/settings/view/widgets/biometric_authentication_setting.dart';
@@ -8,8 +9,18 @@ import 'package:paperless_mobile/features/settings/view/widgets/language_selecti
 import 'package:paperless_mobile/features/settings/view/widgets/theme_mode_setting.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 
-class ApplicationIntroSlideshow extends StatelessWidget {
+class ApplicationIntroSlideshow extends StatefulWidget {
   const ApplicationIntroSlideshow({super.key});
+
+  @override
+  State<ApplicationIntroSlideshow> createState() =>
+      _ApplicationIntroSlideshowState();
+}
+
+class _ApplicationIntroSlideshowState extends State<ApplicationIntroSlideshow> {
+  Image organizeImage = AssetImages.organizeDocuments.image;
+  Image secureImage = AssetImages.secureDocuments.image;
+  Image successImage = AssetImages.success.image;
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +37,8 @@ class ApplicationIntroSlideshow extends StatelessWidget {
           dotsDecorator: DotsDecorator(
             color: Theme.of(context).colorScheme.onBackground,
             activeColor: Theme.of(context).colorScheme.primary,
-            activeSize: Size(16.0, 8.0),
-            activeShape: RoundedRectangleBorder(
+            activeSize: const Size(16.0, 8.0),
+            activeShape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(25.0)),
             ),
           ),
@@ -39,7 +50,7 @@ class ApplicationIntroSlideshow extends StatelessWidget {
               ),
               image: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Image.asset("assets/images/organize_documents.png"),
+                child: organizeImage,
               ),
               bodyWidget: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -59,7 +70,7 @@ class ApplicationIntroSlideshow extends StatelessWidget {
               ),
               image: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Image.asset("assets/images/secure_documents.png"),
+                child: secureImage,
               ),
               bodyWidget: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -79,7 +90,7 @@ class ApplicationIntroSlideshow extends StatelessWidget {
               ),
               image: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Image.asset("assets/images/success.png"),
+                child: successImage,
               ),
               bodyWidget: Column(
                 children: const [

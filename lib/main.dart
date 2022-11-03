@@ -7,6 +7,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
 import 'package:paperless_mobile/core/bloc/global_error_cubit.dart';
 import 'package:paperless_mobile/core/bloc/label_bloc_provider.dart';
+import 'package:paperless_mobile/core/global/asset_images.dart';
 import 'package:paperless_mobile/core/global/http_self_signed_certificate_override.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/app_intro/application_intro_slideshow.dart';
@@ -125,9 +126,12 @@ class AuthenticationWrapper extends StatefulWidget {
 
 class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
   @override
-  void initState() {
+  void didChangeDependencies() {
     FlutterNativeSplash.remove();
-    super.initState();
+    for (var element in AssetImages.values) {
+      element.load(context);
+    }
+    super.didChangeDependencies();
   }
 
   @override
@@ -144,6 +148,9 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
             final bool showIntroSlider =
                 authState.isAuthenticated && !authState.wasLoginStored;
             if (showIntroSlider) {
+              for (final img in AssetImages.values) {
+                img.load(context);
+              }
               Navigator.push(
                 context,
                 MaterialPageRoute(
