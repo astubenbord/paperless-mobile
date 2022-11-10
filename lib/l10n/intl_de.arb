@@ -102,6 +102,9 @@
   "documentScannerPageTitle": "Scanner",
   "documentScannerPageResetButtonTooltipText": "Alle scans löschen",
   "documentScannerPageUploadButtonTooltip": "Dokument hochladen",
+  "documentScannerPageAddScanButtonLabel": "Scanne ein Dokument", 
+  "documentScannerPageOrText": "oder",
+  "documentScannerPageUploadFromThisDeviceButtonLabel": "Lade ein Dokument von diesem Gerät hoch",
   "addTagPageTitle": "Neuer Tag",
   "addCorrespondentPageTitle": "Neuer Korrespondent",
   "addDocumentTypePageTitle": "Neuer Dokumententyp",
@@ -182,4 +185,5 @@
   "referencedDocumentsReadOnlyHintText": "Dies ist eine schreibgeschützte Ansicht! Dokumente können nicht bearbeitet oder entfernt werden.",
   "editLabelPageConfirmDeletionDialogTitle": "Löschen bestätigen",
   "editLabelPageDeletionDialogText": "Dieser Kennzeichner wird von Dokumenten referenziert. Durch das Löschen dieses Kennzeichners werden alle Referenzen entfernt. Fortfahren?"
+
 }

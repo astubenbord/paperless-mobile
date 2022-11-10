@@ -29,10 +29,11 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 
 class DocumentUploadPage extends StatefulWidget {
-  final Uint8List pdfBytes;
+  final Uint8List fileBytes;
+
   const DocumentUploadPage({
     Key? key,
-    required this.pdfBytes,
+    required this.fileBytes,
   }) : super(key: key);
 
   @override
@@ -190,7 +191,7 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
           _isUploadLoading = true;
         });
         await BlocProvider.of<DocumentsCubit>(context).addDocument(
-          widget.pdfBytes,
+          widget.fileBytes,
           _formKey.currentState?.value[fkFileName],
           onConsumptionFinished: (document) {
             ScaffoldMessenger.of(rootScaffoldKey.currentContext!).showSnackBar(

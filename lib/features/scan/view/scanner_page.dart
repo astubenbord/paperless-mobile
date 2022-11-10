@@ -2,9 +2,13 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:edge_detection/edge_detection.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mime/mime.dart';
 import 'package:paperless_mobile/core/bloc/label_bloc_provider.dart';
+import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/home/view/widget/info_drawer.dart';
@@ -12,6 +16,7 @@ import 'package:paperless_mobile/features/scan/bloc/document_scanner_cubit.dart'
 import 'package:paperless_mobile/features/scan/view/document_upload_page.dart';
 import 'package:paperless_mobile/features/scan/view/widgets/grid_image_item_widget.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
+import 'package:paperless_mobile/util.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:permission_handler/permission_handler.dart';
@@ -25,6 +30,14 @@ class ScannerPage extends StatefulWidget {
 
 class _ScannerPageState extends State<ScannerPage>
     with SingleTickerProviderStateMixin {
+  static const _supportedExtensions = [
+    'pdf',
+    'png',
+    'tiff',
+    'gif',
+    'jpg',
+    'jpeg'
+  ];
   late final AnimationController _fabPulsingController;
   late final Animation _animation;
   @override
@@ -109,18 +122,8 @@ class _ScannerPageState extends State<ScannerPage>
   }
 
   void _export(BuildContext context) async {
-    final pw.Document doc = pw.Document();
-
-    for (var element in BlocProvider.of<DocumentScannerCubit>(context).state) {
-      final img = pw.MemoryImage(element.readAsBytesSync());
-      doc.addPage(
-        pw.Page(
-          pageFormat:
-              PdfPageFormat(img.width!.toDouble(), img.height!.toDouble()),
-          build: (context) => pw.Image(img),
-        ),
-      );
-    }
+    final doc = _buildDocumentFromImageFiles(
+        BlocProvider.of<DocumentScannerCubit>(context).state);
     final bytes = await doc.save();
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -128,7 +131,7 @@ class _ScannerPageState extends State<ScannerPage>
           value: getIt<DocumentsCubit>(),
           child: LabelBlocProvider(
             child: DocumentUploadPage(
-              pdfBytes: bytes,
+              fileBytes: bytes,
             ),
           ),
         ),
@@ -144,10 +147,27 @@ class _ScannerPageState extends State<ScannerPage>
         }
         return Center(
           child: Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Text(
-              S.of(context).documentScannerPageEmptyStateText,
-              textAlign: TextAlign.center,
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  S.of(context).documentScannerPageEmptyStateText,
+                  textAlign: TextAlign.center,
+                ),
+                TextButton(
+                  child:
+                      Text(S.of(context).documentScannerPageAddScanButtonLabel),
+                  onPressed: () => _openDocumentScanner(context),
+                ),
+                Text(S.of(context).documentScannerPageOrText),
+                TextButton(
+                  child: Text(S
+                      .of(context)
+                      .documentScannerPageUploadFromThisDeviceButtonLabel),
+                  onPressed: _onUploadFromFilesystem,
+                ),
+              ],
             ),
           ),
         );
@@ -184,5 +204,54 @@ class _ScannerPageState extends State<ScannerPage>
     if (!hasPermission) {
       Permission.camera.request();
     }
+  }
+
+  void _onUploadFromFilesystem() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: _supportedExtensions,
+      withData: true,
+    );
+    if (result?.files.single.path != null) {
+      File file = File(result!.files.single.path!);
+
+      final mimeType = lookupMimeType(file.path) ?? '';
+      late Uint8List fileBytes;
+      if (mimeType.startsWith('image')) {
+        fileBytes = await _buildDocumentFromImageFiles([file]).save();
+      } else {
+        // pdf
+        fileBytes = file.readAsBytesSync();
+      }
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => BlocProvider.value(
+            value: getIt<DocumentsCubit>(),
+            child: LabelBlocProvider(
+              child: DocumentUploadPage(
+                fileBytes: fileBytes,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+  }
+
+  pw.Document _buildDocumentFromImageFiles(List<File> files) {
+    final doc = pw.Document();
+    for (final file in files) {
+      final img = pw.MemoryImage(file.readAsBytesSync());
+      doc.addPage(
+        pw.Page(
+          pageFormat:
+              PdfPageFormat(img.width!.toDouble(), img.height!.toDouble()),
+          build: (context) => pw.Image(img),
+        ),
+      );
+    }
+    return doc;
   }
 }
