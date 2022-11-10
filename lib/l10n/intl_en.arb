@@ -76,7 +76,7 @@
   "errorMessageScanRemoveFailed": "An error occurred removing the scans.",
   "errorMessageInvalidClientCertificateConfiguration": "Invalid certificate or missing passphrase, please try again",
   "errorMessageDocumentLoadFailed": "Could not load documents, please try again.",
-  "documentsPageSelectionBulkDeleteDialogTitle": "Confirm Deletion",
+  "documentsPageSelectionBulkDeleteDialogTitle": "Confirm deletion",
   "documentsPageSelectionBulkDeleteDialogWarningTextOne": "Are you sure you want to delete the following document?",
   "documentsPageSelectionBulkDeleteDialogWarningTextMany": "Are you sure you want to delete the following documents?",
   "documentsPageSelectionBulkDeleteDialogContinueText": "This action is irreversible. Do you wish to proceed anyway?",
@@ -180,5 +180,7 @@
   "labelsPageTagsEmptyStateDescriptionText": "You don't seem to have any tags set up.",
   "labelsPageStoragePathEmptyStateAddNewLabel": "Add new storage path",
   "labelsPageStoragePathEmptyStateDescriptionText": "You don't seem to have any storage paths set up.",
-  "referencedDocumentsReadOnlyHintText": "This is a read-only view! You cannot edit or remove documents."
+  "referencedDocumentsReadOnlyHintText": "This is a read-only view! You cannot edit or remove documents.",
+  "editLabelPageConfirmDeletionDialogTitle": "Confirm deletion",
+  "editLabelPageDeletionDialogText": "This label contains references to other documents. By deleting this label, all references will be removed. Continue?"
 }

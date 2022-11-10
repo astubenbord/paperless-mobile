@@ -104,9 +104,9 @@ class _MyAppState extends State<MyApp> {
                 languageCode: settings.preferredLocaleSubtag),
             localizationsDelegates: const [
               S.delegate,
-              FormBuilderLocalizations.delegate,
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
+              FormBuilderLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
             ],
             home: const AuthenticationWrapper(),

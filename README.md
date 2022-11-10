@@ -69,13 +69,13 @@ To get a local copy up and running follow these simple steps.
 * Install the Flutter SDK (https://docs.flutter.dev/get-started/install)
 * Install an IDE of your choice (e.g. VSCode with the Dart/Flutter extensions)
 
-### Installation
+### Install dependencies and generate files
 
 1. Clone the repo
    ```sh
    git clone https://github.com/astubenbord/paperless-mobile.git
    ```
-2. Install the dependencies (should be done automatically by your IDE) and generate localization files
+2. Install the dependencies
    ```sh
    flutter pub get
    ```
@@ -83,6 +83,12 @@ To get a local copy up and running follow these simple steps.
    ```sh
    flutter packages pub run build_runner build --delete-conflicting-outputs
    ```
+4. Generate the localization files
+   ```sh
+   flutter pub run intl_utils:generate
+   ```
+
+  
 
 <!-- ROADMAP -->
 ## Roadmap

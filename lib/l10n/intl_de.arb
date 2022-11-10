@@ -179,5 +179,7 @@
   "labelsPageTagsEmptyStateDescriptionText": "Es wurden noch keine Tags angelegt.",
   "labelsPageStoragePathEmptyStateAddNewLabel": "Erstelle neuen Speicherpfad",
   "labelsPageStoragePathEmptyStateDescriptionText": "Es wurden noch keine Speicherpfade angelegt.",
-  "referencedDocumentsReadOnlyHintText": "Dies ist eine schreibgeschützte Ansicht! Dokumente können nicht bearbeitet oder entfernt werden."
+  "referencedDocumentsReadOnlyHintText": "Dies ist eine schreibgeschützte Ansicht! Dokumente können nicht bearbeitet oder entfernt werden.",
+  "editLabelPageConfirmDeletionDialogTitle": "Löschen bestätigen",
+  "editLabelPageDeletionDialogText": "Dieser Kennzeichner wird von Dokumenten referenziert. Durch das Löschen dieses Kennzeichners werden alle Referenzen entfernt. Fortfahren?"
 }

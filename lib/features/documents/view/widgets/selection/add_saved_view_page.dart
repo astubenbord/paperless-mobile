@@ -47,7 +47,7 @@ class _AddSavedViewPageState extends State<AddSavedViewPage> {
             children: [
               FormBuilderTextField(
                 name: fkName,
-                validator: FormBuilderValidators.required(), //TODO: INTL
+                validator: FormBuilderValidators.required(),
                 decoration: InputDecoration(
                   label: Text(S.of(context).savedViewNameLabel),
                 ),

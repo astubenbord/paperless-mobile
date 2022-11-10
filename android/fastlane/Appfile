@@ -1,0 +1,2 @@
+json_key_file("~\paperless-mobile-play-store-credentials.json")
+package_name("de.astubenbord.paperless_mobile")

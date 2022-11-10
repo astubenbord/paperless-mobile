@@ -2,15 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:paperless_mobile/core/logic/error_code_localization_mapper.dart';
-import 'package:paperless_mobile/core/model/error_message.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:paperless_mobile/core/type/types.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/labels/document_type/model/matching_algorithm.dart';
 import 'package:paperless_mobile/features/labels/model/label.model.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
-import 'package:paperless_mobile/util.dart';
-import 'package:form_builder_validators/form_builder_validators.dart';
 
 class EditLabelPage<T extends Label> extends StatefulWidget {
   final T label;
@@ -45,7 +42,7 @@ class _EditLabelPageState<T extends Label> extends State<EditLabelPage<T>> {
         title: Text(S.of(context).genericActionEditLabel),
         actions: [
           IconButton(
-            onPressed: () => widget.onDelete(widget.label),
+            onPressed: _onDelete,
             icon: const Icon(Icons.delete),
           ),
         ],
@@ -106,6 +103,34 @@ class _EditLabelPageState<T extends Label> extends State<EditLabelPage<T>> {
         ),
       ),
     );
+  }
+
+  void _onDelete() {
+    if ((widget.label.documentCount ?? 0) > 0) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(S.of(context).editLabelPageConfirmDeletionDialogTitle),
+          content: Text(
+            S.of(context).editLabelPageDeletionDialogText,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(S.of(context).genericActionCancelLabel),
+            ),
+            TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  widget.onDelete(widget.label);
+                },
+                child: Text(S.of(context).genericActionDeleteLabel)),
+          ],
+        ),
+      );
+    } else {
+      widget.onDelete(widget.label);
+    }
   }
 
   void _onSubmit() async {
