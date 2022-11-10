@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:paperless_mobile/core/bloc/label_cubit.dart';
 import 'package:paperless_mobile/features/labels/document_type/model/document_type.model.dart';
 import 'package:injectable/injectable.dart';
@@ -8,7 +9,7 @@ class DocumentTypeCubit extends LabelCubit<DocumentType> {
 
   @override
   Future<void> initialize() async {
-    return labelRepository.getDocumentTypes().then(loadFrom);
+    labelRepository.getDocumentTypes().then(loadFrom);
   }
 
   @override

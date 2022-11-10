@@ -7,7 +7,6 @@ import 'package:paperless_mobile/core/widgets/offline_banner.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/documents/bloc/saved_view_cubit.dart';
-import 'package:paperless_mobile/features/documents/model/saved_view.model.dart';
 import 'package:paperless_mobile/features/documents/view/pages/documents_page.dart';
 import 'package:paperless_mobile/features/home/view/widget/bottom_navigation_bar.dart';
 import 'package:paperless_mobile/features/home/view/widget/info_drawer.dart';

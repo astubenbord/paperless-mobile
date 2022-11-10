@@ -1,6 +1,8 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -11,9 +13,11 @@ import 'package:paperless_mobile/core/global/asset_images.dart';
 import 'package:paperless_mobile/core/global/http_self_signed_certificate_override.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/app_intro/application_intro_slideshow.dart';
+import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/home/view/home_page.dart';
 import 'package:paperless_mobile/features/login/bloc/authentication_cubit.dart';
 import 'package:paperless_mobile/features/login/view/login_page.dart';
+import 'package:paperless_mobile/features/scan/view/document_upload_page.dart';
 import 'package:paperless_mobile/features/settings/bloc/application_settings_cubit.dart';
 import 'package:paperless_mobile/features/settings/model/application_settings_state.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
@@ -23,6 +27,7 @@ import 'package:intl/intl.dart';
 import 'package:intl/intl_standalone.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
 void main() async {
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -125,6 +130,53 @@ class AuthenticationWrapper extends StatefulWidget {
 }
 
 class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
+  @override
+  void initState() {
+    super.initState();
+    // For sharing files coming from outside the app while the app is still opened
+    ReceiveSharingIntent.getMediaStream().listen((List<SharedMediaFile> value) {
+      final bytes = File(value.first.path).readAsBytesSync();
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => BlocProvider.value(
+            value: getIt<DocumentsCubit>(),
+            child: LabelBlocProvider(
+              child: DocumentUploadPage(
+                fileBytes: bytes,
+                afterUpload: () => SystemNavigator.pop(),
+              ),
+            ),
+          ),
+        ),
+      );
+    }, onError: (err) {
+      log(err);
+    });
+
+    // For sharing files coming from outside the app while the app is closed
+    ReceiveSharingIntent.getInitialMedia().then((List<SharedMediaFile> value) {
+      if (value.isEmpty) {
+        return;
+      }
+      final bytes = File(value.first.path).readAsBytesSync();
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => BlocProvider.value(
+            value: getIt<DocumentsCubit>(),
+            child: LabelBlocProvider(
+              child: DocumentUploadPage(
+                fileBytes: bytes,
+                afterUpload: () => SystemNavigator.pop(),
+              ),
+            ),
+          ),
+        ),
+      );
+    });
+  }
+
   @override
   void didChangeDependencies() {
     FlutterNativeSplash.remove();

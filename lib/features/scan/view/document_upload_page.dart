@@ -30,10 +30,11 @@ import 'package:intl/intl.dart';
 
 class DocumentUploadPage extends StatefulWidget {
   final Uint8List fileBytes;
-
+  final void Function()? afterUpload;
   const DocumentUploadPage({
     Key? key,
     required this.fileBytes,
+    this.afterUpload,
   }) : super(key: key);
 
   @override
@@ -221,6 +222,7 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
                   .ids,
           createdAt: (_formKey.currentState?.value[DocumentModel.createdKey]
               as DateTime?),
+          propagateEventOnError: false,
         );
         setState(() {
           _isUploadLoading = false;
@@ -228,6 +230,7 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
         getIt<DocumentScannerCubit>().reset();
         Navigator.pop(context);
         showSnackBar(context, S.of(context).documentUploadSuccessText);
+        widget.afterUpload?.call();
       } on ErrorMessage catch (error) {
         showError(context, error);
       } on PaperlessValidationErrors catch (errorMessages) {
