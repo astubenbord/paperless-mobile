@@ -46,6 +46,5 @@ enum ErrorCode {
   createSavedViewError,
   deleteSavedViewError,
   requestTimedOut,
-  storagePathAlreadyExists,
   unsupportedFileFormat;
 }

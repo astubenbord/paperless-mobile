@@ -4,7 +4,6 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:encrypted_shared_preferences/encrypted_shared_preferences.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:paperless_mobile/core/interceptor/authentication.interceptor.dart';
-import 'package:paperless_mobile/core/interceptor/connection_state.interceptor.dart';
 import 'package:paperless_mobile/core/interceptor/language_header.interceptor.dart';
 import 'package:paperless_mobile/core/interceptor/response_conversion.interceptor.dart';
 import 'package:http/http.dart';
@@ -38,7 +37,6 @@ abstract class RegisterModule {
   BaseClient getBaseClient(
     AuthenticationInterceptor authInterceptor,
     ResponseConversionInterceptor responseConversionInterceptor,
-    ConnectionStateInterceptor connectionStateInterceptor,
     LanguageHeaderInterceptor languageHeaderInterceptor,
     HttpClient client,
   ) =>
@@ -46,7 +44,6 @@ abstract class RegisterModule {
         interceptors: [
           authInterceptor,
           responseConversionInterceptor,
-          connectionStateInterceptor,
           languageHeaderInterceptor
         ],
         client: IOClient(client),

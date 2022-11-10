@@ -64,7 +64,7 @@ String translateError(BuildContext context, ErrorCode code) {
       return S.of(context).errorMessageDeleteSavedViewError;
     case ErrorCode.requestTimedOut:
       return S.of(context).errorMessageRequestTimedOut;
-    default:
-      return S.of(context).errorMessageUnknonwnError;
+    case ErrorCode.unsupportedFileFormat:
+      return S.of(context).errorMessageUnsupportedFileFormat;
   }
 }

@@ -171,6 +171,7 @@
   "errorMessageCreateSavedViewError": "Gespeicherte Ansicht konnte nicht erstellt werden, bitte versuche es erneut.",
   "errorMessageDeleteSavedViewError": "Gespeicherte Ansicht konnte nicht geklöscht werden, bitte versuche es erneut.",
   "errorMessageRequestTimedOut": "Bei der Anfrage an den Server kam es zu einer Zeitüberschreitung.",
+  "errorMessageUnsupportedFileFormat": "Das Dateiformat wird nicht unterstützt.",
   "labelFormFieldNoItemsFoundText": "Keine Treffer gefunden!",
   "onboardingDoneButtonLabel": "Fertig",
   "onboardingNextButtonLabel": "Weiter",
