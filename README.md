@@ -87,7 +87,35 @@ To get a local copy up and running follow these simple steps.
    ```sh
    flutter pub run intl_utils:generate
    ```
+   
+### Build release version
+In order to build a release version, you have to...
+1. Exchange the signing configuration in android/app/build.gradle from
+```gradle
+buildTypes {
+    release {
+        signingConfig signingConfigs.release
+    }
+}
+```
+to 
+```gradle
+buildTypes {
+    release {
+        signingConfig signingConfigs.debug
+    }
+}
+```
+2. Build the app with release profile (here for android):
+```sh
+flutter build apk --split-per-abi
+```
+(the --release flag is implicit for the build command)
 
+3. Install the app to your device
+```sh
+flutter install
+```
   
 
 <!-- ROADMAP -->
