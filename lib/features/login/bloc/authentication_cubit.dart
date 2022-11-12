@@ -79,6 +79,17 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
         errorCubit.add(error);
       }
       throw error;
+    } on SocketException catch (err) {
+      late ErrorMessage error;
+      if (err.message.contains("connection timed out")) {
+        error = const ErrorMessage(ErrorCode.requestTimedOut);
+      } else {
+        error = ErrorMessage.unknown();
+      }
+      if (propagateEventOnError) {
+        errorCubit.add(error);
+      }
+      rethrow;
     } on ErrorMessage catch (error) {
       if (propagateEventOnError) {
         errorCubit.add(error);

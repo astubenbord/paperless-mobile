@@ -354,10 +354,12 @@ packages:
   edge_detection:
     dependency: "direct main"
     description:
-      name: edge_detection
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.9"
+      path: "."
+      ref: master
+      resolved-ref: "19fbebef99360e9cf0b59c6a90ff7cd26d4d6e7d"
+      url: "https://github.com/sawankumarbundelkhandi/edge_detection"
+    source: git
+    version: "1.1.1"
   encrypt:
     dependency: transitive
     description:
@@ -1465,7 +1467,7 @@ packages:
     source: hosted
     version: "3.0.1"
   uuid:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: uuid
       url: "https://pub.dartlang.org"

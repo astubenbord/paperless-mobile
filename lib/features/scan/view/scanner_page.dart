@@ -1,3 +1,4 @@
+import 'dart:developer' as dev;
 import 'dart:io';
 import 'dart:math';
 
@@ -7,8 +8,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mime/mime.dart';
+import 'package:paperless_mobile/core/bloc/global_error_cubit.dart';
 import 'package:paperless_mobile/core/bloc/label_bloc_provider.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
+import 'package:paperless_mobile/core/service/file_service.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/home/view/widget/info_drawer.dart';
@@ -16,7 +19,6 @@ import 'package:paperless_mobile/features/scan/bloc/document_scanner_cubit.dart'
 import 'package:paperless_mobile/features/scan/view/document_upload_page.dart';
 import 'package:paperless_mobile/features/scan/view/widgets/grid_image_item_widget.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
-import 'package:paperless_mobile/util.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:permission_handler/permission_handler.dart';
@@ -38,8 +40,10 @@ class _ScannerPageState extends State<ScannerPage>
     'jpg',
     'jpeg'
   ];
+
   late final AnimationController _fabPulsingController;
   late final Animation _animation;
+
   @override
   void initState() {
     super.initState();
@@ -47,9 +51,7 @@ class _ScannerPageState extends State<ScannerPage>
         AnimationController(vsync: this, duration: const Duration(seconds: 1))
           ..repeat(reverse: true);
     _animation = Tween(begin: 1.0, end: 1.2).animate(_fabPulsingController)
-      ..addListener(() {
-        setState(() {});
-      });
+      ..addListener(() => setState((() {})));
   }
 
   @override
@@ -101,7 +103,9 @@ class _ScannerPageState extends State<ScannerPage>
         BlocBuilder<DocumentScannerCubit, List<File>>(
           builder: (context, state) {
             return IconButton(
-              onPressed: state.isEmpty ? null : () => _export(context),
+              onPressed: state.isEmpty
+                  ? null
+                  : () => _onPrepareDocumentUpload(context),
               icon: const Icon(Icons.done),
               tooltip: S.of(context).documentScannerPageUploadButtonTooltip,
             );
@@ -113,17 +117,31 @@ class _ScannerPageState extends State<ScannerPage>
 
   void _openDocumentScanner(BuildContext context) async {
     await _requestCameraPermissions();
-    final imagePath = await EdgeDetection.detectEdge;
-    if (imagePath == null) {
+    final file = await FileService.allocateTemporaryFile(
+      PaperlessDirectoryType.scans,
+      extension: 'jpeg',
+    );
+    if (kDebugMode) {
+      dev.log('[ScannerPage] Created temporary file: ${file.path}');
+    }
+    final success = await EdgeDetection.detectEdge(file.path);
+    if (!success) {
+      if (kDebugMode) {
+        dev.log(
+            '[ScannerPage] Scan either not successful or canceled by user.');
+      }
       return;
     }
-    final file = File(imagePath);
+    if (kDebugMode) {
+      dev.log('[ScannerPage] Wrote image to temporary file: ${file.path}');
+    }
     BlocProvider.of<DocumentScannerCubit>(context).addScan(file);
   }
 
-  void _export(BuildContext context) async {
+  void _onPrepareDocumentUpload(BuildContext context) async {
     final doc = _buildDocumentFromImageFiles(
-        BlocProvider.of<DocumentScannerCubit>(context).state);
+      BlocProvider.of<DocumentScannerCubit>(context).state,
+    );
     final bytes = await doc.save();
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -202,7 +220,7 @@ class _ScannerPageState extends State<ScannerPage>
   Future<void> _requestCameraPermissions() async {
     final hasPermission = await Permission.camera.isGranted;
     if (!hasPermission) {
-      Permission.camera.request();
+      await Permission.camera.request();
     }
   }
 
@@ -214,7 +232,11 @@ class _ScannerPageState extends State<ScannerPage>
     );
     if (result?.files.single.path != null) {
       File file = File(result!.files.single.path!);
-
+      if (!_supportedExtensions.contains(file.path.split('.').last)) {
+        return getIt<GlobalErrorCubit>().add(
+          const ErrorMessage(ErrorCode.unsupportedFileFormat),
+        );
+      }
       final mimeType = lookupMimeType(file.path) ?? '';
       late Uint8List fileBytes;
       if (mimeType.startsWith('image')) {

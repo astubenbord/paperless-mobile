@@ -35,8 +35,12 @@ class TimeoutClient implements BaseClient {
   }
 
   @override
-  Future<Response> delete(Uri url,
-      {Map<String, String>? headers, Object? body, Encoding? encoding}) async {
+  Future<Response> delete(
+    Uri url, {
+    Map<String, String>? headers,
+    Object? body,
+    Encoding? encoding,
+  }) async {
     await _handleOfflineState();
     return _handle400Error(
       await getIt<BaseClient>()
@@ -50,7 +54,10 @@ class TimeoutClient implements BaseClient {
   }
 
   @override
-  Future<Response> get(Uri url, {Map<String, String>? headers}) async {
+  Future<Response> get(
+    Uri url, {
+    Map<String, String>? headers,
+  }) async {
     await _handleOfflineState();
     return _handle400Error(
       await getIt<BaseClient>().get(url, headers: headers).timeout(
@@ -62,7 +69,10 @@ class TimeoutClient implements BaseClient {
   }
 
   @override
-  Future<Response> head(Uri url, {Map<String, String>? headers}) async {
+  Future<Response> head(
+    Uri url, {
+    Map<String, String>? headers,
+  }) async {
     await _handleOfflineState();
     return _handle400Error(
       await getIt<BaseClient>().head(url, headers: headers).timeout(
@@ -74,8 +84,12 @@ class TimeoutClient implements BaseClient {
   }
 
   @override
-  Future<Response> patch(Uri url,
-      {Map<String, String>? headers, Object? body, Encoding? encoding}) async {
+  Future<Response> patch(
+    Uri url, {
+    Map<String, String>? headers,
+    Object? body,
+    Encoding? encoding,
+  }) async {
     await _handleOfflineState();
     return _handle400Error(
       await getIt<BaseClient>()
@@ -89,8 +103,12 @@ class TimeoutClient implements BaseClient {
   }
 
   @override
-  Future<Response> post(Uri url,
-      {Map<String, String>? headers, Object? body, Encoding? encoding}) async {
+  Future<Response> post(
+    Uri url, {
+    Map<String, String>? headers,
+    Object? body,
+    Encoding? encoding,
+  }) async {
     await _handleOfflineState();
     return _handle400Error(
       await getIt<BaseClient>()
@@ -104,8 +122,12 @@ class TimeoutClient implements BaseClient {
   }
 
   @override
-  Future<Response> put(Uri url,
-      {Map<String, String>? headers, Object? body, Encoding? encoding}) async {
+  Future<Response> put(
+    Uri url, {
+    Map<String, String>? headers,
+    Object? body,
+    Encoding? encoding,
+  }) async {
     await _handleOfflineState();
     return _handle400Error(
       await getIt<BaseClient>()
@@ -119,7 +141,10 @@ class TimeoutClient implements BaseClient {
   }
 
   @override
-  Future<String> read(Uri url, {Map<String, String>? headers}) async {
+  Future<String> read(
+    Uri url, {
+    Map<String, String>? headers,
+  }) async {
     await _handleOfflineState();
     return getIt<BaseClient>().read(url, headers: headers).timeout(
           requestTimeout,
@@ -129,7 +154,10 @@ class TimeoutClient implements BaseClient {
   }
 
   @override
-  Future<Uint8List> readBytes(Uri url, {Map<String, String>? headers}) async {
+  Future<Uint8List> readBytes(
+    Uri url, {
+    Map<String, String>? headers,
+  }) async {
     await _handleOfflineState();
     return getIt<BaseClient>().readBytes(url, headers: headers).timeout(
           requestTimeout,

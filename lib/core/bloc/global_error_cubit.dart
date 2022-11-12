@@ -25,7 +25,8 @@ class GlobalErrorCubit extends Cubit<GlobalErrorState> {
 
   bool _canEmitNewError() {
     if (state.errorTimestamp != null) {
-      return DateTime.now().difference(state.errorTimestamp!).inSeconds >= 5;
+      return DateTime.now().difference(state.errorTimestamp!) >=
+          _waitBeforeNextErrorDuration;
     }
     return true;
   }

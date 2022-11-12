@@ -54,16 +54,3 @@ Future<List<T>> getCollection<T>(
   }
   return Future.error(errorCode);
 }
-
-class FileUtils {
-  static Future<File> saveToFile(
-    Uint8List bytes,
-    String filename, {
-    StorageDirectory directoryType = StorageDirectory.documents,
-  }) async {
-    final dir = (await getExternalStorageDirectories(type: directoryType));
-    File file = File("$dir/$filename");
-    file.writeAsBytesSync(bytes);
-    return file;
-  }
-}

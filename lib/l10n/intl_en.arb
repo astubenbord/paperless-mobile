@@ -186,5 +186,7 @@
   "labelsPageStoragePathEmptyStateDescriptionText": "You don't seem to have any storage paths set up.",
   "referencedDocumentsReadOnlyHintText": "This is a read-only view! You cannot edit or remove documents.",
   "editLabelPageConfirmDeletionDialogTitle": "Confirm deletion",
-  "editLabelPageDeletionDialogText": "This label contains references to other documents. By deleting this label, all references will be removed. Continue?"
+  "editLabelPageDeletionDialogText": "This label contains references to other documents. By deleting this label, all references will be removed. Continue?",
+  "settingsPageStorageSettingsLabel": "Storage",
+  "settingsPageStorageSettingsDescriptionText": "Manage files and storage space"
 }

@@ -10,6 +10,7 @@ class Tag extends Label {
   static const colorKey = 'color';
   static const isInboxTagKey = 'is_inbox_tag';
   static const textColorKey = 'text_color';
+  static const legacyColourKey = 'colour';
 
   final Color? color;
   final Color? textColor;
@@ -31,10 +32,22 @@ class Tag extends Label {
   Tag.fromJson(JSON json)
       : isInboxTag = json[isInboxTagKey],
         textColor = Color(_colorStringToInt(json[textColorKey]) ?? 0),
-        color = (json[colorKey] is Color)
-            ? json[colorKey]
-            : Color(_colorStringToInt(json[colorKey]) ?? 0),
+        color = _parseColorFromJson(json),
         super.fromJson(json);
+
+  ///
+  /// The `color` field of the json object can either be of type [Color] or a hex [String].
+  /// Since API version 2, the old attribute `colour` has been replaced with `color`.
+  ///
+  static Color _parseColorFromJson(JSON json) {
+    if (json.containsKey(legacyColourKey)) {
+      return Color(_colorStringToInt(json[legacyColourKey]) ?? 0);
+    }
+    if (json[colorKey] is Color) {
+      return json[colorKey];
+    }
+    return Color(_colorStringToInt(json[colorKey]) ?? 0);
+  }
 
   @override
   String toString() {
