@@ -57,8 +57,8 @@ class EditTagPage extends StatelessWidget {
       }
       cubit.updateFilter(filter: updatedFilter);
       Navigator.pop(context);
-    } on ErrorMessage catch (error) {
-      showError(context, error);
+    } on ErrorMessage catch (error, stackTrace) {
+      showError(context, error, stackTrace);
     }
   }
 }

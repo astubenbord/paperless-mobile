@@ -58,8 +58,8 @@ class StoragePathWidget extends StatelessWidget {
         );
       }
       afterSelected?.call();
-    } on ErrorMessage catch (error) {
-      showError(context, error);
+    } on ErrorMessage catch (error, stackTrace) {
+      showError(context, error, stackTrace);
     }
   }
 }

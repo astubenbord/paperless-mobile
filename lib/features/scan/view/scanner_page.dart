@@ -201,8 +201,8 @@ class _ScannerPageState extends State<ScannerPage>
               try {
                 BlocProvider.of<DocumentScannerCubit>(context)
                     .removeScan(index);
-              } on ErrorMessage catch (error) {
-                showError(context, error);
+              } on ErrorMessage catch (error, stackTrace) {
+                showError(context, error, stackTrace);
               }
             },
             index: index,
@@ -214,8 +214,8 @@ class _ScannerPageState extends State<ScannerPage>
   void _reset(BuildContext context) {
     try {
       BlocProvider.of<DocumentScannerCubit>(context).reset();
-    } on ErrorMessage catch (error) {
-      showError(context, error);
+    } on ErrorMessage catch (error, stackTrace) {
+      showError(context, error, stackTrace);
     }
   }
 

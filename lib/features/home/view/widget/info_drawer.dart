@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:paperless_mobile/core/bloc/paperless_server_information_cubit.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
+import 'package:paperless_mobile/core/model/paperless_server_information.dart';
 import 'package:paperless_mobile/features/settings/bloc/application_settings_cubit.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/labels/correspondent/bloc/correspondents_cubit.dart';
@@ -39,24 +41,46 @@ class InfoDrawer extends StatelessWidget {
                     Text(
                       S.of(context).appTitleText,
                       style: Theme.of(context).textTheme.headline5!.copyWith(
-                          color:
-                              Theme.of(context).colorScheme.onPrimaryContainer),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onPrimaryContainer,
+                          ),
                     ),
                   ],
                 ),
                 Align(
                   alignment: Alignment.bottomRight,
-                  child: BlocBuilder<AuthenticationCubit, AuthenticationState>(
+                  child: BlocBuilder<PaperlessServerInformationCubit,
+                      PaperlessServerInformation>(
                     builder: (context, state) {
-                      return Text(
-                        state.authentication?.serverUrl
-                                .replaceAll(RegExp(r'https?://'), "") ??
-                            "",
-                        textAlign: TextAlign.end,
-                        style: TextStyle(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onPrimaryContainer),
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            dense: true,
+                            title: Text(
+                              'example.paperless.myinstance.com.de',
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.end,
+                              maxLines: 1,
+                            ),
+                            isThreeLine: true,
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  'Logged in as anton',
+                                  textAlign: TextAlign.end,
+                                ),
+                                Text(
+                                  '${S.of(context).serverInformationPaperlessVersionText} ${state.version} (API v${state.apiVersion})',
+                                  style: Theme.of(context).textTheme.caption,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       );
                     },
                   ),
@@ -134,8 +158,8 @@ class InfoDrawer extends StatelessWidget {
                 getIt<DocumentTypeCubit>().reset();
                 getIt<TagCubit>().reset();
                 getIt<DocumentScannerCubit>().reset();
-              } on ErrorMessage catch (error) {
-                showError(context, error);
+              } on ErrorMessage catch (error, stackTrace) {
+                showError(context, error, stackTrace);
               }
             },
           ),

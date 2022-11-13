@@ -190,5 +190,6 @@
   "settingsPageStorageSettingsLabel": "Storage",
   "settingsPageStorageSettingsDescriptionText": "Manage files and storage space",
   "documentUpdateErrorMessage": "Document successfully updated.",
-  "errorMessageMissingClientCertificate": "A client certificate was expected but not sent. Please provide a valid client certificate."
+  "errorMessageMissingClientCertificate": "A client certificate was expected but not sent. Please provide a valid client certificate.",
+  "serverInformationPaperlessVersionText": "Paperless server version"
 }

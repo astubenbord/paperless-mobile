@@ -536,8 +536,8 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
         BlocProvider.of<SavedViewCubit>(context).resetSelection();
         FocusScope.of(context).unfocus();
         widget.panelController.close();
-      } on ErrorMessage catch (error) {
-        showError(context, error);
+      } on ErrorMessage catch (error, stackTrace) {
+        showError(context, error, stackTrace);
       }
     }
   }

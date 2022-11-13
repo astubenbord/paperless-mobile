@@ -189,5 +189,6 @@
   "settingsPageStorageSettingsLabel": "Storage",
   "settingsPageStorageSettingsDescriptionText": "Manage files and storage space",
   "documentUpdateErrorMessage": "Document successfully updated.",
-  "errorMessageMissingClientCertificate": "Ein Client Zerfitikat wurde erwartet, aber nicht gesendet. Bitte konfiguriere ein gültiges Zertifikat."
+  "errorMessageMissingClientCertificate": "Ein Client Zerfitikat wurde erwartet, aber nicht gesendet. Bitte konfiguriere ein gültiges Zertifikat.",
+  "serverInformationPaperlessVersionText": "Paperless Server-Version"
 }

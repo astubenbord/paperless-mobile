@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
 import 'package:paperless_mobile/core/logic/error_code_localization_mapper.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
+import 'package:paperless_mobile/core/service/github_issue_service.dart';
 import 'package:paperless_mobile/core/widgets/offline_banner.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/labels/correspondent/bloc/correspondents_cubit.dart';
@@ -53,8 +54,8 @@ class _DocumentsPageState extends State<DocumentsPage> {
   Future<void> _initDocuments() async {
     try {
       BlocProvider.of<DocumentsCubit>(context).loadDocuments();
-    } on ErrorMessage catch (error) {
-      showError(context, error);
+    } on ErrorMessage catch (error, stackTrace) {
+      showError(context, error, stackTrace);
     }
   }
 
@@ -73,9 +74,20 @@ class _DocumentsPageState extends State<DocumentsPage> {
     }
     try {
       await documentsCubit.loadMore();
-    } on ErrorMessage catch (error) {
-      showError(context, error);
+    } on ErrorMessage catch (error, stackTrace) {
+      showError(context, error, stackTrace);
     }
+    Future.delayed(const Duration(seconds: 1), () {
+      try {
+        throw ErrorMessage(ErrorCode.tagLoadFailed);
+      } on ErrorMessage catch (error, stackTrace) {
+        showError(
+          context,
+          error,
+          stackTrace,
+        );
+      }
+    });
   }
 
   void _onSelected(DocumentModel model) {
@@ -87,8 +99,8 @@ class _DocumentsPageState extends State<DocumentsPage> {
       await BlocProvider.of<DocumentsCubit>(context).updateCurrentFilter(
         (filter) => filter.copyWith(page: 1),
       );
-    } on ErrorMessage catch (error) {
-      showError(context, error);
+    } on ErrorMessage catch (error, stackTrace) {
+      showError(context, error, stackTrace);
     }
   }
 
