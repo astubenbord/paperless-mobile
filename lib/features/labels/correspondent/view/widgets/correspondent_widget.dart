@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/documents/model/query_parameters/correspondent_query.dart';
 import 'package:paperless_mobile/features/labels/correspondent/bloc/correspondents_cubit.dart';
 import 'package:paperless_mobile/features/labels/correspondent/model/correspondent.model.dart';
+import 'package:paperless_mobile/util.dart';
 
 class CorrespondentWidget extends StatelessWidget {
   final int? correspondentId;
@@ -44,17 +46,21 @@ class CorrespondentWidget extends StatelessWidget {
 
   void _addCorrespondentToFilter(BuildContext context) {
     final cubit = BlocProvider.of<DocumentsCubit>(context);
-    if (cubit.state.filter.correspondent.id == correspondentId) {
-      cubit.updateCurrentFilter(
-        (filter) =>
-            filter.copyWith(correspondent: const CorrespondentQuery.unset()),
-      );
-    } else {
-      cubit.updateCurrentFilter(
-        (filter) => filter.copyWith(
-            correspondent: CorrespondentQuery.fromId(correspondentId)),
-      );
+    try {
+      if (cubit.state.filter.correspondent.id == correspondentId) {
+        cubit.updateCurrentFilter(
+          (filter) =>
+              filter.copyWith(correspondent: const CorrespondentQuery.unset()),
+        );
+      } else {
+        cubit.updateCurrentFilter(
+          (filter) => filter.copyWith(
+              correspondent: CorrespondentQuery.fromId(correspondentId)),
+        );
+      }
+      afterSelected?.call();
+    } on ErrorMessage catch (error) {
+      showError(context, error);
     }
-    afterSelected?.call();
   }
 }

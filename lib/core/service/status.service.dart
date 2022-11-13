@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:paperless_mobile/core/bloc/document_status_cubit.dart';
 import 'package:paperless_mobile/core/model/document_processing_status.dart';
 import 'package:paperless_mobile/di_initializer.dart';
@@ -89,8 +90,11 @@ class LongPollingStatusService implements StatusService {
         Uri.parse(
             '$httpUrl/api/documents/?query=$documentFileName added:${formatDate(today)}'),
       );
-      final data = PagedSearchResult.fromJson(
-          jsonDecode(response.body), DocumentModel.fromJson);
+      final data = await compute(
+        PagedSearchResult.fromJson,
+        PagedSearchResultJsonSerializer(
+            jsonDecode(response.body), DocumentModel.fromJson),
+      );
       if (data.count > 0) {
         consumptionFinished = true;
         final docId = data.results[0].id;

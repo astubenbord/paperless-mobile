@@ -513,7 +513,7 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
     );
   }
 
-  void _onApplyFilter() {
+  void _onApplyFilter() async {
     if (_formKey.currentState?.saveAndValidate() ?? false) {
       final v = _formKey.currentState!.value;
       final docCubit = BlocProvider.of<DocumentsCubit>(context);
@@ -530,13 +530,15 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
         addedDateAfter: (v[fkAddedAt] as DateTimeRange?)?.start,
         queryType: v[QueryTypeFormField.fkQueryType] as QueryType,
       );
-      BlocProvider.of<DocumentsCubit>(context)
-          .updateFilter(filter: newFilter)
-          .then((value) {
+      try {
+        await BlocProvider.of<DocumentsCubit>(context)
+            .updateFilter(filter: newFilter);
         BlocProvider.of<SavedViewCubit>(context).resetSelection();
         FocusScope.of(context).unfocus();
         widget.panelController.close();
-      });
+      } on ErrorMessage catch (error) {
+        showError(context, error);
+      }
     }
   }
 

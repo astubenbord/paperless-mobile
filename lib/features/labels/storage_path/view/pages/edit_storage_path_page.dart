@@ -32,13 +32,19 @@ class EditStoragePathPage extends StatelessWidget {
   }
 
   Future<void> _onDelete(StoragePath path, BuildContext context) async {
-    await BlocProvider.of<StoragePathCubit>(context).remove(path);
-    final cubit = BlocProvider.of<DocumentsCubit>(context);
-    if (cubit.state.filter.storagePath.id == path.id) {
-      cubit.updateFilter(
-          filter: cubit.state.filter
-              .copyWith(storagePath: const StoragePathQuery.unset()));
+    try {
+      await BlocProvider.of<StoragePathCubit>(context).remove(path);
+      final cubit = BlocProvider.of<DocumentsCubit>(context);
+      if (cubit.state.filter.storagePath.id == path.id) {
+        cubit.updateCurrentFilter(
+          (filter) => filter.copyWith(
+            storagePath: const StoragePathQuery.unset(),
+          ),
+        );
+      }
+      Navigator.pop(context);
+    } on ErrorMessage catch (error) {
+      showError(context, error);
     }
-    Navigator.pop(context);
   }
 }

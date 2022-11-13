@@ -1,8 +1,6 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:paperless_mobile/core/bloc/global_error_cubit.dart';
+import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/features/settings/bloc/application_settings_cubit.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/labels/correspondent/bloc/correspondents_cubit.dart';
@@ -129,14 +127,16 @@ class InfoDrawer extends StatelessWidget {
             leading: const Icon(Icons.logout),
             title: Text(S.of(context).appDrawerLogoutLabel),
             onTap: () {
-              // Clear all bloc data
-              BlocProvider.of<AuthenticationCubit>(context).logout();
-              getIt<DocumentsCubit>().reset();
-              getIt<CorrespondentCubit>().reset();
-              getIt<DocumentTypeCubit>().reset();
-              getIt<TagCubit>().reset();
-              getIt<DocumentScannerCubit>().reset();
-              getIt<GlobalErrorCubit>().reset();
+              try {
+                BlocProvider.of<AuthenticationCubit>(context).logout();
+                getIt<DocumentsCubit>().reset();
+                getIt<CorrespondentCubit>().reset();
+                getIt<DocumentTypeCubit>().reset();
+                getIt<TagCubit>().reset();
+                getIt<DocumentScannerCubit>().reset();
+              } on ErrorMessage catch (error) {
+                showError(context, error);
+              }
             },
           ),
           const Divider(),

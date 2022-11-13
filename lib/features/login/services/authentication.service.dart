@@ -26,10 +26,19 @@ class AuthenticationService {
     required String password,
     required String serverUrl,
   }) async {
-    final response = await httpClient.post(
-      Uri.parse("/api/token/"),
-      body: {"username": username, "password": password},
-    );
+    late Response response;
+    try {
+      response = await httpClient.post(
+        Uri.parse("/api/token/"),
+        body: {"username": username, "password": password},
+      );
+    } on FormatException catch (e) {
+      final source = e.source;
+      if (source is String &&
+          source.contains("400 No required SSL certificate was sent")) {
+        throw const ErrorMessage(ErrorCode.missingClientCertificate);
+      }
+    }
     if (response.statusCode == 200) {
       final data = jsonDecode(utf8.decode(response.bodyBytes));
       return data['token'];

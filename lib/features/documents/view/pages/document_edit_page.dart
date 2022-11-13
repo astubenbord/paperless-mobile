@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
@@ -76,10 +77,14 @@ class _DocumentEditPageState extends State<DocumentEditPage> {
             setState(() {
               _isSubmitLoading = true;
             });
-            await getIt<DocumentsCubit>().updateDocument(updatedDocument);
-            Navigator.pop(context);
-            showSnackBar(
-                context, "Document successfully updated."); //TODO: INTL
+            try {
+              await getIt<DocumentsCubit>().updateDocument(updatedDocument);
+              showSnackBar(context, S.of(context).documentUpdateErrorMessage);
+            } on ErrorMessage catch (error) {
+              showError(context, error);
+            } finally {
+              Navigator.pop(context);
+            }
           }
         },
         icon: const Icon(Icons.save),

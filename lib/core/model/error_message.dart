@@ -1,9 +1,11 @@
 class ErrorMessage implements Exception {
   final ErrorCode code;
+  final String? details;
   final StackTrace? stackTrace;
   final int? httpStatusCode;
 
-  const ErrorMessage(this.code, {this.stackTrace, this.httpStatusCode});
+  const ErrorMessage(this.code,
+      {this.details, this.stackTrace, this.httpStatusCode});
 
   factory ErrorMessage.unknown() {
     return const ErrorMessage(ErrorCode.unknown);
@@ -46,5 +48,6 @@ enum ErrorCode {
   createSavedViewError,
   deleteSavedViewError,
   requestTimedOut,
-  unsupportedFileFormat;
+  unsupportedFileFormat,
+  missingClientCertificate;
 }

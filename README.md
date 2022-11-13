@@ -28,8 +28,13 @@
     An (almost) fully fledged mobile paperless client.
     <br />
     <br />
+    <p>
+      <a href="https://play.google.com/store/apps/details?id=de.astubenbord.paperless_mobile">
+        <img src="resources/get_it_on_google_play_en.svg" width="140px">
+      </a>
+    </p>
     <!--<a href="https://github.com/astubenbord/paperless-mobile">View Demo</a>
-    ·-->
+    ·-->  
     <a href="https://github.com/astubenbord/paperless-mobile/issues">Report Bug</a>
     ·
     <a href="https://github.com/astubenbord/paperless-mobile/issues">Request Feature</a>

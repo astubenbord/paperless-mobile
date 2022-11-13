@@ -30,10 +30,11 @@ import 'package:intl/intl.dart';
 
 class DocumentUploadPage extends StatefulWidget {
   final Uint8List fileBytes;
-
+  final void Function()? afterUpload;
   const DocumentUploadPage({
     Key? key,
     required this.fileBytes,
+    this.afterUpload,
   }) : super(key: key);
 
   @override
@@ -184,50 +185,33 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
   }
 
   void _onSubmit() async {
-    _formKey.currentState?.save();
-    if (_formKey.currentState?.validate() ?? false) {
+    if (_formKey.currentState?.saveAndValidate() ?? false) {
       try {
-        setState(() {
-          _isUploadLoading = true;
-        });
+        setState(() => _isUploadLoading = true);
+
+        final fv = _formKey.currentState!.value;
+
+        final createdAt = fv[DocumentModel.createdKey] as DateTime?;
+        final title = fv[DocumentModel.titleKey] as String;
+        final docType = fv[DocumentModel.documentTypeKey] as IdQueryParameter;
+        final tags = fv[DocumentModel.tagsKey] as TagsQuery;
+        final correspondent =
+            fv[DocumentModel.correspondentKey] as IdQueryParameter;
+
         await BlocProvider.of<DocumentsCubit>(context).addDocument(
           widget.fileBytes,
           _formKey.currentState?.value[fkFileName],
-          onConsumptionFinished: (document) {
-            ScaffoldMessenger.of(rootScaffoldKey.currentContext!).showSnackBar(
-              SnackBar(
-                action: SnackBarAction(
-                  onPressed: () {
-                    getIt<DocumentsCubit>().reloadDocuments();
-                  },
-                  label: S
-                      .of(context)
-                      .documentUploadProcessingSuccessfulReloadActionText,
-                ),
-                content:
-                    Text(S.of(context).documentUploadProcessingSuccessfulText),
-              ),
-            );
-          },
-          title: _formKey.currentState?.value[DocumentModel.titleKey],
-          documentType: (_formKey.currentState
-                  ?.value[DocumentModel.documentTypeKey] as IdQueryParameter)
-              .id,
-          correspondent: (_formKey.currentState
-                  ?.value[DocumentModel.correspondentKey] as IdQueryParameter)
-              .id,
-          tags:
-              (_formKey.currentState?.value[DocumentModel.tagsKey] as TagsQuery)
-                  .ids,
-          createdAt: (_formKey.currentState?.value[DocumentModel.createdKey]
-              as DateTime?),
+          onConsumptionFinished: _onConsumptionFinished,
+          title: title,
+          documentType: docType.id,
+          correspondent: correspondent.id,
+          tags: tags.ids,
+          createdAt: createdAt,
         );
-        setState(() {
-          _isUploadLoading = false;
-        });
-        getIt<DocumentScannerCubit>().reset();
-        Navigator.pop(context);
+        getIt<DocumentScannerCubit>().reset(); //TODO: Access via provider
         showSnackBar(context, S.of(context).documentUploadSuccessText);
+        Navigator.pop(context);
+        widget.afterUpload?.call();
       } on ErrorMessage catch (error) {
         showError(context, error);
       } on PaperlessValidationErrors catch (errorMessages) {
@@ -236,9 +220,28 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
         showSnackBar(context, other.toString());
       } finally {
         setState(() {
-          _isUploadLoading = true;
+          _isUploadLoading = false;
         });
       }
     }
+  }
+
+  void _onConsumptionFinished(document) {
+    ScaffoldMessenger.of(rootScaffoldKey.currentContext!).showSnackBar(
+      SnackBar(
+        action: SnackBarAction(
+          onPressed: () async {
+            try {
+              getIt<DocumentsCubit>().reloadDocuments();
+            } on ErrorMessage catch (error) {
+              showError(context, error);
+            }
+          },
+          label:
+              S.of(context).documentUploadProcessingSuccessfulReloadActionText,
+        ),
+        content: Text(S.of(context).documentUploadProcessingSuccessfulText),
+      ),
+    );
   }
 }

@@ -44,11 +44,18 @@ class _DocumentsPageState extends State<DocumentsPage> {
   @override
   void initState() {
     super.initState();
-    final documentsCubit = BlocProvider.of<DocumentsCubit>(context);
-    if (!documentsCubit.state.isLoaded) {
-      documentsCubit.loadDocuments();
+    if (!BlocProvider.of<DocumentsCubit>(context).state.isLoaded) {
+      _initDocuments();
     }
     _pagingController.addPageRequestListener(_loadNewPage);
+  }
+
+  Future<void> _initDocuments() async {
+    try {
+      BlocProvider.of<DocumentsCubit>(context).loadDocuments();
+    } on ErrorMessage catch (error) {
+      showError(context, error);
+    }
   }
 
   @override
@@ -64,17 +71,25 @@ class _DocumentsPageState extends State<DocumentsPage> {
     if (pageCount <= pageKey + 1) {
       _pagingController.nextPageKey = null;
     }
-    documentsCubit.loadMore();
+    try {
+      await documentsCubit.loadMore();
+    } on ErrorMessage catch (error) {
+      showError(context, error);
+    }
   }
 
   void _onSelected(DocumentModel model) {
     BlocProvider.of<DocumentsCubit>(context).toggleDocumentSelection(model);
   }
 
-  Future<void> _onRefresh() {
-    final documentsCubit = BlocProvider.of<DocumentsCubit>(context);
-    return documentsCubit.updateFilter(
-        filter: documentsCubit.state.filter.copyWith(page: 1));
+  Future<void> _onRefresh() async {
+    try {
+      await BlocProvider.of<DocumentsCubit>(context).updateCurrentFilter(
+        (filter) => filter.copyWith(page: 1),
+      );
+    } on ErrorMessage catch (error) {
+      showError(context, error);
+    }
   }
 
   @override
@@ -86,9 +101,9 @@ class _DocumentsPageState extends State<DocumentsPage> {
           _panelController.close();
           return false;
         }
-        final docBloc = BlocProvider.of<DocumentsCubit>(context);
-        if (docBloc.state.selection.isNotEmpty) {
-          docBloc.resetSelection();
+        final documentsCubit = BlocProvider.of<DocumentsCubit>(context);
+        if (documentsCubit.state.selection.isNotEmpty) {
+          documentsCubit.resetSelection();
           return false;
         }
         return true;

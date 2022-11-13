@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/login/bloc/authentication_cubit.dart';
 import 'package:paperless_mobile/features/login/view/widgets/client_certificate_form_field.dart';
 import 'package:paperless_mobile/features/login/view/widgets/server_address_form_field.dart';
 import 'package:paperless_mobile/features/login/view/widgets/user_credentials_form_field.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
+import 'package:paperless_mobile/util.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -72,7 +74,8 @@ class _LoginPageState extends State<LoginPage> {
     return ElevatedButton(
       style: ButtonStyle(
         backgroundColor: MaterialStatePropertyAll(
-            Theme.of(context).colorScheme.primaryContainer),
+          Theme.of(context).colorScheme.primaryContainer,
+        ),
         elevation: const MaterialStatePropertyAll(0),
       ),
       onPressed: _login,
@@ -82,19 +85,25 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  void _login() {
+  void _login() async {
     FocusScope.of(context).unfocus();
     if (_formKey.currentState?.saveAndValidate() ?? false) {
       setState(() => _isLoginLoading = true);
-      final form = _formKey.currentState?.value;
-      BlocProvider.of<AuthenticationCubit>(context)
-          .login(
-            credentials: form?[UserCredentialsFormField.fkCredentials],
-            serverUrl: form?[ServerAddressFormField.fkServerAddress],
-            clientCertificate:
-                form?[ClientCertificateFormField.fkClientCertificate],
-          )
-          .whenComplete(() => setState(() => _isLoginLoading = false));
+      final form = _formKey.currentState!.value;
+      try {
+        await BlocProvider.of<AuthenticationCubit>(context).login(
+          credentials: form[UserCredentialsFormField.fkCredentials],
+          serverUrl: form[ServerAddressFormField.fkServerAddress],
+          clientCertificate:
+              form[ClientCertificateFormField.fkClientCertificate],
+        );
+      } on ErrorMessage catch (error) {
+        showError(context, error);
+      } catch (unknownError) {
+        showSnackBar(context, unknownError.toString());
+      } finally {
+        setState(() => _isLoginLoading = false);
+      }
     }
   }
 }

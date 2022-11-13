@@ -102,7 +102,7 @@
   "documentScannerPageTitle": "Scanner",
   "documentScannerPageResetButtonTooltipText": "Alle scans löschen",
   "documentScannerPageUploadButtonTooltip": "Dokument hochladen",
-  "documentScannerPageAddScanButtonLabel": "Scanne ein Dokument", 
+  "documentScannerPageAddScanButtonLabel": "Scanne ein Dokument",
   "documentScannerPageOrText": "oder",
   "documentScannerPageUploadFromThisDeviceButtonLabel": "Lade ein Dokument von diesem Gerät hoch",
   "addTagPageTitle": "Neuer Tag",
@@ -185,6 +185,9 @@
   "labelsPageStoragePathEmptyStateDescriptionText": "Es wurden noch keine Speicherpfade angelegt.",
   "referencedDocumentsReadOnlyHintText": "Dies ist eine schreibgeschützte Ansicht! Dokumente können nicht bearbeitet oder entfernt werden.",
   "editLabelPageConfirmDeletionDialogTitle": "Löschen bestätigen",
-  "editLabelPageDeletionDialogText": "Dieser Kennzeichner wird von Dokumenten referenziert. Durch das Löschen dieses Kennzeichners werden alle Referenzen entfernt. Fortfahren?"
-
+  "editLabelPageDeletionDialogText": "Dieser Kennzeichner wird von Dokumenten referenziert. Durch das Löschen dieses Kennzeichners werden alle Referenzen entfernt. Fortfahren?",
+  "settingsPageStorageSettingsLabel": "Storage",
+  "settingsPageStorageSettingsDescriptionText": "Manage files and storage space",
+  "documentUpdateErrorMessage": "Document successfully updated.",
+  "errorMessageMissingClientCertificate": "Ein Client Zerfitikat wurde erwartet, aber nicht gesendet. Bitte konfiguriere ein gültiges Zertifikat."
 }

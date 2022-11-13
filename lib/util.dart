@@ -13,12 +13,14 @@ final dateFormat = DateFormat("yyyy-MM-dd");
 final GlobalKey<ScaffoldState> rootScaffoldKey = GlobalKey<ScaffoldState>();
 late PackageInfo kPackageInfo;
 
-void showSnackBar(BuildContext context, String message) {
-  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+void showSnackBar(BuildContext context, String message, [String? details]) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text(message + (details != null ? ' ($details)' : ''))),
+  );
 }
 
 void showError(BuildContext context, ErrorMessage error) {
-  showSnackBar(context, translateError(context, error.code));
+  showSnackBar(context, translateError(context, error.code), error.details);
 }
 
 bool isNotNull(dynamic value) {

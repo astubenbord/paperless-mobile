@@ -4,6 +4,13 @@ import 'package:paperless_mobile/features/documents/model/document.model.dart';
 
 const pageRegex = r".*page=(\d+).*";
 
+class PagedSearchResultJsonSerializer<T> {
+  final JSON json;
+  final T Function(JSON) fromJson;
+
+  PagedSearchResultJsonSerializer(this.json, this.fromJson);
+}
+
 class PagedSearchResult<T> extends Equatable {
   /// Total number of available items
   final int count;
@@ -46,12 +53,14 @@ class PagedSearchResult<T> extends Equatable {
   });
 
   factory PagedSearchResult.fromJson(
-      Map<dynamic, dynamic> json, T Function(JSON) fromJson) {
+      PagedSearchResultJsonSerializer<T> serializer) {
     return PagedSearchResult(
-      count: json['count'],
-      next: json['next'],
-      previous: json['previous'],
-      results: List<JSON>.from(json['results']).map<T>(fromJson).toList(),
+      count: serializer.json['count'],
+      next: serializer.json['next'],
+      previous: serializer.json['previous'],
+      results: List<JSON>.from(serializer.json['results'])
+          .map<T>(serializer.fromJson)
+          .toList(),
     );
   }
 

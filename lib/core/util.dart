@@ -1,13 +1,9 @@
 import 'dart:convert';
-import 'dart:io';
-import 'dart:typed_data';
-
-import 'package:paperless_mobile/core/logic/timeout_client.dart';
+import 'package:flutter/foundation.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/core/type/types.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:http/http.dart';
-import 'package:path_provider/path_provider.dart';
 
 const requestTimeout = Duration(seconds: 5);
 
@@ -23,7 +19,10 @@ Future<T> getSingleResult<T>(
     headers: {'accept': 'application/json; version=$minRequiredApiVersion'},
   );
   if (response.statusCode == 200) {
-    return fromJson(jsonDecode(utf8.decode(response.bodyBytes)) as JSON);
+    return compute(
+      fromJson,
+      jsonDecode(utf8.decode(response.bodyBytes)) as JSON,
+    );
   }
   return Future.error(errorCode);
 }
@@ -45,25 +44,25 @@ Future<List<T>> getCollection<T>(
       if (body['count'] == 0) {
         return <T>[];
       } else {
-        return body['results']
-            .cast<JSON>()
-            .map<T>((result) => fromJson(result))
-            .toList();
+        return compute(
+          _collectionFromJson,
+          _CollectionFromJsonSerializationParams(
+              fromJson, (body['results'] as List).cast<JSON>()),
+        );
       }
     }
   }
   return Future.error(errorCode);
 }
 
-class FileUtils {
-  static Future<File> saveToFile(
-    Uint8List bytes,
-    String filename, {
-    StorageDirectory directoryType = StorageDirectory.documents,
-  }) async {
-    final dir = (await getExternalStorageDirectories(type: directoryType));
-    File file = File("$dir/$filename");
-    file.writeAsBytesSync(bytes);
-    return file;
-  }
+List<T> _collectionFromJson<T>(
+    _CollectionFromJsonSerializationParams<T> params) {
+  return params.list.map<T>((result) => params.fromJson(result)).toList();
+}
+
+class _CollectionFromJsonSerializationParams<T> {
+  final T Function(JSON) fromJson;
+  final List<JSON> list;
+
+  _CollectionFromJsonSerializationParams(this.fromJson, this.list);
 }

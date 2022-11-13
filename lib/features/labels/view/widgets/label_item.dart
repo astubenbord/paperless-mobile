@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:paperless_mobile/core/bloc/global_error_cubit.dart';
 import 'package:paperless_mobile/core/bloc/label_bloc_provider.dart';
 import 'package:paperless_mobile/core/logic/error_code_localization_mapper.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
@@ -53,10 +52,9 @@ class LabelItem<T extends Label> extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (context) => LabelBlocProvider(
                     child: BlocProvider(
-                      create: (context) => DocumentsCubit(
-                          getIt<DocumentRepository>(),
-                          getIt<GlobalErrorCubit>())
-                        ..updateFilter(filter: filter),
+                      create: (context) =>
+                          DocumentsCubit(getIt<DocumentRepository>())
+                            ..updateFilter(filter: filter),
                       child: LinkedDocumentsPreview(filter: filter),
                     ),
                   ),

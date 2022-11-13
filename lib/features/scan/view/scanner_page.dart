@@ -1,3 +1,4 @@
+import 'dart:developer' as dev;
 import 'dart:io';
 import 'dart:math';
 
@@ -8,7 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mime/mime.dart';
 import 'package:paperless_mobile/core/bloc/label_bloc_provider.dart';
+import 'package:paperless_mobile/core/global/constants.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
+import 'package:paperless_mobile/core/service/file_service.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/home/view/widget/info_drawer.dart';
@@ -30,16 +33,9 @@ class ScannerPage extends StatefulWidget {
 
 class _ScannerPageState extends State<ScannerPage>
     with SingleTickerProviderStateMixin {
-  static const _supportedExtensions = [
-    'pdf',
-    'png',
-    'tiff',
-    'gif',
-    'jpg',
-    'jpeg'
-  ];
   late final AnimationController _fabPulsingController;
   late final Animation _animation;
+
   @override
   void initState() {
     super.initState();
@@ -47,9 +43,7 @@ class _ScannerPageState extends State<ScannerPage>
         AnimationController(vsync: this, duration: const Duration(seconds: 1))
           ..repeat(reverse: true);
     _animation = Tween(begin: 1.0, end: 1.2).animate(_fabPulsingController)
-      ..addListener(() {
-        setState(() {});
-      });
+      ..addListener(() => setState((() {})));
   }
 
   @override
@@ -101,7 +95,9 @@ class _ScannerPageState extends State<ScannerPage>
         BlocBuilder<DocumentScannerCubit, List<File>>(
           builder: (context, state) {
             return IconButton(
-              onPressed: state.isEmpty ? null : () => _export(context),
+              onPressed: state.isEmpty
+                  ? null
+                  : () => _onPrepareDocumentUpload(context),
               icon: const Icon(Icons.done),
               tooltip: S.of(context).documentScannerPageUploadButtonTooltip,
             );
@@ -113,17 +109,31 @@ class _ScannerPageState extends State<ScannerPage>
 
   void _openDocumentScanner(BuildContext context) async {
     await _requestCameraPermissions();
-    final imagePath = await EdgeDetection.detectEdge;
-    if (imagePath == null) {
+    final file = await FileService.allocateTemporaryFile(
+      PaperlessDirectoryType.scans,
+      extension: 'jpeg',
+    );
+    if (kDebugMode) {
+      dev.log('[ScannerPage] Created temporary file: ${file.path}');
+    }
+    final success = await EdgeDetection.detectEdge(file.path);
+    if (!success) {
+      if (kDebugMode) {
+        dev.log(
+            '[ScannerPage] Scan either not successful or canceled by user.');
+      }
       return;
     }
-    final file = File(imagePath);
+    if (kDebugMode) {
+      dev.log('[ScannerPage] Wrote image to temporary file: ${file.path}');
+    }
     BlocProvider.of<DocumentScannerCubit>(context).addScan(file);
   }
 
-  void _export(BuildContext context) async {
+  void _onPrepareDocumentUpload(BuildContext context) async {
     final doc = _buildDocumentFromImageFiles(
-        BlocProvider.of<DocumentScannerCubit>(context).state);
+      BlocProvider.of<DocumentScannerCubit>(context).state,
+    );
     final bytes = await doc.save();
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -187,8 +197,14 @@ class _ScannerPageState extends State<ScannerPage>
         itemBuilder: (context, index) {
           return GridImageItemWidget(
             file: scans[index],
-            onDelete: () => BlocProvider.of<DocumentScannerCubit>(context)
-                .removeScan(index),
+            onDelete: () async {
+              try {
+                BlocProvider.of<DocumentScannerCubit>(context)
+                    .removeScan(index);
+              } on ErrorMessage catch (error) {
+                showError(context, error);
+              }
+            },
             index: index,
             totalNumberOfFiles: scans.length,
           );
@@ -196,25 +212,32 @@ class _ScannerPageState extends State<ScannerPage>
   }
 
   void _reset(BuildContext context) {
-    BlocProvider.of<DocumentScannerCubit>(context).reset();
+    try {
+      BlocProvider.of<DocumentScannerCubit>(context).reset();
+    } on ErrorMessage catch (error) {
+      showError(context, error);
+    }
   }
 
   Future<void> _requestCameraPermissions() async {
     final hasPermission = await Permission.camera.isGranted;
     if (!hasPermission) {
-      Permission.camera.request();
+      await Permission.camera.request();
     }
   }
 
   void _onUploadFromFilesystem() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: _supportedExtensions,
+      allowedExtensions: supportedFileExtensions,
       withData: true,
     );
     if (result?.files.single.path != null) {
       File file = File(result!.files.single.path!);
-
+      if (!supportedFileExtensions.contains(file.path.split('.').last)) {
+        //TODO: Show error message;
+        return;
+      }
       final mimeType = lookupMimeType(file.path) ?? '';
       late Uint8List fileBytes;
       if (mimeType.startsWith('image')) {

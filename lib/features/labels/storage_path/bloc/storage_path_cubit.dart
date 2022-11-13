@@ -4,7 +4,7 @@ import 'package:paperless_mobile/features/labels/storage_path/model/storage_path
 
 @singleton
 class StoragePathCubit extends LabelCubit<StoragePath> {
-  StoragePathCubit(super.metaDataService, super.errorCubit);
+  StoragePathCubit(super.metaDataService);
 
   @override
   Future<void> initialize() async {
