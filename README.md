@@ -51,7 +51,8 @@ With this app you can conveniently add, manage or simply find documents stored i
 :heavy_check_mark: **Add**, **delete** or **edit** your documents<br>
 :heavy_check_mark: **Share**, **download** and **preview** PDF files<br>
 :heavy_check_mark: **Manage** and assign correspondents, document types, tags and storage paths<br>
-:heavy_check_mark: **Scan** and upload documents with preset correspondent, document type, tags and creation date<br>
+:heavy_check_mark: **Scan** and upload documents to paperless with preset correspondent, document type, tags and creation date<br>
+:heavy_check_mark: **Upload existing documents** from other apps via Paperless Mobile<br>
 :heavy_check_mark: **Search** for documents using a wide range of filter criteria<br>
 :heavy_check_mark: **Secure** your data with **biometric authentication** across sessions<br>
 :heavy_check_mark: Support for **TLS mutual authentication** (client certificates)<br>
