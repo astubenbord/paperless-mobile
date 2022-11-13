@@ -60,7 +60,7 @@ class InfoDrawer extends StatelessWidget {
                             contentPadding: EdgeInsets.zero,
                             dense: true,
                             title: Text(
-                              'example.paperless.myinstance.com.de',
+                              state.host ?? '',
                               overflow: TextOverflow.ellipsis,
                               textAlign: TextAlign.end,
                               maxLines: 1,
@@ -70,7 +70,7 @@ class InfoDrawer extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 Text(
-                                  'Logged in as anton',
+                                  state.username ?? '',
                                   textAlign: TextAlign.end,
                                 ),
                                 Text(
