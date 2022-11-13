@@ -198,10 +198,8 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
                       child: Text(S
                           .of(context)
                           .documentDetailsPageAssignAsnButtonLabel),
-                      onPressed: widget.allowEdit
-                          ? () => BlocProvider.of<DocumentsCubit>(context)
-                              .assignAsn(document)
-                          : null,
+                      onPressed:
+                          widget.allowEdit ? () => _assignAsn(document) : null,
                     ),
             ),
             _separator(),
@@ -231,6 +229,14 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
         );
       },
     );
+  }
+
+  Future<void> _assignAsn(DocumentModel document) async {
+    try {
+      await BlocProvider.of<DocumentsCubit>(context).assignAsn(document);
+    } on ErrorMessage catch (error) {
+      showError(context, error);
+    }
   }
 
   Widget _buildDocumentContentView(DocumentModel document, String? match) {
@@ -392,21 +398,23 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
     );
   }
 
-  Future<void> _onDelete(DocumentModel document) async {
-    showDialog(
-            context: context,
-            builder: (context) =>
-                DeleteDocumentConfirmationDialog(document: document))
-        .then((delete) {
-      if (delete ?? false) {
-        BlocProvider.of<DocumentsCubit>(context)
-            .removeDocument(document)
-            .then((value) {
-          Navigator.pop(context);
-          showSnackBar(context, S.of(context).documentDeleteSuccessMessage);
-        });
+  void _onDelete(DocumentModel document) async {
+    final delete = await showDialog(
+          context: context,
+          builder: (context) =>
+              DeleteDocumentConfirmationDialog(document: document),
+        ) ??
+        false;
+    if (delete) {
+      try {
+        await BlocProvider.of<DocumentsCubit>(context).removeDocument(document);
+        showSnackBar(context, S.of(context).documentDeleteSuccessMessage);
+      } on ErrorMessage catch (error) {
+        showError(context, error);
+      } finally {
+        Navigator.pop(context);
       }
-    });
+    }
   }
 
   Future<void> _onOpen(DocumentModel document) async {

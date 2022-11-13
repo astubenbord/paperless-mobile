@@ -48,5 +48,6 @@ enum ErrorCode {
   createSavedViewError,
   deleteSavedViewError,
   requestTimedOut,
-  unsupportedFileFormat;
+  unsupportedFileFormat,
+  missingClientCertificate;
 }

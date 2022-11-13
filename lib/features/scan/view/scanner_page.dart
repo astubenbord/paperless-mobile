@@ -8,8 +8,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mime/mime.dart';
-import 'package:paperless_mobile/core/bloc/global_error_cubit.dart';
 import 'package:paperless_mobile/core/bloc/label_bloc_provider.dart';
+import 'package:paperless_mobile/core/global/constants.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/core/service/file_service.dart';
 import 'package:paperless_mobile/di_initializer.dart';
@@ -19,6 +19,7 @@ import 'package:paperless_mobile/features/scan/bloc/document_scanner_cubit.dart'
 import 'package:paperless_mobile/features/scan/view/document_upload_page.dart';
 import 'package:paperless_mobile/features/scan/view/widgets/grid_image_item_widget.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
+import 'package:paperless_mobile/util.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:permission_handler/permission_handler.dart';
@@ -32,15 +33,6 @@ class ScannerPage extends StatefulWidget {
 
 class _ScannerPageState extends State<ScannerPage>
     with SingleTickerProviderStateMixin {
-  static const _supportedExtensions = [
-    'pdf',
-    'png',
-    'tiff',
-    'gif',
-    'jpg',
-    'jpeg'
-  ];
-
   late final AnimationController _fabPulsingController;
   late final Animation _animation;
 
@@ -205,8 +197,14 @@ class _ScannerPageState extends State<ScannerPage>
         itemBuilder: (context, index) {
           return GridImageItemWidget(
             file: scans[index],
-            onDelete: () => BlocProvider.of<DocumentScannerCubit>(context)
-                .removeScan(index),
+            onDelete: () async {
+              try {
+                BlocProvider.of<DocumentScannerCubit>(context)
+                    .removeScan(index);
+              } on ErrorMessage catch (error) {
+                showError(context, error);
+              }
+            },
             index: index,
             totalNumberOfFiles: scans.length,
           );
@@ -214,7 +212,11 @@ class _ScannerPageState extends State<ScannerPage>
   }
 
   void _reset(BuildContext context) {
-    BlocProvider.of<DocumentScannerCubit>(context).reset();
+    try {
+      BlocProvider.of<DocumentScannerCubit>(context).reset();
+    } on ErrorMessage catch (error) {
+      showError(context, error);
+    }
   }
 
   Future<void> _requestCameraPermissions() async {
@@ -227,15 +229,14 @@ class _ScannerPageState extends State<ScannerPage>
   void _onUploadFromFilesystem() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: _supportedExtensions,
+      allowedExtensions: supportedFileExtensions,
       withData: true,
     );
     if (result?.files.single.path != null) {
       File file = File(result!.files.single.path!);
-      if (!_supportedExtensions.contains(file.path.split('.').last)) {
-        return getIt<GlobalErrorCubit>().add(
-          const ErrorMessage(ErrorCode.unsupportedFileFormat),
-        );
+      if (!supportedFileExtensions.contains(file.path.split('.').last)) {
+        //TODO: Show error message;
+        return;
       }
       final mimeType = lookupMimeType(file.path) ?? '';
       late Uint8List fileBytes;

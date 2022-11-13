@@ -22,19 +22,22 @@ class DocumentScannerCubit extends Cubit<List<File>> {
       scans.removeAt(fileIndex);
       emit(scans);
     } catch (_) {
-      addError(const ErrorMessage(ErrorCode.scanRemoveFailed));
+      throw const ErrorMessage(ErrorCode.scanRemoveFailed);
     }
   }
 
   void reset() {
-    for (final doc in state) {
-      doc.deleteSync();
-      if (kDebugMode) {
-        log('[ScannerCubit]: Removed ${doc.path}');
+    try {
+      for (final doc in state) {
+        doc.deleteSync();
+        if (kDebugMode) {
+          log('[ScannerCubit]: Removed ${doc.path}');
+        }
       }
+      imageCache.clear();
+      emit(initialState);
+    } catch (_) {
+      throw const ErrorMessage(ErrorCode.scanRemoveFailed);
     }
-
-    imageCache.clear();
-    emit(initialState);
   }
 }

@@ -1,5 +1,4 @@
 import 'package:bloc_test/bloc_test.dart';
-import 'package:paperless_mobile/core/bloc/global_error_cubit.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
 import 'package:paperless_mobile/features/documents/model/document.model.dart';
@@ -15,32 +14,32 @@ import 'package:mockito/mockito.dart';
 
 import '../../utils.dart';
 @GenerateNiceMocks([MockSpec<DocumentRepository>()])
-@GenerateNiceMocks([MockSpec<GlobalErrorCubit>()])
 import 'document_cubit_test.mocks.dart';
 
 void main() async {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   final List<DocumentModel> documents = List.unmodifiable(
-    await loadCollection("test/fixtures/documents/documents.json", DocumentModel.fromJson),
+    await loadCollection(
+        "test/fixtures/documents/documents.json", DocumentModel.fromJson),
   );
   final List<Tag> tags = List.unmodifiable(
     await loadCollection("test/fixtures/tags/tags.json", Tag.fromJson),
   );
   final List<Correspondent> correspondents = List.unmodifiable(
-    await loadCollection(
-        "test/fixtures/correspondents/correspondents.json", Correspondent.fromJson),
+    await loadCollection("test/fixtures/correspondents/correspondents.json",
+        Correspondent.fromJson),
   );
   final List<DocumentType> documentTypes = List.unmodifiable(
-    await loadCollection("test/fixtures/document_types/document_types.json", DocumentType.fromJson),
+    await loadCollection("test/fixtures/document_types/document_types.json",
+        DocumentType.fromJson),
   );
 
   final MockDocumentRepository documentRepository = MockDocumentRepository();
-  final MockGlobalErrorCubit globalErrorCubit = MockGlobalErrorCubit();
 
   group("Test DocumentsCubit reloadDocuments", () {
     test("Assert correct initial state", () {
-      expect(DocumentsCubit(documentRepository, globalErrorCubit).state, DocumentsState.initial);
+      expect(DocumentsCubit(documentRepository).state, DocumentsState.initial);
     });
 
     blocTest<DocumentsCubit, DocumentsState>(
@@ -53,7 +52,7 @@ void main() async {
           results: documents,
         ),
       ),
-      build: () => DocumentsCubit(documentRepository, globalErrorCubit),
+      build: () => DocumentsCubit(documentRepository),
       seed: () => DocumentsState.initial,
       act: (bloc) => bloc.loadDocuments(),
       expect: () => [
@@ -82,7 +81,7 @@ void main() async {
           results: documents,
         ),
       ),
-      build: () => DocumentsCubit(documentRepository, globalErrorCubit),
+      build: () => DocumentsCubit(documentRepository),
       seed: () => DocumentsState.initial,
       act: (bloc) => bloc.loadDocuments(),
       expect: () => [

@@ -138,8 +138,10 @@ class DocumentRepositoryImpl implements DocumentRepository {
         body: json.encode(doc.toJson()),
         headers: {"Content-Type": "application/json"}).timeout(requestTimeout);
     if (response.statusCode == 200) {
-      return DocumentModel.fromJson(
-          jsonDecode(utf8.decode(response.bodyBytes)));
+      return compute(
+        DocumentModel.fromJson,
+        jsonDecode(utf8.decode(response.bodyBytes)) as JSON,
+      );
     } else {
       throw const ErrorMessage(ErrorCode.documentUpdateFailed);
     }
@@ -152,11 +154,13 @@ class DocumentRepositoryImpl implements DocumentRepository {
       Uri.parse("/api/documents/?$filterParams"),
     );
     if (response.statusCode == 200) {
-      final searchResult = PagedSearchResult.fromJson(
-        jsonDecode(utf8.decode(response.bodyBytes)),
-        DocumentModel.fromJson,
+      return compute(
+        PagedSearchResult.fromJson,
+        PagedSearchResultJsonSerializer<DocumentModel>(
+          jsonDecode(utf8.decode(response.bodyBytes)),
+          DocumentModel.fromJson,
+        ),
       );
-      return searchResult;
     } else {
       throw const ErrorMessage(ErrorCode.documentLoadFailed);
     }
@@ -261,8 +265,10 @@ class DocumentRepositoryImpl implements DocumentRepository {
   Future<DocumentMetaData> getMetaData(DocumentModel document) async {
     final response = await httpClient
         .get(Uri.parse("/api/documents/${document.id}/metadata/"));
-    return DocumentMetaData.fromJson(
-        jsonDecode(utf8.decode(response.bodyBytes)));
+    return compute(
+      DocumentMetaData.fromJson,
+      jsonDecode(utf8.decode(response.bodyBytes)) as JSON,
+    );
   }
 
   @override
@@ -280,10 +286,14 @@ class DocumentRepositoryImpl implements DocumentRepository {
     final response = await httpClient
         .get(Uri.parse("/api/documents/?more_like=$docId&pageSize=10"));
     if (response.statusCode == 200) {
-      return PagedSearchResult<SimilarDocumentModel>.fromJson(
-        jsonDecode(utf8.decode(response.bodyBytes)),
-        SimilarDocumentModel.fromJson,
-      ).results;
+      return (await compute(
+        PagedSearchResult<SimilarDocumentModel>.fromJson,
+        PagedSearchResultJsonSerializer(
+          jsonDecode(utf8.decode(response.bodyBytes)),
+          SimilarDocumentModel.fromJson,
+        ),
+      ))
+          .results;
     }
     throw const ErrorMessage(ErrorCode.similarQueryError);
   }

@@ -74,14 +74,22 @@ class _DocumentsPageAppBarState extends State<DocumentsPageAppBar> {
 
   void _onDelete(BuildContext context, DocumentsState documentsState) async {
     final shouldDelete = await showDialog<bool>(
-      context: context,
-      builder: (context) => BulkDeleteConfirmationDialog(state: documentsState),
-    );
-    if (shouldDelete ?? false) {
-      BlocProvider.of<DocumentsCubit>(context)
-          .bulkRemoveDocuments(documentsState.selection)
-          .then((_) => showSnackBar(
-              context, S.of(context).documentsPageBulkDeleteSuccessfulText));
+          context: context,
+          builder: (context) =>
+              BulkDeleteConfirmationDialog(state: documentsState),
+        ) ??
+        false;
+    if (shouldDelete) {
+      try {
+        await BlocProvider.of<DocumentsCubit>(context)
+            .bulkRemoveDocuments(documentsState.selection);
+        showSnackBar(
+          context,
+          S.of(context).documentsPageBulkDeleteSuccessfulText,
+        );
+      } on ErrorMessage catch (error) {
+        showError(context, error);
+      }
     }
   }
 

@@ -1,7 +1,7 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:paperless_mobile/core/bloc/global_error_cubit.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/core/store/local_vault.dart';
 import 'package:paperless_mobile/di_initializer.dart';
@@ -17,13 +17,11 @@ const authenticationKey = "authentication";
 @singleton
 class AuthenticationCubit extends Cubit<AuthenticationState> {
   final LocalVault localStore;
-  final GlobalErrorCubit errorCubit;
   final AuthenticationService authenticationService;
 
   AuthenticationCubit(
     this.localStore,
     this.authenticationService,
-    this.errorCubit,
   ) : super(AuthenticationState.initial);
 
   Future<void> initialize() {
@@ -34,7 +32,6 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     required UserCredentials credentials,
     required String serverUrl,
     ClientCertificate? clientCertificate,
-    bool propagateEventOnError = true,
   }) async {
     assert(credentials.username != null && credentials.password != null);
     try {
@@ -75,60 +72,37 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     } on TlsException catch (_) {
       const error =
           ErrorMessage(ErrorCode.invalidClientCertificateConfiguration);
-      if (propagateEventOnError) {
-        errorCubit.add(error);
-      }
       throw error;
     } on SocketException catch (err) {
-      late ErrorMessage error;
       if (err.message.contains("connection timed out")) {
-        error = const ErrorMessage(ErrorCode.requestTimedOut);
+        throw const ErrorMessage(ErrorCode.requestTimedOut);
       } else {
-        error = ErrorMessage.unknown();
+        throw ErrorMessage.unknown();
       }
-      if (propagateEventOnError) {
-        errorCubit.add(error);
-      }
-      rethrow;
-    } on ErrorMessage catch (error) {
-      if (propagateEventOnError) {
-        errorCubit.add(error);
-      }
-      rethrow;
     }
   }
 
-  Future<void> restoreSessionState({
-    bool propagateEventOnError = true,
-  }) async {
-    try {
-      final storedAuth = await localStore.loadAuthenticationInformation();
-      final appSettings = await localStore.loadApplicationSettings() ??
-          ApplicationSettingsState.defaultSettings;
+  Future<void> restoreSessionState() async {
+    final storedAuth = await localStore.loadAuthenticationInformation();
+    final appSettings = await localStore.loadApplicationSettings() ??
+        ApplicationSettingsState.defaultSettings;
 
-      if (storedAuth == null || !storedAuth.isValid) {
+    if (storedAuth == null || !storedAuth.isValid) {
+      emit(AuthenticationState(isAuthenticated: false, wasLoginStored: false));
+    } else {
+      if (!appSettings.isLocalAuthenticationEnabled ||
+          await authenticationService
+              .authenticateLocalUser("Authenticate to log back in")) {
+        registerSecurityContext(storedAuth.clientCertificate);
         emit(
-            AuthenticationState(isAuthenticated: false, wasLoginStored: false));
+          AuthenticationState(
+            isAuthenticated: true,
+            wasLoginStored: true,
+            authentication: storedAuth,
+          ),
+        );
       } else {
-        if (!appSettings.isLocalAuthenticationEnabled ||
-            await authenticationService
-                .authenticateLocalUser("Authenticate to log back in")) {
-          registerSecurityContext(storedAuth.clientCertificate);
-          emit(
-            AuthenticationState(
-              isAuthenticated: true,
-              wasLoginStored: true,
-              authentication: storedAuth,
-            ),
-          );
-        } else {
-          emit(AuthenticationState(
-              isAuthenticated: false, wasLoginStored: true));
-        }
-      }
-    } on ErrorMessage catch (error) {
-      if (propagateEventOnError) {
-        errorCubit.add(error);
+        emit(AuthenticationState(isAuthenticated: false, wasLoginStored: true));
       }
     }
   }

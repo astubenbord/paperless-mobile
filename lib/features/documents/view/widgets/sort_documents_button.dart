@@ -43,11 +43,18 @@ class _SortDocumentsButtonState extends State<SortDocumentsButton> {
             ),
             onPressed: () async {
               setState(() => _isLoading = true);
-              BlocProvider.of<DocumentsCubit>(context)
-                  .updateFilter(
-                      filter: state.filter
-                          .copyWith(sortOrder: state.filter.sortOrder.toggle()))
-                  .whenComplete(() => setState(() => _isLoading = false));
+              try {
+                await BlocProvider.of<DocumentsCubit>(context)
+                    .updateCurrentFilter(
+                  (filter) => filter.copyWith(
+                    sortOrder: state.filter.sortOrder.toggle(),
+                  ),
+                );
+              } on ErrorMessage catch (error) {
+                showError(context, error);
+              } finally {
+                setState(() => _isLoading = false);
+              }
             },
           );
         }

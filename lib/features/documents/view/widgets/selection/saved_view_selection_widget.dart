@@ -78,22 +78,32 @@ class SavedViewSelectionWidget extends StatelessWidget {
     final newView = await Navigator.of(context).push<SavedView?>(
       MaterialPageRoute(
         builder: (context) => AddSavedViewPage(
-            currentFilter: getIt<DocumentsCubit>().state.filter),
+          currentFilter: getIt<DocumentsCubit>().state.filter,
+        ),
       ),
     );
     if (newView != null) {
-      BlocProvider.of<SavedViewCubit>(context).add(newView);
+      try {
+        await BlocProvider.of<SavedViewCubit>(context).add(newView);
+      } on ErrorMessage catch (error) {
+        showError(context, error);
+      }
     }
   }
 
-  void _onSelected(bool isSelected, BuildContext context, SavedView view) {
-    if (isSelected) {
-      BlocProvider.of<DocumentsCubit>(context)
-          .updateFilter(filter: view.toDocumentFilter());
-      BlocProvider.of<SavedViewCubit>(context).selectView(view);
-    } else {
-      BlocProvider.of<DocumentsCubit>(context).updateFilter();
-      BlocProvider.of<SavedViewCubit>(context).selectView(null);
+  void _onSelected(
+      bool isSelected, BuildContext context, SavedView view) async {
+    try {
+      if (isSelected) {
+        BlocProvider.of<DocumentsCubit>(context)
+            .updateFilter(filter: view.toDocumentFilter());
+        BlocProvider.of<SavedViewCubit>(context).selectView(view);
+      } else {
+        BlocProvider.of<DocumentsCubit>(context).updateFilter();
+        BlocProvider.of<SavedViewCubit>(context).selectView(null);
+      }
+    } on ErrorMessage catch (error) {
+      showError(context, error);
     }
   }
 
@@ -105,7 +115,11 @@ class SavedViewSelectionWidget extends StatelessWidget {
           ) ??
           false;
       if (delete) {
-        BlocProvider.of<SavedViewCubit>(context).remove(view);
+        try {
+          BlocProvider.of<SavedViewCubit>(context).remove(view);
+        } on ErrorMessage catch (error) {
+          showError(context, error);
+        }
       }
     }
   }

@@ -66,5 +66,7 @@ String translateError(BuildContext context, ErrorCode code) {
       return S.of(context).errorMessageRequestTimedOut;
     case ErrorCode.unsupportedFileFormat:
       return S.of(context).errorMessageUnsupportedFileFormat;
+    case ErrorCode.missingClientCertificate:
+      return S.of(context).errorMessageMissingClientCertificate;
   }
 }

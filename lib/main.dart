@@ -9,11 +9,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
-import 'package:paperless_mobile/core/bloc/global_error_cubit.dart';
 import 'package:paperless_mobile/core/bloc/label_bloc_provider.dart';
 import 'package:paperless_mobile/core/global/asset_images.dart';
+import 'package:paperless_mobile/core/global/constants.dart';
 import 'package:paperless_mobile/core/global/http_self_signed_certificate_override.dart';
 import 'package:paperless_mobile/core/logic/error_code_localization_mapper.dart';
+import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/core/service/file_service.dart';
 import 'package:paperless_mobile/core/util.dart';
 import 'package:paperless_mobile/di_initializer.dart';
@@ -148,51 +149,46 @@ class AuthenticationWrapper extends StatefulWidget {
 }
 
 class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
+  bool isFileTypeSupported(SharedMediaFile file) {
+    return supportedFileExtensions.contains(file.path.split('.').last);
+  }
+
+  void handleReceivedFiles(List<SharedMediaFile> files) async {
+    if (files.isEmpty) {
+      return;
+    }
+    if (!isFileTypeSupported(files.first)) {
+      showError(context, const ErrorMessage(ErrorCode.unsupportedFileFormat));
+      await Future.delayed(
+        const Duration(seconds: 2),
+        () => SystemNavigator.pop(),
+      );
+    }
+    final bytes = File(files.first.path).readAsBytesSync();
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BlocProvider.value(
+          value: getIt<DocumentsCubit>(),
+          child: LabelBlocProvider(
+            child: DocumentUploadPage(
+              fileBytes: bytes,
+              afterUpload: () => SystemNavigator.pop(),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
     // For sharing files coming from outside the app while the app is still opened
-    ReceiveSharingIntent.getMediaStream().listen((List<SharedMediaFile> value) {
-      final bytes = File(value.first.path).readAsBytesSync();
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => BlocProvider.value(
-            value: getIt<DocumentsCubit>(),
-            child: LabelBlocProvider(
-              child: DocumentUploadPage(
-                fileBytes: bytes,
-                afterUpload: () => SystemNavigator.pop(),
-              ),
-            ),
-          ),
-        ),
-      );
-    }, onError: (err) {
-      log(err);
-    });
+    ReceiveSharingIntent.getMediaStream().listen(handleReceivedFiles);
 
     // For sharing files coming from outside the app while the app is closed
-    ReceiveSharingIntent.getInitialMedia().then((List<SharedMediaFile> value) {
-      if (value.isEmpty) {
-        return;
-      }
-      final bytes = File(value.first.path).readAsBytesSync();
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => BlocProvider.value(
-            value: getIt<DocumentsCubit>(),
-            child: LabelBlocProvider(
-              child: DocumentUploadPage(
-                fileBytes: bytes,
-                afterUpload: () => SystemNavigator.pop(),
-              ),
-            ),
-          ),
-        ),
-      );
-    });
+    ReceiveSharingIntent.getInitialMedia().then(handleReceivedFiles);
   }
 
   @override
@@ -206,47 +202,37 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: getIt<GlobalErrorCubit>(),
-      child: BlocListener<GlobalErrorCubit, GlobalErrorState>(
-        listener: (context, state) {
-          if (state.hasError) {
-            showSnackBar(context, translateError(context, state.error!.code));
+    return SafeArea(
+      top: true,
+      left: false,
+      right: false,
+      bottom: false,
+      child: BlocConsumer<AuthenticationCubit, AuthenticationState>(
+        listener: (context, authState) {
+          final bool showIntroSlider =
+              authState.isAuthenticated && !authState.wasLoginStored;
+          if (showIntroSlider) {
+            for (final img in AssetImages.values) {
+              img.load(context);
+            }
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const ApplicationIntroSlideshow(),
+                fullscreenDialog: true,
+              ),
+            );
           }
         },
-        child: SafeArea(
-          top: true,
-          left: false,
-          right: false,
-          bottom: false,
-          child: BlocConsumer<AuthenticationCubit, AuthenticationState>(
-            listener: (context, authState) {
-              final bool showIntroSlider =
-                  authState.isAuthenticated && !authState.wasLoginStored;
-              if (showIntroSlider) {
-                for (final img in AssetImages.values) {
-                  img.load(context);
-                }
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ApplicationIntroSlideshow(),
-                    fullscreenDialog: true,
-                  ),
-                );
-              }
-            },
-            builder: (context, authentication) {
-              if (authentication.isAuthenticated) {
-                return const LabelBlocProvider(
-                  child: HomePage(),
-                );
-              } else {
-                return const LoginPage();
-              }
-            },
-          ),
-        ),
+        builder: (context, authentication) {
+          if (authentication.isAuthenticated) {
+            return const LabelBlocProvider(
+              child: HomePage(),
+            );
+          } else {
+            return const LoginPage();
+          }
+        },
       ),
     );
   }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
-import 'package:paperless_mobile/core/bloc/global_error_cubit.dart';
 import 'package:paperless_mobile/core/logic/error_code_localization_mapper.dart';
+import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/core/widgets/offline_banner.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
@@ -74,10 +74,14 @@ class _HomePageState extends State<HomePage> {
   }
 
   initializeLabelData(BuildContext context) {
-    BlocProvider.of<DocumentTypeCubit>(context).initialize();
-    BlocProvider.of<CorrespondentCubit>(context).initialize();
-    BlocProvider.of<TagCubit>(context).initialize();
-    BlocProvider.of<StoragePathCubit>(context).initialize();
-    BlocProvider.of<SavedViewCubit>(context).initialize();
+    try {
+      BlocProvider.of<DocumentTypeCubit>(context).initialize();
+      BlocProvider.of<CorrespondentCubit>(context).initialize();
+      BlocProvider.of<TagCubit>(context).initialize();
+      BlocProvider.of<StoragePathCubit>(context).initialize();
+      BlocProvider.of<SavedViewCubit>(context).initialize();
+    } on ErrorMessage catch (error) {
+      showError(context, error);
+    }
   }
 }

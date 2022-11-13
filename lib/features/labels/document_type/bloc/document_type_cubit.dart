@@ -5,7 +5,7 @@ import 'package:injectable/injectable.dart';
 
 @singleton
 class DocumentTypeCubit extends LabelCubit<DocumentType> {
-  DocumentTypeCubit(super.metaDataService, super.errorCubit);
+  DocumentTypeCubit(super.metaDataService);
 
   @override
   Future<void> initialize() async {

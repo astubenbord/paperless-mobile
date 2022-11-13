@@ -4,7 +4,7 @@ import 'package:injectable/injectable.dart';
 
 @singleton
 class CorrespondentCubit extends LabelCubit<Correspondent> {
-  CorrespondentCubit(super.metaDataService, super.errorCubit);
+  CorrespondentCubit(super.metaDataService);
 
   @override
   Future<void> initialize() async {

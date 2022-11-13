@@ -38,22 +38,27 @@ class TagWidget extends StatelessWidget {
 
   void _addTagToFilter(BuildContext context) {
     final cubit = BlocProvider.of<DocumentsCubit>(context);
-    if (cubit.state.filter.tags.ids.contains(tag.id)) {
-      cubit.updateCurrentFilter(
-        (filter) => filter.copyWith(
-          tags: TagsQuery.fromIds(
-              cubit.state.filter.tags.ids.where((id) => id != tag.id).toList()),
-        ),
-      );
-    } else {
-      cubit.updateCurrentFilter(
-        (filter) => filter.copyWith(
-          tags: TagsQuery.fromIds([...cubit.state.filter.tags.ids, tag.id!]),
-        ),
-      );
-    }
-    if (afterTagTapped != null) {
-      afterTagTapped!();
+    try {
+      if (cubit.state.filter.tags.ids.contains(tag.id)) {
+        cubit.updateCurrentFilter(
+          (filter) => filter.copyWith(
+            tags: TagsQuery.fromIds(cubit.state.filter.tags.ids
+                .where((id) => id != tag.id)
+                .toList()),
+          ),
+        );
+      } else {
+        cubit.updateCurrentFilter(
+          (filter) => filter.copyWith(
+            tags: TagsQuery.fromIds([...cubit.state.filter.tags.ids, tag.id!]),
+          ),
+        );
+      }
+      if (afterTagTapped != null) {
+        afterTagTapped!();
+      }
+    } on ErrorMessage catch (error) {
+      showError(context, error);
     }
   }
 }
