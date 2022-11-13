@@ -77,17 +77,6 @@ class _DocumentsPageState extends State<DocumentsPage> {
     } on ErrorMessage catch (error, stackTrace) {
       showError(context, error, stackTrace);
     }
-    Future.delayed(const Duration(seconds: 1), () {
-      try {
-        throw ErrorMessage(ErrorCode.tagLoadFailed);
-      } on ErrorMessage catch (error, stackTrace) {
-        showError(
-          context,
-          error,
-          stackTrace,
-        );
-      }
-    });
   }
 
   void _onSelected(DocumentModel model) {
