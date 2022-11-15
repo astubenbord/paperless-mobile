@@ -26,6 +26,12 @@ class InfoDrawer extends StatelessWidget {
       child: ListView(
         children: [
           DrawerHeader(
+            padding: EdgeInsets.only(
+              top: 8,
+              left: 8,
+              bottom: 0,
+              right: 8,
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -60,25 +66,45 @@ class InfoDrawer extends StatelessWidget {
                             contentPadding: EdgeInsets.zero,
                             dense: true,
                             title: Text(
-                              state.host ?? '',
+                              S.of(context).appDrawerHeaderLoggedInAsText +
+                                  (state.username ?? '?'),
+                              style: Theme.of(context).textTheme.bodyText2,
                               overflow: TextOverflow.ellipsis,
                               textAlign: TextAlign.end,
                               maxLines: 1,
                             ),
-                            isThreeLine: true,
                             subtitle: Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 Text(
-                                  state.username ?? '',
+                                  state.host ?? '',
+                                  style: Theme.of(context).textTheme.bodyText2,
+                                  overflow: TextOverflow.ellipsis,
                                   textAlign: TextAlign.end,
+                                  maxLines: 1,
                                 ),
                                 Text(
                                   '${S.of(context).serverInformationPaperlessVersionText} ${state.version} (API v${state.apiVersion})',
                                   style: Theme.of(context).textTheme.caption,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.end,
+                                  maxLines: 1,
                                 ),
                               ],
                             ),
+                            // title: RichText(
+
+                            //   text: TextSpan(
+                            //     children: [
+                            //       TextSpan(
+                            //         text:
+                            //         style:
+                            //             Theme.of(context).textTheme.bodyText2,
+                            //       ),
+                            //     ],
+                            //   ),
+                            // ),
+                            isThreeLine: true,
                           ),
                         ],
                       );

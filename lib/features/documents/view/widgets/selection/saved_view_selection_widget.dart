@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
@@ -17,9 +15,11 @@ class SavedViewSelectionWidget extends StatelessWidget {
   const SavedViewSelectionWidget({
     Key? key,
     required this.height,
+    required this.enabled,
   }) : super(key: key);
 
   final double height;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +33,7 @@ class SavedViewSelectionWidget extends StatelessWidget {
               return Text(S.of(context).savedViewsEmptyStateText);
             }
             return SizedBox(
-              height: 48.0,
+              height: height,
               child: ListView.separated(
                 itemCount: state.value.length,
                 scrollDirection: Axis.horizontal,
@@ -44,8 +44,10 @@ class SavedViewSelectionWidget extends StatelessWidget {
                     child: FilterChip(
                       label: Text(state.value.values.toList()[index].name),
                       selected: view.id == state.selectedSavedViewId,
-                      onSelected: (isSelected) =>
-                          _onSelected(isSelected, context, view),
+                      onSelected: enabled
+                          ? (isSelected) =>
+                              _onSelected(isSelected, context, view)
+                          : null,
                     ),
                   );
                 },
@@ -65,7 +67,7 @@ class SavedViewSelectionWidget extends StatelessWidget {
             ),
             TextButton.icon(
               icon: const Icon(Icons.add),
-              onPressed: () => _onCreatePressed(context),
+              onPressed: enabled ? () => _onCreatePressed(context) : null,
               label: Text(S.of(context).savedViewCreateNewLabel),
             ),
           ],

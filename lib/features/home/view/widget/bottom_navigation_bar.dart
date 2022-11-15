@@ -19,7 +19,7 @@ class BottomNavBar extends StatelessWidget {
       selectedIndex: selectedIndex,
       destinations: [
         NavigationDestination(
-          icon: const Icon(Icons.description_outlined),
+          icon: const Icon(Icons.description),
           selectedIcon: Icon(
             Icons.description,
             color: Theme.of(context).colorScheme.primary,

@@ -130,8 +130,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
               controller: _panelController,
               defaultPanelState: PanelState.CLOSED,
               minHeight: 48,
-              maxHeight: MediaQuery.of(context).size.height -
-                  kBottomNavigationBarHeight,
+              maxHeight: (MediaQuery.of(context).size.height * 3) / 4,
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),
@@ -193,7 +192,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
           onRefresh: _onRefresh,
           child: Container(
             padding: const EdgeInsets.only(
-              bottom: 142,
+              bottom: 48 + kBottomNavigationBarHeight + 48,
             ), // Prevents panel from hiding scrollable content
             child: CustomScrollView(
               slivers: [
@@ -211,7 +210,12 @@ class _DocumentsPageState extends State<DocumentsPage> {
                     ),
                   ],
                 ),
-                child
+                child,
+                // SliverToBoxAdapter(
+                //   child: SizedBox(
+                //     height: MediaQuery.of(context).size.height / 3,
+                //   ),
+                // )
               ],
             ),
           ),

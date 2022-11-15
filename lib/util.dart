@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -9,6 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:paperless_mobile/core/service/github_issue_service.dart';
 import 'package:paperless_mobile/generated/intl/messages_de.dart';
+import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:path_provider/path_provider.dart';
 
 final dateFormat = DateFormat("yyyy-MM-dd");
@@ -42,13 +44,19 @@ void showError(
     translateError(context, error.code),
     details: error.details,
     action: SnackBarAction(
-      label: "REPORT",
+      label: S.of(context).errorReportLabel,
       textColor: Colors.amber,
       onPressed: () => GithubIssueService.createIssueFromError(
         context,
         stackTrace: stackTrace,
       ),
     ),
+  );
+  log(
+    "An error has occurred.",
+    error: error,
+    stackTrace: stackTrace,
+    time: DateTime.now(),
   );
 }
 
