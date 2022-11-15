@@ -33,43 +33,13 @@ class ScannerPage extends StatefulWidget {
 
 class _ScannerPageState extends State<ScannerPage>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _fabPulsingController;
-  late final Animation _animation;
-
-  @override
-  void initState() {
-    super.initState();
-    _fabPulsingController =
-        AnimationController(vsync: this, duration: const Duration(seconds: 1))
-          ..repeat(reverse: true);
-    _animation = Tween(begin: 1.0, end: 1.2).animate(_fabPulsingController)
-      ..addListener(() => setState((() {})));
-  }
-
-  @override
-  void dispose() {
-    _fabPulsingController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: const InfoDrawer(),
-      floatingActionButton: BlocBuilder<DocumentScannerCubit, List<File>>(
-        builder: (context, state) {
-          final fab = FloatingActionButton(
-            onPressed: () => _openDocumentScanner(context),
-            child: const Icon(Icons.add_a_photo_outlined),
-          );
-          if (state.isEmpty) {
-            return Transform.scale(
-              child: fab,
-              scale: _animation.value,
-            );
-          }
-          return fab;
-        },
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _openDocumentScanner(context),
+        child: const Icon(Icons.add_a_photo_outlined),
       ),
       appBar: _buildAppBar(context),
       body: Padding(
@@ -201,8 +171,8 @@ class _ScannerPageState extends State<ScannerPage>
               try {
                 BlocProvider.of<DocumentScannerCubit>(context)
                     .removeScan(index);
-              } on ErrorMessage catch (error) {
-                showError(context, error);
+              } on ErrorMessage catch (error, stackTrace) {
+                showError(context, error, stackTrace);
               }
             },
             index: index,
@@ -214,8 +184,8 @@ class _ScannerPageState extends State<ScannerPage>
   void _reset(BuildContext context) {
     try {
       BlocProvider.of<DocumentScannerCubit>(context).reset();
-    } on ErrorMessage catch (error) {
-      showError(context, error);
+    } on ErrorMessage catch (error, stackTrace) {
+      showError(context, error, stackTrace);
     }
   }
 

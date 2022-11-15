@@ -146,8 +146,8 @@ class _EditLabelPageState<T extends Label> extends State<EditLabelPage<T>> {
         Navigator.pop(context);
       } on PaperlessValidationErrors catch (errorMessages) {
         setState(() => _errors = errorMessages);
-      } on ErrorMessage catch (error) {
-        showError(context, error);
+      } on ErrorMessage catch (error, stackTrace) {
+        showError(context, error, stackTrace);
       }
     }
   }

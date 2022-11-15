@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
 import 'package:paperless_mobile/core/logic/error_code_localization_mapper.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
+import 'package:paperless_mobile/core/service/github_issue_service.dart';
 import 'package:paperless_mobile/core/widgets/offline_banner.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/labels/correspondent/bloc/correspondents_cubit.dart';
@@ -53,8 +54,8 @@ class _DocumentsPageState extends State<DocumentsPage> {
   Future<void> _initDocuments() async {
     try {
       BlocProvider.of<DocumentsCubit>(context).loadDocuments();
-    } on ErrorMessage catch (error) {
-      showError(context, error);
+    } on ErrorMessage catch (error, stackTrace) {
+      showError(context, error, stackTrace);
     }
   }
 
@@ -73,8 +74,8 @@ class _DocumentsPageState extends State<DocumentsPage> {
     }
     try {
       await documentsCubit.loadMore();
-    } on ErrorMessage catch (error) {
-      showError(context, error);
+    } on ErrorMessage catch (error, stackTrace) {
+      showError(context, error, stackTrace);
     }
   }
 
@@ -87,8 +88,8 @@ class _DocumentsPageState extends State<DocumentsPage> {
       await BlocProvider.of<DocumentsCubit>(context).updateCurrentFilter(
         (filter) => filter.copyWith(page: 1),
       );
-    } on ErrorMessage catch (error) {
-      showError(context, error);
+    } on ErrorMessage catch (error, stackTrace) {
+      showError(context, error, stackTrace);
     }
   }
 
@@ -129,8 +130,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
               controller: _panelController,
               defaultPanelState: PanelState.CLOSED,
               minHeight: 48,
-              maxHeight: MediaQuery.of(context).size.height -
-                  kBottomNavigationBarHeight,
+              maxHeight: (MediaQuery.of(context).size.height * 3) / 4,
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),
@@ -192,7 +192,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
           onRefresh: _onRefresh,
           child: Container(
             padding: const EdgeInsets.only(
-              bottom: 142,
+              bottom: 48 + kBottomNavigationBarHeight + 48,
             ), // Prevents panel from hiding scrollable content
             child: CustomScrollView(
               slivers: [
@@ -210,7 +210,12 @@ class _DocumentsPageState extends State<DocumentsPage> {
                     ),
                   ],
                 ),
-                child
+                child,
+                // SliverToBoxAdapter(
+                //   child: SizedBox(
+                //     height: MediaQuery.of(context).size.height / 3,
+                //   ),
+                // )
               ],
             ),
           ),

@@ -24,7 +24,7 @@ Future<T> getSingleResult<T>(
       jsonDecode(utf8.decode(response.bodyBytes)) as JSON,
     );
   }
-  return Future.error(errorCode);
+  throw ErrorMessage(errorCode);
 }
 
 Future<List<T>> getCollection<T>(
@@ -52,7 +52,7 @@ Future<List<T>> getCollection<T>(
       }
     }
   }
-  return Future.error(errorCode);
+  throw ErrorMessage(errorCode);
 }
 
 List<T> _collectionFromJson<T>(

@@ -212,12 +212,12 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
         showSnackBar(context, S.of(context).documentUploadSuccessText);
         Navigator.pop(context);
         widget.afterUpload?.call();
-      } on ErrorMessage catch (error) {
-        showError(context, error);
+      } on ErrorMessage catch (error, stackTrace) {
+        showError(context, error, stackTrace);
       } on PaperlessValidationErrors catch (errorMessages) {
         setState(() => _errors = errorMessages);
-      } catch (other) {
-        showSnackBar(context, other.toString());
+      } catch (unknownError, stackTrace) {
+        showError(context, ErrorMessage.unknown(), stackTrace);
       } finally {
         setState(() {
           _isUploadLoading = false;
@@ -233,8 +233,8 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
           onPressed: () async {
             try {
               getIt<DocumentsCubit>().reloadDocuments();
-            } on ErrorMessage catch (error) {
-              showError(context, error);
+            } on ErrorMessage catch (error, stackTrace) {
+              showError(context, error, stackTrace);
             }
           },
           label:

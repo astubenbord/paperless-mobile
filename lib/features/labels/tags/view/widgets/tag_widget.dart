@@ -28,6 +28,7 @@ class TagWidget extends StatelessWidget {
               tag.name,
               style: TextStyle(color: tag.textColor),
             ),
+            checkmarkColor: tag.textColor,
             backgroundColor: tag.color,
             side: BorderSide.none,
           );
@@ -57,8 +58,8 @@ class TagWidget extends StatelessWidget {
       if (afterTagTapped != null) {
         afterTagTapped!();
       }
-    } on ErrorMessage catch (error) {
-      showError(context, error);
+    } on ErrorMessage catch (error, stackTrace) {
+      showError(context, error, stackTrace);
     }
   }
 }

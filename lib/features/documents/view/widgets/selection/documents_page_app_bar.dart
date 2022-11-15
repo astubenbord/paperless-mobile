@@ -6,6 +6,7 @@ import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/selection/bulk_delete_confirmation_dialog.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/selection/saved_view_selection_widget.dart';
+import 'package:paperless_mobile/features/documents/view/widgets/sort_documents_button.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:paperless_mobile/util.dart';
 
@@ -28,12 +29,14 @@ class _DocumentsPageAppBarState extends State<DocumentsPageAppBar> {
   Widget build(BuildContext context) {
     return BlocBuilder<DocumentsCubit, DocumentsState>(
       builder: (context, documentsState) {
-        if (documentsState.selection.isNotEmpty) {
+        final hasSelection = documentsState.selection.isNotEmpty;
+        if (hasSelection) {
           return SliverAppBar(
+            expandedHeight: kToolbarHeight + _flexibleAreaHeight,
             snap: true,
             floating: true,
             pinned: true,
-            expandedHeight: kToolbarHeight,
+            flexibleSpace: _buildFlexibleArea(false),
             leading: IconButton(
               icon: const Icon(Icons.close),
               onPressed: () =>
@@ -51,13 +54,10 @@ class _DocumentsPageAppBarState extends State<DocumentsPageAppBar> {
         } else {
           return SliverAppBar(
             expandedHeight: kToolbarHeight + _flexibleAreaHeight,
+            snap: true,
+            floating: true,
             pinned: true,
-            flexibleSpace: const FlexibleSpaceBar(
-              background: Padding(
-                padding: EdgeInsets.all(8.0),
-                child: SavedViewSelectionWidget(height: _flexibleAreaHeight),
-              ),
-            ),
+            flexibleSpace: _buildFlexibleArea(true),
             title: BlocBuilder<DocumentsCubit, DocumentsState>(
               builder: (context, state) {
                 return Text(
@@ -65,10 +65,27 @@ class _DocumentsPageAppBarState extends State<DocumentsPageAppBar> {
                 );
               },
             ),
-            actions: widget.actions,
+            actions: [
+              ...widget.actions,
+            ],
           );
         }
       },
+    );
+  }
+
+  Widget _buildFlexibleArea(bool enabled) {
+    return FlexibleSpaceBar(
+      background: Padding(
+        padding: EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+//TODO: replace with sorting stuff...
+            SavedViewSelectionWidget(height: 48, enabled: enabled),
+          ],
+        ),
+      ),
     );
   }
 
@@ -87,8 +104,8 @@ class _DocumentsPageAppBarState extends State<DocumentsPageAppBar> {
           context,
           S.of(context).documentsPageBulkDeleteSuccessfulText,
         );
-      } on ErrorMessage catch (error) {
-        showError(context, error);
+      } on ErrorMessage catch (error, stackTrace) {
+        showError(context, error, stackTrace);
       }
     }
   }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
-import 'package:paperless_mobile/core/logic/error_code_localization_mapper.dart';
+import 'package:paperless_mobile/core/bloc/paperless_server_information_cubit.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/core/widgets/offline_banner.dart';
 import 'package:paperless_mobile/di_initializer.dart';
@@ -32,7 +32,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    initializeLabelData(context);
+    _initializeData(context);
   }
 
   @override
@@ -41,7 +41,7 @@ class _HomePageState extends State<HomePage> {
       //Only re-initialize data if the connectivity changed from not connected to connected
       listenWhen: (previous, current) => current == ConnectivityState.connected,
       listener: (context, state) {
-        initializeLabelData(context);
+        _initializeData(context);
       },
       builder: (context, connectivityState) {
         return Scaffold(
@@ -73,15 +73,17 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  initializeLabelData(BuildContext context) {
+  _initializeData(BuildContext context) async {
     try {
+      await BlocProvider.of<PaperlessServerInformationCubit>(context)
+          .updateStatus();
       BlocProvider.of<DocumentTypeCubit>(context).initialize();
       BlocProvider.of<CorrespondentCubit>(context).initialize();
       BlocProvider.of<TagCubit>(context).initialize();
       BlocProvider.of<StoragePathCubit>(context).initialize();
       BlocProvider.of<SavedViewCubit>(context).initialize();
-    } on ErrorMessage catch (error) {
-      showError(context, error);
+    } on ErrorMessage catch (error, stackTrace) {
+      showError(context, error, stackTrace);
     }
   }
 }

@@ -50,8 +50,8 @@ class _SortDocumentsButtonState extends State<SortDocumentsButton> {
                     sortOrder: state.filter.sortOrder.toggle(),
                   ),
                 );
-              } on ErrorMessage catch (error) {
-                showError(context, error);
+              } on ErrorMessage catch (error, stackTrace) {
+                showError(context, error, stackTrace);
               } finally {
                 setState(() => _isLoading = false);
               }
