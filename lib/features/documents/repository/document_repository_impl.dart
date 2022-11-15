@@ -138,8 +138,7 @@ class DocumentRepositoryImpl implements DocumentRepository {
         body: json.encode(doc.toJson()),
         headers: {"Content-Type": "application/json"}).timeout(requestTimeout);
     if (response.statusCode == 200) {
-      return compute(
-        DocumentModel.fromJson,
+      return DocumentModel.fromJson(
         jsonDecode(utf8.decode(response.bodyBytes)) as JSON,
       );
     } else {

@@ -155,6 +155,7 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
                 TagFormField(
                   name: DocumentModel.tagsKey,
                   initialValue: state.filter.tags,
+                  allowCreation: false,
                 ).padded(),
                 // Required in order for the storage path field to be visible when typing
                 const SizedBox(

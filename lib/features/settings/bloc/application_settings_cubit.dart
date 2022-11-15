@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_mobile/core/store/local_vault.dart';
 import 'package:paperless_mobile/features/settings/model/application_settings_state.dart';
 import 'package:injectable/injectable.dart';
+import 'package:paperless_mobile/features/settings/model/view_type.dart';
 
 @singleton
 class ApplicationSettingsCubit extends Cubit<ApplicationSettingsState> {
@@ -28,13 +29,18 @@ class ApplicationSettingsCubit extends Cubit<ApplicationSettingsState> {
     _updateSettings(updatedSettings);
   }
 
-  Future<void> _updateSettings(ApplicationSettingsState settings) async {
-    await localVault.storeApplicationSettings(settings);
-    emit(settings);
-  }
-
   Future<void> setThemeMode(ThemeMode? selectedMode) async {
     final updatedSettings = state.copyWith(preferredThemeMode: selectedMode);
     _updateSettings(updatedSettings);
+  }
+
+  Future<void> setViewType(ViewType viewType) async {
+    final updatedSettings = state.copyWith(preferredViewType: viewType);
+    _updateSettings(updatedSettings);
+  }
+
+  Future<void> _updateSettings(ApplicationSettingsState settings) async {
+    await localVault.storeApplicationSettings(settings);
+    emit(settings);
   }
 }
