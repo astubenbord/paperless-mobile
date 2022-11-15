@@ -22,6 +22,9 @@ import 'package:paperless_mobile/features/home/view/widget/info_drawer.dart';
 import 'package:paperless_mobile/features/labels/storage_path/bloc/storage_path_cubit.dart';
 import 'package:paperless_mobile/features/login/bloc/authentication_cubit.dart';
 import 'package:paperless_mobile/features/labels/tags/bloc/tags_cubit.dart';
+import 'package:paperless_mobile/features/settings/bloc/application_settings_cubit.dart';
+import 'package:paperless_mobile/features/settings/model/application_settings_state.dart';
+import 'package:paperless_mobile/features/settings/model/view_type.dart';
 import 'package:paperless_mobile/util.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -40,7 +43,6 @@ class _DocumentsPageState extends State<DocumentsPage> {
   );
 
   final PanelController _panelController = PanelController();
-  ViewType _viewType = ViewType.list;
 
   @override
   void initState() {
@@ -149,76 +151,79 @@ class _DocumentsPageState extends State<DocumentsPage> {
   }
 
   Widget _buildBody(ConnectivityState connectivityState) {
-    return BlocBuilder<DocumentsCubit, DocumentsState>(
-      builder: (context, state) {
-        // Some ugly tricks to make it work with bloc, update pageController
-        _pagingController.value = PagingState(
-          itemList: state.documents,
-          nextPageKey: state.nextPageNumber,
-        );
-
-        late Widget child;
-        switch (_viewType) {
-          case ViewType.list:
-            child = DocumentListView(
-              onTap: _openDocumentDetails,
-              state: state,
-              onSelected: _onSelected,
-              pagingController: _pagingController,
-              hasInternetConnection:
-                  connectivityState == ConnectivityState.connected,
+    return BlocBuilder<ApplicationSettingsCubit, ApplicationSettingsState>(
+      builder: (context, settings) {
+        return BlocBuilder<DocumentsCubit, DocumentsState>(
+          builder: (context, state) {
+            // Some ugly tricks to make it work with bloc, update pageController
+            _pagingController.value = PagingState(
+              itemList: state.documents,
+              nextPageKey: state.nextPageNumber,
             );
-            break;
-          case ViewType.grid:
-            child = DocumentGridView(
-                onTap: _openDocumentDetails,
-                state: state,
-                onSelected: _onSelected,
-                pagingController: _pagingController,
-                hasInternetConnection:
-                    connectivityState == ConnectivityState.connected);
-            break;
-        }
 
-        if (state.isLoaded && state.documents.isEmpty) {
-          child = SliverToBoxAdapter(
-            child: DocumentsEmptyState(
-              state: state,
-            ),
-          );
-        }
+            late Widget child;
+            switch (settings.preferredViewType) {
+              case ViewType.list:
+                child = DocumentListView(
+                  onTap: _openDocumentDetails,
+                  state: state,
+                  onSelected: _onSelected,
+                  pagingController: _pagingController,
+                  hasInternetConnection:
+                      connectivityState == ConnectivityState.connected,
+                );
+                break;
+              case ViewType.grid:
+                child = DocumentGridView(
+                    onTap: _openDocumentDetails,
+                    state: state,
+                    onSelected: _onSelected,
+                    pagingController: _pagingController,
+                    hasInternetConnection:
+                        connectivityState == ConnectivityState.connected);
+                break;
+            }
 
-        return RefreshIndicator(
-          onRefresh: _onRefresh,
-          child: Container(
-            padding: const EdgeInsets.only(
-              bottom: 48 + kBottomNavigationBarHeight + 48,
-            ), // Prevents panel from hiding scrollable content
-            child: CustomScrollView(
-              slivers: [
-                DocumentsPageAppBar(
-                  actions: [
-                    const SortDocumentsButton(),
-                    IconButton(
-                      icon: Icon(
-                        _viewType == ViewType.grid
-                            ? Icons.list
-                            : Icons.grid_view,
-                      ),
-                      onPressed: () =>
-                          setState(() => _viewType = _viewType.toggle()),
+            if (state.isLoaded && state.documents.isEmpty) {
+              child = SliverToBoxAdapter(
+                child: DocumentsEmptyState(
+                  state: state,
+                ),
+              );
+            }
+
+            return RefreshIndicator(
+              onRefresh: _onRefresh,
+              child: Container(
+                child: CustomScrollView(
+                  slivers: [
+                    DocumentsPageAppBar(
+                      actions: [
+                        const SortDocumentsButton(),
+                        IconButton(
+                          icon: Icon(
+                            settings.preferredViewType == ViewType.grid
+                                ? Icons.list
+                                : Icons.grid_view,
+                          ),
+                          onPressed: () =>
+                              BlocProvider.of<ApplicationSettingsCubit>(context)
+                                  .setViewType(
+                                      settings.preferredViewType.toggle()),
+                        ),
+                      ],
                     ),
+                    child,
+                    SliverToBoxAdapter(
+                      child: SizedBox(
+                        height: MediaQuery.of(context).size.height / 4,
+                      ),
+                    )
                   ],
                 ),
-                child,
-                // SliverToBoxAdapter(
-                //   child: SizedBox(
-                //     height: MediaQuery.of(context).size.height / 3,
-                //   ),
-                // )
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         );
       },
     );
@@ -228,13 +233,16 @@ class _DocumentsPageState extends State<DocumentsPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => MultiBlocProvider(
+        builder: (_) => MultiBlocProvider(
           providers: [
-            BlocProvider.value(value: getIt<DocumentsCubit>()),
-            BlocProvider.value(value: getIt<CorrespondentCubit>()),
-            BlocProvider.value(value: getIt<DocumentTypeCubit>()),
-            BlocProvider.value(value: getIt<TagCubit>()),
-            BlocProvider.value(value: getIt<StoragePathCubit>()),
+            BlocProvider.value(value: BlocProvider.of<DocumentsCubit>(context)),
+            BlocProvider.value(
+                value: BlocProvider.of<CorrespondentCubit>(context)),
+            BlocProvider.value(
+                value: BlocProvider.of<DocumentTypeCubit>(context)),
+            BlocProvider.value(value: BlocProvider.of<TagCubit>(context)),
+            BlocProvider.value(
+                value: BlocProvider.of<StoragePathCubit>(context)),
           ],
           child: DocumentDetailsPage(
             documentId: model.id,
@@ -242,14 +250,5 @@ class _DocumentsPageState extends State<DocumentsPage> {
         ),
       ),
     );
-  }
-}
-
-enum ViewType {
-  grid,
-  list;
-
-  ViewType toggle() {
-    return this == grid ? list : grid;
   }
 }

@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:encrypted_shared_preferences/encrypted_shared_preferences.dart';
+import 'package:flutter/foundation.dart';
+import 'package:paperless_mobile/core/type/types.dart';
 import 'package:paperless_mobile/features/login/model/authentication_information.dart';
 import 'package:paperless_mobile/features/login/model/client_certificate.dart';
 import 'package:paperless_mobile/features/settings/model/application_settings_state.dart';
@@ -20,7 +22,7 @@ class LocalVault {
   ) async {
     await sharedPreferences.setString(
       authenticationKey,
-      json.encode(auth.toJson()),
+      jsonEncode(auth.toJson()),
     );
   }
 
@@ -29,7 +31,7 @@ class LocalVault {
       return null;
     }
     return AuthenticationInformation.fromJson(
-      json.decode(await sharedPreferences.getString(authenticationKey)),
+      jsonDecode(await sharedPreferences.getString(authenticationKey)),
     );
   }
 
@@ -40,7 +42,9 @@ class LocalVault {
 
   Future<bool> storeApplicationSettings(ApplicationSettingsState settings) {
     return sharedPreferences.setString(
-        applicationSettingsKey, json.encode(settings.toJson()));
+      applicationSettingsKey,
+      jsonEncode(settings.toJson()),
+    );
   }
 
   Future<ApplicationSettingsState?> loadApplicationSettings() async {
@@ -48,7 +52,10 @@ class LocalVault {
     if (settings.isEmpty) {
       return null;
     }
-    return ApplicationSettingsState.fromJson(json.decode(settings));
+    return compute(
+      ApplicationSettingsState.fromJson,
+      jsonDecode(settings) as JSON,
+    );
   }
 
   Future<void> clear() {

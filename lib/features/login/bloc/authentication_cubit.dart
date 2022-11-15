@@ -84,9 +84,13 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
 
   Future<void> restoreSessionState() async {
     final storedAuth = await localStore.loadAuthenticationInformation();
-    final appSettings = await localStore.loadApplicationSettings() ??
-        ApplicationSettingsState.defaultSettings;
-
+    late ApplicationSettingsState? appSettings;
+    try {
+      appSettings = await localStore.loadApplicationSettings() ??
+          ApplicationSettingsState.defaultSettings;
+    } catch (err) {
+      appSettings = ApplicationSettingsState.defaultSettings;
+    }
     if (storedAuth == null || !storedAuth.isValid) {
       emit(AuthenticationState(isAuthenticated: false, wasLoginStored: false));
     } else {

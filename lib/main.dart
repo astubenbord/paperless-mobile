@@ -46,6 +46,7 @@ void main() async {
   getIt<ConnectivityCubit>().initialize();
   await getIt<ApplicationSettingsCubit>().initialize();
   await getIt<AuthenticationCubit>().initialize();
+
   runApp(const MyApp());
 }
 
@@ -64,9 +65,9 @@ class _MyAppState extends State<MyApp> {
         BlocProvider.value(value: getIt<ConnectivityCubit>()),
         BlocProvider.value(value: getIt<AuthenticationCubit>()),
         BlocProvider.value(value: getIt<PaperlessServerInformationCubit>()),
+        BlocProvider.value(value: getIt<ApplicationSettingsCubit>()),
       ],
       child: BlocBuilder<ApplicationSettingsCubit, ApplicationSettingsState>(
-        bloc: getIt<ApplicationSettingsCubit>(),
         builder: (context, settings) {
           return MaterialApp(
             debugShowCheckedModeBanner: true,

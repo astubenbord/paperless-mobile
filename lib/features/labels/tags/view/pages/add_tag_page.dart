@@ -8,7 +8,8 @@ import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:form_builder_extra_fields/form_builder_extra_fields.dart';
 
 class AddTagPage extends StatelessWidget {
-  const AddTagPage({Key? key}) : super(key: key);
+  final String? initialValue;
+  const AddTagPage({Key? key, this.initialValue}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -16,6 +17,7 @@ class AddTagPage extends StatelessWidget {
       addLabelStr: S.of(context).addTagPageTitle,
       fromJson: Tag.fromJson,
       cubit: BlocProvider.of<TagCubit>(context),
+      initialName: initialValue,
       additionalFields: [
         FormBuilderColorPickerField(
           name: Tag.colorKey,

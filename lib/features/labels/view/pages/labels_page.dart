@@ -151,7 +151,16 @@ class _LabelsPageState extends State<LabelsPage>
                   pageSize: label.documentCount ?? 0,
                 ),
                 onOpenEditPage: _openEditTagPage,
-                leadingBuilder: (t) => CircleAvatar(backgroundColor: t.color),
+                leadingBuilder: (t) => CircleAvatar(
+                  backgroundColor: t.color,
+                  child: t.isInboxTag ?? false
+                      ? Icon(
+                          Icons.inbox,
+                          color: t.textColor,
+                        )
+                      : null,
+                ),
+                contentBuilder: (t) => Text(t.match ?? ''),
                 emptyStateActionButtonLabel:
                     S.of(context).labelsPageTagsEmptyStateAddNewLabel,
                 emptyStateDescription:
