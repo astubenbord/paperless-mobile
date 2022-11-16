@@ -1,11 +1,17 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_mobile/core/logic/error_code_localization_mapper.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
+import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
+import 'package:paperless_mobile/features/documents/model/query_parameters/sort_field.dart';
 import 'package:paperless_mobile/features/documents/model/query_parameters/sort_order.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:paperless_mobile/features/documents/view/widgets/search/sort_field_selection_bottom_sheet.dart';
+import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:paperless_mobile/util.dart';
 
 class SortDocumentsButton extends StatefulWidget {
@@ -18,52 +24,32 @@ class SortDocumentsButton extends StatefulWidget {
 }
 
 class _SortDocumentsButtonState extends State<SortDocumentsButton> {
-  bool _isLoading = false;
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<DocumentsCubit, DocumentsState>(
-      builder: (context, state) {
-        Widget child;
-        if (_isLoading) {
-          child = const FittedBox(
-            fit: BoxFit.scaleDown,
-            child: RefreshProgressIndicator(
-              strokeWidth: 4.0,
-              backgroundColor: Colors.transparent,
-            ),
-          );
-        } else {
-          final bool isAscending =
-              state.filter.sortOrder == SortOrder.ascending;
-          child = IconButton(
-            icon: FaIcon(
-              isAscending
-                  ? FontAwesomeIcons.arrowDownAZ
-                  : FontAwesomeIcons.arrowUpZA,
-            ),
-            onPressed: () async {
-              setState(() => _isLoading = true);
-              try {
-                await BlocProvider.of<DocumentsCubit>(context)
-                    .updateCurrentFilter(
-                  (filter) => filter.copyWith(
-                    sortOrder: state.filter.sortOrder.toggle(),
-                  ),
-                );
-              } on ErrorMessage catch (error, stackTrace) {
-                showError(context, error, stackTrace);
-              } finally {
-                setState(() => _isLoading = false);
-              }
-            },
-          );
-        }
-        return SizedBox(
-          height: Theme.of(context).iconTheme.size,
-          width: Theme.of(context).iconTheme.size,
-          child: child,
-        );
-      },
+    return IconButton(
+      icon: Icon(Icons.sort),
+      onPressed: _onOpenSortBottomSheet,
+    );
+  }
+
+  void _onOpenSortBottomSheet() {
+    showModalBottomSheet(
+      elevation: 2,
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(16),
+          topRight: Radius.circular(16),
+        ),
+      ),
+      builder: (context) => BlocProvider.value(
+        value: getIt<DocumentsCubit>(),
+        child: FractionallySizedBox(
+          heightFactor: .6,
+          child: const SortFieldSelectionBottomSheet(),
+        ),
+      ),
     );
   }
 }

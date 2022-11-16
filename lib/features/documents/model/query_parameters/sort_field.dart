@@ -2,7 +2,7 @@ enum SortField {
   archiveSerialNumber("archive_serial_number"),
   correspondentName("correspondent__name"),
   title("title"),
-  documentType("documentType"),
+  documentType("document_type__name"),
   created("created"),
   added("added"),
   modified("modified");
