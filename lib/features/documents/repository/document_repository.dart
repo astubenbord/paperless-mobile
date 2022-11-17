@@ -13,7 +13,7 @@ abstract class DocumentRepository {
     required String title,
     int? documentType,
     int? correspondent,
-    List<int>? tags,
+    Iterable<int> tags = const [],
     DateTime? createdAt,
   });
   Future<DocumentModel> update(DocumentModel doc);

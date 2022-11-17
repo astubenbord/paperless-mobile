@@ -5,6 +5,9 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart';
+import 'package:http/src/boundary_characters.dart'; //TODO: remove once there is either a paperless API update or there is a better solution...
+import 'package:injectable/injectable.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/core/store/local_vault.dart';
 import 'package:paperless_mobile/core/type/types.dart';
@@ -22,9 +25,6 @@ import 'package:paperless_mobile/features/documents/model/query_parameters/sort_
 import 'package:paperless_mobile/features/documents/model/similar_document.model.dart';
 import 'package:paperless_mobile/features/documents/repository/document_repository.dart';
 import 'package:paperless_mobile/util.dart';
-import 'package:http/http.dart';
-import 'package:http/src/boundary_characters.dart'; //TODO: remove once there is either a paperless API update or there is a better solution...
-import 'package:injectable/injectable.dart';
 
 @Injectable(as: DocumentRepository)
 class DocumentRepositoryImpl implements DocumentRepository {
@@ -45,7 +45,7 @@ class DocumentRepositoryImpl implements DocumentRepository {
     required String title,
     int? documentType,
     int? correspondent,
-    List<int>? tags,
+    Iterable<int> tags = const [],
     DateTime? createdAt,
   }) async {
     final auth = await localStorage.loadAuthenticationInformation();
@@ -78,7 +78,7 @@ class DocumentRepositoryImpl implements DocumentRepository {
       bodyBuffer.write(_buildMultipartField(key, fields[key]!, boundary));
     }
 
-    for (final tag in tags ?? <int>[]) {
+    for (final tag in tags) {
       bodyBuffer.write(_buildMultipartField('tags', tag.toString(), boundary));
     }
 
@@ -124,10 +124,10 @@ class DocumentRepositoryImpl implements DocumentRepository {
     Random _random = Random();
     var prefix = 'dart-http-boundary-';
     var list = List<int>.generate(
-        70 - prefix.length,
-        (index) =>
-            boundaryCharacters[_random.nextInt(boundaryCharacters.length)],
-        growable: false);
+      70 - prefix.length,
+      (index) => boundaryCharacters[_random.nextInt(boundaryCharacters.length)],
+      growable: false,
+    );
     return '$prefix${String.fromCharCodes(list)}';
   }
 

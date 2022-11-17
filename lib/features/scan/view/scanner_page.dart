@@ -14,6 +14,8 @@ import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/core/service/file_service.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
+import 'package:paperless_mobile/features/documents/repository/document_repository.dart';
+import 'package:paperless_mobile/features/documents/view/pages/document_view.dart';
 import 'package:paperless_mobile/features/home/view/widget/info_drawer.dart';
 import 'package:paperless_mobile/features/scan/bloc/document_scanner_cubit.dart';
 import 'package:paperless_mobile/features/scan/view/document_upload_page.dart';
@@ -53,6 +55,24 @@ class _ScannerPageState extends State<ScannerPage>
     return AppBar(
       title: Text(S.of(context).documentScannerPageTitle),
       actions: [
+        BlocBuilder<DocumentScannerCubit, List<File>>(
+          builder: (context, state) {
+            return IconButton(
+              onPressed: state.isNotEmpty
+                  ? () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => DocumentView(
+                            documentBytes:
+                                _buildDocumentFromImageFiles(state).save(),
+                          ),
+                        ),
+                      )
+                  : null,
+              icon: const Icon(Icons.preview),
+              tooltip: S.of(context).documentScannerPageResetButtonTooltipText,
+            );
+          },
+        ),
         BlocBuilder<DocumentScannerCubit, List<File>>(
           builder: (context, state) {
             return IconButton(

@@ -3,31 +3,29 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_mobile/core/bloc/label_bloc_provider.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
+import 'package:paperless_mobile/features/documents/model/document_filter.dart';
 import 'package:paperless_mobile/features/documents/model/query_parameters/correspondent_query.dart';
 import 'package:paperless_mobile/features/documents/model/query_parameters/document_type_query.dart';
 import 'package:paperless_mobile/features/documents/model/query_parameters/storage_path_query.dart';
 import 'package:paperless_mobile/features/documents/model/query_parameters/tags_query.dart';
-import 'package:paperless_mobile/features/labels/correspondent/bloc/correspondents_cubit.dart';
-import 'package:paperless_mobile/features/labels/correspondent/view/pages/edit_correspondent_page.dart';
-import 'package:paperless_mobile/features/labels/document_type/bloc/document_type_cubit.dart';
-import 'package:paperless_mobile/features/documents/model/document_filter.dart';
 import 'package:paperless_mobile/features/home/view/widget/info_drawer.dart';
+import 'package:paperless_mobile/features/labels/correspondent/bloc/correspondents_cubit.dart';
 import 'package:paperless_mobile/features/labels/correspondent/model/correspondent.model.dart';
 import 'package:paperless_mobile/features/labels/correspondent/view/pages/add_correspondent_page.dart';
+import 'package:paperless_mobile/features/labels/correspondent/view/pages/edit_correspondent_page.dart';
+import 'package:paperless_mobile/features/labels/document_type/bloc/document_type_cubit.dart';
 import 'package:paperless_mobile/features/labels/document_type/model/document_type.model.dart';
 import 'package:paperless_mobile/features/labels/document_type/view/pages/add_document_type_page.dart';
 import 'package:paperless_mobile/features/labels/document_type/view/pages/edit_document_type_page.dart';
-import 'package:paperless_mobile/features/labels/model/label.model.dart';
 import 'package:paperless_mobile/features/labels/storage_path/bloc/storage_path_cubit.dart';
 import 'package:paperless_mobile/features/labels/storage_path/model/storage_path.model.dart';
 import 'package:paperless_mobile/features/labels/storage_path/view/pages/add_storage_path_page.dart';
 import 'package:paperless_mobile/features/labels/storage_path/view/pages/edit_storage_path_page.dart';
+import 'package:paperless_mobile/features/labels/tags/bloc/tags_cubit.dart';
 import 'package:paperless_mobile/features/labels/tags/model/tag.model.dart';
 import 'package:paperless_mobile/features/labels/tags/view/pages/add_tag_page.dart';
 import 'package:paperless_mobile/features/labels/tags/view/pages/edit_tag_page.dart';
-import 'package:paperless_mobile/features/labels/view/widgets/label_item.dart';
 import 'package:paperless_mobile/features/labels/view/widgets/label_tab_view.dart';
-import 'package:paperless_mobile/features/labels/tags/bloc/tags_cubit.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 
 class LabelsPage extends StatefulWidget {
@@ -147,7 +145,7 @@ class _LabelsPageState extends State<LabelsPage>
               LabelTabView<Tag>(
                 cubit: BlocProvider.of<TagCubit>(context),
                 filterBuilder: (label) => DocumentFilter(
-                  tags: TagsQuery.fromIds([label.id!]),
+                  tags: IdsTagsQuery.fromIds([label.id!]),
                   pageSize: label.documentCount ?? 0,
                 ),
                 onOpenEditPage: _openEditTagPage,

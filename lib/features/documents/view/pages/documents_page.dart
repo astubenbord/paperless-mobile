@@ -1,13 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
-import 'package:paperless_mobile/core/logic/error_code_localization_mapper.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
-import 'package:paperless_mobile/core/service/github_issue_service.dart';
-import 'package:paperless_mobile/core/widgets/offline_banner.dart';
-import 'package:paperless_mobile/di_initializer.dart';
-import 'package:paperless_mobile/features/labels/correspondent/bloc/correspondents_cubit.dart';
-import 'package:paperless_mobile/features/labels/document_type/bloc/document_type_cubit.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
 import 'package:paperless_mobile/features/documents/model/document.model.dart';
@@ -19,14 +14,15 @@ import 'package:paperless_mobile/features/documents/view/widgets/search/document
 import 'package:paperless_mobile/features/documents/view/widgets/selection/documents_page_app_bar.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/sort_documents_button.dart';
 import 'package:paperless_mobile/features/home/view/widget/info_drawer.dart';
+import 'package:paperless_mobile/features/labels/correspondent/bloc/correspondents_cubit.dart';
+import 'package:paperless_mobile/features/labels/document_type/bloc/document_type_cubit.dart';
 import 'package:paperless_mobile/features/labels/storage_path/bloc/storage_path_cubit.dart';
-import 'package:paperless_mobile/features/login/bloc/authentication_cubit.dart';
 import 'package:paperless_mobile/features/labels/tags/bloc/tags_cubit.dart';
+import 'package:paperless_mobile/features/login/bloc/authentication_cubit.dart';
 import 'package:paperless_mobile/features/settings/bloc/application_settings_cubit.dart';
 import 'package:paperless_mobile/features/settings/model/application_settings_state.dart';
 import 'package:paperless_mobile/features/settings/model/view_type.dart';
 import 'package:paperless_mobile/util.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class DocumentsPage extends StatefulWidget {
@@ -42,7 +38,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
     firstPageKey: 1,
   );
 
-  final PanelController _panelController = PanelController();
+  final PanelController _filterPanelController = PanelController();
 
   @override
   void initState() {
@@ -99,9 +95,9 @@ class _DocumentsPageState extends State<DocumentsPage> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        if (_panelController.isPanelOpen) {
+        if (_filterPanelController.isPanelOpen) {
           FocusScope.of(context).unfocus();
-          _panelController.close();
+          _filterPanelController.close();
           return false;
         }
         final documentsCubit = BlocProvider.of<DocumentsCubit>(context);
@@ -129,7 +125,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
               backdropEnabled: true,
               parallaxEnabled: true,
               parallaxOffset: .5,
-              controller: _panelController,
+              controller: _filterPanelController,
               defaultPanelState: PanelState.CLOSED,
               minHeight: 48,
               maxHeight: (MediaQuery.of(context).size.height * 3) / 4,
@@ -140,7 +136,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
               body: _buildBody(connectivityState),
               color: Theme.of(context).scaffoldBackgroundColor,
               panelBuilder: (scrollController) => DocumentFilterPanel(
-                panelController: _panelController,
+                panelController: _filterPanelController,
                 scrollController: scrollController,
               ),
             ),
@@ -194,33 +190,31 @@ class _DocumentsPageState extends State<DocumentsPage> {
 
             return RefreshIndicator(
               onRefresh: _onRefresh,
-              child: Container(
-                child: CustomScrollView(
-                  slivers: [
-                    DocumentsPageAppBar(
-                      actions: [
-                        const SortDocumentsButton(),
-                        IconButton(
-                          icon: Icon(
-                            settings.preferredViewType == ViewType.grid
-                                ? Icons.list
-                                : Icons.grid_view,
-                          ),
-                          onPressed: () =>
-                              BlocProvider.of<ApplicationSettingsCubit>(context)
-                                  .setViewType(
-                                      settings.preferredViewType.toggle()),
+              child: CustomScrollView(
+                slivers: [
+                  DocumentsPageAppBar(
+                    actions: [
+                      const SortDocumentsButton(),
+                      IconButton(
+                        icon: Icon(
+                          settings.preferredViewType == ViewType.grid
+                              ? Icons.list
+                              : Icons.grid_view,
                         ),
-                      ],
-                    ),
-                    child,
-                    SliverToBoxAdapter(
-                      child: SizedBox(
-                        height: MediaQuery.of(context).size.height / 4,
+                        onPressed: () =>
+                            BlocProvider.of<ApplicationSettingsCubit>(context)
+                                .setViewType(
+                                    settings.preferredViewType.toggle()),
                       ),
-                    )
-                  ],
-                ),
+                    ],
+                  ),
+                  child,
+                  SliverToBoxAdapter(
+                    child: SizedBox(
+                      height: MediaQuery.of(context).size.height / 4,
+                    ),
+                  )
+                ],
               ),
             );
           },

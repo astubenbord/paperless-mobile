@@ -18,8 +18,13 @@ class TagWidget extends StatelessWidget {
       padding: const EdgeInsets.only(right: 4.0),
       child: BlocBuilder<DocumentsCubit, DocumentsState>(
         builder: (context, state) {
+          final isIdsQuery = state.filter.tags is IdsTagsQuery;
           return FilterChip(
-            selected: state.filter.tags.ids.contains(tag.id),
+            selected: isIdsQuery
+                ? (state.filter.tags as IdsTagsQuery)
+                    .includedIds
+                    .contains(tag.id)
+                : false,
             selectedColor: tag.color,
             onSelected: (_) => _addTagToFilter(context),
             visualDensity: const VisualDensity(vertical: -2),
@@ -40,18 +45,19 @@ class TagWidget extends StatelessWidget {
   void _addTagToFilter(BuildContext context) {
     final cubit = BlocProvider.of<DocumentsCubit>(context);
     try {
-      if (cubit.state.filter.tags.ids.contains(tag.id)) {
+      final tagsQuery = cubit.state.filter.tags is IdsTagsQuery
+          ? cubit.state.filter.tags as IdsTagsQuery
+          : const IdsTagsQuery();
+      if (tagsQuery.includedIds.contains(tag.id)) {
         cubit.updateCurrentFilter(
           (filter) => filter.copyWith(
-            tags: TagsQuery.fromIds(cubit.state.filter.tags.ids
-                .where((id) => id != tag.id)
-                .toList()),
+            tags: tagsQuery.withIdsRemoved([tag.id!]),
           ),
         );
       } else {
         cubit.updateCurrentFilter(
           (filter) => filter.copyWith(
-            tags: TagsQuery.fromIds([...cubit.state.filter.tags.ids, tag.id!]),
+            tags: tagsQuery.withIdQueriesAdded([IncludeTagIdQuery(tag.id!)]),
           ),
         );
       }

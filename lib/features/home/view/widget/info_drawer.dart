@@ -22,175 +22,182 @@ class InfoDrawer extends StatelessWidget {
   const InfoDrawer({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return Drawer(
-      child: ListView(
-        children: [
-          DrawerHeader(
-            padding: EdgeInsets.only(
-              top: 8,
-              left: 8,
-              bottom: 0,
-              right: 8,
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Image.asset(
-                      "assets/logos/paperless_logo_white.png",
-                      height: 32,
-                      width: 32,
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
-                    ).padded(const EdgeInsets.only(right: 8.0)),
-                    Text(
-                      S.of(context).appTitleText,
-                      style: Theme.of(context).textTheme.headline5!.copyWith(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onPrimaryContainer,
-                          ),
-                    ),
-                  ],
-                ),
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: BlocBuilder<PaperlessServerInformationCubit,
-                      PaperlessServerInformation>(
-                    builder: (context, state) {
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          ListTile(
-                            contentPadding: EdgeInsets.zero,
-                            dense: true,
-                            title: Text(
-                              S.of(context).appDrawerHeaderLoggedInAsText +
-                                  (state.username ?? '?'),
-                              style: Theme.of(context).textTheme.bodyText2,
-                              overflow: TextOverflow.ellipsis,
-                              textAlign: TextAlign.end,
-                              maxLines: 1,
+    return ClipRRect(
+      borderRadius: const BorderRadius.only(
+        topRight: Radius.circular(16.0),
+        bottomRight: Radius.circular(16.0),
+      ),
+      child: Drawer(
+        child: ListView(
+          children: [
+            DrawerHeader(
+              padding: const EdgeInsets.only(
+                top: 8,
+                left: 8,
+                bottom: 0,
+                right: 8,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Image.asset(
+                        "assets/logos/paperless_logo_white.png",
+                        height: 32,
+                        width: 32,
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      ).padded(const EdgeInsets.only(right: 8.0)),
+                      Text(
+                        S.of(context).appTitleText,
+                        style: Theme.of(context).textTheme.headline5!.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimaryContainer,
                             ),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Text(
-                                  state.host ?? '',
-                                  style: Theme.of(context).textTheme.bodyText2,
-                                  overflow: TextOverflow.ellipsis,
-                                  textAlign: TextAlign.end,
-                                  maxLines: 1,
-                                ),
-                                Text(
-                                  '${S.of(context).serverInformationPaperlessVersionText} ${state.version} (API v${state.apiVersion})',
-                                  style: Theme.of(context).textTheme.caption,
-                                  overflow: TextOverflow.ellipsis,
-                                  textAlign: TextAlign.end,
-                                  maxLines: 1,
-                                ),
-                              ],
-                            ),
-                            // title: RichText(
+                      ),
+                    ],
+                  ),
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: BlocBuilder<PaperlessServerInformationCubit,
+                        PaperlessServerInformation>(
+                      builder: (context, state) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              dense: true,
+                              title: Text(
+                                S.of(context).appDrawerHeaderLoggedInAsText +
+                                    (state.username ?? '?'),
+                                style: Theme.of(context).textTheme.bodyText2,
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.end,
+                                maxLines: 1,
+                              ),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    state.host ?? '',
+                                    style:
+                                        Theme.of(context).textTheme.bodyText2,
+                                    overflow: TextOverflow.ellipsis,
+                                    textAlign: TextAlign.end,
+                                    maxLines: 1,
+                                  ),
+                                  Text(
+                                    '${S.of(context).serverInformationPaperlessVersionText} ${state.version} (API v${state.apiVersion})',
+                                    style: Theme.of(context).textTheme.caption,
+                                    overflow: TextOverflow.ellipsis,
+                                    textAlign: TextAlign.end,
+                                    maxLines: 1,
+                                  ),
+                                ],
+                              ),
+                              // title: RichText(
 
-                            //   text: TextSpan(
-                            //     children: [
-                            //       TextSpan(
-                            //         text:
-                            //         style:
-                            //             Theme.of(context).textTheme.bodyText2,
-                            //       ),
-                            //     ],
-                            //   ),
-                            // ),
-                            isThreeLine: true,
-                          ),
-                        ],
-                      );
-                    },
+                              //   text: TextSpan(
+                              //     children: [
+                              //       TextSpan(
+                              //         text:
+                              //         style:
+                              //             Theme.of(context).textTheme.bodyText2,
+                              //       ),
+                              //     ],
+                              //   ),
+                              // ),
+                              isThreeLine: true,
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primaryContainer,
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.settings),
+              title: Text(
+                S.of(context).appDrawerSettingsLabel,
+              ),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => BlocProvider.value(
+                    value: getIt<ApplicationSettingsCubit>(),
+                    child: const SettingsPage(),
                   ),
                 ),
+              ),
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.bug_report),
+              title: Text(S.of(context).appDrawerReportBugLabel),
+              onTap: () {
+                launchUrlString(
+                    "https://github.com/astubenbord/paperless-mobile/issues/new");
+              },
+            ),
+            const Divider(),
+            AboutListTile(
+              icon: const Icon(Icons.info),
+              applicationIcon: const ImageIcon(
+                  AssetImage("assets/logos/paperless_logo_green.png")),
+              applicationName: "Paperless Mobile",
+              applicationVersion:
+                  kPackageInfo.version + "+" + kPackageInfo.buildNumber,
+              aboutBoxChildren: [
+                Text(
+                    '${S.of(context).aboutDialogDevelopedByText} Anton Stubenbord'),
+                Link(
+                  uri: Uri.parse(
+                      "https://github.com/astubenbord/paperless-mobile"),
+                  builder: (context, followLink) => GestureDetector(
+                    onTap: followLink,
+                    child: Text(
+                      "https://github.com/astubenbord/paperless-mobile",
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.tertiary),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  "Credits",
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                _buildOnboardingImageCredits(),
               ],
+              child: Text(S.of(context).appDrawerAboutLabel),
             ),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primaryContainer,
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: Text(S.of(context).appDrawerLogoutLabel),
+              onTap: () {
+                try {
+                  BlocProvider.of<AuthenticationCubit>(context).logout();
+                  getIt<DocumentsCubit>().reset();
+                  getIt<CorrespondentCubit>().reset();
+                  getIt<DocumentTypeCubit>().reset();
+                  getIt<TagCubit>().reset();
+                  getIt<DocumentScannerCubit>().reset();
+                } on ErrorMessage catch (error, stackTrace) {
+                  showError(context, error, stackTrace);
+                }
+              },
             ),
-          ),
-          ListTile(
-            leading: const Icon(Icons.settings),
-            title: Text(
-              S.of(context).appDrawerSettingsLabel,
-            ),
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => BlocProvider.value(
-                  value: getIt<ApplicationSettingsCubit>(),
-                  child: const SettingsPage(),
-                ),
-              ),
-            ),
-          ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.bug_report),
-            title: Text(S.of(context).appDrawerReportBugLabel),
-            onTap: () {
-              launchUrlString(
-                  "https://github.com/astubenbord/paperless-mobile/issues/new");
-            },
-          ),
-          const Divider(),
-          AboutListTile(
-            icon: const Icon(Icons.info),
-            applicationIcon: const ImageIcon(
-                AssetImage("assets/logos/paperless_logo_green.png")),
-            applicationName: "Paperless Mobile",
-            applicationVersion:
-                kPackageInfo.version + "+" + kPackageInfo.buildNumber,
-            aboutBoxChildren: [
-              Text(
-                  '${S.of(context).aboutDialogDevelopedByText} Anton Stubenbord'),
-              Link(
-                uri: Uri.parse(
-                    "https://github.com/astubenbord/paperless-mobile"),
-                builder: (context, followLink) => GestureDetector(
-                  onTap: followLink,
-                  child: Text(
-                    "https://github.com/astubenbord/paperless-mobile",
-                    style: TextStyle(
-                        color: Theme.of(context).colorScheme.tertiary),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                "Credits",
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              _buildOnboardingImageCredits(),
-            ],
-            child: Text(S.of(context).appDrawerAboutLabel),
-          ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.logout),
-            title: Text(S.of(context).appDrawerLogoutLabel),
-            onTap: () {
-              try {
-                BlocProvider.of<AuthenticationCubit>(context).logout();
-                getIt<DocumentsCubit>().reset();
-                getIt<CorrespondentCubit>().reset();
-                getIt<DocumentTypeCubit>().reset();
-                getIt<TagCubit>().reset();
-                getIt<DocumentScannerCubit>().reset();
-              } on ErrorMessage catch (error, stackTrace) {
-                showError(context, error, stackTrace);
-              }
-            },
-          ),
-          const Divider(),
-        ],
+            const Divider(),
+          ],
+        ),
       ),
     );
   }

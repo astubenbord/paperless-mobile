@@ -48,12 +48,14 @@ class EditTagPage extends StatelessWidget {
       final cubit = BlocProvider.of<DocumentsCubit>(context);
       final currentFilter = cubit.state.filter;
       late DocumentFilter updatedFilter = currentFilter;
-      if (currentFilter.tags.ids.contains(tag.id)) {
-        updatedFilter = currentFilter.copyWith(
-          tags: TagsQuery.fromIds(
-            currentFilter.tags.ids.where((tagId) => tagId != tag.id).toList(),
-          ),
-        );
+      if (currentFilter.tags is IdsTagsQuery) {
+        if ((currentFilter.tags as IdsTagsQuery).includedIds.contains(tag.id)) {
+          updatedFilter = currentFilter.copyWith(
+            tags: (currentFilter.tags as IdsTagsQuery).withIdsRemoved(
+              [tag.id!],
+            ),
+          );
+        }
       }
       cubit.updateFilter(filter: updatedFilter);
       Navigator.pop(context);

@@ -66,8 +66,12 @@ class DocumentGridItem extends StatelessWidget {
                           tagIds: document.tags,
                           isMultiLine: false,
                         ),
-                        Text(DateFormat.yMMMd(Intl.getCurrentLocale())
-                            .format(document.created)),
+                        const Spacer(),
+                        Text(
+                          DateFormat.yMMMd(Intl.getCurrentLocale())
+                              .format(document.created),
+                          style: Theme.of(context).textTheme.caption,
+                        ),
                       ],
                     ),
                   ),

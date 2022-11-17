@@ -23,7 +23,7 @@ class DocumentModel extends Equatable {
   final int id;
   final String title;
   final String? content;
-  final List<int> tags;
+  final Iterable<int> tags;
   final int? documentType;
   final int? correspondent;
   final int? storagePath;
@@ -78,7 +78,7 @@ class DocumentModel extends Equatable {
       modifiedKey: modified.toUtc().toIso8601String(),
       addedKey: added.toUtc().toIso8601String(),
       originalFileNameKey: originalFileName,
-      tagsKey: tags,
+      tagsKey: tags.toList(),
       storagePathKey: storagePath,
     };
   }
@@ -86,10 +86,14 @@ class DocumentModel extends Equatable {
   DocumentModel copyWith({
     String? title,
     String? content,
-    TagsQuery? tags,
-    IdQueryParameter? documentType,
-    IdQueryParameter? correspondent,
-    IdQueryParameter? storagePath,
+    bool overwriteTags = false,
+    Iterable<int>? tags,
+    bool overwriteDocumentType = false,
+    int? documentType,
+    bool overwriteCorrespondent = false,
+    int? correspondent,
+    bool overwriteStoragePath = false,
+    int? storagePath,
     DateTime? created,
     DateTime? modified,
     DateTime? added,
@@ -101,10 +105,11 @@ class DocumentModel extends Equatable {
       id: id,
       title: title ?? this.title,
       content: content ?? this.content,
-      documentType: fromQuery(documentType, this.documentType),
-      correspondent: fromQuery(correspondent, this.correspondent),
-      storagePath: fromQuery(storagePath, this.storagePath),
-      tags: fromListQuery(tags, this.tags),
+      documentType: overwriteDocumentType ? documentType : this.documentType,
+      correspondent:
+          overwriteCorrespondent ? correspondent : this.correspondent,
+      storagePath: overwriteDocumentType ? storagePath : this.storagePath,
+      tags: overwriteTags ? tags ?? [] : this.tags,
       created: created ?? this.created,
       modified: modified ?? this.modified,
       added: added ?? this.added,
@@ -112,20 +117,6 @@ class DocumentModel extends Equatable {
       archiveSerialNumber: archiveSerialNumber ?? this.archiveSerialNumber,
       archivedFileName: archivedFileName ?? this.archivedFileName,
     );
-  }
-
-  int? fromQuery(IdQueryParameter? query, int? previous) {
-    if (query == null) {
-      return previous;
-    }
-    return query.id;
-  }
-
-  List<int> fromListQuery(TagsQuery? query, List<int> previous) {
-    if (query == null) {
-      return previous;
-    }
-    return query.ids;
   }
 
   @override

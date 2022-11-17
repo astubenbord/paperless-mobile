@@ -19,7 +19,7 @@ class DocumentProcessingStatus {
   final String taskId;
   final bool isApproximated;
 
-  static const String UNKNOWN_TASK_ID = "NO_TASK_ID";
+  static const String unknownTaskId = "NO_TASK_ID";
 
   DocumentProcessingStatus({
     required this.currentProgress,

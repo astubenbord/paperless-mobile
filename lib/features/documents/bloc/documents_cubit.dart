@@ -22,7 +22,7 @@ class DocumentsCubit extends Cubit<DocumentsState> {
     required void Function(DocumentModel document) onConsumptionFinished,
     int? documentType,
     int? correspondent,
-    List<int>? tags,
+    Iterable<int> tags = const [],
     DateTime? createdAt,
   }) async {
     await documentRepository.create(

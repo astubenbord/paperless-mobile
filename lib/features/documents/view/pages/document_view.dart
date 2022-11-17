@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/documents/model/document.model.dart';
@@ -6,11 +7,11 @@ import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:pdfx/pdfx.dart';
 
 class DocumentView extends StatefulWidget {
-  final DocumentModel document;
+  final Future<Uint8List> documentBytes;
 
   const DocumentView({
     Key? key,
-    required this.document,
+    required this.documentBytes,
   }) : super(key: key);
 
   @override
@@ -25,7 +26,7 @@ class _DocumentViewState extends State<DocumentView> {
     super.initState();
     _pdfController = PdfController(
       document: PdfDocument.openData(
-        getIt<DocumentRepository>().getPreview(widget.document.id),
+        widget.documentBytes,
       ),
     );
   }

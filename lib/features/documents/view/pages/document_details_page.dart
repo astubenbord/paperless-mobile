@@ -420,7 +420,9 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
   Future<void> _onOpen(DocumentModel document) async {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => DocumentView(document: document),
+        builder: (context) => DocumentView(
+          documentBytes: getIt<DocumentRepository>().getPreview(document.id),
+        ),
       ),
     );
   }

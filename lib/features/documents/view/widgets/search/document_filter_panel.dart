@@ -11,7 +11,6 @@ import 'package:paperless_mobile/features/documents/model/document_filter.dart';
 import 'package:paperless_mobile/features/documents/model/query_parameters/correspondent_query.dart';
 import 'package:paperless_mobile/features/documents/model/query_parameters/document_type_query.dart';
 import 'package:paperless_mobile/features/documents/model/query_parameters/query_type.dart';
-import 'package:paperless_mobile/features/documents/model/query_parameters/sort_field.dart';
 import 'package:paperless_mobile/features/documents/model/query_parameters/storage_path_query.dart';
 import 'package:paperless_mobile/features/documents/model/query_parameters/tags_query.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/search/query_type_form_field.dart';
@@ -52,16 +51,6 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
   static const fkCreatedAt = DocumentModel.createdKey;
   static const fkAddedAt = DocumentModel.addedKey;
 
-  static const _sortFields = [
-    SortField.created,
-    SortField.added,
-    SortField.modified,
-    SortField.title,
-    SortField.correspondentName,
-    SortField.documentType,
-    SortField.archiveSerialNumber
-  ];
-
   final _formKey = GlobalKey<FormBuilderState>();
 
   late final DocumentsCubit _documentsCubit;
@@ -99,8 +88,7 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
         builder: (context, state) {
           return FormBuilder(
             key: _formKey,
-            child: ListView(
-              controller: widget.scrollController,
+            child: Column(
               children: [
                 Stack(
                   alignment: Alignment.center,
@@ -137,29 +125,43 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
                 const SizedBox(
                   height: 16.0,
                 ),
-                _buildSortByChipsList(context, state),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(S.of(context).documentsFilterPageSearchLabel),
-                ).padded(const EdgeInsets.only(left: 8.0)),
-                _buildQueryFormField(state),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(S.of(context).documentsFilterPageAdvancedLabel),
-                ).padded(const EdgeInsets.only(left: 8.0, top: 8.0)),
-                _buildCreatedDateRangePickerFormField(state).padded(),
-                _buildAddedDateRangePickerFormField(state).padded(),
-                _buildCorrespondentFormField(state).padded(),
-                _buildDocumentTypeFormField(state).padded(),
-                _buildStoragePathFormField(state).padded(),
-                TagFormField(
-                  name: DocumentModel.tagsKey,
-                  initialValue: state.filter.tags,
-                  allowCreation: false,
-                ).padded(),
-                // Required in order for the storage path field to be visible when typing
-                const SizedBox(
-                  height: 200,
+                Expanded(
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(16.0),
+                      topRight: Radius.circular(16.0),
+                    ),
+                    child: ListView(
+                      controller: widget.scrollController,
+                      children: [
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                              S.of(context).documentsFilterPageSearchLabel),
+                        ).padded(const EdgeInsets.only(left: 8.0)),
+                        _buildQueryFormField(state),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                              S.of(context).documentsFilterPageAdvancedLabel),
+                        ).padded(const EdgeInsets.only(left: 8.0, top: 8.0)),
+                        _buildCreatedDateRangePickerFormField(state).padded(),
+                        _buildAddedDateRangePickerFormField(state).padded(),
+                        _buildCorrespondentFormField(state).padded(),
+                        _buildDocumentTypeFormField(state).padded(),
+                        _buildStoragePathFormField(state).padded(),
+                        TagFormField(
+                          name: DocumentModel.tagsKey,
+                          initialValue: state.filter.tags,
+                          allowCreation: false,
+                        ).padded(),
+                        // Required in order for the storage path field to be visible when typing
+                        const SizedBox(
+                          height: 150,
+                        ),
+                      ],
+                    ).padded(),
+                  ),
                 ),
               ],
             ),
@@ -385,6 +387,7 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
             ),
           ),
         ),
+        const SizedBox(height: 4.0),
         _buildDateRangePickerHelper(state, fkCreatedAt),
       ],
     );
@@ -432,6 +435,7 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
             ),
           ),
         ),
+        const SizedBox(height: 4.0),
         _buildDateRangePickerHelper(state, fkAddedAt),
       ],
     );
@@ -445,71 +449,6 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
         color: Colors.grey[300],
         borderRadius: const BorderRadius.all(Radius.circular(12.0)),
       ),
-    );
-  }
-
-  Widget _buildSortByChipsList(BuildContext context, DocumentsState state) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.end,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          S.of(context).documentsPageOrderByLabel,
-        ),
-        SizedBox(
-          height: kToolbarHeight,
-          child: ListView.separated(
-            itemCount: _sortFields.length,
-            scrollDirection: Axis.horizontal,
-            separatorBuilder: (context, index) => const SizedBox(
-              width: 8.0,
-            ),
-            itemBuilder: (context, index) => _buildActionChip(
-                _sortFields[index], state.filter.sortField, context),
-          ),
-        ),
-      ],
-    ).padded();
-  }
-
-  Widget _buildActionChip(SortField sortField,
-      SortField? currentlySelectedOrder, BuildContext context) {
-    String text;
-    switch (sortField) {
-      case SortField.archiveSerialNumber:
-        text = S.of(context).documentArchiveSerialNumberPropertyShortLabel;
-        break;
-      case SortField.correspondentName:
-        text = S.of(context).documentCorrespondentPropertyLabel;
-        break;
-      case SortField.title:
-        text = S.of(context).documentTitlePropertyLabel;
-        break;
-      case SortField.documentType:
-        text = S.of(context).documentDocumentTypePropertyLabel;
-        break;
-      case SortField.created:
-        text = S.of(context).documentCreatedPropertyLabel;
-        break;
-      case SortField.added:
-        text = S.of(context).documentAddedPropertyLabel;
-        break;
-      case SortField.modified:
-        text = S.of(context).documentModifiedPropertyLabel;
-        break;
-    }
-
-    final docBloc = BlocProvider.of<DocumentsCubit>(context);
-    return ActionChip(
-      label: Text(text),
-      avatar: currentlySelectedOrder == sortField
-          ? const Icon(
-              Icons.done,
-              color: Colors.green,
-            )
-          : null,
-      onPressed: () => docBloc.updateFilter(
-          filter: docBloc.state.filter.copyWith(sortField: sortField)),
     );
   }
 

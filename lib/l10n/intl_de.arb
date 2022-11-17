@@ -192,5 +192,8 @@
   "errorMessageMissingClientCertificate": "Ein Client Zerfitikat wurde erwartet, aber nicht gesendet. Bitte konfiguriere ein gültiges Zertifikat.",
   "serverInformationPaperlessVersionText": "Paperless Server-Version",
   "errorReportLabel": "MELDEN",
-  "appDrawerHeaderLoggedInAsText": "Eingeloggt als "
+  "appDrawerHeaderLoggedInAsText": "Eingeloggt als ",
+  "labelAnyAssignedText": "Beliebig zugewiesen",
+  "deleteViewDialogContentText": "Möchtest Du diese Ansicht wirklich löschen?",
+  "deleteViewDialogTitleText": "Lösche Ansicht "
 }
