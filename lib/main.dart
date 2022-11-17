@@ -35,7 +35,7 @@ void main() async {
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   Intl.systemLocale = await findSystemLocale();
 
-  // Required for client certificates
+  // Required for self signed client certificates
   HttpOverrides.global = X509HttpOverrides();
 
   configureDependencies();

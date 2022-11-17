@@ -53,9 +53,8 @@ class _DocumentEditPageState extends State<DocumentEditPage> {
 
   @override
   void initState() {
-    documentBytes = getIt<DocumentRepository>().getPreview(widget.document.id);
-
     super.initState();
+    documentBytes = getIt<DocumentRepository>().getPreview(widget.document.id);
   }
 
   @override
@@ -69,10 +68,14 @@ class _DocumentEditPageState extends State<DocumentEditPage> {
             final updatedDocument = widget.document.copyWith(
               title: values[fkTitle],
               created: values[fkCreatedDate],
-              documentType: values[fkDocumentType] as IdQueryParameter,
-              correspondent: values[fkCorrespondent] as IdQueryParameter,
-              storagePath: values[fkStoragePath] as IdQueryParameter,
-              tags: values[fkTags] as TagsQuery,
+              overwriteDocumentType: true,
+              documentType: (values[fkDocumentType] as IdQueryParameter).id,
+              overwriteCorrespondent: true,
+              correspondent: (values[fkCorrespondent] as IdQueryParameter).id,
+              overwriteStoragePath: true,
+              storagePath: (values[fkStoragePath] as IdQueryParameter).id,
+              overwriteTags: true,
+              tags: (values[fkTags] as IdsTagsQuery).includedIds,
             );
             setState(() {
               _isSubmitLoading = true;
@@ -181,7 +184,10 @@ class _DocumentEditPageState extends State<DocumentEditPage> {
               },
             ).padded(),
             TagFormField(
-              initialValue: TagsQuery.fromIds(widget.document.tags),
+              initialValue: IdsTagsQuery.included(widget.document.tags),
+              notAssignedSelectable: false,
+              anyAssignedSelectable: false,
+              excludeAllowed: false,
               name: fkTags,
             ).padded(),
           ]),

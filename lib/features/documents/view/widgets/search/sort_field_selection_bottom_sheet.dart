@@ -44,9 +44,10 @@ class _SortFieldSelectionBottomSheetState
             children: [
               Text(
                 S.of(context).documentsPageOrderByLabel,
-                style: Theme.of(context).textTheme.titleSmall,
+                style: Theme.of(context).textTheme.caption,
                 textAlign: TextAlign.start,
-              ).padded(EdgeInsets.symmetric(horizontal: 16, vertical: 16)),
+              ).padded(
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 16)),
               Column(
                 children: _sortFields
                     .map(
@@ -110,9 +111,9 @@ class _SortFieldSelectionBottomSheetState
 
   Widget _buildOrderIcon(SortOrder order) {
     if (order == SortOrder.ascending) {
-      return Icon(Icons.arrow_upward);
+      return const Icon(Icons.arrow_upward);
     }
-    return Icon(Icons.arrow_downward);
+    return const Icon(Icons.arrow_downward);
   }
 
   String _localizedSortField(SortField sortField) {

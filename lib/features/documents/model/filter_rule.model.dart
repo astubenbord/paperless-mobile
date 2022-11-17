@@ -13,24 +13,24 @@ class FilterRule with EquatableMixin {
   static const int asnRule = 2;
   static const int correspondentRule = 3;
   static const int documentTypeRule = 4;
-  static const int tagRule = 6;
+  static const int includeTagsRule = 6;
+  static const int hasAnyTag = 7; // Corresponds to Not assigned
   static const int createdBeforeRule = 8;
   static const int createdAfterRule = 9;
   static const int addedBeforeRule = 13;
   static const int addedAfterRule = 14;
+  static const int excludeTagsRule = 17;
   static const int titleAndContentRule = 19;
   static const int extendedRule = 20;
   static const int storagePathRule = 25;
-  // Currently unsupported view optiosn:
+  // Currently unsupported view options:
   static const int _content = 1;
   static const int _isInInbox = 5;
-  static const int _hasAnyTag = 7;
   static const int _createdYearIs = 10;
   static const int _createdMonthIs = 11;
   static const int _createdDayIs = 12;
   static const int _modifiedBefore = 15;
   static const int _modifiedAfter = 16;
-  static const int _doesNotHaveTag = 17;
   static const int _doesNotHaveAsn = 18;
   static const int _moreLikeThis = 21;
   static const int _hasTagsIn = 22;
@@ -76,11 +76,25 @@ class FilterRule with EquatableMixin {
               ? const StoragePathQuery.notAssigned()
               : StoragePathQuery.fromId(int.parse(value!)),
         );
-      case tagRule:
+      case hasAnyTag:
         return filter.copyWith(
-          tags: value == null
-              ? const TagsQuery.notAssigned()
-              : TagsQuery.fromIds([...filter.tags.ids, int.parse(value!)]),
+          tags: value == "true"
+              ? const AnyAssignedTagsQuery()
+              : const OnlyNotAssignedTagsQuery(),
+        );
+      case includeTagsRule:
+        assert(filter.tags is IdsTagsQuery);
+        return filter.copyWith(
+          tags: (filter.tags as IdsTagsQuery).withIdQueriesAdded([
+            IncludeTagIdQuery(int.parse(value!)),
+          ]),
+        );
+      case excludeTagsRule:
+        assert(filter.tags is IdsTagsQuery);
+        return filter.copyWith(
+          tags: (filter.tags as IdsTagsQuery).withIdQueriesAdded([
+            ExcludeTagIdQuery(int.parse(value!)),
+          ]),
         );
       case createdBeforeRule:
         return filter.copyWith(
@@ -131,12 +145,19 @@ class FilterRule with EquatableMixin {
       filterRules
           .add(FilterRule(storagePathRule, filter.storagePath.id!.toString()));
     }
-    if (filter.tags.onlyNotAssigned) {
-      filterRules.add(FilterRule(tagRule, null));
+    if (filter.tags is OnlyNotAssignedTagsQuery) {
+      filterRules.add(FilterRule(hasAnyTag, "false"));
     }
-    if (filter.tags.isSet) {
-      filterRules.addAll(
-          filter.tags.ids.map((id) => FilterRule(tagRule, id.toString())));
+    if (filter.tags is AnyAssignedTagsQuery) {
+      filterRules.add(FilterRule(hasAnyTag, "true"));
+    }
+    if (filter.tags is IdsTagsQuery) {
+      filterRules.addAll((filter.tags as IdsTagsQuery)
+          .includedIds
+          .map((id) => FilterRule(includeTagsRule, id.toString())));
+      filterRules.addAll((filter.tags as IdsTagsQuery)
+          .excludedIds
+          .map((id) => FilterRule(excludeTagsRule, id.toString())));
     }
 
     if (filter.queryText != null) {

@@ -23,7 +23,7 @@ class InfoDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadius.only(
+      borderRadius: const BorderRadius.only(
         topRight: Radius.circular(16.0),
         bottomRight: Radius.circular(16.0),
       ),

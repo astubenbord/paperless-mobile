@@ -18,10 +18,10 @@ class ConfirmDeleteSavedViewDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(
-        "Delete view " + view.name + "?",
+        S.of(context).deleteViewDialogTitleText + view.name + "?",
         softWrap: true,
       ),
-      content: Text("Do you really want to delete this view?"),
+      content: Text(S.of(context).deleteViewDialogContentText),
       actions: [
         TextButton(
           child: Text(S.of(context).genericActionCancelLabel),

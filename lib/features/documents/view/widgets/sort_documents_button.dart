@@ -27,7 +27,7 @@ class _SortDocumentsButtonState extends State<SortDocumentsButton> {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      icon: Icon(Icons.sort),
+      icon: const Icon(Icons.sort),
       onPressed: _onOpenSortBottomSheet,
     );
   }
@@ -45,9 +45,9 @@ class _SortDocumentsButtonState extends State<SortDocumentsButton> {
       ),
       builder: (context) => BlocProvider.value(
         value: getIt<DocumentsCubit>(),
-        child: FractionallySizedBox(
+        child: const FractionallySizedBox(
           heightFactor: .6,
-          child: const SortFieldSelectionBottomSheet(),
+          child: SortFieldSelectionBottomSheet(),
         ),
       ),
     );

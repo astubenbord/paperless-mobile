@@ -11,7 +11,6 @@ import 'package:paperless_mobile/features/documents/model/document_filter.dart';
 import 'package:paperless_mobile/features/documents/model/query_parameters/correspondent_query.dart';
 import 'package:paperless_mobile/features/documents/model/query_parameters/document_type_query.dart';
 import 'package:paperless_mobile/features/documents/model/query_parameters/query_type.dart';
-import 'package:paperless_mobile/features/documents/model/query_parameters/sort_field.dart';
 import 'package:paperless_mobile/features/documents/model/query_parameters/storage_path_query.dart';
 import 'package:paperless_mobile/features/documents/model/query_parameters/tags_query.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/search/query_type_form_field.dart';
@@ -89,8 +88,7 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
         builder: (context, state) {
           return FormBuilder(
             key: _formKey,
-            child: ListView(
-              controller: widget.scrollController,
+            child: Column(
               children: [
                 Stack(
                   alignment: Alignment.center,
@@ -127,28 +125,43 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
                 const SizedBox(
                   height: 16.0,
                 ),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(S.of(context).documentsFilterPageSearchLabel),
-                ).padded(const EdgeInsets.only(left: 8.0)),
-                _buildQueryFormField(state),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(S.of(context).documentsFilterPageAdvancedLabel),
-                ).padded(const EdgeInsets.only(left: 8.0, top: 8.0)),
-                _buildCreatedDateRangePickerFormField(state).padded(),
-                _buildAddedDateRangePickerFormField(state).padded(),
-                _buildCorrespondentFormField(state).padded(),
-                _buildDocumentTypeFormField(state).padded(),
-                _buildStoragePathFormField(state).padded(),
-                TagFormField(
-                  name: DocumentModel.tagsKey,
-                  initialValue: state.filter.tags,
-                  allowCreation: false,
-                ).padded(),
-                // Required in order for the storage path field to be visible when typing
-                const SizedBox(
-                  height: 200,
+                Expanded(
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(16.0),
+                      topRight: Radius.circular(16.0),
+                    ),
+                    child: ListView(
+                      controller: widget.scrollController,
+                      children: [
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                              S.of(context).documentsFilterPageSearchLabel),
+                        ).padded(const EdgeInsets.only(left: 8.0)),
+                        _buildQueryFormField(state),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                              S.of(context).documentsFilterPageAdvancedLabel),
+                        ).padded(const EdgeInsets.only(left: 8.0, top: 8.0)),
+                        _buildCreatedDateRangePickerFormField(state).padded(),
+                        _buildAddedDateRangePickerFormField(state).padded(),
+                        _buildCorrespondentFormField(state).padded(),
+                        _buildDocumentTypeFormField(state).padded(),
+                        _buildStoragePathFormField(state).padded(),
+                        TagFormField(
+                          name: DocumentModel.tagsKey,
+                          initialValue: state.filter.tags,
+                          allowCreation: false,
+                        ).padded(),
+                        // Required in order for the storage path field to be visible when typing
+                        const SizedBox(
+                          height: 150,
+                        ),
+                      ],
+                    ).padded(),
+                  ),
                 ),
               ],
             ),
@@ -374,6 +387,7 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
             ),
           ),
         ),
+        const SizedBox(height: 4.0),
         _buildDateRangePickerHelper(state, fkCreatedAt),
       ],
     );
@@ -421,6 +435,7 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
             ),
           ),
         ),
+        const SizedBox(height: 4.0),
         _buildDateRangePickerHelper(state, fkAddedAt),
       ],
     );

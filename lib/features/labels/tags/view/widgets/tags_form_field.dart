@@ -13,6 +13,8 @@ class TagFormField extends StatefulWidget {
   final String name;
   final bool allowCreation;
   final bool notAssignedSelectable;
+  final bool anyAssignedSelectable;
+  final bool excludeAllowed;
 
   const TagFormField({
     super.key,
@@ -20,6 +22,8 @@ class TagFormField extends StatefulWidget {
     this.initialValue,
     this.allowCreation = true,
     this.notAssignedSelectable = true,
+    this.anyAssignedSelectable = true,
+    this.excludeAllowed = true,
   });
 
   @override
@@ -27,8 +31,11 @@ class TagFormField extends StatefulWidget {
 }
 
 class _TagFormFieldState extends State<TagFormField> {
+  static const _onlyNotAssignedId = -1;
+  static const _anyAssignedId = -2;
+
   late final TextEditingController _textEditingController;
-  bool _showCreationSuffixIcon = false;
+  bool _showCreationSuffixIcon = true;
   bool _showClearSuffixIcon = false;
 
   @override
@@ -39,12 +46,13 @@ class _TagFormFieldState extends State<TagFormField> {
       ..addListener(() {
         setState(() {
           _showCreationSuffixIcon = state.values
-              .where(
-                (item) => item.name.toLowerCase().startsWith(
-                      _textEditingController.text.toLowerCase(),
-                    ),
-              )
-              .isEmpty;
+                  .where(
+                    (item) => item.name.toLowerCase().startsWith(
+                          _textEditingController.text.toLowerCase(),
+                        ),
+                  )
+                  .isEmpty ||
+              _textEditingController.text.isEmpty;
         });
         setState(() =>
             _showClearSuffixIcon = _textEditingController.text.isNotEmpty);
@@ -78,20 +86,31 @@ class _TagFormFieldState extends State<TagFormField> {
                             .toLowerCase()
                             .startsWith(query.toLowerCase()))
                         .map((e) => e.id!)
-                        .toList()
-                      ..removeWhere((element) =>
-                          field.value?.ids.contains(element) ?? false);
-                    if (widget.notAssignedSelectable) {
-                      suggestions.insert(0, -1);
+                        .toList();
+                    if (field.value is IdsTagsQuery) {
+                      suggestions.removeWhere((element) =>
+                          (field.value as IdsTagsQuery).ids.contains(element));
+                    }
+                    if (widget.notAssignedSelectable &&
+                        field.value is! OnlyNotAssignedTagsQuery) {
+                      suggestions.insert(0, _onlyNotAssignedId);
+                    }
+                    if (widget.anyAssignedSelectable &&
+                        field.value is! AnyAssignedTagsQuery) {
+                      suggestions.insert(0, _anyAssignedId);
                     }
                     return suggestions;
                   },
                   getImmediateSuggestions: true,
                   animationStart: 1,
                   itemBuilder: (context, data) {
-                    if (data == -1) {
+                    if (data == _onlyNotAssignedId) {
                       return ListTile(
                         title: Text(S.of(context).labelNotAssignedText),
+                      );
+                    } else if (data == _anyAssignedId) {
+                      return ListTile(
+                        title: Text(S.of(context).labelAnyAssignedText),
                       );
                     }
                     final tag = tagState[data]!;
@@ -108,33 +127,48 @@ class _TagFormFieldState extends State<TagFormField> {
                     );
                   },
                   onSuggestionSelected: (id) {
-                    if (id == -1) {
-                      field.didChange(const TagsQuery.notAssigned());
+                    if (id == _onlyNotAssignedId) {
+                      //Not assigned tag
+                      field.didChange(const OnlyNotAssignedTagsQuery());
                       return;
+                    } else if (id == _anyAssignedId) {
+                      field.didChange(const AnyAssignedTagsQuery());
                     } else {
-                      field.didChange(
-                          TagsQuery.fromIds([...field.value?.ids ?? [], id]));
+                      final tagsQuery = field.value is IdsTagsQuery
+                          ? field.value as IdsTagsQuery
+                          : const IdsTagsQuery();
+                      field.didChange(tagsQuery
+                          .withIdQueriesAdded([IncludeTagIdQuery(id)]));
                     }
                     _textEditingController.clear();
                   },
                   direction: AxisDirection.up,
                 ),
-                if (field.value?.onlyNotAssigned ?? false) ...[
+                if (field.value is OnlyNotAssignedTagsQuery) ...[
                   _buildNotAssignedTag(field)
+                ] else if (field.value is AnyAssignedTagsQuery) ...[
+                  _buildAnyAssignedTag(field)
                 ] else ...[
+                  // field.value is IdsTagsQuery
                   Wrap(
                     alignment: WrapAlignment.start,
                     runAlignment: WrapAlignment.start,
                     spacing: 8.0,
-                    children: (field.value?.ids ?? [])
-                        .map((id) => _buildTag(field, tagState[id]!))
+                    children: ((field.value as IdsTagsQuery).queries)
+                        .map(
+                          (query) => _buildTag(
+                            field,
+                            query,
+                            tagState[query.id]!,
+                          ),
+                        )
                         .toList(),
                   ),
                 ]
               ],
             );
           },
-          initialValue: widget.initialValue ?? const TagsQuery.unset(),
+          initialValue: widget.initialValue ?? const IdsTagsQuery(),
           name: widget.name,
         );
       },
@@ -172,8 +206,11 @@ class _TagFormFieldState extends State<TagFormField> {
       ),
     );
     if (tag != null) {
+      final tagsQuery = field.value is IdsTagsQuery
+          ? field.value as IdsTagsQuery
+          : const IdsTagsQuery();
       field.didChange(
-        TagsQuery.fromIds([...field.value?.ids ?? [], tag.id!]),
+        tagsQuery.withIdQueriesAdded([IncludeTagIdQuery(tag.id!)]),
       );
     }
     _textEditingController.clear();
@@ -191,24 +228,43 @@ class _TagFormFieldState extends State<TagFormField> {
       ),
       backgroundColor:
           Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
+      onDeleted: () => field.didChange(const IdsTagsQuery()),
+    );
+  }
+
+  Widget _buildTag(
+    FormFieldState<TagsQuery> field,
+    TagIdQuery query,
+    Tag tag,
+  ) {
+    final currentQuery = field.value as IdsTagsQuery;
+    final isIncludedTag = currentQuery.includedIds.contains(query.id);
+
+    return InputChip(
+      label: Text(
+        tag.name,
+        style: TextStyle(
+          color: tag.textColor,
+          decoration: !isIncludedTag ? TextDecoration.lineThrough : null,
+          decorationThickness: 2.0,
+        ),
+      ),
+      onPressed: widget.excludeAllowed
+          ? () => field.didChange(currentQuery.withIdQueryToggled(tag.id!))
+          : null,
+      backgroundColor: tag.color,
       onDeleted: () => field.didChange(
-        const TagsQuery.unset(),
+        (field.value as IdsTagsQuery).withIdsRemoved([tag.id!]),
       ),
     );
   }
 
-  Widget _buildTag(FormFieldState<TagsQuery> field, Tag tag) {
+  Widget _buildAnyAssignedTag(FormFieldState<TagsQuery> field) {
     return InputChip(
-      label: Text(
-        tag.name,
-        style: TextStyle(color: tag.textColor),
-      ),
-      backgroundColor: tag.color,
-      onDeleted: () => field.didChange(
-        TagsQuery.fromIds(
-          field.value?.ids.where((element) => element != tag.id).toList() ?? [],
-        ),
-      ),
+      label: Text(S.of(context).labelAnyAssignedText),
+      backgroundColor:
+          Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.12),
+      onDeleted: () => field.didChange(const IdsTagsQuery()),
     );
   }
 }

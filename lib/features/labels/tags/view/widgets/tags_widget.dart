@@ -7,7 +7,7 @@ import 'package:paperless_mobile/features/labels/tags/model/tag.model.dart';
 import 'package:paperless_mobile/features/labels/tags/view/widgets/tag_widget.dart';
 
 class TagsWidget extends StatefulWidget {
-  final List<int> tagIds;
+  final Iterable<int> tagIds;
   final bool isMultiLine;
   final void Function()? afterTagTapped;
   final bool isClickable;

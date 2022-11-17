@@ -172,6 +172,9 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
             ),
             const TagFormField(
               name: DocumentModel.tagsKey,
+              notAssignedSelectable: false,
+              anyAssignedSelectable: false,
+              excludeAllowed: false,
               //Label: "Tags" + " *",
             ),
             Text(
@@ -194,10 +197,9 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
         final createdAt = fv[DocumentModel.createdKey] as DateTime?;
         final title = fv[DocumentModel.titleKey] as String;
         final docType = fv[DocumentModel.documentTypeKey] as IdQueryParameter;
-        final tags = fv[DocumentModel.tagsKey] as TagsQuery;
+        final tags = fv[DocumentModel.tagsKey] as IdsTagsQuery;
         final correspondent =
             fv[DocumentModel.correspondentKey] as IdQueryParameter;
-
         await BlocProvider.of<DocumentsCubit>(context).addDocument(
           widget.fileBytes,
           _formKey.currentState?.value[fkFileName],

@@ -193,5 +193,8 @@
   "errorMessageMissingClientCertificate": "A client certificate was expected but not sent. Please provide a valid client certificate.",
   "serverInformationPaperlessVersionText": "Paperless server version",
   "errorReportLabel": "REPORT",
-  "appDrawerHeaderLoggedInAsText": "Logged in as "
+  "appDrawerHeaderLoggedInAsText": "Logged in as ",
+  "labelAnyAssignedText": "Any assigned",
+  "deleteViewDialogContentText": "Do you really want to delete this view?",
+  "deleteViewDialogTitleText": "Delete view "
 }
