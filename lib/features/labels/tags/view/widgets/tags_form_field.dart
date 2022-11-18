@@ -253,6 +253,7 @@ class _TagFormFieldState extends State<TagFormField> {
           ? () => field.didChange(currentQuery.withIdQueryToggled(tag.id!))
           : null,
       backgroundColor: tag.color,
+      deleteIconColor: tag.textColor,
       onDeleted: () => field.didChange(
         (field.value as IdsTagsQuery).withIdsRemoved([tag.id!]),
       ),
