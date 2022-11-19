@@ -14,7 +14,7 @@ class FilterRule with EquatableMixin {
   static const int correspondentRule = 3;
   static const int documentTypeRule = 4;
   static const int includeTagsRule = 6;
-  static const int hasAnyTag = 7; // Corresponds to Not assigned
+  static const int hasAnyTag = 7; // true = any tag, false = not assigned
   static const int createdBeforeRule = 8;
   static const int createdAfterRule = 9;
   static const int addedBeforeRule = 13;
@@ -85,32 +85,36 @@ class FilterRule with EquatableMixin {
       case includeTagsRule:
         assert(filter.tags is IdsTagsQuery);
         return filter.copyWith(
-          tags: (filter.tags as IdsTagsQuery).withIdQueriesAdded([
-            IncludeTagIdQuery(int.parse(value!)),
-          ]),
+          tags: (filter.tags as IdsTagsQuery)
+              .withIdQueriesAdded([IncludeTagIdQuery(int.parse(value!))]),
         );
       case excludeTagsRule:
         assert(filter.tags is IdsTagsQuery);
         return filter.copyWith(
-          tags: (filter.tags as IdsTagsQuery).withIdQueriesAdded([
-            ExcludeTagIdQuery(int.parse(value!)),
-          ]),
+          tags: (filter.tags as IdsTagsQuery)
+              .withIdQueriesAdded([ExcludeTagIdQuery(int.parse(value!))]),
         );
       case createdBeforeRule:
         return filter.copyWith(
-            createdDateBefore: value == null ? null : DateTime.parse(value!));
+          createdDateBefore: value == null ? null : DateTime.parse(value!),
+        );
       case createdAfterRule:
         return filter.copyWith(
-            createdDateAfter: value == null ? null : DateTime.parse(value!));
+          createdDateAfter: value == null ? null : DateTime.parse(value!),
+        );
       case addedBeforeRule:
         return filter.copyWith(
-            addedDateBefore: value == null ? null : DateTime.parse(value!));
+          addedDateBefore: value == null ? null : DateTime.parse(value!),
+        );
       case addedAfterRule:
         return filter.copyWith(
-            addedDateAfter: value == null ? null : DateTime.parse(value!));
+          addedDateAfter: value == null ? null : DateTime.parse(value!),
+        );
       case titleAndContentRule:
         return filter.copyWith(
-            queryText: value, queryType: QueryType.titleAndContent);
+          queryText: value,
+          queryType: QueryType.titleAndContent,
+        );
       case extendedRule:
         return filter.copyWith(queryText: value, queryType: QueryType.extended);
       //TODO: Add currently unused rules
@@ -146,10 +150,10 @@ class FilterRule with EquatableMixin {
           .add(FilterRule(storagePathRule, filter.storagePath.id!.toString()));
     }
     if (filter.tags is OnlyNotAssignedTagsQuery) {
-      filterRules.add(FilterRule(hasAnyTag, "false"));
+      filterRules.add(FilterRule(hasAnyTag, false.toString()));
     }
     if (filter.tags is AnyAssignedTagsQuery) {
-      filterRules.add(FilterRule(hasAnyTag, "true"));
+      filterRules.add(FilterRule(hasAnyTag, true.toString()));
     }
     if (filter.tags is IdsTagsQuery) {
       filterRules.addAll((filter.tags as IdsTagsQuery)

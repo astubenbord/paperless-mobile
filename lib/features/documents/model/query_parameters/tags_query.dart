@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:paperless_mobile/extensions/dart_extensions.dart';
 
 abstract class TagsQuery with EquatableMixin {
   const TagsQuery();
@@ -33,8 +32,6 @@ class IdsTagsQuery extends TagsQuery {
 
   const IdsTagsQuery([this._idQueries = const []]);
 
-  const IdsTagsQuery.unset() : _idQueries = const [];
-
   IdsTagsQuery.included(Iterable<int> ids)
       : _idQueries = ids.map((id) => IncludeTagIdQuery(id));
 
@@ -44,13 +41,14 @@ class IdsTagsQuery extends TagsQuery {
       : _idQueries = ids.map((id) => ExcludeTagIdQuery(id));
 
   IdsTagsQuery withIdQueriesAdded(Iterable<TagIdQuery> idQueries) {
-    final intersection = _idQueries
+    final intersection = idQueries
         .map((idQ) => idQ.id)
         .toSet()
         .intersection(_idQueries.map((idQ) => idQ.id).toSet());
-    return IdsTagsQuery(
+    final res = IdsTagsQuery(
       [...withIdsRemoved(intersection).queries, ...idQueries],
     );
+    return res;
   }
 
   IdsTagsQuery withIdsRemoved(Iterable<int> ids) {

@@ -43,7 +43,7 @@ class DocumentFilter with EquatableMixin {
     this.correspondent = const CorrespondentQuery.unset(),
     this.storagePath = const StoragePathQuery.unset(),
     this.asn = const AsnQuery.unset(),
-    this.tags = const IdsTagsQuery.unset(),
+    this.tags = const IdsTagsQuery(),
     this.sortField = SortField.created,
     this.sortOrder = SortOrder.descending,
     this.page = 1,

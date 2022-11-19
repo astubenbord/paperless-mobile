@@ -52,9 +52,9 @@ class SavedView with EquatableMixin {
               .where((order) => order.queryString == json['sort_field'])
               .first,
           sortReverse: json['sort_reverse'],
-          filterRules: json['filter_rules']
+          filterRules: (json['filter_rules'] as List)
               .cast<JSON>()
-              .map<FilterRule>(FilterRule.fromJson)
+              .map(FilterRule.fromJson)
               .toList(),
         );
 
