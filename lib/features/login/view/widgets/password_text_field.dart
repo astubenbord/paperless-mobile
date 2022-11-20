@@ -5,6 +5,7 @@ class ObscuredInputTextFormField extends StatefulWidget {
   final String label;
   final void Function(String?) onChanged;
   final FormFieldValidator<String>? validator;
+  final bool enabled;
 
   const ObscuredInputTextFormField({
     super.key,
@@ -12,6 +13,7 @@ class ObscuredInputTextFormField extends StatefulWidget {
     required this.label,
     this.validator,
     this.initialValue,
+    this.enabled = true,
   });
 
   @override
@@ -33,6 +35,7 @@ class _ObscuredInputTextFormFieldState
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      enabled: widget.enabled,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       validator: widget.validator,
       initialValue: widget.initialValue,

@@ -24,7 +24,9 @@ class PaperlessServerInformationService {
     final String username =
         jsonDecode(utf8.decode(response.bodyBytes))['username'];
     final String? host =
-        response.headers[PaperlessServerInformation.hostHeader];
+        response.headers[PaperlessServerInformation.hostHeader] ??
+            response.request?.headers[PaperlessServerInformation.hostHeader] ??
+            ('${response.request?.url.host}:${response.request?.url.port}');
     return PaperlessServerInformation(
       username: username,
       version: version,
