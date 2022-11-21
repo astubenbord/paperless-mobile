@@ -84,7 +84,7 @@ class _DocumentEditPageState extends State<DocumentEditPage> {
               await getIt<DocumentsCubit>().updateDocument(updatedDocument);
               showSnackBar(context, S.of(context).documentUpdateErrorMessage);
             } on ErrorMessage catch (error, stackTrace) {
-              showError(context, error, stackTrace);
+              showErrorMessage(context, error, stackTrace);
             } finally {
               Navigator.pop(context);
             }

@@ -83,7 +83,7 @@ class _HomePageState extends State<HomePage> {
       BlocProvider.of<StoragePathCubit>(context).initialize();
       BlocProvider.of<SavedViewCubit>(context).initialize();
     } on ErrorMessage catch (error, stackTrace) {
-      showError(context, error, stackTrace);
+      showErrorMessage(context, error, stackTrace);
     }
   }
 }

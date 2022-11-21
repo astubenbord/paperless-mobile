@@ -88,7 +88,7 @@ class SavedViewSelectionWidget extends StatelessWidget {
       try {
         await BlocProvider.of<SavedViewCubit>(context).add(newView);
       } on ErrorMessage catch (error, stackTrace) {
-        showError(context, error, stackTrace);
+        showErrorMessage(context, error, stackTrace);
       }
     }
   }
@@ -105,7 +105,7 @@ class SavedViewSelectionWidget extends StatelessWidget {
         BlocProvider.of<SavedViewCubit>(context).selectView(null);
       }
     } on ErrorMessage catch (error, stackTrace) {
-      showError(context, error, stackTrace);
+      showErrorMessage(context, error, stackTrace);
     }
   }
 
@@ -120,7 +120,7 @@ class SavedViewSelectionWidget extends StatelessWidget {
         try {
           BlocProvider.of<SavedViewCubit>(context).remove(view);
         } on ErrorMessage catch (error, stackTrace) {
-          showError(context, error, stackTrace);
+          showErrorMessage(context, error, stackTrace);
         }
       }
     }

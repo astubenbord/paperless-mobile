@@ -192,7 +192,7 @@ class _ScannerPageState extends State<ScannerPage>
                 BlocProvider.of<DocumentScannerCubit>(context)
                     .removeScan(index);
               } on ErrorMessage catch (error, stackTrace) {
-                showError(context, error, stackTrace);
+                showErrorMessage(context, error, stackTrace);
               }
             },
             index: index,
@@ -205,7 +205,7 @@ class _ScannerPageState extends State<ScannerPage>
     try {
       BlocProvider.of<DocumentScannerCubit>(context).reset();
     } on ErrorMessage catch (error, stackTrace) {
-      showError(context, error, stackTrace);
+      showErrorMessage(context, error, stackTrace);
     }
   }
 
@@ -224,10 +224,16 @@ class _ScannerPageState extends State<ScannerPage>
     );
     if (result?.files.single.path != null) {
       File file = File(result!.files.single.path!);
-      if (!supportedFileExtensions.contains(file.path.split('.').last)) {
-        //TODO: Show error message;
+      if (!supportedFileExtensions.contains(
+        file.path.split('.').last.toLowerCase(),
+      )) {
+        showErrorMessage(
+          context,
+          const ErrorMessage(ErrorCode.unsupportedFileFormat),
+        );
         return;
       }
+      final filename = extractFilenameFromPath(file.path);
       final mimeType = lookupMimeType(file.path) ?? '';
       late Uint8List fileBytes;
       if (mimeType.startsWith('image')) {
@@ -244,6 +250,7 @@ class _ScannerPageState extends State<ScannerPage>
             value: getIt<DocumentsCubit>(),
             child: LabelBlocProvider(
               child: DocumentUploadPage(
+                filename: filename,
                 fileBytes: fileBytes,
               ),
             ),

@@ -98,9 +98,11 @@ class _LoginPageState extends State<LoginPage> {
               form[ClientCertificateFormField.fkClientCertificate],
         );
       } on ErrorMessage catch (error, stackTrace) {
-        showError(context, error, stackTrace);
+        showErrorMessage(context, error, stackTrace);
+      } on Map<String, dynamic> catch (error, stackTrace) {
+        showGenericError(context, error.values.first, stackTrace);
       } catch (unknownError, stackTrace) {
-        showError(context, ErrorMessage.unknown(), stackTrace);
+        showErrorMessage(context, ErrorMessage.unknown(), stackTrace);
       } finally {
         setState(() => _isLoginLoading = false);
       }

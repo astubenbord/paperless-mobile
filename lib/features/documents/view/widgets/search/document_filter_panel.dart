@@ -476,7 +476,7 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
         FocusScope.of(context).unfocus();
         widget.panelController.close();
       } on ErrorMessage catch (error, stackTrace) {
-        showError(context, error, stackTrace);
+        showErrorMessage(context, error, stackTrace);
       }
     }
   }

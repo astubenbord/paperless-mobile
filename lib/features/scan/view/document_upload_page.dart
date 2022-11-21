@@ -30,11 +30,16 @@ import 'package:intl/intl.dart';
 
 class DocumentUploadPage extends StatefulWidget {
   final Uint8List fileBytes;
+  final String? title;
+  final String? filename;
   final void Function()? afterUpload;
+
   const DocumentUploadPage({
     Key? key,
     required this.fileBytes,
     this.afterUpload,
+    this.title,
+    this.filename,
   }) : super(key: key);
 
   @override
@@ -42,18 +47,21 @@ class DocumentUploadPage extends StatefulWidget {
 }
 
 class _DocumentUploadPageState extends State<DocumentUploadPage> {
-  static const fkFileName = "fileName";
-
+  static const fkFileName = "filename";
   static final fileNameDateFormat = DateFormat("yyyy_MM_ddTHH_mm_ss");
+
   final GlobalKey<FormBuilderState> _formKey = GlobalKey();
 
   PaperlessValidationErrors _errors = {};
   bool _isUploadLoading = false;
+  late bool _syncTitleAndFilename;
+  final _now = DateTime.now();
 
   @override
   void initState() {
     super.initState();
-    initializeDateFormatting(); //TODO: INTL (has to do with intl below)
+    _syncTitleAndFilename = widget.filename == null && widget.title == null;
+    initializeDateFormatting();
   }
 
   @override
@@ -83,7 +91,8 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
             FormBuilderTextField(
               autovalidateMode: AutovalidateMode.always,
               name: DocumentModel.titleKey,
-              initialValue: "scan_${fileNameDateFormat.format(DateTime.now())}",
+              initialValue:
+                  widget.title ?? "scan_${fileNameDateFormat.format(_now)}",
               validator: FormBuilderValidators.required(),
               decoration: InputDecoration(
                 labelText: S.of(context).documentTitlePropertyLabel,
@@ -92,29 +101,58 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
                   onPressed: () {
                     _formKey.currentState?.fields[DocumentModel.titleKey]
                         ?.didChange("");
-                    _formKey.currentState?.fields[fkFileName]
-                        ?.didChange(".pdf");
+                    if (_syncTitleAndFilename) {
+                      _formKey.currentState?.fields[fkFileName]?.didChange("");
+                    }
                   },
                 ),
                 errorText: _errors[DocumentModel.titleKey],
               ),
               onChanged: (value) {
-                final String? transformedValue =
-                    value?.replaceAll(RegExp(r"[\W_]"), "_");
-                _formKey.currentState?.fields[fkFileName]
-                    ?.didChange("${transformedValue ?? ''}.pdf");
+                final String transformedValue = _formatFilename(value ?? '');
+                if (_syncTitleAndFilename) {
+                  _formKey.currentState?.fields[fkFileName]
+                      ?.didChange(transformedValue);
+                }
               },
             ),
             FormBuilderTextField(
               autovalidateMode: AutovalidateMode.always,
-              readOnly: true,
-              enabled: false,
+              readOnly: _syncTitleAndFilename,
+              enabled: !_syncTitleAndFilename,
               name: fkFileName,
               decoration: InputDecoration(
                 labelText: S.of(context).documentUploadFileNameLabel,
+                suffixText: ".pdf",
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.clear),
+                  onPressed: () =>
+                      _formKey.currentState?.fields[fkFileName]?.didChange(''),
+                ),
               ),
               initialValue:
-                  "scan_${fileNameDateFormat.format(DateTime.now())}.pdf",
+                  widget.filename ?? "scan_${fileNameDateFormat.format(_now)}",
+            ),
+            SwitchListTile(
+              value: _syncTitleAndFilename,
+              onChanged: (value) {
+                setState(
+                  () => _syncTitleAndFilename = value,
+                );
+                if (_syncTitleAndFilename) {
+                  final String transformedValue = _formatFilename(_formKey
+                      .currentState
+                      ?.fields[DocumentModel.titleKey]
+                      ?.value as String);
+                  if (_syncTitleAndFilename) {
+                    _formKey.currentState?.fields[fkFileName]
+                        ?.didChange(transformedValue);
+                  }
+                }
+              },
+              title: Text(S
+                  .of(context)
+                  .documentUploadPageSynchronizeTitleAndFilenameLabel), //TODO: INTL
             ),
             FormBuilderDateTimePicker(
               autovalidateMode: AutovalidateMode.always,
@@ -202,7 +240,7 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
             fv[DocumentModel.correspondentKey] as IdQueryParameter;
         await BlocProvider.of<DocumentsCubit>(context).addDocument(
           widget.fileBytes,
-          _formKey.currentState?.value[fkFileName],
+          _padWithPdfExtension(_formKey.currentState?.value[fkFileName]),
           onConsumptionFinished: _onConsumptionFinished,
           title: title,
           documentType: docType.id,
@@ -215,17 +253,25 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
         Navigator.pop(context);
         widget.afterUpload?.call();
       } on ErrorMessage catch (error, stackTrace) {
-        showError(context, error, stackTrace);
+        showErrorMessage(context, error, stackTrace);
       } on PaperlessValidationErrors catch (errorMessages) {
         setState(() => _errors = errorMessages);
       } catch (unknownError, stackTrace) {
-        showError(context, ErrorMessage.unknown(), stackTrace);
+        showErrorMessage(context, ErrorMessage.unknown(), stackTrace);
       } finally {
         setState(() {
           _isUploadLoading = false;
         });
       }
     }
+  }
+
+  String _padWithPdfExtension(String source) {
+    return source.endsWith(".pdf") ? source : '$source.pdf';
+  }
+
+  String _formatFilename(String source) {
+    return source.replaceAll(RegExp(r"[\W_]"), "_");
   }
 
   void _onConsumptionFinished(document) {
@@ -236,7 +282,7 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
             try {
               getIt<DocumentsCubit>().reloadDocuments();
             } on ErrorMessage catch (error, stackTrace) {
-              showError(context, error, stackTrace);
+              showErrorMessage(context, error, stackTrace);
             }
           },
           label:

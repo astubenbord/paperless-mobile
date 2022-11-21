@@ -235,7 +235,7 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
     try {
       await BlocProvider.of<DocumentsCubit>(context).assignAsn(document);
     } on ErrorMessage catch (error, stackTrace) {
-      showError(context, error, stackTrace);
+      showErrorMessage(context, error, stackTrace);
     }
   }
 
@@ -410,7 +410,7 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
         await BlocProvider.of<DocumentsCubit>(context).removeDocument(document);
         showSnackBar(context, S.of(context).documentDeleteSuccessMessage);
       } on ErrorMessage catch (error, stackTrace) {
-        showError(context, error, stackTrace);
+        showErrorMessage(context, error, stackTrace);
       } finally {
         Navigator.pop(context);
       }

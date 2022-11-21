@@ -65,7 +65,7 @@ class TagWidget extends StatelessWidget {
         afterTagTapped!();
       }
     } on ErrorMessage catch (error, stackTrace) {
-      showError(context, error, stackTrace);
+      showErrorMessage(context, error, stackTrace);
     }
   }
 }

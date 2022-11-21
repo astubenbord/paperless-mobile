@@ -147,7 +147,7 @@ class _EditLabelPageState<T extends Label> extends State<EditLabelPage<T>> {
       } on PaperlessValidationErrors catch (errorMessages) {
         setState(() => _errors = errorMessages);
       } on ErrorMessage catch (error, stackTrace) {
-        showError(context, error, stackTrace);
+        showErrorMessage(context, error, stackTrace);
       }
     }
   }

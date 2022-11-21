@@ -105,7 +105,7 @@ class _DocumentsPageAppBarState extends State<DocumentsPageAppBar> {
           S.of(context).documentsPageBulkDeleteSuccessfulText,
         );
       } on ErrorMessage catch (error, stackTrace) {
-        showError(context, error, stackTrace);
+        showErrorMessage(context, error, stackTrace);
       }
     }
   }

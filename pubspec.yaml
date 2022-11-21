@@ -80,6 +80,7 @@ dependencies:
   receive_sharing_intent: ^1.4.5
   uuid: ^3.0.6
   flutter_typeahead: ^4.1.1
+  fluttertoast: ^8.1.1
 
 dev_dependencies:
   integration_test:

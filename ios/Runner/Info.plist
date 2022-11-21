@@ -2,6 +2,22 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 	<dict>
+		<key>CFBundleURLTypes</key>
+			<array>
+				<dict>
+					<key>CFBundleTypeRole</key>
+					<string>Editor</string>
+					<key>CFBundleURLSchemes</key>
+					<array>
+						<string>ShareMedia</string>
+					</array>
+				</dict>
+				<dict/>
+			</array>
+
+		<key>NSPhotoLibraryUsageDescription</key>
+			<string>To upload photos, please allow permission to access your photo library.</string>
+
 		<key>NSFaceIDUsageDescription</key>
 		<string>Why is my app authenticating using face id?</string>
 		<key>CFBundleDevelopmentRegion</key>
@@ -48,6 +64,6 @@
 		<key>UIStatusBarHidden</key>
 		<false/>
 		<key>CADisableMinimumFrameDurationOnPhone</key>
-	<true/>
-</dict>
+		<true/>
+	</dict>
 </plist>

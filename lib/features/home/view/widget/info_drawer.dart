@@ -191,7 +191,7 @@ class InfoDrawer extends StatelessWidget {
                   getIt<TagCubit>().reset();
                   getIt<DocumentScannerCubit>().reset();
                 } on ErrorMessage catch (error, stackTrace) {
-                  showError(context, error, stackTrace);
+                  showErrorMessage(context, error, stackTrace);
                 }
               },
             ),

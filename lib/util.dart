@@ -34,7 +34,32 @@ void showSnackBar(
   );
 }
 
-void showError(
+void showGenericError(
+  BuildContext context,
+  dynamic error, [
+  StackTrace? stackTrace,
+]) {
+  showSnackBar(
+    context,
+    error.toString(),
+    action: SnackBarAction(
+      label: S.of(context).errorReportLabel,
+      textColor: Colors.amber,
+      onPressed: () => GithubIssueService.createIssueFromError(
+        context,
+        stackTrace: stackTrace,
+      ),
+    ),
+  );
+  log(
+    "An error has occurred.",
+    error: error,
+    stackTrace: stackTrace,
+    time: DateTime.now(),
+  );
+}
+
+void showErrorMessage(
   BuildContext context,
   ErrorMessage error, [
   StackTrace? stackTrace,
@@ -90,4 +115,8 @@ void setKeyNullable(Map data, String key, dynamic value) {
 String formatLocalDate(BuildContext context, DateTime dateTime) {
   final tag = Localizations.maybeLocaleOf(context)?.toLanguageTag();
   return DateFormat.yMMMd(tag).format(dateTime);
+}
+
+String extractFilenameFromPath(String path) {
+  return path.split(RegExp('[./]')).reversed.skip(1).first;
 }

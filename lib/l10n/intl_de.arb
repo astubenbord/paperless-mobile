@@ -1,9 +1,9 @@
 {
   "@@locale": "de",
   "documentTitlePropertyLabel": "Titel",
-  "documentCreatedPropertyLabel": "Erstellt Am",
-  "documentAddedPropertyLabel": "Hinzugefügt Am",
-  "documentModifiedPropertyLabel": "Geändert Am",
+  "documentCreatedPropertyLabel": "Ausgestellt am",
+  "documentAddedPropertyLabel": "Hinzugefügt am",
+  "documentModifiedPropertyLabel": "Geändert am",
   "documentDocumentTypePropertyLabel": "Dokumenttyp",
   "documentCorrespondentPropertyLabel": "Korrespondent",
   "documentStoragePathPropertyLabel": "Speicherpfad",
@@ -107,7 +107,7 @@
   "documentScannerPageUploadFromThisDeviceButtonLabel": "Lade ein Dokument von diesem Gerät hoch",
   "addTagPageTitle": "Neuer Tag",
   "addCorrespondentPageTitle": "Neuer Korrespondent",
-  "addDocumentTypePageTitle": "Neuer Dokumententyp",
+  "addDocumentTypePageTitle": "Neuer Dokumenttyp",
   "labelNamePropertyLabel": "Name",
   "labelMatchPropertyLabel": "Zuweisungsmuster",
   "labelMatchingAlgorithmPropertyLabel": "Zuweisungsalgorithmus",
@@ -195,5 +195,6 @@
   "appDrawerHeaderLoggedInAsText": "Eingeloggt als ",
   "labelAnyAssignedText": "Beliebig zugewiesen",
   "deleteViewDialogContentText": "Möchtest Du diese Ansicht wirklich löschen?",
-  "deleteViewDialogTitleText": "Lösche Ansicht "
+  "deleteViewDialogTitleText": "Lösche Ansicht ",
+  "documentUploadPageSynchronizeTitleAndFilenameLabel": "Synchronisiere Titel und Dateiname"
 }

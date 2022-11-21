@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/intl_standalone.dart';
@@ -15,6 +16,7 @@ import 'package:paperless_mobile/core/bloc/paperless_server_information_cubit.da
 import 'package:paperless_mobile/core/global/asset_images.dart';
 import 'package:paperless_mobile/core/global/constants.dart';
 import 'package:paperless_mobile/core/global/http_self_signed_certificate_override.dart';
+import 'package:paperless_mobile/core/logic/error_code_localization_mapper.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/core/service/file_service.dart';
 import 'package:paperless_mobile/di_initializer.dart';
@@ -132,21 +134,40 @@ class AuthenticationWrapper extends StatefulWidget {
 
 class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
   bool isFileTypeSupported(SharedMediaFile file) {
-    return supportedFileExtensions.contains(file.path.split('.').last);
+    return supportedFileExtensions.contains(
+      file.path.split('.').last.toLowerCase(),
+    );
   }
 
   void handleReceivedFiles(List<SharedMediaFile> files) async {
     if (files.isEmpty) {
       return;
     }
-    if (!isFileTypeSupported(files.first)) {
-      showError(context, const ErrorMessage(ErrorCode.unsupportedFileFormat));
-      await Future.delayed(
-        const Duration(seconds: 2),
-        () => SystemNavigator.pop(),
+    late final SharedMediaFile file;
+    if (Platform.isIOS) {
+      // Workaround: https://stackoverflow.com/a/72813212
+      file = SharedMediaFile(
+        files.first.path.replaceAll('file://', ''),
+        files.first.thumbnail,
+        files.first.duration,
+        files.first.type,
       );
+    } else {
+      file = files.first;
     }
-    final bytes = File(files.first.path).readAsBytesSync();
+
+    if (!isFileTypeSupported(file)) {
+      Fluttertoast.showToast(
+        msg: translateError(context, ErrorCode.unsupportedFileFormat),
+      );
+      if (Platform.isAndroid) {
+        // As stated in the docs, SystemNavigator.pop() is ignored on IOS to comply with HCI guidelines.
+        await SystemNavigator.pop();
+      }
+      return;
+    }
+    final filename = extractFilenameFromPath(file.path);
+    final bytes = File(file.path).readAsBytesSync();
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -156,6 +177,7 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
             child: DocumentUploadPage(
               fileBytes: bytes,
               afterUpload: () => SystemNavigator.pop(),
+              filename: filename,
             ),
           ),
         ),
@@ -184,7 +206,7 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      top: true,
+      top: false,
       left: false,
       right: false,
       bottom: false,

@@ -53,7 +53,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
     try {
       BlocProvider.of<DocumentsCubit>(context).loadDocuments();
     } on ErrorMessage catch (error, stackTrace) {
-      showError(context, error, stackTrace);
+      showErrorMessage(context, error, stackTrace);
     }
   }
 
@@ -73,7 +73,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
     try {
       await documentsCubit.loadMore();
     } on ErrorMessage catch (error, stackTrace) {
-      showError(context, error, stackTrace);
+      showErrorMessage(context, error, stackTrace);
     }
   }
 
@@ -87,7 +87,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
         (filter) => filter.copyWith(page: 1),
       );
     } on ErrorMessage catch (error, stackTrace) {
-      showError(context, error, stackTrace);
+      showErrorMessage(context, error, stackTrace);
     }
   }
 

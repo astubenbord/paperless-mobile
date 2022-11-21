@@ -19,7 +19,7 @@ class BottomNavBar extends StatelessWidget {
       selectedIndex: selectedIndex,
       destinations: [
         NavigationDestination(
-          icon: const Icon(Icons.description),
+          icon: const Icon(Icons.description_outlined),
           selectedIcon: Icon(
             Icons.description,
             color: Theme.of(context).colorScheme.primary,
@@ -27,7 +27,7 @@ class BottomNavBar extends StatelessWidget {
           label: S.of(context).bottomNavDocumentsPageLabel,
         ),
         NavigationDestination(
-          icon: const Icon(Icons.document_scanner),
+          icon: const Icon(Icons.document_scanner_outlined),
           selectedIcon: Icon(
             Icons.document_scanner,
             color: Theme.of(context).colorScheme.primary,
@@ -35,9 +35,7 @@ class BottomNavBar extends StatelessWidget {
           label: S.of(context).bottomNavScannerPageLabel,
         ),
         NavigationDestination(
-          icon: const Icon(
-            Icons.sell,
-          ),
+          icon: const Icon(Icons.sell_outlined),
           selectedIcon: Icon(
             Icons.sell,
             color: Theme.of(context).colorScheme.primary,

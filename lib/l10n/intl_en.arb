@@ -196,5 +196,6 @@
   "appDrawerHeaderLoggedInAsText": "Logged in as ",
   "labelAnyAssignedText": "Any assigned",
   "deleteViewDialogContentText": "Do you really want to delete this view?",
-  "deleteViewDialogTitleText": "Delete view "
+  "deleteViewDialogTitleText": "Delete view ",
+  "documentUploadPageSynchronizeTitleAndFilenameLabel": "Synchronize title and filename"
 }
