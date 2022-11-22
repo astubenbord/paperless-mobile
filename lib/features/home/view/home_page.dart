@@ -7,9 +7,12 @@ import 'package:paperless_mobile/core/widgets/offline_banner.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/documents/bloc/saved_view_cubit.dart';
+import 'package:paperless_mobile/features/documents/repository/document_repository.dart';
+import 'package:paperless_mobile/features/documents/repository/document_repository_impl.dart';
 import 'package:paperless_mobile/features/documents/view/pages/documents_page.dart';
 import 'package:paperless_mobile/features/home/view/widget/bottom_navigation_bar.dart';
 import 'package:paperless_mobile/features/home/view/widget/info_drawer.dart';
+import 'package:paperless_mobile/features/inbox/view/inbox_page.dart';
 import 'package:paperless_mobile/features/labels/correspondent/bloc/correspondents_cubit.dart';
 import 'package:paperless_mobile/features/labels/document_type/bloc/document_type_cubit.dart';
 import 'package:paperless_mobile/features/labels/storage_path/bloc/storage_path_cubit.dart';
@@ -56,10 +59,12 @@ class _HomePageState extends State<HomePage> {
           ),
           drawer: const InfoDrawer(),
           body: [
-            MultiBlocProvider(
-              providers: [
-                BlocProvider.value(value: getIt<DocumentsCubit>()),
-              ],
+            BlocProvider.value(
+              value: DocumentsCubit(getIt<DocumentRepository>()),
+              child: const InboxPage(),
+            ),
+            BlocProvider.value(
+              value: getIt<DocumentsCubit>(),
               child: const DocumentsPage(),
             ),
             BlocProvider.value(

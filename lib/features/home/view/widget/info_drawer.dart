@@ -1,8 +1,14 @@
+import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:paperless_mobile/core/bloc/label_bloc_provider.dart';
 import 'package:paperless_mobile/core/bloc/paperless_server_information_cubit.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/core/model/paperless_server_information.dart';
+import 'package:paperless_mobile/core/model/paperless_statistics.dart';
+import 'package:paperless_mobile/core/service/paperless_statistics_service.dart';
+import 'package:paperless_mobile/features/documents/repository/document_repository.dart';
+import 'package:paperless_mobile/features/inbox/view/inbox_page.dart';
 import 'package:paperless_mobile/features/settings/bloc/application_settings_cubit.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/labels/correspondent/bloc/correspondents_cubit.dart';
@@ -123,6 +129,31 @@ class InfoDrawer extends StatelessWidget {
                 color: Theme.of(context).colorScheme.primaryContainer,
               ),
             ),
+            FutureBuilder<PaperlessStatistics>(
+              future: getIt<PaperlessStatisticsService>().getStatistics(),
+              builder: (context, snapshot) {
+                return ListTile(
+                  title: Text("Inbox"),
+                  leading: const Icon(Icons.inbox),
+                  trailing: snapshot.hasData
+                      ? Text(
+                          snapshot.data!.documentsInInbox.toString(),
+                        )
+                      : null,
+                  onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => LabelBlocProvider(
+                          child: BlocProvider.value(
+                            value: DocumentsCubit(getIt<DocumentRepository>()),
+                            child: const InboxPage(),
+                          ),
+                        ),
+                      )),
+                );
+              },
+            ),
+            Divider(),
             ListTile(
               leading: const Icon(Icons.settings),
               title: Text(

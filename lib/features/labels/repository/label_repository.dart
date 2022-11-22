@@ -27,6 +27,4 @@ abstract class LabelRepository {
   Future<StoragePath> saveStoragePath(StoragePath path);
   Future<StoragePath> updateStoragePath(StoragePath path);
   Future<int> deleteStoragePath(StoragePath path);
-
-  Future<int> getStatistics();
 }

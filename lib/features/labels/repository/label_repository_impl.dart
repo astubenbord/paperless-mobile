@@ -121,15 +121,6 @@ class LabelRepositoryImpl implements LabelRepository {
   }
 
   @override
-  Future<int> getStatistics() async {
-    final response = await httpClient.get(Uri.parse('/api/statistics/'));
-    if (response.statusCode == 200) {
-      return jsonDecode(utf8.decode(response.bodyBytes))['documents_total'];
-    }
-    throw const ErrorMessage(ErrorCode.unknown);
-  }
-
-  @override
   Future<int> deleteCorrespondent(Correspondent correspondent) async {
     assert(correspondent.id != null);
     final response = await httpClient

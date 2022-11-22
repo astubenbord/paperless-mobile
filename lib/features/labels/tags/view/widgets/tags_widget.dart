@@ -35,6 +35,7 @@ class _TagsWidgetState extends State<TagsWidget> {
               (id) => TagWidget(
                 tag: state[id]!,
                 afterTagTapped: widget.afterTagTapped,
+                isClickable: widget.isClickable,
               ),
             )
             .toList();

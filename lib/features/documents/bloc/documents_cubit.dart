@@ -6,6 +6,7 @@ import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
 import 'package:paperless_mobile/features/documents/model/document.model.dart';
 import 'package:paperless_mobile/features/documents/model/document_filter.dart';
 import 'package:paperless_mobile/features/documents/model/paged_search_result.dart';
+import 'package:paperless_mobile/features/documents/model/query_parameters/tags_query.dart';
 import 'package:paperless_mobile/features/documents/repository/document_repository.dart';
 import 'package:injectable/injectable.dart';
 
@@ -132,6 +133,17 @@ class DocumentsCubit extends Cubit<DocumentsState> {
         state.copyWith(selection: [...state.selection, model]),
       );
     }
+  }
+
+  Future<void> removeInboxTags(
+      DocumentModel document, final Iterable<int> inboxTags) async {
+    final updatedTags = document.tags.where((id) => !inboxTags.contains(id));
+    return updateDocument(
+      document.copyWith(
+        tags: updatedTags,
+        overwriteTags: true,
+      ),
+    );
   }
 
   void resetSelection() {

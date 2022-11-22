@@ -19,6 +19,14 @@ class BottomNavBar extends StatelessWidget {
       selectedIndex: selectedIndex,
       destinations: [
         NavigationDestination(
+          icon: const Icon(Icons.inbox_outlined),
+          selectedIcon: Icon(
+            Icons.inbox,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          label: S.of(context).bottomNavInboxPageLabel,
+        ),
+        NavigationDestination(
           icon: const Icon(Icons.description_outlined),
           selectedIcon: Icon(
             Icons.description,

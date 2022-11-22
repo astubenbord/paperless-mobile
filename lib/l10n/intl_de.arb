@@ -196,5 +196,6 @@
   "labelAnyAssignedText": "Beliebig zugewiesen",
   "deleteViewDialogContentText": "Möchtest Du diese Ansicht wirklich löschen?",
   "deleteViewDialogTitleText": "Lösche Ansicht ",
-  "documentUploadPageSynchronizeTitleAndFilenameLabel": "Synchronisiere Titel und Dateiname"
+  "documentUploadPageSynchronizeTitleAndFilenameLabel": "Synchronisiere Titel und Dateiname",
+  "bottomNavInboxPageLabel": "Posteingang"
 }

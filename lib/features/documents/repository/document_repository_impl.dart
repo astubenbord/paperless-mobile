@@ -134,9 +134,10 @@ class DocumentRepositoryImpl implements DocumentRepository {
   @override
   Future<DocumentModel> update(DocumentModel doc) async {
     final response = await httpClient.put(
-        Uri.parse("/api/documents/${doc.id}/"),
-        body: json.encode(doc.toJson()),
-        headers: {"Content-Type": "application/json"}).timeout(requestTimeout);
+      Uri.parse("/api/documents/${doc.id}/"),
+      body: json.encode(doc.toJson()),
+      headers: {"Content-Type": "application/json"},
+    );
     if (response.statusCode == 200) {
       return DocumentModel.fromJson(
         jsonDecode(utf8.decode(response.bodyBytes)) as JSON,

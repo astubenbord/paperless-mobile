@@ -4,12 +4,14 @@ class ErrorMessage implements Exception {
   final StackTrace? stackTrace;
   final int? httpStatusCode;
 
-  const ErrorMessage(this.code,
-      {this.details, this.stackTrace, this.httpStatusCode});
+  const ErrorMessage(
+    this.code, {
+    this.details,
+    this.stackTrace,
+    this.httpStatusCode,
+  });
 
-  factory ErrorMessage.unknown() {
-    return const ErrorMessage(ErrorCode.unknown);
-  }
+  const ErrorMessage.unknown() : this(ErrorCode.unknown);
 
   @override
   String toString() {

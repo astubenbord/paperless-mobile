@@ -10,7 +10,13 @@ import 'package:paperless_mobile/util.dart';
 class TagWidget extends StatelessWidget {
   final Tag tag;
   final void Function()? afterTagTapped;
-  const TagWidget({super.key, required this.tag, required this.afterTagTapped});
+  final bool isClickable;
+  const TagWidget({
+    super.key,
+    required this.tag,
+    required this.afterTagTapped,
+    this.isClickable = true,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +49,9 @@ class TagWidget extends StatelessWidget {
   }
 
   void _addTagToFilter(BuildContext context) {
+    if (!isClickable) {
+      return;
+    }
     final cubit = BlocProvider.of<DocumentsCubit>(context);
     try {
       final tagsQuery = cubit.state.filter.tags is IdsTagsQuery
