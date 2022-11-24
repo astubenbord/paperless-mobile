@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:paperless_mobile/features/documents/model/bulk_edit.model.dart';
 import 'package:paperless_mobile/features/documents/model/document.model.dart';
 import 'package:paperless_mobile/features/documents/model/document_filter.dart';
 import 'package:paperless_mobile/features/documents/model/document_meta_data.model.dart';
@@ -23,7 +24,7 @@ abstract class DocumentRepository {
   Future<List<SimilarDocumentModel>> findSimilar(int docId);
   Future<int> delete(DocumentModel doc);
   Future<DocumentMetaData> getMetaData(DocumentModel document);
-  Future<List<int>> bulkDelete(List<DocumentModel> models);
+  Future<Iterable<int>> bulkAction(BulkAction action);
   Future<Uint8List> getPreview(int docId);
   String getThumbnailUrl(int docId);
   Future<DocumentModel> waitForConsumptionFinished(

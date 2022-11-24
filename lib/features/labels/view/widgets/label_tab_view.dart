@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
-import 'package:paperless_mobile/core/bloc/label_cubit.dart';
+import 'package:paperless_mobile/features/labels/bloc/label_cubit.dart';
 import 'package:paperless_mobile/core/widgets/offline_widget.dart';
 import 'package:paperless_mobile/features/documents/model/document_filter.dart';
 import 'package:paperless_mobile/features/labels/model/label.model.dart';
+import 'package:paperless_mobile/features/labels/model/label_state.dart';
 import 'package:paperless_mobile/features/labels/view/widgets/label_item.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 
@@ -45,10 +46,10 @@ class LabelTabView<T extends Label> extends StatelessWidget {
         }
         return RefreshIndicator(
           onRefresh: cubit.initialize,
-          child: BlocBuilder<Cubit<Map<int, T>>, Map<int, T>>(
+          child: BlocBuilder<Cubit<LabelState<T>>, LabelState<T>>(
             bloc: cubit,
             builder: (context, state) {
-              final labels = state.values.toList()..sort();
+              final labels = state.labels.values.toList()..sort();
               if (labels.isEmpty) {
                 return Center(
                   child: Column(

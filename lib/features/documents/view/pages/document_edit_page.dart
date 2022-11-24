@@ -3,6 +3,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:intl/intl.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
@@ -20,6 +22,7 @@ import 'package:paperless_mobile/features/labels/correspondent/view/pages/add_co
 import 'package:paperless_mobile/features/labels/document_type/bloc/document_type_cubit.dart';
 import 'package:paperless_mobile/features/labels/document_type/model/document_type.model.dart';
 import 'package:paperless_mobile/features/labels/document_type/view/pages/add_document_type_page.dart';
+import 'package:paperless_mobile/features/labels/model/label_state.dart';
 import 'package:paperless_mobile/features/labels/storage_path/bloc/storage_path_cubit.dart';
 import 'package:paperless_mobile/features/labels/storage_path/model/storage_path.model.dart';
 import 'package:paperless_mobile/features/labels/storage_path/view/pages/add_storage_path_page.dart';
@@ -27,8 +30,6 @@ import 'package:paperless_mobile/features/labels/tags/view/widgets/tags_form_fie
 import 'package:paperless_mobile/features/labels/view/widgets/label_form_field.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:paperless_mobile/util.dart';
-import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:intl/intl.dart';
 
 class DocumentEditPage extends StatefulWidget {
   final DocumentModel document;
@@ -80,13 +81,15 @@ class _DocumentEditPageState extends State<DocumentEditPage> {
             setState(() {
               _isSubmitLoading = true;
             });
+            bool wasUpdated = false;
             try {
               await getIt<DocumentsCubit>().updateDocument(updatedDocument);
               showSnackBar(context, S.of(context).documentUpdateErrorMessage);
+              wasUpdated = true;
             } on ErrorMessage catch (error, stackTrace) {
               showErrorMessage(context, error, stackTrace);
             } finally {
-              Navigator.pop(context);
+              Navigator.pop(context, wasUpdated);
             }
           }
         },
@@ -115,7 +118,7 @@ class _DocumentEditPageState extends State<DocumentEditPage> {
           child: ListView(children: [
             _buildTitleFormField().padded(),
             _buildCreatedAtFormField().padded(),
-            BlocBuilder<DocumentTypeCubit, Map<int, DocumentType>>(
+            BlocBuilder<DocumentTypeCubit, LabelState<DocumentType>>(
               builder: (context, state) {
                 return LabelFormField<DocumentType, DocumentTypeQuery>(
                   notAssignedSelectable: false,
@@ -130,7 +133,7 @@ class _DocumentEditPageState extends State<DocumentEditPage> {
                   label: S.of(context).documentDocumentTypePropertyLabel,
                   initialValue:
                       DocumentTypeQuery.fromId(widget.document.documentType),
-                  state: state,
+                  state: state.labels,
                   name: fkDocumentType,
                   queryParameterIdBuilder: DocumentTypeQuery.fromId,
                   queryParameterNotAssignedBuilder:
@@ -139,7 +142,7 @@ class _DocumentEditPageState extends State<DocumentEditPage> {
                 );
               },
             ).padded(),
-            BlocBuilder<CorrespondentCubit, Map<int, Correspondent>>(
+            BlocBuilder<CorrespondentCubit, LabelState<Correspondent>>(
               builder: (context, state) {
                 return LabelFormField<Correspondent, CorrespondentQuery>(
                   notAssignedSelectable: false,
@@ -150,7 +153,7 @@ class _DocumentEditPageState extends State<DocumentEditPage> {
                     child: AddCorrespondentPage(initalValue: initialValue),
                   ),
                   label: S.of(context).documentCorrespondentPropertyLabel,
-                  state: state,
+                  state: state.labels,
                   initialValue:
                       CorrespondentQuery.fromId(widget.document.correspondent),
                   name: fkCorrespondent,
@@ -161,7 +164,7 @@ class _DocumentEditPageState extends State<DocumentEditPage> {
                 );
               },
             ).padded(),
-            BlocBuilder<StoragePathCubit, Map<int, StoragePath>>(
+            BlocBuilder<StoragePathCubit, LabelState<StoragePath>>(
               builder: (context, state) {
                 return LabelFormField<StoragePath, StoragePathQuery>(
                   notAssignedSelectable: false,
@@ -172,7 +175,7 @@ class _DocumentEditPageState extends State<DocumentEditPage> {
                     child: AddStoragePathPage(initalValue: initialValue),
                   ),
                   label: S.of(context).documentStoragePathPropertyLabel,
-                  state: state,
+                  state: state.labels,
                   initialValue:
                       StoragePathQuery.fromId(widget.document.storagePath),
                   name: fkStoragePath,

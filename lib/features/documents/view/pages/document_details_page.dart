@@ -5,7 +5,8 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:paperless_mobile/core/bloc/label_bloc_provider.dart';
+import 'package:paperless_mobile/core/bloc/paperless_statistics_cubit.dart';
+import 'package:paperless_mobile/features/labels/bloc/label_bloc_provider.dart';
 import 'package:paperless_mobile/core/logic/error_code_localization_mapper.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/core/widgets/highlighted_text.dart';
@@ -345,16 +346,20 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
     return const SizedBox(height: 32.0);
   }
 
-  void _onEdit(DocumentModel document) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => LabelBlocProvider(
-          child: DocumentEditPage(document: document),
-        ),
-        maintainState: true,
-      ),
-    );
+  void _onEdit(DocumentModel document) async {
+    final wasUpdated = await Navigator.push<bool>(
+          context,
+          MaterialPageRoute(
+            builder: (_) => LabelBlocProvider(
+              child: DocumentEditPage(document: document),
+            ),
+            maintainState: true,
+          ),
+        ) ??
+        false;
+    if (wasUpdated) {
+      BlocProvider.of<PaperlessStatisticsCubit>(context).updateStatistics();
+    }
   }
 
   Future<void> _onDownload(DocumentModel document) async {

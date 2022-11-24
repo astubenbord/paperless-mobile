@@ -43,7 +43,6 @@ class DocumentListItem extends StatelessWidget {
                   child: CorrespondentWidget(
                     isClickable: isLabelClickable,
                     correspondentId: document.correspondent,
-                    afterSelected: () {},
                   ),
                 ),
               ],

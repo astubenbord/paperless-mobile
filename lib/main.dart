@@ -11,7 +11,8 @@ import 'package:intl/intl.dart';
 import 'package:intl/intl_standalone.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
-import 'package:paperless_mobile/core/bloc/label_bloc_provider.dart';
+import 'package:paperless_mobile/core/bloc/paperless_statistics_cubit.dart';
+import 'package:paperless_mobile/features/labels/bloc/label_bloc_provider.dart';
 import 'package:paperless_mobile/core/bloc/paperless_server_information_cubit.dart';
 import 'package:paperless_mobile/core/global/asset_images.dart';
 import 'package:paperless_mobile/core/global/constants.dart';
@@ -195,15 +196,6 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
   }
 
   @override
-  void didChangeDependencies() {
-    FlutterNativeSplash.remove();
-    for (var element in AssetImages.values) {
-      element.load(context);
-    }
-    super.didChangeDependencies();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return SafeArea(
       top: false,
@@ -215,9 +207,6 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
           final bool showIntroSlider =
               authState.isAuthenticated && !authState.wasLoginStored;
           if (showIntroSlider) {
-            for (final img in AssetImages.values) {
-              img.load(context);
-            }
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -229,10 +218,14 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
         },
         builder: (context, authentication) {
           if (authentication.isAuthenticated) {
-            return const LabelBlocProvider(
-              child: HomePage(),
+            return BlocProvider.value(
+              value: getIt<PaperlessStatisticsCubit>(),
+              child: const LabelBlocProvider(
+                child: HomePage(),
+              ),
             );
           } else {
+            FlutterNativeSplash.remove();
             return const LoginPage();
           }
         },

@@ -1,7 +1,9 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:paperless_mobile/core/bloc/label_bloc_provider.dart';
+import 'package:paperless_mobile/core/bloc/paperless_statistics_cubit.dart';
+import 'package:paperless_mobile/core/model/paperless_statistics_state.dart';
+import 'package:paperless_mobile/features/labels/bloc/label_bloc_provider.dart';
 import 'package:paperless_mobile/core/bloc/paperless_server_information_cubit.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/core/model/paperless_server_information.dart';
@@ -57,7 +59,7 @@ class InfoDrawer extends StatelessWidget {
                       ).padded(const EdgeInsets.only(right: 8.0)),
                       Text(
                         S.of(context).appTitleText,
-                        style: Theme.of(context).textTheme.headline5!.copyWith(
+                        style: Theme.of(context).textTheme.headline5?.copyWith(
                               color: Theme.of(context)
                                   .colorScheme
                                   .onPrimaryContainer,
@@ -104,18 +106,6 @@ class InfoDrawer extends StatelessWidget {
                                   ),
                                 ],
                               ),
-                              // title: RichText(
-
-                              //   text: TextSpan(
-                              //     children: [
-                              //       TextSpan(
-                              //         text:
-                              //         style:
-                              //             Theme.of(context).textTheme.bodyText2,
-                              //       ),
-                              //     ],
-                              //   ),
-                              // ),
                               isThreeLine: true,
                             ),
                           ],
@@ -129,27 +119,32 @@ class InfoDrawer extends StatelessWidget {
                 color: Theme.of(context).colorScheme.primaryContainer,
               ),
             ),
-            FutureBuilder<PaperlessStatistics>(
-              future: getIt<PaperlessStatisticsService>().getStatistics(),
-              builder: (context, snapshot) {
+            BlocBuilder<PaperlessStatisticsCubit, PaperlessStatisticsState>(
+              builder: (context, state) {
                 return ListTile(
-                  title: Text("Inbox"),
+                  title: Text(S.of(context).bottomNavInboxPageLabel),
                   leading: const Icon(Icons.inbox),
-                  trailing: snapshot.hasData
-                      ? Text(
-                          snapshot.data!.documentsInInbox.toString(),
-                        )
+                  trailing: state.isLoaded
+                      ? Text(state.statistics!.documentsInInbox.toString())
                       : null,
-                  onTap: () => Navigator.push(
+                  onTap: () async {
+                    await Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => LabelBlocProvider(
-                          child: BlocProvider.value(
-                            value: DocumentsCubit(getIt<DocumentRepository>()),
-                            child: const InboxPage(),
+                        builder: (context) => BlocProvider.value(
+                          value: getIt<PaperlessStatisticsCubit>(),
+                          child: LabelBlocProvider(
+                            child: BlocProvider.value(
+                              value:
+                                  DocumentsCubit(getIt<DocumentRepository>()),
+                              child: const InboxPage(),
+                            ),
                           ),
                         ),
-                      )),
+                      ),
+                    );
+                    getIt<DocumentsCubit>().reloadDocuments();
+                  },
                 );
               },
             ),

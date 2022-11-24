@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:paperless_mobile/features/documents/model/query_parameters/tags_query.dart';
+import 'package:paperless_mobile/features/labels/model/label_state.dart';
 import 'package:paperless_mobile/features/labels/tags/bloc/tags_cubit.dart';
 import 'package:paperless_mobile/features/labels/tags/model/tag.model.dart';
 import 'package:paperless_mobile/features/labels/tags/view/pages/add_tag_page.dart';
@@ -45,7 +46,7 @@ class _TagFormFieldState extends State<TagFormField> {
     _textEditingController = TextEditingController()
       ..addListener(() {
         setState(() {
-          _showCreationSuffixIcon = state.values
+          _showCreationSuffixIcon = state.labels.values
                   .where(
                     (item) => item.name.toLowerCase().startsWith(
                           _textEditingController.text.toLowerCase(),
@@ -61,7 +62,7 @@ class _TagFormFieldState extends State<TagFormField> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<TagCubit, Map<int, Tag>>(
+    return BlocBuilder<TagCubit, LabelState<Tag>>(
       builder: (context, tagState) {
         return FormBuilderField<TagsQuery>(
           builder: (field) {
@@ -81,7 +82,7 @@ class _TagFormFieldState extends State<TagFormField> {
                     controller: _textEditingController,
                   ),
                   suggestionsCallback: (query) {
-                    final suggestions = tagState.values
+                    final suggestions = tagState.labels.values
                         .where((element) => element.name
                             .toLowerCase()
                             .startsWith(query.toLowerCase()))
@@ -113,7 +114,7 @@ class _TagFormFieldState extends State<TagFormField> {
                         title: Text(S.of(context).labelAnyAssignedText),
                       );
                     }
-                    final tag = tagState[data]!;
+                    final tag = tagState.getLabel(data)!;
                     return ListTile(
                       leading: Icon(
                         Icons.circle,
@@ -159,7 +160,7 @@ class _TagFormFieldState extends State<TagFormField> {
                           (query) => _buildTag(
                             field,
                             query,
-                            tagState[query.id]!,
+                            tagState.getLabel(query.id)!,
                           ),
                         )
                         .toList(),

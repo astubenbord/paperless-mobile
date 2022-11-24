@@ -5,6 +5,7 @@ import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/documents/model/query_parameters/document_type_query.dart';
 import 'package:paperless_mobile/features/labels/document_type/bloc/document_type_cubit.dart';
 import 'package:paperless_mobile/features/labels/document_type/model/document_type.model.dart';
+import 'package:paperless_mobile/features/labels/model/label_state.dart';
 import 'package:paperless_mobile/util.dart';
 
 class DocumentTypeWidget extends StatelessWidget {
@@ -24,10 +25,10 @@ class DocumentTypeWidget extends StatelessWidget {
       absorbing: !isClickable,
       child: GestureDetector(
         onTap: () => _addDocumentTypeToFilter(context),
-        child: BlocBuilder<DocumentTypeCubit, Map<int, DocumentType>>(
+        child: BlocBuilder<DocumentTypeCubit, LabelState<DocumentType>>(
           builder: (context, state) {
             return Text(
-              state[documentTypeId]?.toString() ?? "-",
+              state.labels[documentTypeId]?.toString() ?? "-",
               style: Theme.of(context)
                   .textTheme
                   .bodyText2!

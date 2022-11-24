@@ -14,23 +14,27 @@ class ApplicationSettingsState {
     preferredLocaleSubtag: Platform.localeName.split('_').first,
     preferredThemeMode: ThemeMode.system,
     preferredViewType: ViewType.list,
+    showInboxOnStartup: true,
   );
 
   static const isLocalAuthenticationEnabledKey = "isLocalAuthenticationEnabled";
   static const preferredLocaleSubtagKey = "localeSubtag";
   static const preferredThemeModeKey = "preferredThemeModeKey";
   static const preferredViewTypeKey = 'preferredViewType';
+  static const showInboxOnStartupKey = 'showinboxOnStartup';
 
   final bool isLocalAuthenticationEnabled;
   final String preferredLocaleSubtag;
   final ThemeMode preferredThemeMode;
   final ViewType preferredViewType;
+  final bool showInboxOnStartup;
 
   ApplicationSettingsState({
     required this.preferredLocaleSubtag,
     required this.preferredThemeMode,
     required this.isLocalAuthenticationEnabled,
     required this.preferredViewType,
+    required this.showInboxOnStartup,
   });
 
   JSON toJson() {
@@ -43,17 +47,25 @@ class ApplicationSettingsState {
   }
 
   ApplicationSettingsState.fromJson(JSON json)
-      : isLocalAuthenticationEnabled = json[isLocalAuthenticationEnabledKey],
-        preferredLocaleSubtag = json[preferredLocaleSubtagKey],
-        preferredThemeMode =
-            ThemeMode.values.byName(json[preferredThemeModeKey]),
-        preferredViewType = ViewType.values.byName(json[preferredViewTypeKey]);
+      : isLocalAuthenticationEnabled = json[isLocalAuthenticationEnabledKey] ??
+            defaultSettings.isLocalAuthenticationEnabled,
+        preferredLocaleSubtag = json[preferredLocaleSubtagKey] ??
+            defaultSettings.preferredLocaleSubtag,
+        preferredThemeMode = json.containsKey(preferredThemeModeKey)
+            ? ThemeMode.values.byName(json[preferredThemeModeKey])
+            : defaultSettings.preferredThemeMode,
+        preferredViewType = json.containsKey(preferredViewTypeKey)
+            ? ViewType.values.byName(json[preferredViewTypeKey])
+            : defaultSettings.preferredViewType,
+        showInboxOnStartup =
+            json[showInboxOnStartupKey] ?? defaultSettings.showInboxOnStartup;
 
   ApplicationSettingsState copyWith({
     bool? isLocalAuthenticationEnabled,
     String? preferredLocaleSubtag,
     ThemeMode? preferredThemeMode,
     ViewType? preferredViewType,
+    bool? showInboxOnStartup,
   }) {
     return ApplicationSettingsState(
       isLocalAuthenticationEnabled:
@@ -62,6 +74,7 @@ class ApplicationSettingsState {
           preferredLocaleSubtag ?? this.preferredLocaleSubtag,
       preferredThemeMode: preferredThemeMode ?? this.preferredThemeMode,
       preferredViewType: preferredViewType ?? this.preferredViewType,
+      showInboxOnStartup: showInboxOnStartup ?? this.showInboxOnStartup,
     );
   }
 }

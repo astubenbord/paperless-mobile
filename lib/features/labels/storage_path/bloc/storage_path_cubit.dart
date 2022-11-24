@@ -1,5 +1,5 @@
 import 'package:injectable/injectable.dart';
-import 'package:paperless_mobile/core/bloc/label_cubit.dart';
+import 'package:paperless_mobile/features/labels/bloc/label_cubit.dart';
 import 'package:paperless_mobile/features/labels/storage_path/model/storage_path.model.dart';
 
 @singleton

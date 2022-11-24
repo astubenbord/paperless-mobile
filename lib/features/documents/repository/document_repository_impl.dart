@@ -216,18 +216,16 @@ class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<List<int>> bulkDelete(List<DocumentModel> documentModels) async {
-    final List<int> ids = documentModels.map((e) => e.id).toList();
-    final action = BulkEditAction.delete(ids);
+  Future<Iterable<int>> bulkAction(BulkAction action) async {
     final response = await httpClient.post(
       Uri.parse("/api/documents/bulk_edit/"),
       body: json.encode(action.toJson()),
       headers: {'Content-Type': 'application/json'},
     );
     if (response.statusCode == 200) {
-      return ids;
+      return action.documentIds;
     } else {
-      throw const ErrorMessage(ErrorCode.documentBulkDeleteFailed);
+      throw const ErrorMessage(ErrorCode.documentBulkActionFailed);
     }
   }
 

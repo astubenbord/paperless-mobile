@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:paperless_mobile/core/bloc/paperless_statistics_cubit.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/core/type/types.dart';
 import 'package:paperless_mobile/di_initializer.dart';
@@ -19,6 +20,7 @@ import 'package:paperless_mobile/features/labels/correspondent/model/corresponde
 import 'package:paperless_mobile/features/labels/correspondent/view/pages/add_correspondent_page.dart';
 import 'package:paperless_mobile/features/labels/document_type/model/document_type.model.dart';
 import 'package:paperless_mobile/features/labels/document_type/view/pages/add_document_type_page.dart';
+import 'package:paperless_mobile/features/labels/model/label_state.dart';
 import 'package:paperless_mobile/features/labels/tags/view/widgets/tags_form_field.dart';
 import 'package:paperless_mobile/features/labels/view/widgets/label_form_field.dart';
 import 'package:paperless_mobile/features/scan/bloc/document_scanner_cubit.dart';
@@ -165,7 +167,7 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
                 labelText: S.of(context).documentCreatedPropertyLabel + " *",
               ),
             ),
-            BlocBuilder<DocumentTypeCubit, Map<int, DocumentType>>(
+            BlocBuilder<DocumentTypeCubit, LabelState<DocumentType>>(
               bloc: getIt<DocumentTypeCubit>(), //TODO: Use provider
               builder: (context, state) {
                 return LabelFormField<DocumentType, DocumentTypeQuery>(
@@ -178,7 +180,7 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
                   ),
                   label: S.of(context).documentDocumentTypePropertyLabel + " *",
                   name: DocumentModel.documentTypeKey,
-                  state: state,
+                  state: state.labels,
                   queryParameterIdBuilder: DocumentTypeQuery.fromId,
                   queryParameterNotAssignedBuilder:
                       DocumentTypeQuery.notAssigned,
@@ -186,7 +188,7 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
                 );
               },
             ),
-            BlocBuilder<CorrespondentCubit, Map<int, Correspondent>>(
+            BlocBuilder<CorrespondentCubit, LabelState<Correspondent>>(
               bloc: getIt<CorrespondentCubit>(), //TODO: Use provider
               builder: (context, state) {
                 return LabelFormField<Correspondent, CorrespondentQuery>(
@@ -200,7 +202,7 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
                   label:
                       S.of(context).documentCorrespondentPropertyLabel + " *",
                   name: DocumentModel.correspondentKey,
-                  state: state,
+                  state: state.labels,
                   queryParameterIdBuilder: CorrespondentQuery.fromId,
                   queryParameterNotAssignedBuilder:
                       CorrespondentQuery.notAssigned,
@@ -257,7 +259,7 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
       } on PaperlessValidationErrors catch (errorMessages) {
         setState(() => _errors = errorMessages);
       } catch (unknownError, stackTrace) {
-        showErrorMessage(context, ErrorMessage.unknown(), stackTrace);
+        showErrorMessage(context, const ErrorMessage.unknown(), stackTrace);
       } finally {
         setState(() {
           _isUploadLoading = false;
@@ -274,22 +276,23 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
     return source.replaceAll(RegExp(r"[\W_]"), "_");
   }
 
-  void _onConsumptionFinished(document) {
-    ScaffoldMessenger.of(rootScaffoldKey.currentContext!).showSnackBar(
-      SnackBar(
-        action: SnackBarAction(
-          onPressed: () async {
-            try {
-              getIt<DocumentsCubit>().reloadDocuments();
-            } on ErrorMessage catch (error, stackTrace) {
-              showErrorMessage(context, error, stackTrace);
-            }
-          },
-          label:
-              S.of(context).documentUploadProcessingSuccessfulReloadActionText,
-        ),
-        content: Text(S.of(context).documentUploadProcessingSuccessfulText),
-      ),
-    );
+  void _onConsumptionFinished(DocumentModel document) {
+    // ScaffoldMessenger.of(rootScaffoldKey.currentContext!).showSnackBar(
+    //   SnackBar(
+    //     action: SnackBarAction(
+    //       onPressed: () async {
+    //         try {
+    //           getIt<DocumentsCubit>().reloadDocuments();
+    //         } on ErrorMessage catch (error, stackTrace) {
+    //           showErrorMessage(context, error, stackTrace);
+    //         }
+    //       },
+    //       label:
+    //           S.of(context).documentUploadProcessingSuccessfulReloadActionText,
+    //     ),
+    //     content: Text(S.of(context).documentUploadProcessingSuccessfulText),
+    //   ),
+    // );
+    getIt<PaperlessStatisticsCubit>().incrementInboxCount();
   }
 }

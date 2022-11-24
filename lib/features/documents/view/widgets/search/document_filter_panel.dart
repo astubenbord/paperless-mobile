@@ -18,6 +18,7 @@ import 'package:paperless_mobile/features/labels/correspondent/bloc/corresponden
 import 'package:paperless_mobile/features/labels/correspondent/model/correspondent.model.dart';
 import 'package:paperless_mobile/features/labels/document_type/bloc/document_type_cubit.dart';
 import 'package:paperless_mobile/features/labels/document_type/model/document_type.model.dart';
+import 'package:paperless_mobile/features/labels/model/label_state.dart';
 import 'package:paperless_mobile/features/labels/storage_path/bloc/storage_path_cubit.dart';
 import 'package:paperless_mobile/features/labels/storage_path/model/storage_path.model.dart';
 import 'package:paperless_mobile/features/labels/tags/view/widgets/tags_form_field.dart';
@@ -52,14 +53,6 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
   static const fkAddedAt = DocumentModel.addedKey;
 
   final _formKey = GlobalKey<FormBuilderState>();
-
-  late final DocumentsCubit _documentsCubit;
-
-  @override
-  void initState() {
-    super.initState();
-    _documentsCubit = BlocProvider.of<DocumentsCubit>(context);
-  }
 
   DateTimeRange? _dateTimeRangeOfNullable(DateTime? start, DateTime? end) {
     if (start == null && end == null) {
@@ -181,12 +174,12 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
   }
 
   Widget _buildDocumentTypeFormField(DocumentsState docState) {
-    return BlocBuilder<DocumentTypeCubit, Map<int, DocumentType>>(
+    return BlocBuilder<DocumentTypeCubit, LabelState<DocumentType>>(
       builder: (context, state) {
         return LabelFormField<DocumentType, DocumentTypeQuery>(
           formBuilderState: _formKey.currentState,
           name: fkDocumentType,
-          state: state,
+          state: state.labels,
           label: S.of(context).documentDocumentTypePropertyLabel,
           initialValue: docState.filter.documentType,
           queryParameterIdBuilder: DocumentTypeQuery.fromId,
@@ -198,12 +191,12 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
   }
 
   Widget _buildCorrespondentFormField(DocumentsState docState) {
-    return BlocBuilder<CorrespondentCubit, Map<int, Correspondent>>(
+    return BlocBuilder<CorrespondentCubit, LabelState<Correspondent>>(
       builder: (context, state) {
         return LabelFormField<Correspondent, CorrespondentQuery>(
           formBuilderState: _formKey.currentState,
           name: fkCorrespondent,
-          state: state,
+          state: state.labels,
           label: S.of(context).documentCorrespondentPropertyLabel,
           initialValue: docState.filter.correspondent,
           queryParameterIdBuilder: CorrespondentQuery.fromId,
@@ -215,12 +208,12 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
   }
 
   Widget _buildStoragePathFormField(DocumentsState docState) {
-    return BlocBuilder<StoragePathCubit, Map<int, StoragePath>>(
+    return BlocBuilder<StoragePathCubit, LabelState<StoragePath>>(
       builder: (context, state) {
         return LabelFormField<StoragePath, StoragePathQuery>(
           formBuilderState: _formKey.currentState,
           name: fkStoragePath,
-          state: state,
+          state: state.labels,
           label: S.of(context).documentStoragePathPropertyLabel,
           initialValue: docState.filter.storagePath,
           queryParameterIdBuilder: StoragePathQuery.fromId,

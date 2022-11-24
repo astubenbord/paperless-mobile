@@ -83,7 +83,7 @@
   "documentPreviewPageTitle": "Preview",
   "appSettingsEnableBiometricAuthenticationReasonText": "Authenticate to enable biometric authentication",
   "appSettingsDisableBiometricAuthenticationReasonText": "Authenticate to disable biometric authentication",
-  "errorMessageBulkDeleteDocumentsFailed": "Could not bulk delete documents.",
+  "errorMessageBulkActionFailed": "Could not bulk edit documents.",
   "errorMessageBiotmetricsNotSupported": "Biometric authentication not supported on this device.",
   "errorMessageBiometricAuthenticationFailed": "Biometric authentication failed.",
   "errorMessageDeviceOffline": "Could not fetch data: You are not connected to the internet.",

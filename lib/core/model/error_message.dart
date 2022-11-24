@@ -27,7 +27,7 @@ enum ErrorCode {
   documentUpdateFailed,
   documentLoadFailed,
   documentDeleteFailed,
-  documentBulkDeleteFailed,
+  documentBulkActionFailed,
   documentPreviewFailed,
   documentAsnQueryFailed,
   tagCreateFailed,

@@ -17,13 +17,19 @@ class OnlyNotAssignedTagsQuery extends TagsQuery {
 }
 
 class AnyAssignedTagsQuery extends TagsQuery {
-  const AnyAssignedTagsQuery();
+  final Iterable<int> tagIds;
+  const AnyAssignedTagsQuery({
+    this.tagIds = const [],
+  });
   @override
   List<Object?> get props => [];
 
   @override
   String toQueryParameter() {
-    return '&is_tagged=1';
+    if (tagIds.isEmpty) {
+      return '&is_tagged=1';
+    }
+    return '&tags__id__in=${tagIds.join(',')}';
   }
 }
 

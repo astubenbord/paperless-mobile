@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
+import 'package:paperless_mobile/core/bloc/paperless_statistics_cubit.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
@@ -237,6 +238,8 @@ class _DocumentsPageState extends State<DocumentsPage> {
             BlocProvider.value(value: BlocProvider.of<TagCubit>(context)),
             BlocProvider.value(
                 value: BlocProvider.of<StoragePathCubit>(context)),
+            BlocProvider.value(
+                value: BlocProvider.of<PaperlessStatisticsCubit>(context)),
           ],
           child: DocumentDetailsPage(
             documentId: model.id,

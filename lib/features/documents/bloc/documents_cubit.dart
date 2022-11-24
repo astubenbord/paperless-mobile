@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
+import 'package:paperless_mobile/features/documents/model/bulk_edit.model.dart';
 import 'package:paperless_mobile/features/documents/model/document.model.dart';
 import 'package:paperless_mobile/features/documents/model/document_filter.dart';
 import 'package:paperless_mobile/features/documents/model/paged_search_result.dart';
@@ -36,9 +37,9 @@ class DocumentsCubit extends Cubit<DocumentsState> {
       createdAt: createdAt,
     );
 
-    // documentRepository
-    //     .waitForConsumptionFinished(fileName, title)
-    //     .then((value) => onConsumptionFinished(value));
+    documentRepository
+        .waitForConsumptionFinished(fileName, title)
+        .then((value) => onConsumptionFinished(value));
   }
 
   Future<void> removeDocument(DocumentModel document) async {
@@ -47,8 +48,23 @@ class DocumentsCubit extends Cubit<DocumentsState> {
   }
 
   Future<void> bulkRemoveDocuments(List<DocumentModel> documents) async {
-    await documentRepository.bulkDelete(documents);
-    return await reloadDocuments();
+    await documentRepository.bulkAction(
+      BulkDeleteAction(documents.map((doc) => doc.id)),
+    );
+    await reloadDocuments();
+  }
+
+  Future<void> bulkEditTags(
+    List<DocumentModel> documents, {
+    Iterable<int> addTags = const [],
+    Iterable<int> removeTags = const [],
+  }) async {
+    await documentRepository.bulkAction(BulkModifyTagsAction(
+      documents.map((doc) => doc.id),
+      addTags: addTags,
+      removeTags: removeTags,
+    ));
+    await reloadDocuments();
   }
 
   Future<void> updateDocument(DocumentModel document) async {
@@ -135,15 +151,20 @@ class DocumentsCubit extends Cubit<DocumentsState> {
     }
   }
 
-  Future<void> removeInboxTags(
+  ///
+  /// Updates the given document with the inbox tags removed and returns the remoed inbox tags.
+  ///
+  Future<Iterable<int>> removeInboxTags(
       DocumentModel document, final Iterable<int> inboxTags) async {
-    final updatedTags = document.tags.where((id) => !inboxTags.contains(id));
-    return updateDocument(
+    final tagsToRemove = document.tags.toSet().intersection(inboxTags.toSet());
+    final updatedTags = {...document.tags}..removeAll(tagsToRemove);
+    await updateDocument(
       document.copyWith(
         tags: updatedTags,
         overwriteTags: true,
       ),
     );
+    return tagsToRemove;
   }
 
   void resetSelection() {

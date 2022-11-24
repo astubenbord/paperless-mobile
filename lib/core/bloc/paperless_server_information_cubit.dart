@@ -11,7 +11,7 @@ class PaperlessServerInformationCubit
   PaperlessServerInformationCubit(this.service)
       : super(PaperlessServerInformation());
 
-  Future<void> updateStatus() async {
+  Future<void> updateInformtion() async {
     emit(await service.getInformation());
   }
 }

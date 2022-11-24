@@ -38,8 +38,8 @@ String translateError(BuildContext context, ErrorCode code) {
       return S.of(context).errorMessageScanRemoveFailed;
     case ErrorCode.invalidClientCertificateConfiguration:
       return S.of(context).errorMessageInvalidClientCertificateConfiguration;
-    case ErrorCode.documentBulkDeleteFailed:
-      return S.of(context).errorMessageBulkDeleteDocumentsFailed;
+    case ErrorCode.documentBulkActionFailed:
+      return S.of(context).errorMessageBulkActionFailed;
     case ErrorCode.biometricsNotSupported:
       return S.of(context).errorMessageBiotmetricsNotSupported;
     case ErrorCode.biometricAuthenticationFailed:

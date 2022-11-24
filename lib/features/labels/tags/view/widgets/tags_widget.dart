@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:paperless_mobile/features/labels/model/label_state.dart';
 import 'package:paperless_mobile/features/labels/tags/bloc/tags_cubit.dart';
 import 'package:paperless_mobile/features/labels/tags/model/tag.model.dart';
 import 'package:paperless_mobile/features/labels/tags/view/widgets/tag_widget.dart';
@@ -27,13 +28,13 @@ class TagsWidget extends StatefulWidget {
 class _TagsWidgetState extends State<TagsWidget> {
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<TagCubit, Map<int, Tag>>(
+    return BlocBuilder<TagCubit, LabelState<Tag>>(
       builder: (context, state) {
         final children = widget.tagIds
-            .where((id) => state.containsKey(id))
+            .where((id) => state.labels.containsKey(id))
             .map(
               (id) => TagWidget(
-                tag: state[id]!,
+                tag: state.getLabel(id)!,
                 afterTagTapped: widget.afterTagTapped,
                 isClickable: widget.isClickable,
               ),

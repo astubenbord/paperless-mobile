@@ -84,7 +84,7 @@
   "appSettingsBiometricAuthenticationLabel": "Biometrische Authentifizierung aktivieren",
   "appSettingsEnableBiometricAuthenticationReasonText": "Authentifizieren, um die biometrische Authentifizierung zu aktivieren.",
   "appSettingsDisableBiometricAuthenticationReasonText": "Authentifizieren, um die biometrische Authentifizierung zu deaktivieren.",
-  "errorMessageBulkDeleteDocumentsFailed": "Es ist ein Fehler beim massenhaften Löschen der Dokumente aufgetreten.",
+  "errorMessageBulkActionFailed": "Es ist ein Fehler beim massenhaften bearbeiten der Dokumente aufgetreten.",
   "errorMessageBiotmetricsNotSupported": "Biometrische Authentifizierung wird von diesem Gerät nicht unterstützt.",
   "errorMessageBiometricAuthenticationFailed": "Biometrische Authentifizierung fehlgeschlagen.",
   "errorMessageDeviceOffline": "Daten konnten nicht geladen werden: Eine Verbindung zum Internet konnte nicht hergestellt werden.",
