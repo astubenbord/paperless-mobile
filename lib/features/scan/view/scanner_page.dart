@@ -8,7 +8,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mime/mime.dart';
-import 'package:paperless_mobile/features/labels/bloc/label_bloc_provider.dart';
+import 'package:paperless_mobile/core/bloc/paperless_statistics_cubit.dart';
+import 'package:paperless_mobile/features/labels/bloc/global_state_bloc_provider.dart';
 import 'package:paperless_mobile/core/global/constants.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/core/service/file_service.dart';
@@ -127,12 +128,17 @@ class _ScannerPageState extends State<ScannerPage>
     final bytes = await doc.save();
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => BlocProvider.value(
-          value: getIt<DocumentsCubit>(),
-          child: LabelBlocProvider(
-            child: DocumentUploadPage(
-              fileBytes: bytes,
+        builder: (_) => GlobalStateBlocProvider(
+          additionalProviders: [
+            BlocProvider<DocumentScannerCubit>.value(
+              value: BlocProvider.of<DocumentScannerCubit>(context),
             ),
+          ],
+          child: DocumentUploadPage(
+            fileBytes: bytes,
+            onSuccessfullyConsumed: (_) =>
+                BlocProvider.of<PaperlessStatisticsCubit>(context)
+                    .updateStatistics(),
           ),
         ),
       ),
@@ -242,17 +248,20 @@ class _ScannerPageState extends State<ScannerPage>
         // pdf
         fileBytes = file.readAsBytesSync();
       }
-
-      Navigator.push(
-        context,
+      Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => BlocProvider.value(
-            value: getIt<DocumentsCubit>(),
-            child: LabelBlocProvider(
-              child: DocumentUploadPage(
-                filename: filename,
-                fileBytes: fileBytes,
+          builder: (_) => GlobalStateBlocProvider(
+            additionalProviders: [
+              BlocProvider<DocumentScannerCubit>.value(
+                value: BlocProvider.of<DocumentScannerCubit>(context),
               ),
+            ],
+            child: DocumentUploadPage(
+              filename: filename,
+              fileBytes: fileBytes,
+              onSuccessfullyConsumed: (_) =>
+                  BlocProvider.of<PaperlessStatisticsCubit>(context)
+                      .updateStatistics(),
             ),
           ),
         ),

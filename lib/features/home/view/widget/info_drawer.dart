@@ -3,14 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_mobile/core/bloc/paperless_statistics_cubit.dart';
 import 'package:paperless_mobile/core/model/paperless_statistics_state.dart';
-import 'package:paperless_mobile/features/labels/bloc/label_bloc_provider.dart';
+import 'package:paperless_mobile/features/inbox/bloc/inbox_cubit.dart';
+import 'package:paperless_mobile/features/labels/bloc/global_state_bloc_provider.dart';
 import 'package:paperless_mobile/core/bloc/paperless_server_information_cubit.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/core/model/paperless_server_information.dart';
 import 'package:paperless_mobile/core/model/paperless_statistics.dart';
 import 'package:paperless_mobile/core/service/paperless_statistics_service.dart';
 import 'package:paperless_mobile/features/documents/repository/document_repository.dart';
-import 'package:paperless_mobile/features/inbox/view/inbox_page.dart';
+import 'package:paperless_mobile/features/inbox/view/pages/inbox_page.dart';
 import 'package:paperless_mobile/features/settings/bloc/application_settings_cubit.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/labels/correspondent/bloc/correspondents_cubit.dart';
@@ -127,24 +128,7 @@ class InfoDrawer extends StatelessWidget {
                   trailing: state.isLoaded
                       ? Text(state.statistics!.documentsInInbox.toString())
                       : null,
-                  onTap: () async {
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => BlocProvider.value(
-                          value: getIt<PaperlessStatisticsCubit>(),
-                          child: LabelBlocProvider(
-                            child: BlocProvider.value(
-                              value:
-                                  DocumentsCubit(getIt<DocumentRepository>()),
-                              child: const InboxPage(),
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                    getIt<DocumentsCubit>().reloadDocuments();
-                  },
+                  onTap: () => _onOpenInbox(context),
                 );
               },
             ),
@@ -223,6 +207,27 @@ class InfoDrawer extends StatelessWidget {
             ),
             const Divider(),
           ],
+        ),
+      ),
+    );
+  }
+
+  Future<dynamic> _onOpenInbox(BuildContext context) {
+    return Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => GlobalStateBlocProvider(
+          additionalProviders: [
+            BlocProvider<PaperlessStatisticsCubit>.value(
+              value: BlocProvider.of<PaperlessStatisticsCubit>(context),
+            ),
+            BlocProvider<InboxCubit>.value(
+              value: getIt<InboxCubit>()..initialize(),
+            ),
+            BlocProvider<DocumentsCubit>.value(
+              value: getIt<DocumentsCubit>(),
+            ),
+          ],
+          child: const InboxPage(),
         ),
       ),
     );

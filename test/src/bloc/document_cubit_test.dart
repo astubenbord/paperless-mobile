@@ -54,7 +54,7 @@ void main() async {
       ),
       build: () => DocumentsCubit(documentRepository),
       seed: () => DocumentsState.initial,
-      act: (bloc) => bloc.loadDocuments(),
+      act: (bloc) => bloc.load(),
       expect: () => [
         DocumentsState(
             isLoaded: true,
@@ -83,7 +83,7 @@ void main() async {
       ),
       build: () => DocumentsCubit(documentRepository),
       seed: () => DocumentsState.initial,
-      act: (bloc) => bloc.loadDocuments(),
+      act: (bloc) => bloc.load(),
       expect: () => [
         DocumentsState(
             isLoaded: true,

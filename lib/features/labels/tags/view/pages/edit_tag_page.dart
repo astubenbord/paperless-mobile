@@ -24,7 +24,7 @@ class EditTagPage extends StatelessWidget {
       label: tag,
       onSubmit: (tag) async {
         await BlocProvider.of<TagCubit>(context).replace(tag);
-        //If inbox property was added/removed from tag, the number of documetns in inbox may increase/decrease.
+        //If inbox property was added/removed from tag, the number of documents in inbox may increase/decrease.
         BlocProvider.of<PaperlessStatisticsCubit>(context).updateStatistics();
       },
       onDelete: (tag) => _onDelete(tag, context),

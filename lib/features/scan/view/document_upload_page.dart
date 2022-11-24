@@ -35,6 +35,7 @@ class DocumentUploadPage extends StatefulWidget {
   final String? title;
   final String? filename;
   final void Function()? afterUpload;
+  final void Function(DocumentModel)? onSuccessfullyConsumed;
 
   const DocumentUploadPage({
     Key? key,
@@ -42,6 +43,7 @@ class DocumentUploadPage extends StatefulWidget {
     this.afterUpload,
     this.title,
     this.filename,
+    this.onSuccessfullyConsumed,
   }) : super(key: key);
 
   @override
@@ -229,6 +231,7 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
 
   void _onSubmit() async {
     if (_formKey.currentState?.saveAndValidate() ?? false) {
+      final cubit = BlocProvider.of<DocumentScannerCubit>(context);
       try {
         setState(() => _isUploadLoading = true);
 
@@ -240,17 +243,19 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
         final tags = fv[DocumentModel.tagsKey] as IdsTagsQuery;
         final correspondent =
             fv[DocumentModel.correspondentKey] as IdQueryParameter;
-        await BlocProvider.of<DocumentsCubit>(context).addDocument(
+
+        await cubit.uploadDocument(
           widget.fileBytes,
           _padWithPdfExtension(_formKey.currentState?.value[fkFileName]),
-          onConsumptionFinished: _onConsumptionFinished,
+          onConsumptionFinished: widget.onSuccessfullyConsumed,
           title: title,
           documentType: docType.id,
           correspondent: correspondent.id,
           tags: tags.ids,
           createdAt: createdAt,
         );
-        getIt<DocumentScannerCubit>().reset(); //TODO: Access via provider
+
+        cubit.reset(); //TODO: Access via provider
         showSnackBar(context, S.of(context).documentUploadSuccessText);
         Navigator.pop(context);
         widget.afterUpload?.call();
@@ -274,25 +279,5 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
 
   String _formatFilename(String source) {
     return source.replaceAll(RegExp(r"[\W_]"), "_");
-  }
-
-  void _onConsumptionFinished(DocumentModel document) {
-    // ScaffoldMessenger.of(rootScaffoldKey.currentContext!).showSnackBar(
-    //   SnackBar(
-    //     action: SnackBarAction(
-    //       onPressed: () async {
-    //         try {
-    //           getIt<DocumentsCubit>().reloadDocuments();
-    //         } on ErrorMessage catch (error, stackTrace) {
-    //           showErrorMessage(context, error, stackTrace);
-    //         }
-    //       },
-    //       label:
-    //           S.of(context).documentUploadProcessingSuccessfulReloadActionText,
-    //     ),
-    //     content: Text(S.of(context).documentUploadProcessingSuccessfulText),
-    //   ),
-    // );
-    getIt<PaperlessStatisticsCubit>().incrementInboxCount();
   }
 }

@@ -12,7 +12,7 @@ import 'package:intl/intl_standalone.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
 import 'package:paperless_mobile/core/bloc/paperless_statistics_cubit.dart';
-import 'package:paperless_mobile/features/labels/bloc/label_bloc_provider.dart';
+import 'package:paperless_mobile/features/labels/bloc/global_state_bloc_provider.dart';
 import 'package:paperless_mobile/core/bloc/paperless_server_information_cubit.dart';
 import 'package:paperless_mobile/core/global/asset_images.dart';
 import 'package:paperless_mobile/core/global/constants.dart';
@@ -26,6 +26,7 @@ import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/home/view/home_page.dart';
 import 'package:paperless_mobile/features/login/bloc/authentication_cubit.dart';
 import 'package:paperless_mobile/features/login/view/login_page.dart';
+import 'package:paperless_mobile/features/scan/bloc/document_scanner_cubit.dart';
 import 'package:paperless_mobile/features/scan/view/document_upload_page.dart';
 import 'package:paperless_mobile/features/settings/bloc/application_settings_cubit.dart';
 import 'package:paperless_mobile/features/settings/model/application_settings_state.dart';
@@ -50,17 +51,18 @@ void main() async {
   await getIt<ApplicationSettingsCubit>().initialize();
   await getIt<AuthenticationCubit>().initialize();
 
-  runApp(const MyApp());
+  runApp(const PaperlessMobileEntrypoint());
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
+class PaperlessMobileEntrypoint extends StatefulWidget {
+  const PaperlessMobileEntrypoint({Key? key}) : super(key: key);
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  State<PaperlessMobileEntrypoint> createState() =>
+      _PaperlessMobileEntrypointState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _PaperlessMobileEntrypointState extends State<PaperlessMobileEntrypoint> {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -68,6 +70,7 @@ class _MyAppState extends State<MyApp> {
         BlocProvider.value(value: getIt<ConnectivityCubit>()),
         BlocProvider.value(value: getIt<AuthenticationCubit>()),
         BlocProvider.value(value: getIt<PaperlessServerInformationCubit>()),
+        BlocProvider.value(value: getIt<PaperlessStatisticsCubit>()),
         BlocProvider.value(value: getIt<ApplicationSettingsCubit>()),
       ],
       child: BlocBuilder<ApplicationSettingsCubit, ApplicationSettingsState>(
@@ -172,18 +175,24 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => BlocProvider.value(
-          value: getIt<DocumentsCubit>(),
-          child: LabelBlocProvider(
-            child: DocumentUploadPage(
-              fileBytes: bytes,
-              afterUpload: () => SystemNavigator.pop(),
-              filename: filename,
-            ),
+        builder: (context) => GlobalStateBlocProvider(
+          additionalProviders: [
+            BlocProvider.value(value: getIt<DocumentScannerCubit>()),
+          ],
+          child: DocumentUploadPage(
+            fileBytes: bytes,
+            afterUpload: SystemNavigator.pop,
+            filename: filename,
           ),
         ),
       ),
     );
+  }
+
+  @override
+  void didChangeDependencies() {
+    FlutterNativeSplash.remove();
+    super.didChangeDependencies();
   }
 
   @override
@@ -218,14 +227,14 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
         },
         builder: (context, authentication) {
           if (authentication.isAuthenticated) {
-            return BlocProvider.value(
-              value: getIt<PaperlessStatisticsCubit>(),
-              child: const LabelBlocProvider(
-                child: HomePage(),
-              ),
+            return GlobalStateBlocProvider(
+              additionalProviders: [
+                BlocProvider.value(value: getIt<PaperlessStatisticsCubit>()),
+                BlocProvider.value(value: getIt<DocumentsCubit>()),
+              ],
+              child: const HomePage(),
             );
           } else {
-            FlutterNativeSplash.remove();
             return const LoginPage();
           }
         },

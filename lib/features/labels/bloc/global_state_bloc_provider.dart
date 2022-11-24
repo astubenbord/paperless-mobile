@@ -7,9 +7,14 @@ import 'package:paperless_mobile/features/labels/document_type/bloc/document_typ
 import 'package:paperless_mobile/features/labels/storage_path/bloc/storage_path_cubit.dart';
 import 'package:paperless_mobile/features/labels/tags/bloc/tags_cubit.dart';
 
-class LabelBlocProvider extends StatelessWidget {
+class GlobalStateBlocProvider extends StatelessWidget {
+  final List<BlocProvider> additionalProviders;
   final Widget child;
-  const LabelBlocProvider({super.key, required this.child});
+  const GlobalStateBlocProvider({
+    super.key,
+    this.additionalProviders = const [],
+    required this.child,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +25,7 @@ class LabelBlocProvider extends StatelessWidget {
         BlocProvider.value(value: getIt<TagCubit>()),
         BlocProvider.value(value: getIt<StoragePathCubit>()),
         BlocProvider.value(value: getIt<SavedViewCubit>()),
+        ...additionalProviders,
       ],
       child: child,
     );

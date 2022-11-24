@@ -1,15 +1,13 @@
 import 'dart:typed_data';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:paperless_mobile/core/model/error_message.dart';
+import 'package:injectable/injectable.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
 import 'package:paperless_mobile/features/documents/model/bulk_edit.model.dart';
 import 'package:paperless_mobile/features/documents/model/document.model.dart';
 import 'package:paperless_mobile/features/documents/model/document_filter.dart';
 import 'package:paperless_mobile/features/documents/model/paged_search_result.dart';
-import 'package:paperless_mobile/features/documents/model/query_parameters/tags_query.dart';
 import 'package:paperless_mobile/features/documents/repository/document_repository.dart';
-import 'package:injectable/injectable.dart';
 
 @singleton
 class DocumentsCubit extends Cubit<DocumentsState> {
@@ -17,45 +15,20 @@ class DocumentsCubit extends Cubit<DocumentsState> {
 
   DocumentsCubit(this.documentRepository) : super(DocumentsState.initial);
 
-  Future<void> addDocument(
-    Uint8List bytes,
-    String fileName, {
-    required String title,
-    required void Function(DocumentModel document) onConsumptionFinished,
-    int? documentType,
-    int? correspondent,
-    Iterable<int> tags = const [],
-    DateTime? createdAt,
-  }) async {
-    await documentRepository.create(
-      bytes,
-      fileName,
-      title: title,
-      documentType: documentType,
-      correspondent: correspondent,
-      tags: tags,
-      createdAt: createdAt,
-    );
-
-    documentRepository
-        .waitForConsumptionFinished(fileName, title)
-        .then((value) => onConsumptionFinished(value));
-  }
-
-  Future<void> removeDocument(DocumentModel document) async {
+  Future<void> remove(DocumentModel document) async {
     await documentRepository.delete(document);
-    return await reloadDocuments();
+    await reload();
   }
 
-  Future<void> bulkRemoveDocuments(List<DocumentModel> documents) async {
+  Future<void> bulkRemove(List<DocumentModel> documents) async {
     await documentRepository.bulkAction(
       BulkDeleteAction(documents.map((doc) => doc.id)),
     );
-    await reloadDocuments();
+    await reload();
   }
 
   Future<void> bulkEditTags(
-    List<DocumentModel> documents, {
+    Iterable<DocumentModel> documents, {
     Iterable<int> addTags = const [],
     Iterable<int> removeTags = const [],
   }) async {
@@ -64,15 +37,15 @@ class DocumentsCubit extends Cubit<DocumentsState> {
       addTags: addTags,
       removeTags: removeTags,
     ));
-    await reloadDocuments();
+    await reload();
   }
 
-  Future<void> updateDocument(DocumentModel document) async {
+  Future<void> update(DocumentModel document) async {
     await documentRepository.update(document);
-    await reloadDocuments();
+    await reload();
   }
 
-  Future<void> loadDocuments() async {
+  Future<void> load() async {
     final result = await documentRepository.find(state.filter);
     emit(DocumentsState(
       isLoaded: true,
@@ -81,7 +54,7 @@ class DocumentsCubit extends Cubit<DocumentsState> {
     ));
   }
 
-  Future<void> reloadDocuments() async {
+  Future<void> reload() async {
     if (state.currentPageNumber >= 5) {
       return _bulkReloadDocuments();
     }
@@ -113,7 +86,7 @@ class DocumentsCubit extends Cubit<DocumentsState> {
   Future<void> assignAsn(DocumentModel document) async {
     if (document.archiveSerialNumber == null) {
       final int asn = await documentRepository.findNextAsn();
-      updateDocument(document.copyWith(archiveSerialNumber: asn));
+      update(document.copyWith(archiveSerialNumber: asn));
     }
   }
 
@@ -149,22 +122,6 @@ class DocumentsCubit extends Cubit<DocumentsState> {
         state.copyWith(selection: [...state.selection, model]),
       );
     }
-  }
-
-  ///
-  /// Updates the given document with the inbox tags removed and returns the remoed inbox tags.
-  ///
-  Future<Iterable<int>> removeInboxTags(
-      DocumentModel document, final Iterable<int> inboxTags) async {
-    final tagsToRemove = document.tags.toSet().intersection(inboxTags.toSet());
-    final updatedTags = {...document.tags}..removeAll(tagsToRemove);
-    await updateDocument(
-      document.copyWith(
-        tags: updatedTags,
-        overwriteTags: true,
-      ),
-    );
-    return tagsToRemove;
   }
 
   void resetSelection() {

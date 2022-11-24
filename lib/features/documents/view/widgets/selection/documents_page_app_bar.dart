@@ -99,7 +99,7 @@ class _DocumentsPageAppBarState extends State<DocumentsPageAppBar> {
     if (shouldDelete) {
       try {
         await BlocProvider.of<DocumentsCubit>(context)
-            .bulkRemoveDocuments(documentsState.selection);
+            .bulkRemove(documentsState.selection);
         showSnackBar(
           context,
           S.of(context).documentsPageBulkDeleteSuccessfulText,

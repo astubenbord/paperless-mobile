@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:paperless_mobile/features/labels/bloc/label_bloc_provider.dart';
+import 'package:paperless_mobile/features/labels/bloc/global_state_bloc_provider.dart';
 import 'package:paperless_mobile/core/logic/error_code_localization_mapper.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/di_initializer.dart';
@@ -8,7 +8,8 @@ import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/documents/model/document_filter.dart';
 import 'package:paperless_mobile/features/documents/repository/document_repository.dart';
 import 'package:paperless_mobile/features/labels/model/label.model.dart';
-import 'package:paperless_mobile/features/labels/view/widgets/linked_documents_preview.dart';
+import 'package:paperless_mobile/features/linked_documents_preview/bloc/linked_documents_cubit.dart';
+import 'package:paperless_mobile/features/linked_documents_preview/view/pages/linked_documents_page.dart';
 
 class LabelItem<T extends Label> extends StatelessWidget {
   final T label;
@@ -50,13 +51,13 @@ class LabelItem<T extends Label> extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => LabelBlocProvider(
-                    child: BlocProvider(
-                      create: (context) =>
-                          DocumentsCubit(getIt<DocumentRepository>())
-                            ..updateFilter(filter: filter),
-                      child: LinkedDocumentsPreview(filter: filter),
-                    ),
+                  builder: (context) => GlobalStateBlocProvider(
+                    additionalProviders: [
+                      BlocProvider.value(
+                          value: getIt<LinkedDocumentsCubit>()
+                            ..initialize(filter)),
+                    ],
+                    child: const LinkedDocumentsPage(),
                   ),
                 ),
               );

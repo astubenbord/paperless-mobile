@@ -184,7 +184,7 @@
   "labelsPageTagsEmptyStateDescriptionText": "You don't seem to have any tags set up.",
   "labelsPageStoragePathEmptyStateAddNewLabel": "Add new storage path",
   "labelsPageStoragePathEmptyStateDescriptionText": "You don't seem to have any storage paths set up.",
-  "referencedDocumentsReadOnlyHintText": "This is a read-only view! You cannot edit or remove documents.",
+  "referencedDocumentsReadOnlyHintText": "This is a read-only view! You cannot edit or remove documents. A maximum of 100 referenced documents will be loaded.",
   "editLabelPageConfirmDeletionDialogTitle": "Confirm deletion",
   "editLabelPageDeletionDialogText": "This label contains references to other documents. By deleting this label, all references will be removed. Continue?",
   "settingsPageStorageSettingsLabel": "Storage",

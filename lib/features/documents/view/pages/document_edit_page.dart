@@ -83,7 +83,7 @@ class _DocumentEditPageState extends State<DocumentEditPage> {
             });
             bool wasUpdated = false;
             try {
-              await getIt<DocumentsCubit>().updateDocument(updatedDocument);
+              await getIt<DocumentsCubit>().update(updatedDocument);
               showSnackBar(context, S.of(context).documentUpdateErrorMessage);
               wasUpdated = true;
             } on ErrorMessage catch (error, stackTrace) {

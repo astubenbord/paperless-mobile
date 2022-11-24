@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_mobile/core/bloc/paperless_statistics_cubit.dart';
-import 'package:paperless_mobile/features/labels/bloc/label_bloc_provider.dart';
+import 'package:paperless_mobile/features/labels/bloc/global_state_bloc_provider.dart';
 import 'package:paperless_mobile/core/logic/error_code_localization_mapper.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/core/widgets/highlighted_text.dart';
@@ -52,7 +52,6 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
       DateFormat("MMM d, yyyy HH:mm:ss");
 
   bool _isDownloadPending = false;
-  bool _isAssignAsnPending = false;
 
   @override
   Widget build(BuildContext context) {
@@ -350,7 +349,7 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
     final wasUpdated = await Navigator.push<bool>(
           context,
           MaterialPageRoute(
-            builder: (_) => LabelBlocProvider(
+            builder: (_) => GlobalStateBlocProvider(
               child: DocumentEditPage(document: document),
             ),
             maintainState: true,
@@ -412,7 +411,7 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
         false;
     if (delete) {
       try {
-        await BlocProvider.of<DocumentsCubit>(context).removeDocument(document);
+        await BlocProvider.of<DocumentsCubit>(context).remove(document);
         showSnackBar(context, S.of(context).documentDeleteSuccessMessage);
       } on ErrorMessage catch (error, stackTrace) {
         showErrorMessage(context, error, stackTrace);

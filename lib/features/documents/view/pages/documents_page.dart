@@ -44,15 +44,13 @@ class _DocumentsPageState extends State<DocumentsPage> {
   @override
   void initState() {
     super.initState();
-    if (!BlocProvider.of<DocumentsCubit>(context).state.isLoaded) {
-      _initDocuments();
-    }
+    _initDocuments();
     _pagingController.addPageRequestListener(_loadNewPage);
   }
 
   Future<void> _initDocuments() async {
     try {
-      BlocProvider.of<DocumentsCubit>(context).loadDocuments();
+      BlocProvider.of<DocumentsCubit>(context).load();
     } on ErrorMessage catch (error, stackTrace) {
       showErrorMessage(context, error, stackTrace);
     }
@@ -113,7 +111,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
             previous != ConnectivityState.connected &&
             current == ConnectivityState.connected,
         listener: (context, state) {
-          BlocProvider.of<DocumentsCubit>(context).loadDocuments();
+          BlocProvider.of<DocumentsCubit>(context).load();
         },
         builder: (context, connectivityState) {
           return Scaffold(
@@ -241,9 +239,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
             BlocProvider.value(
                 value: BlocProvider.of<PaperlessStatisticsCubit>(context)),
           ],
-          child: DocumentDetailsPage(
-            documentId: model.id,
-          ),
+          child: DocumentDetailsPage(documentId: model.id),
         ),
       ),
     );
