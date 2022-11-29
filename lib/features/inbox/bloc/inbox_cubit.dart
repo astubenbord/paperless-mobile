@@ -48,11 +48,13 @@ class InboxCubit extends Cubit<InboxState> {
           sortField: SortField.added,
         ))
         .then((psr) => psr.results);
-    emit(InboxState(
-      isLoaded: true,
-      inboxItems: inboxDocuments,
-      inboxTags: state.inboxTags,
-    ));
+    emit(
+      InboxState(
+        isLoaded: true,
+        inboxItems: inboxDocuments,
+        inboxTags: state.inboxTags,
+      ),
+    );
   }
 
   ///
@@ -61,12 +63,13 @@ class InboxCubit extends Cubit<InboxState> {
   ///
   Future<Iterable<int>> remove(DocumentModel document) async {
     if (!state.isLoaded) {
-      throw "State has not yet loaded. Ensure the state is loaded when calling this method!";
+      throw "State has not loaded yet. Ensure the state is loaded when calling this method!";
     }
     final tagsToRemove =
         document.tags.toSet().intersection(state.inboxTags.toSet());
 
     final updatedTags = {...document.tags}..removeAll(tagsToRemove);
+
     await _documentRepository.update(
       document.copyWith(
         tags: updatedTags,
@@ -84,31 +87,43 @@ class InboxCubit extends Cubit<InboxState> {
     return tagsToRemove;
   }
 
+  ///
+  /// Adds the previously removed tags to the document and performs an update.
+  ///
   Future<void> undoRemove(
-      DocumentModel document, Iterable<int> removedTags) async {
+    DocumentModel document,
+    Iterable<int> removedTags,
+  ) async {
     final updatedDoc = document.copyWith(
       tags: {...document.tags, ...removedTags},
       overwriteTags: true,
     );
     await _documentRepository.update(updatedDoc);
-    emit(InboxState(
-      isLoaded: true,
-      inboxItems: [...state.inboxItems, updatedDoc]
-        ..sort((d1, d2) => d1.added.compareTo(d2.added)),
-      inboxTags: state.inboxTags,
-    ));
+    emit(
+      InboxState(
+        isLoaded: true,
+        inboxItems: [...state.inboxItems, updatedDoc]
+          ..sort((d1, d2) => d2.added.compareTo(d1.added)),
+        inboxTags: state.inboxTags,
+      ),
+    );
   }
 
   ///
   /// Removes inbox tags from all documents in the inbox.
   ///
   Future<void> clearInbox() async {
-    await _documentRepository.bulkAction(BulkModifyTagsAction.removeTags(
-        state.inboxItems.map((e) => e.id), state.inboxTags));
+    await _documentRepository.bulkAction(
+      BulkModifyTagsAction.removeTags(
+        state.inboxItems.map((e) => e.id),
+        state.inboxTags,
+      ),
+    );
     emit(
       InboxState(
         isLoaded: true,
         inboxTags: state.inboxTags,
+        inboxItems: [],
       ),
     );
   }

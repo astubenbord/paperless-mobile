@@ -3,12 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
 import 'package:paperless_mobile/core/bloc/paperless_server_information_cubit.dart';
-import 'package:paperless_mobile/core/bloc/paperless_statistics_cubit.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/core/widgets/offline_banner.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
-import 'package:paperless_mobile/features/documents/bloc/saved_view_cubit.dart';
 import 'package:paperless_mobile/features/documents/view/pages/documents_page.dart';
 import 'package:paperless_mobile/features/home/view/widget/bottom_navigation_bar.dart';
 import 'package:paperless_mobile/features/home/view/widget/info_drawer.dart';
@@ -20,6 +18,7 @@ import 'package:paperless_mobile/features/labels/document_type/bloc/document_typ
 import 'package:paperless_mobile/features/labels/storage_path/bloc/storage_path_cubit.dart';
 import 'package:paperless_mobile/features/labels/tags/bloc/tags_cubit.dart';
 import 'package:paperless_mobile/features/labels/view/pages/labels_page.dart';
+import 'package:paperless_mobile/features/saved_view/bloc/saved_view_cubit.dart';
 import 'package:paperless_mobile/features/scan/bloc/document_scanner_cubit.dart';
 import 'package:paperless_mobile/features/scan/view/scanner_page.dart';
 import 'package:paperless_mobile/util.dart';
@@ -88,7 +87,6 @@ class _HomePageState extends State<HomePage> {
       return Future.wait([
         BlocProvider.of<PaperlessServerInformationCubit>(context)
             .updateInformtion(),
-        getIt<PaperlessStatisticsCubit>().updateStatistics(),
         getIt<DocumentTypeCubit>().initialize(),
         getIt<CorrespondentCubit>().initialize(),
         getIt<TagCubit>().initialize(),

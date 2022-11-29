@@ -1,6 +1,5 @@
 name: paperless_mobile
-description:
-  Application to conveniently scan and share documents with a paperless-ng
+description: Application to conveniently scan and share documents with a paperless-ng
   server.
 
 # The following line prevents the package from being accidentally published to
@@ -139,6 +138,8 @@ flutter:
   # see https://flutter.dev/custom-fonts/#from-packages
 flutter_intl:
   enabled: true
+  localizely:
+    project_id: 84b4144d-a628-4ba6-a8d0-4f9917444057
 
 flutter_native_splash:
   image: assets/logos/paperless_logo_green.png

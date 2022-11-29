@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_mobile/features/labels/model/label_state.dart';
@@ -10,8 +8,10 @@ import 'package:paperless_mobile/features/labels/tags/view/widgets/tag_widget.da
 class TagsWidget extends StatefulWidget {
   final Iterable<int> tagIds;
   final bool isMultiLine;
-  final void Function()? afterTagTapped;
+  final VoidCallback? afterTagTapped;
+  final void Function(int tagId) onTagSelected;
   final bool isClickable;
+  final bool Function(int id) isSelectedPredicate;
 
   const TagsWidget({
     Key? key,
@@ -19,6 +19,8 @@ class TagsWidget extends StatefulWidget {
     this.afterTagTapped,
     this.isMultiLine = true,
     this.isClickable = true,
+    required this.isSelectedPredicate,
+    required this.onTagSelected,
   }) : super(key: key);
 
   @override
@@ -37,6 +39,8 @@ class _TagsWidgetState extends State<TagsWidget> {
                 tag: state.getLabel(id)!,
                 afterTagTapped: widget.afterTagTapped,
                 isClickable: widget.isClickable,
+                isSelected: widget.isSelectedPredicate(id),
+                onSelected: () => widget.onTagSelected(id),
               ),
             )
             .toList();

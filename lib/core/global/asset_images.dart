@@ -4,16 +4,16 @@ enum AssetImages {
   headacheDocuments("images/documents_headache.png"),
   organizeDocuments("images/organize_documents.png"),
   secureDocuments("images/secure_documents.png"),
-  success("images/success.png");
+  success("images/success.png"),
+  emptyInbox("images/empty_inbox.png");
 
   final String relativePath;
   const AssetImages(String relativePath)
       : relativePath = "assets/$relativePath";
 
-  Image get image => Image.asset(
-        relativePath,
-        key: ObjectKey("assetimage_$relativePath"),
-      );
+  AssetImage get image => AssetImage(relativePath);
 
-  void load(context) => precacheImage(image.image, context);
+  void load(context) => precacheImage(image, context);
 }
+
+late Image emptyInboxImage;

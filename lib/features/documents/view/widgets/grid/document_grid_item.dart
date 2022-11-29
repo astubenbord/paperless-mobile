@@ -12,6 +12,8 @@ class DocumentGridItem extends StatelessWidget {
   final void Function(DocumentModel) onTap;
   final void Function(DocumentModel) onSelected;
   final bool isAtLeastOneSelected;
+  final bool Function(int tagId) isTagSelectedPredicate;
+  final void Function(int tagId) onTagSelected;
 
   const DocumentGridItem({
     Key? key,
@@ -20,6 +22,8 @@ class DocumentGridItem extends StatelessWidget {
     required this.onSelected,
     required this.isSelected,
     required this.isAtLeastOneSelected,
+    required this.isTagSelectedPredicate,
+    required this.onTagSelected,
   }) : super(key: key);
 
   @override
@@ -65,6 +69,8 @@ class DocumentGridItem extends StatelessWidget {
                         TagsWidget(
                           tagIds: document.tags,
                           isMultiLine: false,
+                          isSelectedPredicate: isTagSelectedPredicate,
+                          onTagSelected: onTagSelected,
                         ),
                         const Spacer(),
                         Text(

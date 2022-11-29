@@ -15,7 +15,7 @@ class AuthenticationInterceptor implements InterceptorContract {
   Future<BaseRequest> interceptRequest({required BaseRequest request}) async {
     final authState = authenticationCubit.state;
     if (kDebugMode) {
-      log("Intercepted request to ${request.url.toString()}");
+      log("Intercepted ${request.method} request to ${request.url.toString()}");
     }
     if (authState.authentication == null) {
       throw const ErrorMessage(ErrorCode.notAuthenticated);

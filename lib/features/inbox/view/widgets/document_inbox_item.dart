@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:paperless_mobile/di_initializer.dart';
+import 'package:paperless_mobile/features/document_details/bloc/document_details_cubit.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/documents/model/document.model.dart';
-import 'package:paperless_mobile/features/documents/view/pages/document_details_page.dart';
+import 'package:paperless_mobile/features/document_details/view/pages/document_details_page.dart';
+import 'package:paperless_mobile/features/documents/repository/document_repository.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/document_preview.dart';
 import 'package:paperless_mobile/features/labels/bloc/global_state_bloc_provider.dart';
 import 'package:paperless_mobile/features/labels/tags/view/widgets/tags_widget.dart';
@@ -37,6 +40,8 @@ class DocumentInboxItem extends StatelessWidget {
             tagIds: document.tags,
             isMultiLine: false,
             isClickable: false,
+            isSelectedPredicate: (_) => false,
+            onTagSelected: (_) {},
           ),
         ],
       ),
@@ -45,11 +50,14 @@ class DocumentInboxItem extends StatelessWidget {
         MaterialPageRoute(
           builder: (_) => GlobalStateBlocProvider(
             additionalProviders: [
-              BlocProvider.value(
-                  value: BlocProvider.of<DocumentsCubit>(context)),
+              BlocProvider<DocumentDetailsCubit>(
+                create: (context) => DocumentDetailsCubit(
+                  getIt<DocumentRepository>(),
+                  document,
+                ),
+              ),
             ],
-            child: DocumentDetailsPage(
-              documentId: document.id,
+            child: const DocumentDetailsPage(
               allowEdit: false,
               isLabelClickable: false,
             ),

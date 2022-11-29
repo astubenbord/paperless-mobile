@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:paperless_mobile/core/bloc/paperless_statistics_cubit.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/core/widgets/documents_list_loading_widget.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
-import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/documents/model/document.model.dart';
 import 'package:paperless_mobile/features/inbox/bloc/inbox_cubit.dart';
 import 'package:paperless_mobile/features/inbox/bloc/state/inbox_state.dart';
@@ -21,7 +19,8 @@ class InboxPage extends StatefulWidget {
 }
 
 class _InboxPageState extends State<InboxPage> {
-  final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
+  final GlobalKey<RefreshIndicatorState> _emptyStateRefreshIndicatorKey =
+      GlobalKey();
 
   @override
   void initState() {
@@ -31,13 +30,34 @@ class _InboxPageState extends State<InboxPage> {
 
   @override
   Widget build(BuildContext context) {
-    final bloc = BlocProvider.of<InboxCubit>(context);
+    //TODO: Group by date (today, yseterday, etc.)
     return Scaffold(
       appBar: AppBar(
         title: Text(S.of(context).bottomNavInboxPageLabel),
         leading: IconButton(
           icon: const Icon(Icons.close),
           onPressed: () => Navigator.pop(context),
+        ),
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(14),
+          child: BlocBuilder<InboxCubit, InboxState>(
+            builder: (context, state) {
+              return Align(
+                alignment: Alignment.centerRight,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8.0),
+                  child: ColoredBox(
+                    color: Theme.of(context).colorScheme.secondaryContainer,
+                    child: Text(
+                      '${state.inboxItems.length} unseen',
+                      textAlign: TextAlign.start,
+                      style: Theme.of(context).textTheme.caption,
+                    ).padded(const EdgeInsets.symmetric(horizontal: 4.0)),
+                  ),
+                ),
+              );
+            },
+          ).padded(const EdgeInsets.symmetric(horizontal: 8.0)),
         ),
       ),
       floatingActionButton: BlocBuilder<InboxCubit, InboxState>(
@@ -47,8 +67,8 @@ class _InboxPageState extends State<InboxPage> {
             icon: const Icon(Icons.done_all),
             onPressed: state.isLoaded && state.inboxItems.isNotEmpty
                 ? () => _onMarkAllAsSeen(
-                      bloc.state.inboxItems,
-                      bloc.state.inboxTags,
+                      state.inboxItems,
+                      state.inboxTags,
                     )
                 : null,
           );
@@ -61,10 +81,26 @@ class _InboxPageState extends State<InboxPage> {
           }
 
           if (state.inboxItems.isEmpty) {
-            return Text(
-              "You do not have new documents in your inbox.",
-              textAlign: TextAlign.center,
-            ).padded();
+            return RefreshIndicator(
+              key: _emptyStateRefreshIndicatorKey,
+              onRefresh: () =>
+                  BlocProvider.of<InboxCubit>(context).reloadInbox(),
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('You do not have unseen documents.'),
+                    TextButton(
+                      onPressed: () =>
+                          _emptyStateRefreshIndicatorKey.currentState?.show(),
+                      child: Text('Refresh'),
+                    ),
+                  ],
+                ),
+              ),
+            );
           }
           return RefreshIndicator(
             onRefresh: () => BlocProvider.of<InboxCubit>(context).reloadInbox(),
@@ -84,10 +120,9 @@ class _InboxPageState extends State<InboxPage> {
                   ),
                 ),
                 Expanded(
-                  child: AnimatedList(
-                    key: _listKey,
-                    initialItemCount: state.inboxItems.length,
-                    itemBuilder: (context, index, animation) {
+                  child: ListView.builder(
+                    itemCount: state.inboxItems.length,
+                    itemBuilder: (context, index) {
                       final doc = state.inboxItems.elementAt(index);
                       return _buildListItem(context, doc);
                     },
@@ -108,11 +143,11 @@ class _InboxPageState extends State<InboxPage> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Icon(
-            Icons.done,
+            Icons.done_all,
             color: Theme.of(context).colorScheme.primary,
           ).padded(),
           Text(
-            'Mark as read', //TODO: INTL
+            'Mark as seen', //TODO: INTL
             style: TextStyle(
               color: Theme.of(context).colorScheme.primary,
             ),
@@ -120,22 +155,8 @@ class _InboxPageState extends State<InboxPage> {
         ],
       ).padded(),
       confirmDismiss: (_) => _onItemDismissed(doc),
-      key: ObjectKey(doc.id),
+      key: UniqueKey(),
       child: DocumentInboxItem(document: doc),
-    );
-  }
-
-  Widget _buildSlideAnimation(
-    BuildContext context,
-    animation,
-    Widget child,
-  ) {
-    return SlideTransition(
-      position: Tween<Offset>(
-        begin: const Offset(-1, 0),
-        end: Offset.zero,
-      ).animate(animation),
-      child: child,
     );
   }
 
@@ -143,34 +164,40 @@ class _InboxPageState extends State<InboxPage> {
     Iterable<DocumentModel> documents,
     Iterable<int> inboxTags,
   ) async {
-    for (int i = documents.length - 1; i >= 0; i--) {
-      final doc = documents.elementAt(i);
-      _listKey.currentState?.removeItem(
-        0,
-        (context, animation) => _buildSlideAnimation(
-          context,
-          animation,
-          _buildListItem(context, doc),
-        ),
-      );
-      await Future.delayed(const Duration(milliseconds: 75));
+    final isActionConfirmed = await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Confirm action'),
+            content: Text(
+              'Are you sure you want to mark all documents as seen? This will perform a bulk edit operation removing all inbox tags from the documents.\nThis action is not reversible! Are you sure you want to continue?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text(S.of(context).genericActionCancelLabel),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: Text(S.of(context).genericActionOkLabel),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+    if (isActionConfirmed) {
+      await BlocProvider.of<InboxCubit>(context).clearInbox();
     }
-    await BlocProvider.of<DocumentsCubit>(context)
-        .bulkEditTags(documents, removeTags: inboxTags);
-    BlocProvider.of<PaperlessStatisticsCubit>(context).resetInboxCount();
   }
 
   Future<bool> _onItemDismissed(DocumentModel doc) async {
     try {
       final removedTags =
           await BlocProvider.of<InboxCubit>(context).remove(doc);
-      BlocProvider.of<PaperlessStatisticsCubit>(context).decrementInboxCount();
       showSnackBar(
         context,
         'Document removed from inbox.', //TODO: INTL
         action: SnackBarAction(
           label: 'UNDO', //TODO: INTL
-          textColor: Theme.of(context).colorScheme.primary,
           onPressed: () => _onUndoMarkAsSeen(doc, removedTags),
         ),
       );
@@ -194,7 +221,6 @@ class _InboxPageState extends State<InboxPage> {
     try {
       await BlocProvider.of<InboxCubit>(context)
           .undoRemove(document, removedTags);
-      BlocProvider.of<PaperlessStatisticsCubit>(context).incrementInboxCount();
     } on ErrorMessage catch (error, stackTrace) {
       showErrorMessage(context, error, stackTrace);
     }

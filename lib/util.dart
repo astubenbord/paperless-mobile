@@ -1,9 +1,13 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:paperless_mobile/core/logic/error_code_localization_mapper.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:intl/intl.dart';
@@ -119,4 +123,36 @@ String formatLocalDate(BuildContext context, DateTime dateTime) {
 
 String extractFilenameFromPath(String path) {
   return path.split(RegExp('[./]')).reversed.skip(1).first;
+}
+
+// Taken from https://github.com/flutter/flutter/issues/26127#issuecomment-782083060
+Future<void> loadImage(ImageProvider provider) {
+  final config = ImageConfiguration(
+    bundle: rootBundle,
+    devicePixelRatio: window.devicePixelRatio,
+    platform: defaultTargetPlatform,
+  );
+  final Completer<void> completer = Completer();
+  final ImageStream stream = provider.resolve(config);
+
+  late final ImageStreamListener listener;
+
+  listener = ImageStreamListener((ImageInfo image, bool sync) {
+    debugPrint("Image ${image.debugLabel} finished loading");
+    completer.complete();
+    stream.removeListener(listener);
+  }, onError: (dynamic exception, StackTrace? stackTrace) {
+    completer.complete();
+    stream.removeListener(listener);
+    FlutterError.reportError(FlutterErrorDetails(
+      context: ErrorDescription('image failed to load'),
+      library: 'image resource service',
+      exception: exception,
+      stack: stackTrace,
+      silent: true,
+    ));
+  });
+
+  stream.addListener(listener);
+  return completer.future;
 }

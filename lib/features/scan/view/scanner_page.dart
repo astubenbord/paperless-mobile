@@ -8,7 +8,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mime/mime.dart';
-import 'package:paperless_mobile/core/bloc/paperless_statistics_cubit.dart';
 import 'package:paperless_mobile/features/labels/bloc/global_state_bloc_provider.dart';
 import 'package:paperless_mobile/core/global/constants.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
@@ -136,9 +135,6 @@ class _ScannerPageState extends State<ScannerPage>
           ],
           child: DocumentUploadPage(
             fileBytes: bytes,
-            onSuccessfullyConsumed: (_) =>
-                BlocProvider.of<PaperlessStatisticsCubit>(context)
-                    .updateStatistics(),
           ),
         ),
       ),
@@ -259,9 +255,6 @@ class _ScannerPageState extends State<ScannerPage>
             child: DocumentUploadPage(
               filename: filename,
               fileBytes: fileBytes,
-              onSuccessfullyConsumed: (_) =>
-                  BlocProvider.of<PaperlessStatisticsCubit>(context)
-                      .updateStatistics(),
             ),
           ),
         ),

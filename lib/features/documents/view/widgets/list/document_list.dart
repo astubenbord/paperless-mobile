@@ -3,8 +3,10 @@ import 'package:paperless_mobile/core/widgets/documents_list_loading_widget.dart
 import 'package:paperless_mobile/core/widgets/offline_widget.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
 import 'package:paperless_mobile/features/documents/model/document.model.dart';
+import 'package:paperless_mobile/features/documents/model/query_parameters/tags_query.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/list/document_list_item.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:paperless_mobile/features/labels/tags/model/tag.model.dart';
 
 class DocumentListView extends StatelessWidget {
   final void Function(DocumentModel) onTap;
@@ -14,6 +16,8 @@ class DocumentListView extends StatelessWidget {
   final DocumentsState state;
   final bool hasInternetConnection;
   final bool isLabelClickable;
+  final void Function(int tagId) onTagSelected;
+
   const DocumentListView({
     super.key,
     required this.onTap,
@@ -22,6 +26,7 @@ class DocumentListView extends StatelessWidget {
     required this.onSelected,
     required this.hasInternetConnection,
     this.isLabelClickable = true,
+    required this.onTagSelected,
   });
 
   @override
@@ -38,6 +43,14 @@ class DocumentListView extends StatelessWidget {
             isSelected: state.selection.contains(document),
             onSelected: onSelected,
             isAtLeastOneSelected: state.selection.isNotEmpty,
+            isTagSelectedPredicate: (int tagId) {
+              return state.filter.tags is IdsTagsQuery
+                  ? (state.filter.tags as IdsTagsQuery)
+                      .includedIds
+                      .contains(tagId)
+                  : false;
+            },
+            onTagSelected: onTagSelected,
           );
         },
         noItemsFoundIndicatorBuilder: (context) => hasInternetConnection

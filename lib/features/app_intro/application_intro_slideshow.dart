@@ -18,9 +18,8 @@ class ApplicationIntroSlideshow extends StatefulWidget {
 }
 
 class _ApplicationIntroSlideshowState extends State<ApplicationIntroSlideshow> {
-  Image organizeImage = AssetImages.organizeDocuments.image;
-  Image secureImage = AssetImages.secureDocuments.image;
-  Image successImage = AssetImages.success.image;
+  AssetImage secureImage = AssetImages.secureDocuments.image;
+  AssetImage successImage = AssetImages.success.image;
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +49,9 @@ class _ApplicationIntroSlideshowState extends State<ApplicationIntroSlideshow> {
               ),
               image: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: organizeImage,
+                child: Image(
+                  image: AssetImages.organizeDocuments.image,
+                ),
               ),
               bodyWidget: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -70,7 +71,7 @@ class _ApplicationIntroSlideshowState extends State<ApplicationIntroSlideshow> {
               ),
               image: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: secureImage,
+                child: Image(image: AssetImages.secureDocuments.image),
               ),
               bodyWidget: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -90,7 +91,7 @@ class _ApplicationIntroSlideshowState extends State<ApplicationIntroSlideshow> {
               ),
               image: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: successImage,
+                child: Image(image: AssetImages.success.image),
               ),
               bodyWidget: Column(
                 children: const [

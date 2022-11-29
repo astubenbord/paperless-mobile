@@ -189,7 +189,7 @@
   "editLabelPageDeletionDialogText": "This label contains references to other documents. By deleting this label, all references will be removed. Continue?",
   "settingsPageStorageSettingsLabel": "Storage",
   "settingsPageStorageSettingsDescriptionText": "Manage files and storage space",
-  "documentUpdateErrorMessage": "Document successfully updated.",
+  "documentUpdateSuccessMessage": "Document successfully updated.",
   "errorMessageMissingClientCertificate": "A client certificate was expected but not sent. Please provide a valid client certificate.",
   "serverInformationPaperlessVersionText": "Paperless server version",
   "errorReportLabel": "REPORT",

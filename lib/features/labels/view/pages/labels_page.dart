@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:paperless_mobile/core/bloc/paperless_statistics_cubit.dart';
 import 'package:paperless_mobile/features/labels/bloc/global_state_bloc_provider.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
@@ -218,7 +217,6 @@ class _LabelsPageState extends State<LabelsPage>
         builder: (_) => GlobalStateBlocProvider(
           additionalProviders: [
             BlocProvider.value(value: BlocProvider.of<DocumentsCubit>(context)),
-            BlocProvider.value(value: getIt<PaperlessStatisticsCubit>()),
           ],
           child: EditTagPage(tag: tag),
         ),

@@ -61,7 +61,7 @@ class SavedView with EquatableMixin {
   DocumentFilter toDocumentFilter() {
     return filterRules.fold(
       DocumentFilter(
-        sortOrder: sortReverse ? SortOrder.ascending : SortOrder.descending,
+        sortOrder: sortReverse ? SortOrder.descending : SortOrder.ascending,
         sortField: sortField,
       ),
       (filter, filterRule) => filterRule.applyToFilter(filter),
@@ -80,7 +80,7 @@ class SavedView with EquatableMixin {
           sortField: filter.sortField,
           showInSidebar: showInSidebar,
           showOnDashboard: showOnDashboard,
-          sortReverse: filter.sortOrder == SortOrder.ascending,
+          sortReverse: filter.sortOrder == SortOrder.descending,
         );
 
   JSON toJson() {

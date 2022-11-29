@@ -16,6 +16,7 @@ class BulkDeleteAction extends BulkAction {
     return {
       'documents': documentIds.toList(),
       'method': 'delete',
+      'parameters': {},
     };
   }
 }
@@ -33,8 +34,9 @@ class BulkModifyTagsAction extends BulkAction {
   BulkModifyTagsAction.addTags(super.documents, this.addTags)
       : removeTags = const [];
 
-  BulkModifyTagsAction.removeTags(super.documents, this.removeTags)
-      : addTags = const [];
+  BulkModifyTagsAction.removeTags(super.documents, Iterable<int> tags)
+      : addTags = const [],
+        removeTags = tags;
 
   @override
   JSON toJson() {

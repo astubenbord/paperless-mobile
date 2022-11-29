@@ -2,8 +2,6 @@
 
 import 'package:equatable/equatable.dart';
 import 'package:paperless_mobile/core/type/types.dart';
-import 'package:paperless_mobile/features/documents/model/query_parameters/id_query_parameter.dart';
-import 'package:paperless_mobile/features/documents/model/query_parameters/tags_query.dart';
 
 class DocumentModel extends Equatable {
   static const idKey = 'id';

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:paperless_mobile/features/documents/model/document.model.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/document_preview.dart';
 import 'package:paperless_mobile/features/labels/correspondent/view/widgets/correspondent_widget.dart';
+import 'package:paperless_mobile/features/labels/tags/model/tag.model.dart';
 import 'package:paperless_mobile/features/labels/tags/view/widgets/tags_widget.dart';
 
 class DocumentListItem extends StatelessWidget {
@@ -12,6 +13,9 @@ class DocumentListItem extends StatelessWidget {
   final bool isSelected;
   final bool isAtLeastOneSelected;
   final bool isLabelClickable;
+  final bool Function(int tagId) isTagSelectedPredicate;
+
+  final void Function(int tagId) onTagSelected;
 
   const DocumentListItem({
     Key? key,
@@ -21,6 +25,8 @@ class DocumentListItem extends StatelessWidget {
     required this.isSelected,
     required this.isAtLeastOneSelected,
     this.isLabelClickable = true,
+    required this.isTagSelectedPredicate,
+    required this.onTagSelected,
   }) : super(key: key);
 
   @override
@@ -62,6 +68,8 @@ class DocumentListItem extends StatelessWidget {
               isClickable: isLabelClickable,
               tagIds: document.tags,
               isMultiLine: false,
+              isSelectedPredicate: isTagSelectedPredicate,
+              onTagSelected: onTagSelected,
             ),
           ),
         ),

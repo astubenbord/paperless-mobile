@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -11,7 +12,6 @@ import 'package:intl/intl.dart';
 import 'package:intl/intl_standalone.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
-import 'package:paperless_mobile/core/bloc/paperless_statistics_cubit.dart';
 import 'package:paperless_mobile/features/labels/bloc/global_state_bloc_provider.dart';
 import 'package:paperless_mobile/core/bloc/paperless_server_information_cubit.dart';
 import 'package:paperless_mobile/core/global/asset_images.dart';
@@ -51,6 +51,13 @@ void main() async {
   await getIt<ApplicationSettingsCubit>().initialize();
   await getIt<AuthenticationCubit>().initialize();
 
+  // Preload asset images
+  // WARNING: This seems to bloat up the app up to almost 200mb!
+  // await Future.forEach<AssetImage>(
+  //   AssetImages.values.map((e) => e.image),
+  //   (img) => loadImage(img),
+  // );
+
   runApp(const PaperlessMobileEntrypoint());
 }
 
@@ -70,7 +77,6 @@ class _PaperlessMobileEntrypointState extends State<PaperlessMobileEntrypoint> {
         BlocProvider.value(value: getIt<ConnectivityCubit>()),
         BlocProvider.value(value: getIt<AuthenticationCubit>()),
         BlocProvider.value(value: getIt<PaperlessServerInformationCubit>()),
-        BlocProvider.value(value: getIt<PaperlessStatisticsCubit>()),
         BlocProvider.value(value: getIt<ApplicationSettingsCubit>()),
       ],
       child: BlocBuilder<ApplicationSettingsCubit, ApplicationSettingsState>(
@@ -229,7 +235,6 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
           if (authentication.isAuthenticated) {
             return GlobalStateBlocProvider(
               additionalProviders: [
-                BlocProvider.value(value: getIt<PaperlessStatisticsCubit>()),
                 BlocProvider.value(value: getIt<DocumentsCubit>()),
               ],
               child: const HomePage(),

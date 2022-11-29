@@ -5,7 +5,6 @@ import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
-import 'package:paperless_mobile/features/documents/bloc/saved_view_cubit.dart';
 import 'package:paperless_mobile/features/documents/model/document.model.dart';
 import 'package:paperless_mobile/features/documents/model/document_filter.dart';
 import 'package:paperless_mobile/features/documents/model/query_parameters/correspondent_query.dart';
@@ -23,6 +22,7 @@ import 'package:paperless_mobile/features/labels/storage_path/bloc/storage_path_
 import 'package:paperless_mobile/features/labels/storage_path/model/storage_path.model.dart';
 import 'package:paperless_mobile/features/labels/tags/view/widgets/tags_form_field.dart';
 import 'package:paperless_mobile/features/labels/view/widgets/label_form_field.dart';
+import 'package:paperless_mobile/features/saved_view/bloc/saved_view_cubit.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:intl/intl.dart';
 import 'package:paperless_mobile/util.dart';

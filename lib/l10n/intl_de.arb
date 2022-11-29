@@ -188,7 +188,7 @@
   "editLabelPageDeletionDialogText": "Dieser Kennzeichner wird von Dokumenten referenziert. Durch das Löschen dieses Kennzeichners werden alle Referenzen entfernt. Fortfahren?",
   "settingsPageStorageSettingsLabel": "Speicher",
   "settingsPageStorageSettingsDescriptionText": "Dateien und Speicherplatz verwalten",
-  "documentUpdateErrorMessage": "Dokument erfolgreich aktualisiert.",
+  "documentUpdateSuccessMessage": "Dokument erfolgreich aktualisiert.",
   "errorMessageMissingClientCertificate": "Ein Client Zerfitikat wurde erwartet, aber nicht gesendet. Bitte konfiguriere ein gültiges Zertifikat.",
   "serverInformationPaperlessVersionText": "Paperless Server-Version",
   "errorReportLabel": "MELDEN",

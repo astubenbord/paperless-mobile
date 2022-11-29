@@ -1,7 +1,6 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:paperless_mobile/core/bloc/paperless_statistics_cubit.dart';
 import 'package:paperless_mobile/core/model/paperless_statistics_state.dart';
 import 'package:paperless_mobile/features/inbox/bloc/inbox_cubit.dart';
 import 'package:paperless_mobile/features/labels/bloc/global_state_bloc_provider.dart';
@@ -120,17 +119,10 @@ class InfoDrawer extends StatelessWidget {
                 color: Theme.of(context).colorScheme.primaryContainer,
               ),
             ),
-            BlocBuilder<PaperlessStatisticsCubit, PaperlessStatisticsState>(
-              builder: (context, state) {
-                return ListTile(
-                  title: Text(S.of(context).bottomNavInboxPageLabel),
-                  leading: const Icon(Icons.inbox),
-                  trailing: state.isLoaded
-                      ? Text(state.statistics!.documentsInInbox.toString())
-                      : null,
-                  onTap: () => _onOpenInbox(context),
-                );
-              },
+            ListTile(
+              title: Text(S.of(context).bottomNavInboxPageLabel),
+              leading: const Icon(Icons.inbox),
+              onTap: () => _onOpenInbox(context),
             ),
             Divider(),
             ListTile(
@@ -217,14 +209,8 @@ class InfoDrawer extends StatelessWidget {
       MaterialPageRoute(
         builder: (_) => GlobalStateBlocProvider(
           additionalProviders: [
-            BlocProvider<PaperlessStatisticsCubit>.value(
-              value: BlocProvider.of<PaperlessStatisticsCubit>(context),
-            ),
             BlocProvider<InboxCubit>.value(
               value: getIt<InboxCubit>()..initialize(),
-            ),
-            BlocProvider<DocumentsCubit>.value(
-              value: getIt<DocumentsCubit>(),
             ),
           ],
           child: const InboxPage(),

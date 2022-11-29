@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:paperless_mobile/core/bloc/paperless_statistics_cubit.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/documents/model/document_filter.dart';
@@ -24,8 +23,6 @@ class EditTagPage extends StatelessWidget {
       label: tag,
       onSubmit: (tag) async {
         await BlocProvider.of<TagCubit>(context).replace(tag);
-        //If inbox property was added/removed from tag, the number of documents in inbox may increase/decrease.
-        BlocProvider.of<PaperlessStatisticsCubit>(context).updateStatistics();
       },
       onDelete: (tag) => _onDelete(tag, context),
       fromJson: Tag.fromJson,

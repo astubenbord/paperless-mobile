@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -33,7 +34,13 @@ import 'package:paperless_mobile/util.dart';
 
 class DocumentEditPage extends StatefulWidget {
   final DocumentModel document;
-  const DocumentEditPage({Key? key, required this.document}) : super(key: key);
+  final FutureOr<void> Function(DocumentModel updatedDocument) onEdit;
+
+  const DocumentEditPage({
+    Key? key,
+    required this.document,
+    required this.onEdit,
+  }) : super(key: key);
 
   @override
   State<DocumentEditPage> createState() => _DocumentEditPageState();
@@ -66,7 +73,7 @@ class _DocumentEditPageState extends State<DocumentEditPage> {
         onPressed: () async {
           if (_formKey.currentState?.saveAndValidate() ?? false) {
             final values = _formKey.currentState!.value;
-            final updatedDocument = widget.document.copyWith(
+            var updatedDocument = widget.document.copyWith(
               title: values[fkTitle],
               created: values[fkCreatedDate],
               overwriteDocumentType: true,
@@ -81,15 +88,17 @@ class _DocumentEditPageState extends State<DocumentEditPage> {
             setState(() {
               _isSubmitLoading = true;
             });
-            bool wasUpdated = false;
+
             try {
-              await getIt<DocumentsCubit>().update(updatedDocument);
-              showSnackBar(context, S.of(context).documentUpdateErrorMessage);
-              wasUpdated = true;
+              await widget.onEdit(updatedDocument);
+              showSnackBar(context, S.of(context).documentUpdateSuccessMessage);
             } on ErrorMessage catch (error, stackTrace) {
               showErrorMessage(context, error, stackTrace);
             } finally {
-              Navigator.pop(context, wasUpdated);
+              setState(() {
+                _isSubmitLoading = false;
+              });
+              Navigator.pop(context);
             }
           }
         },

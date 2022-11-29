@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:paperless_mobile/core/widgets/documents_list_loading_widget.dart';
+import 'package:paperless_mobile/di_initializer.dart';
+import 'package:paperless_mobile/features/document_details/bloc/document_details_cubit.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
 import 'package:paperless_mobile/features/documents/model/document.model.dart';
-import 'package:paperless_mobile/features/documents/view/pages/document_details_page.dart';
+import 'package:paperless_mobile/features/document_details/view/pages/document_details_page.dart';
+import 'package:paperless_mobile/features/documents/repository/document_repository.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/list/document_list.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/list/document_list_item.dart';
 import 'package:paperless_mobile/features/labels/bloc/global_state_bloc_provider.dart';
@@ -68,15 +71,15 @@ class _LinkedDocumentsPageState extends State<LinkedDocumentsPage> {
                                   builder: (ctxt) => GlobalStateBlocProvider(
                                     additionalProviders: [
                                       BlocProvider.value(
-                                        value: BlocProvider.of<DocumentsCubit>(
-                                          context,
+                                        value: DocumentDetailsCubit(
+                                          getIt<DocumentRepository>(),
+                                          document,
                                         ),
                                       ),
                                     ],
-                                    child: DocumentDetailsPage(
-                                      documentId: doc.id,
-                                      allowEdit: false,
+                                    child: const DocumentDetailsPage(
                                       isLabelClickable: false,
+                                      allowEdit: false,
                                     ),
                                   ),
                                 ),
@@ -84,6 +87,8 @@ class _LinkedDocumentsPageState extends State<LinkedDocumentsPage> {
                             },
                             isSelected: false,
                             isAtLeastOneSelected: false,
+                            isTagSelectedPredicate: (_) => false,
+                            onTagSelected: (int tag) {},
                           );
                         },
                       ),

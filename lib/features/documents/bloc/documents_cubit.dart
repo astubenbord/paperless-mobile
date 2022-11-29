@@ -15,11 +15,6 @@ class DocumentsCubit extends Cubit<DocumentsState> {
 
   DocumentsCubit(this.documentRepository) : super(DocumentsState.initial);
 
-  Future<void> remove(DocumentModel document) async {
-    await documentRepository.delete(document);
-    await reload();
-  }
-
   Future<void> bulkRemove(List<DocumentModel> documents) async {
     await documentRepository.bulkAction(
       BulkDeleteAction(documents.map((doc) => doc.id)),
@@ -40,8 +35,13 @@ class DocumentsCubit extends Cubit<DocumentsState> {
     await reload();
   }
 
-  Future<void> update(DocumentModel document) async {
-    await documentRepository.update(document);
+  Future<void> update(
+    DocumentModel document, [
+    bool updateRemote = true,
+  ]) async {
+    if (updateRemote) {
+      await documentRepository.update(document);
+    }
     await reload();
   }
 
@@ -81,13 +81,6 @@ class DocumentsCubit extends Cubit<DocumentsState> {
     final result = await documentRepository.find(newFilter);
     emit(DocumentsState(
         isLoaded: true, value: [...state.value, result], filter: newFilter));
-  }
-
-  Future<void> assignAsn(DocumentModel document) async {
-    if (document.archiveSerialNumber == null) {
-      final int asn = await documentRepository.findNextAsn();
-      update(document.copyWith(archiveSerialNumber: asn));
-    }
   }
 
   ///

@@ -3,11 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
-import 'package:paperless_mobile/features/documents/bloc/saved_view_cubit.dart';
-import 'package:paperless_mobile/features/documents/bloc/saved_view_state.dart';
 import 'package:paperless_mobile/features/documents/model/saved_view.model.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/selection/add_saved_view_page.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/selection/confirm_delete_saved_view_dialog.dart';
+import 'package:paperless_mobile/features/saved_view/bloc/saved_view_cubit.dart';
+import 'package:paperless_mobile/features/saved_view/bloc/saved_view_state.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:paperless_mobile/util.dart';
 

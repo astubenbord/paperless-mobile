@@ -1,10 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:paperless_mobile/core/model/error_message.dart';
+import 'package:injectable/injectable.dart';
 import 'package:paperless_mobile/di_initializer.dart';
-import 'package:paperless_mobile/features/documents/bloc/saved_view_state.dart';
 import 'package:paperless_mobile/features/documents/model/saved_view.model.dart';
 import 'package:paperless_mobile/features/documents/repository/saved_views_repository.dart';
-import 'package:injectable/injectable.dart';
+import 'package:paperless_mobile/features/saved_view/bloc/saved_view_state.dart';
 
 @singleton
 class SavedViewCubit extends Cubit<SavedViewState> {

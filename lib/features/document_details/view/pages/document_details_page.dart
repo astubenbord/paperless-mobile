@@ -5,15 +5,13 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:paperless_mobile/core/bloc/paperless_statistics_cubit.dart';
-import 'package:paperless_mobile/features/labels/bloc/global_state_bloc_provider.dart';
-import 'package:paperless_mobile/core/logic/error_code_localization_mapper.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/core/widgets/highlighted_text.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
-import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
-import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
+import 'package:paperless_mobile/features/document_details/bloc/document_details_cubit.dart';
 import 'package:paperless_mobile/features/documents/model/document.model.dart';
 import 'package:paperless_mobile/features/documents/model/document_meta_data.model.dart';
 import 'package:paperless_mobile/features/documents/repository/document_repository.dart';
@@ -21,26 +19,26 @@ import 'package:paperless_mobile/features/documents/view/pages/document_edit_pag
 import 'package:paperless_mobile/features/documents/view/pages/document_view.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/delete_document_confirmation_dialog.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/document_preview.dart';
+import 'package:paperless_mobile/features/labels/bloc/global_state_bloc_provider.dart';
 import 'package:paperless_mobile/features/labels/correspondent/view/widgets/correspondent_widget.dart';
 import 'package:paperless_mobile/features/labels/document_type/view/widgets/document_type_widget.dart';
 import 'package:paperless_mobile/features/labels/storage_path/view/widgets/storage_path_widget.dart';
 import 'package:paperless_mobile/features/labels/tags/view/widgets/tags_widget.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:paperless_mobile/util.dart';
-import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 class DocumentDetailsPage extends StatefulWidget {
-  final int documentId;
   final bool allowEdit;
   final bool isLabelClickable;
+  final String? titleAndContentQueryString;
 
   const DocumentDetailsPage({
     Key? key,
-    required this.documentId,
-    this.allowEdit = true,
     this.isLabelClickable = true,
+    this.titleAndContentQueryString,
+    this.allowEdit = true,
   }) : super(key: key);
 
   @override
@@ -48,128 +46,192 @@ class DocumentDetailsPage extends StatefulWidget {
 }
 
 class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
-  static final DateFormat _detailedDateFormat =
-      DateFormat("MMM d, yyyy HH:mm:ss");
+  @override
+  void initState() {
+    super.initState();
+    initializeDateFormatting();
+  }
 
   bool _isDownloadPending = false;
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<DocumentsCubit, DocumentsState>(
-      // buildWhen required because rebuild would happen after delete causing error.
-      buildWhen: (previous, current) {
-        return current.documents
-            .where((element) => element.id == widget.documentId)
-            .isNotEmpty;
+    return WillPopScope(
+      onWillPop: () {
+        print("Returning document...");
+        Navigator.of(context)
+            .pop(BlocProvider.of<DocumentDetailsCubit>(context).state.document);
+        return Future.value(false);
       },
-      builder: (context, state) {
-        final document =
-            state.documents.where((doc) => doc.id == widget.documentId).first;
-        return DefaultTabController(
-          length: 3,
-          child: Scaffold(
-            floatingActionButtonLocation:
-                FloatingActionButtonLocation.endDocked,
-            floatingActionButton: widget.allowEdit
-                ? FloatingActionButton(
-                    child: const Icon(Icons.edit),
-                    onPressed: () => _onEdit(document),
-                  )
-                : null,
-            bottomNavigationBar: BottomAppBar(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.delete),
-                    onPressed:
-                        widget.allowEdit ? () => _onDelete(document) : null,
-                  ).padded(const EdgeInsets.symmetric(horizontal: 4)),
-                  IconButton(
-                    icon: const Icon(Icons.download),
-                    onPressed:
-                        Platform.isAndroid ? () => _onDownload(document) : null,
-                  ).padded(const EdgeInsets.only(right: 4)),
-                  IconButton(
-                    icon: const Icon(Icons.open_in_new),
-                    onPressed: () => _onOpen(document),
-                  ).padded(const EdgeInsets.only(right: 4)),
-                  IconButton(
-                    icon: const Icon(Icons.share),
-                    onPressed: () => _onShare(document),
-                  ),
-                ],
-              ),
-            ),
-            body: NestedScrollView(
-              headerSliverBuilder: (context, innerBoxIsScrolled) => [
-                SliverAppBar(
-                  leading: IconButton(
-                    icon: const Icon(
-                      Icons.arrow_back,
-                      color: Colors
-                          .black, //TODO: check if there is a way to dynamically determine color...
+      child: DefaultTabController(
+        length: 3,
+        child: Scaffold(
+          floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+          floatingActionButton: widget.allowEdit
+              ? FloatingActionButton(
+                  child: const Icon(Icons.edit),
+                  onPressed: _onEdit,
+                )
+              : null,
+          bottomNavigationBar:
+              BlocBuilder<DocumentDetailsCubit, DocumentDetailsState>(
+            builder: (context, state) {
+              return BottomAppBar(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.delete),
+                      onPressed: widget.allowEdit && state.document != null
+                          ? () => _onDelete(state.document!)
+                          : null,
+                    ).padded(const EdgeInsets.symmetric(horizontal: 4)),
+                    IconButton(
+                      icon: const Icon(Icons.download),
+                      onPressed: Platform.isAndroid && state.document != null
+                          ? () => _onDownload(state.document!)
+                          : null,
+                    ).padded(const EdgeInsets.only(right: 4)),
+                    IconButton(
+                      icon: const Icon(Icons.open_in_new),
+                      onPressed: state.document != null
+                          ? () => _onOpen(state.document!)
+                          : null,
+                    ).padded(const EdgeInsets.only(right: 4)),
+                    IconButton(
+                      icon: const Icon(Icons.share),
+                      onPressed: state.document != null
+                          ? () => _onShare(state.document!)
+                          : null,
                     ),
-                    onPressed: () => Navigator.pop(context),
+                  ],
+                ),
+              );
+            },
+          ),
+          body: NestedScrollView(
+            headerSliverBuilder: (context, innerBoxIsScrolled) => [
+              SliverAppBar(
+                leading: IconButton(
+                  icon: const Icon(
+                    Icons.arrow_back,
+                    color: Colors
+                        .black, //TODO: check if there is a way to dynamically determine color...
                   ),
-                  floating: true,
-                  pinned: true,
-                  expandedHeight: 200.0,
-                  flexibleSpace: DocumentPreview(
-                    id: document.id,
-                    fit: BoxFit.cover,
-                  ),
-                  bottom: ColoredTabBar(
-                    backgroundColor:
-                        Theme.of(context).colorScheme.primaryContainer,
-                    tabBar: TabBar(
-                      tabs: [
-                        Tab(
-                          child: Text(
-                            S.of(context).documentDetailsPageTabOverviewLabel,
-                            style: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onPrimaryContainer),
-                          ),
+                  onPressed: () => Navigator.pop(
+                      context,
+                      BlocProvider.of<DocumentDetailsCubit>(context)
+                          .state
+                          .document),
+                ),
+                floating: true,
+                pinned: true,
+                expandedHeight: 200.0,
+                flexibleSpace:
+                    BlocBuilder<DocumentDetailsCubit, DocumentDetailsState>(
+                  builder: (context, state) {
+                    if (state.document == null) {
+                      return Container(height: 200);
+                    }
+                    return DocumentPreview(
+                      id: state.document!.id,
+                      fit: BoxFit.cover,
+                    );
+                  },
+                ),
+                bottom: ColoredTabBar(
+                  backgroundColor:
+                      Theme.of(context).colorScheme.primaryContainer,
+                  tabBar: TabBar(
+                    tabs: [
+                      Tab(
+                        child: Text(
+                          S.of(context).documentDetailsPageTabOverviewLabel,
+                          style: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimaryContainer),
                         ),
-                        Tab(
-                          child: Text(
-                            S.of(context).documentDetailsPageTabContentLabel,
-                            style: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onPrimaryContainer),
-                          ),
+                      ),
+                      Tab(
+                        child: Text(
+                          S.of(context).documentDetailsPageTabContentLabel,
+                          style: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimaryContainer),
                         ),
-                        Tab(
-                          child: Text(
-                            S.of(context).documentDetailsPageTabMetaDataLabel,
-                            style: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onPrimaryContainer),
-                          ),
+                      ),
+                      Tab(
+                        child: Text(
+                          S.of(context).documentDetailsPageTabMetaDataLabel,
+                          style: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimaryContainer),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-              body: TabBarView(
-                children: [
-                  _buildDocumentOverview(
-                      document, state.filter.titleAndContentMatchString),
-                  _buildDocumentContentView(
-                      document, state.filter.titleAndContentMatchString),
-                  _buildDocumentMetaDataView(document),
-                ].padded(),
               ),
+            ],
+            body: BlocBuilder<DocumentDetailsCubit, DocumentDetailsState>(
+              builder: (context, state) {
+                if (state.document == null) {
+                  return TabBarView(
+                    children: [
+                      Container(),
+                      Container(),
+                      Container(),
+                    ],
+                  );
+                }
+                return TabBarView(
+                  children: [
+                    _buildDocumentOverview(
+                      state.document!,
+                      widget.titleAndContentQueryString,
+                    ),
+                    _buildDocumentContentView(
+                      state.document!,
+                      widget.titleAndContentQueryString,
+                    ),
+                    _buildDocumentMetaDataView(
+                      state.document!,
+                    ),
+                  ].padded(),
+                );
+              },
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
+  }
+
+  Future<void> _onEdit() async {
+    {
+      final cubit = BlocProvider.of<DocumentDetailsCubit>(context);
+      if (cubit.state.document == null) {
+        return;
+      }
+      Navigator.push<bool>(
+        context,
+        MaterialPageRoute(
+          builder: (_) => GlobalStateBlocProvider(
+            child: DocumentEditPage(
+              document: cubit.state.document!,
+              onEdit: (updatedDocument) {
+                return BlocProvider.of<DocumentDetailsCubit>(context)
+                    .update(updatedDocument);
+              },
+            ),
+          ),
+          maintainState: false,
+        ),
+      );
+    }
   }
 
   Widget _buildDocumentMetaDataView(DocumentModel document) {
@@ -182,11 +244,11 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
         final meta = snapshot.data!;
         return ListView(
           children: [
-            _DetailsItem.text(_detailedDateFormat.format(document.modified),
+            _DetailsItem.text(DateFormat().format(document.modified),
                 label: S.of(context).documentModifiedPropertyLabel,
                 context: context),
             _separator(),
-            _DetailsItem.text(_detailedDateFormat.format(document.added),
+            _DetailsItem.text(DateFormat().format(document.added),
                 label: S.of(context).documentAddedPropertyLabel,
                 context: context),
             _separator(),
@@ -233,7 +295,7 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
 
   Future<void> _assignAsn(DocumentModel document) async {
     try {
-      await BlocProvider.of<DocumentsCubit>(context).assignAsn(document);
+      await BlocProvider.of<DocumentDetailsCubit>(context).assignAsn(document);
     } on ErrorMessage catch (error, stackTrace) {
       showErrorMessage(context, error, stackTrace);
     }
@@ -265,8 +327,7 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
         ),
         _separator(),
         _DetailsItem.text(
-          DateFormat.yMMMd(Localizations.localeOf(context).toLanguageTag())
-              .format(document.created),
+          DateFormat().format(document.created),
           context: context,
           label: S.of(context).documentCreatedPropertyLabel,
         ),
@@ -311,6 +372,8 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
             child: TagsWidget(
               isClickable: widget.isLabelClickable,
               tagIds: document.tags,
+              isSelectedPredicate: (_) => false,
+              onTagSelected: (int tagId) {},
             ),
           ),
         ),
@@ -343,22 +406,6 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
 
   Widget _separator() {
     return const SizedBox(height: 32.0);
-  }
-
-  void _onEdit(DocumentModel document) async {
-    final wasUpdated = await Navigator.push<bool>(
-          context,
-          MaterialPageRoute(
-            builder: (_) => GlobalStateBlocProvider(
-              child: DocumentEditPage(document: document),
-            ),
-            maintainState: true,
-          ),
-        ) ??
-        false;
-    if (wasUpdated) {
-      BlocProvider.of<PaperlessStatisticsCubit>(context).updateStatistics();
-    }
   }
 
   Future<void> _onDownload(DocumentModel document) async {
@@ -411,12 +458,13 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
         false;
     if (delete) {
       try {
-        await BlocProvider.of<DocumentsCubit>(context).remove(document);
+        await BlocProvider.of<DocumentDetailsCubit>(context).delete(document);
         showSnackBar(context, S.of(context).documentDeleteSuccessMessage);
       } on ErrorMessage catch (error, stackTrace) {
         showErrorMessage(context, error, stackTrace);
       } finally {
-        Navigator.pop(context);
+        // Document deleted => go back to primary route
+        Navigator.popUntil(context, (route) => route.isFirst);
       }
     }
   }

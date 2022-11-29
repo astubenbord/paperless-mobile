@@ -4,8 +4,8 @@ import 'package:paperless_mobile/core/widgets/empty_state.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
-import 'package:paperless_mobile/features/documents/bloc/saved_view_cubit.dart';
 import 'package:paperless_mobile/features/documents/model/document_filter.dart';
+import 'package:paperless_mobile/features/saved_view/bloc/saved_view_cubit.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:paperless_mobile/util.dart';
 
@@ -23,7 +23,7 @@ class DocumentsEmptyState extends StatelessWidget {
         title: S.of(context).documentsPageEmptyStateOopsText,
         subtitle: S.of(context).documentsPageEmptyStateNothingHereText,
         bottomChild: state.filter != DocumentFilter.initial
-            ? ElevatedButton(
+            ? TextButton(
                 onPressed: () async {
                   await BlocProvider.of<DocumentsCubit>(context).updateFilter();
                   BlocProvider.of<SavedViewCubit>(context).resetSelection();
