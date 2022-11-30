@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:form_builder_extra_fields/form_builder_extra_fields.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/documents/model/document_filter.dart';
@@ -10,7 +11,6 @@ import 'package:paperless_mobile/features/labels/tags/model/tag.model.dart';
 import 'package:paperless_mobile/features/labels/view/pages/edit_label_page.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:paperless_mobile/util.dart';
-import 'package:form_builder_extra_fields/form_builder_extra_fields.dart';
 
 class EditTagPage extends StatelessWidget {
   final Tag tag;

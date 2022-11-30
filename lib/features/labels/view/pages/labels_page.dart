@@ -188,7 +188,9 @@ class _LabelsPageState extends State<LabelsPage>
       MaterialPageRoute(
         builder: (_) => GlobalStateBlocProvider(
           additionalProviders: [
-            BlocProvider.value(value: BlocProvider.of<DocumentsCubit>(context)),
+            BlocProvider<DocumentsCubit>.value(
+              value: BlocProvider.of<DocumentsCubit>(context),
+            ),
           ],
           child: EditCorrespondentPage(correspondent: correspondent),
         ),
@@ -202,7 +204,9 @@ class _LabelsPageState extends State<LabelsPage>
       MaterialPageRoute(
         builder: (_) => GlobalStateBlocProvider(
           additionalProviders: [
-            BlocProvider.value(value: BlocProvider.of<DocumentsCubit>(context)),
+            BlocProvider<DocumentsCubit>.value(
+              value: BlocProvider.of<DocumentsCubit>(context),
+            ),
           ],
           child: EditDocumentTypePage(documentType: docType),
         ),
@@ -216,7 +220,9 @@ class _LabelsPageState extends State<LabelsPage>
       MaterialPageRoute(
         builder: (_) => GlobalStateBlocProvider(
           additionalProviders: [
-            BlocProvider.value(value: BlocProvider.of<DocumentsCubit>(context)),
+            BlocProvider<DocumentsCubit>.value(
+              value: BlocProvider.of<DocumentsCubit>(context),
+            ),
           ],
           child: EditTagPage(tag: tag),
         ),
@@ -230,7 +236,9 @@ class _LabelsPageState extends State<LabelsPage>
       MaterialPageRoute(
         builder: (_) => GlobalStateBlocProvider(
           additionalProviders: [
-            BlocProvider.value(value: getIt<DocumentsCubit>()),
+            BlocProvider<DocumentsCubit>.value(
+              value: getIt<DocumentsCubit>(),
+            ),
           ],
           child: EditStoragePathPage(storagePath: path),
         ),
