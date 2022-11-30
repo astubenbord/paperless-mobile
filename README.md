@@ -123,6 +123,8 @@ flutter build apk --split-per-abi
 flutter install
 ```
   
+## Languages and Translations
+If you want to contribute to translate the app into your language, create an issue and you will be invited to the Localizely project.
 
 <!-- ROADMAP -->
 ## Roadmap
