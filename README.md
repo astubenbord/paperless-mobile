@@ -152,7 +152,6 @@ Don't forget to give the project a star! Thanks again!
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-
 <!-- LICENSE -->
 ## License
 Distributed under the GNU General Public License v3.0. See `LICENSE.txt` for more information.
@@ -208,4 +207,11 @@ Here are some impressions from the app!
 [product-screenshot]: images/screenshot.png
 [Flutter]: https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white
 [Flutter-url]: https://flutter.dev
+
+## Contributors
+<a href="https://github.com/astubenbord/paperless-mobile/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=astubenbord/paperless-mobile" />
+</a>
+
+Made with [contrib.rocks](https://contrib.rocks).
 
