@@ -53,15 +53,15 @@ With this app you can conveniently add, manage or simply find documents stored i
 :heavy_check_mark: **Manage** and assign correspondents, document types, tags and storage paths<br>
 :heavy_check_mark: **Scan** and upload documents to paperless with preset correspondent, document type, tags and creation date<br>
 :heavy_check_mark: **Upload existing documents** from other apps via Paperless Mobile<br>
+:heavy_check_mark: See all new documents in a dedicated **inbox**<br>
 :heavy_check_mark: **Search** for documents using a wide range of filter criteria<br>
 :heavy_check_mark: **Secure** your data with **biometric authentication** across sessions<br>
 :heavy_check_mark: Support for **TLS mutual authentication** (client certificates)<br>
 :heavy_check_mark: **Modern, intuitive UI** built according to the Material Design 3 specification<br>
-:heavy_check_mark: Available in english and german language (more to come!)
+:heavy_check_mark: Available in english and german language (more to come!)<br>
 
 
 ### Built With
-
 [![Flutter][Flutter]][Flutter-url]
 
 
@@ -140,7 +140,6 @@ See the [open issues](https://github.com/astubenbord/paperless-mobile/issues) fo
 
 <!-- CONTRIBUTING -->
 ## Contributing
-
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 All bug reports or feature requests are welcome, even if you can't contribute code!
 
@@ -156,8 +155,12 @@ Don't forget to give the project a star! Thanks again!
 
 <!-- LICENSE -->
 ## License
-
 Distributed under the GNU General Public License v3.0. See `LICENSE.txt` for more information.
+
+## Donations
+I do this in my free time, so if you like the project, consider buying me a coffee! Any donation is much appreciated :)
+
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/astubenbord)
 
 
 <!-- USAGE EXAMPLES -->
