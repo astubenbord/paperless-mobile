@@ -53,7 +53,7 @@ class LabelItem<T extends Label> extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (context) => GlobalStateBlocProvider(
                     additionalProviders: [
-                      BlocProvider.value(
+                      BlocProvider<LinkedDocumentsCubit>.value(
                           value: getIt<LinkedDocumentsCubit>()
                             ..initialize(filter)),
                     ],
