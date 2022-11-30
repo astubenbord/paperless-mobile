@@ -21,9 +21,18 @@ class InboxCubit extends Cubit<InboxState> {
   ///
   /// Fetches inbox tag ids and loads the inbox items (documents).
   ///
-  Future<void> initialize() async {
+  Future<void> loadInbox() async {
     final inboxTags = await _labelRepository.getTags().then(
-        (value) => value.where((t) => t.isInboxTag ?? false).map((t) => t.id!));
+          (tags) => tags.where((t) => t.isInboxTag ?? false).map((t) => t.id!),
+        );
+    if (inboxTags.isEmpty) {
+      // no inbox tags = no inbox items.
+      return emit(const InboxState(
+        isLoaded: true,
+        inboxItems: [],
+        inboxTags: [],
+      ));
+    }
     final inboxDocuments = await _documentRepository
         .find(DocumentFilter(
           tags: AnyAssignedTagsQuery(tagIds: inboxTags),
@@ -38,33 +47,11 @@ class InboxCubit extends Cubit<InboxState> {
     emit(newState);
   }
 
-  Future<void> reloadInbox() async {
-    if (!state.isLoaded) {
-      throw "State has not yet loaded. Ensure the state is loaded when calling this method!";
-    }
-    final inboxDocuments = await _documentRepository
-        .find(DocumentFilter(
-          tags: AnyAssignedTagsQuery(tagIds: state.inboxTags),
-          sortField: SortField.added,
-        ))
-        .then((psr) => psr.results);
-    emit(
-      InboxState(
-        isLoaded: true,
-        inboxItems: inboxDocuments,
-        inboxTags: state.inboxTags,
-      ),
-    );
-  }
-
   ///
   /// Updates the document with all inbox tags removed and removes the document
   /// from the currently loaded inbox documents.
   ///
   Future<Iterable<int>> remove(DocumentModel document) async {
-    if (!state.isLoaded) {
-      throw "State has not loaded yet. Ensure the state is loaded when calling this method!";
-    }
     final tagsToRemove =
         document.tags.toSet().intersection(state.inboxTags.toSet());
 

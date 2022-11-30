@@ -58,7 +58,6 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () {
-        print("Returning document...");
         Navigator.of(context)
             .pop(BlocProvider.of<DocumentDetailsCubit>(context).state.document);
         return Future.value(false);

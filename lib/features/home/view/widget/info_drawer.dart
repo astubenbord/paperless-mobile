@@ -1,33 +1,30 @@
-import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:paperless_mobile/core/model/paperless_statistics_state.dart';
-import 'package:paperless_mobile/features/inbox/bloc/inbox_cubit.dart';
-import 'package:paperless_mobile/features/labels/bloc/global_state_bloc_provider.dart';
 import 'package:paperless_mobile/core/bloc/paperless_server_information_cubit.dart';
 import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/core/model/paperless_server_information.dart';
-import 'package:paperless_mobile/core/model/paperless_statistics.dart';
-import 'package:paperless_mobile/core/service/paperless_statistics_service.dart';
-import 'package:paperless_mobile/features/documents/repository/document_repository.dart';
-import 'package:paperless_mobile/features/inbox/view/pages/inbox_page.dart';
-import 'package:paperless_mobile/features/settings/bloc/application_settings_cubit.dart';
 import 'package:paperless_mobile/di_initializer.dart';
+import 'package:paperless_mobile/extensions/flutter_extensions.dart';
+import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
+import 'package:paperless_mobile/features/inbox/bloc/inbox_cubit.dart';
+import 'package:paperless_mobile/features/inbox/view/pages/inbox_page.dart';
+import 'package:paperless_mobile/features/labels/bloc/global_state_bloc_provider.dart';
 import 'package:paperless_mobile/features/labels/correspondent/bloc/correspondents_cubit.dart';
 import 'package:paperless_mobile/features/labels/document_type/bloc/document_type_cubit.dart';
-import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
-import 'package:paperless_mobile/features/settings/view/settings_page.dart';
+import 'package:paperless_mobile/features/labels/tags/bloc/tags_cubit.dart';
 import 'package:paperless_mobile/features/login/bloc/authentication_cubit.dart';
 import 'package:paperless_mobile/features/scan/bloc/document_scanner_cubit.dart';
-import 'package:paperless_mobile/features/labels/tags/bloc/tags_cubit.dart';
+import 'package:paperless_mobile/features/settings/bloc/application_settings_cubit.dart';
+import 'package:paperless_mobile/features/settings/view/settings_page.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:paperless_mobile/util.dart';
 import 'package:url_launcher/link.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 
 class InfoDrawer extends StatelessWidget {
-  const InfoDrawer({Key? key}) : super(key: key);
+  final VoidCallback? afterInboxClosed;
+
+  const InfoDrawer({Key? key, this.afterInboxClosed}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
@@ -52,7 +49,7 @@ class InfoDrawer extends StatelessWidget {
                   Row(
                     children: [
                       Image.asset(
-                        "assets/logos/paperless_logo_white.png",
+                        'assets/logos/paperless_logo_white.png',
                         height: 32,
                         width: 32,
                         color: Theme.of(context).colorScheme.onPrimaryContainer,
@@ -124,7 +121,7 @@ class InfoDrawer extends StatelessWidget {
               leading: const Icon(Icons.inbox),
               onTap: () => _onOpenInbox(context),
             ),
-            Divider(),
+            const Divider(),
             ListTile(
               leading: const Icon(Icons.settings),
               title: Text(
@@ -145,27 +142,27 @@ class InfoDrawer extends StatelessWidget {
               title: Text(S.of(context).appDrawerReportBugLabel),
               onTap: () {
                 launchUrlString(
-                    "https://github.com/astubenbord/paperless-mobile/issues/new");
+                    'https://github.com/astubenbord/paperless-mobile/issues/new');
               },
             ),
             const Divider(),
             AboutListTile(
               icon: const Icon(Icons.info),
               applicationIcon: const ImageIcon(
-                  AssetImage("assets/logos/paperless_logo_green.png")),
-              applicationName: "Paperless Mobile",
+                  AssetImage('assets/logos/paperless_logo_green.png')),
+              applicationName: 'Paperless Mobile',
               applicationVersion:
-                  kPackageInfo.version + "+" + kPackageInfo.buildNumber,
+                  kPackageInfo.version + '+' + kPackageInfo.buildNumber,
               aboutBoxChildren: [
                 Text(
                     '${S.of(context).aboutDialogDevelopedByText} Anton Stubenbord'),
                 Link(
                   uri: Uri.parse(
-                      "https://github.com/astubenbord/paperless-mobile"),
+                      'https://github.com/astubenbord/paperless-mobile'),
                   builder: (context, followLink) => GestureDetector(
                     onTap: followLink,
                     child: Text(
-                      "https://github.com/astubenbord/paperless-mobile",
+                      'https://github.com/astubenbord/paperless-mobile',
                       style: TextStyle(
                           color: Theme.of(context).colorScheme.tertiary),
                     ),
@@ -173,7 +170,7 @@ class InfoDrawer extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  "Credits",
+                  'Credits',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 _buildOnboardingImageCredits(),
@@ -204,36 +201,38 @@ class InfoDrawer extends StatelessWidget {
     );
   }
 
-  Future<dynamic> _onOpenInbox(BuildContext context) {
-    return Navigator.of(context).push(
+  Future<void> _onOpenInbox(BuildContext context) async {
+    await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => GlobalStateBlocProvider(
           additionalProviders: [
             BlocProvider<InboxCubit>.value(
-              value: getIt<InboxCubit>()..initialize(),
+              value: getIt<InboxCubit>()..loadInbox(),
             ),
           ],
           child: const InboxPage(),
         ),
+        maintainState: false,
       ),
     );
+    afterInboxClosed?.call();
   }
 
   Link _buildOnboardingImageCredits() {
     return Link(
       uri: Uri.parse(
-          "https://www.freepik.com/free-vector/business-team-working-cogwheel-mechanism-together_8270974.htm#query=setting&position=4&from_view=author"),
+          'https://www.freepik.com/free-vector/business-team-working-cogwheel-mechanism-together_8270974.htm#query=setting&position=4&from_view=author'),
       builder: (context, followLink) => Wrap(
         children: [
-          const Text("Onboarding images by "),
+          const Text('Onboarding images by '),
           GestureDetector(
             onTap: followLink,
             child: Text(
-              "pch.vector",
+              'pch.vector',
               style: TextStyle(color: Theme.of(context).colorScheme.tertiary),
             ),
           ),
-          const Text(" on Freepik.")
+          const Text(' on Freepik.')
         ],
       ),
     );

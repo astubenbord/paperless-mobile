@@ -18,6 +18,7 @@ class OnlyNotAssignedTagsQuery extends TagsQuery {
 
 class AnyAssignedTagsQuery extends TagsQuery {
   final Iterable<int> tagIds;
+
   const AnyAssignedTagsQuery({
     this.tagIds = const [],
   });

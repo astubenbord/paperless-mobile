@@ -12,7 +12,7 @@ class FileService {
   ) async {
     final dir = await documentsDirectory;
     if (dir == null) {
-      throw ErrorMessage.unknown(); //TODO: better handling
+      throw const ErrorMessage.unknown(); //TODO: better handling
     }
     File file = File("${dir.path}/$filename");
     return file..writeAsBytes(bytes);

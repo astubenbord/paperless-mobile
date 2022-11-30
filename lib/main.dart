@@ -11,6 +11,7 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/intl_standalone.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:paperless_mobile/core/bloc/bloc_changes_observer.dart';
 import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
 import 'package:paperless_mobile/features/labels/bloc/global_state_bloc_provider.dart';
 import 'package:paperless_mobile/core/bloc/paperless_server_information_cubit.dart';
@@ -35,6 +36,7 @@ import 'package:paperless_mobile/util.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
 void main() async {
+  Bloc.observer = BlocChangesObserver();
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   Intl.systemLocale = await findSystemLocale();

@@ -50,7 +50,7 @@ class _EditLabelPageState<T extends Label> extends State<EditLabelPage<T>> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        icon: const Icon(Icons.add),
+        icon: const Icon(Icons.update),
         label: Text(S.of(context).genericActionUpdateLabel),
         onPressed: _onSubmit,
       ),

@@ -102,25 +102,6 @@ String? formatDateNullable(DateTime? date) {
   return dateFormat.format(date);
 }
 
-Future<String> writeToFile(Uint8List data) async {
-  Directory tempDir = await getTemporaryDirectory();
-  String tempPath = tempDir.path;
-  var filePath =
-      tempPath + '/file_01.tmp'; // file_01.tmp is dump file, can be anything
-  return (await File(filePath).writeAsBytes(data)).path;
-}
-
-void setKeyNullable(Map data, String key, dynamic value) {
-  if (value != null) {
-    data[key] = value is String ? value : json.encode(value);
-  }
-}
-
-String formatLocalDate(BuildContext context, DateTime dateTime) {
-  final tag = Localizations.maybeLocaleOf(context)?.toLanguageTag();
-  return DateFormat.yMMMd(tag).format(dateTime);
-}
-
 String extractFilenameFromPath(String path) {
   return path.split(RegExp('[./]')).reversed.skip(1).first;
 }

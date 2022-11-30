@@ -79,8 +79,10 @@ class DocumentsCubit extends Cubit<DocumentsState> {
     }
     final newFilter = state.filter.copyWith(page: state.filter.page + 1);
     final result = await documentRepository.find(newFilter);
-    emit(DocumentsState(
-        isLoaded: true, value: [...state.value, result], filter: newFilter));
+    emit(
+      DocumentsState(
+          isLoaded: true, value: [...state.value, result], filter: newFilter),
+    );
   }
 
   ///

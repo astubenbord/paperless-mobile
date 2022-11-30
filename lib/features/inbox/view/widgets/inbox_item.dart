@@ -11,14 +11,16 @@ import 'package:paperless_mobile/features/documents/view/widgets/document_previe
 import 'package:paperless_mobile/features/labels/bloc/global_state_bloc_provider.dart';
 import 'package:paperless_mobile/features/labels/tags/view/widgets/tags_widget.dart';
 
-class DocumentInboxItem extends StatelessWidget {
+class InboxItem extends StatelessWidget {
+  static const _a4AspectRatio = 1 / 1.4142;
+
   final DocumentModel document;
 
-  const DocumentInboxItem({
+  const InboxItem({
     super.key,
     required this.document,
   });
-  static const _a4AspectRatio = 1 / 1.4142;
+
   @override
   Widget build(BuildContext context) {
     return ListTile(

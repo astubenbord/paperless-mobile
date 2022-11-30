@@ -171,7 +171,6 @@ class TimeoutClient implements BaseClient {
       // try to parse contained error message, otherwise return response
       final JSON json = jsonDecode(utf8.decode(response.bodyBytes));
       final PaperlessValidationErrors errorMessages = {};
-      //TODO: This could be simplified, look at error message format of paperless-ngx
       for (final entry in json.entries) {
         if (entry.value is List) {
           errorMessages.putIfAbsent(

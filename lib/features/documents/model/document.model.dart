@@ -5,18 +5,18 @@ import 'package:paperless_mobile/core/type/types.dart';
 
 class DocumentModel extends Equatable {
   static const idKey = 'id';
-  static const titleKey = "title";
-  static const contentKey = "content";
-  static const archivedFileNameKey = "archived_file_name";
-  static const asnKey = "archive_serial_number";
-  static const createdKey = "created";
-  static const modifiedKey = "modified";
-  static const addedKey = "added";
-  static const correspondentKey = "correspondent";
+  static const titleKey = 'title';
+  static const contentKey = 'content';
+  static const archivedFileNameKey = 'archived_file_name';
+  static const asnKey = 'archive_serial_number';
+  static const createdKey = 'created';
+  static const modifiedKey = 'modified';
+  static const addedKey = 'added';
+  static const correspondentKey = 'correspondent';
   static const originalFileNameKey = 'original_file_name';
-  static const documentTypeKey = "document_type";
-  static const tagsKey = "tags";
-  static const storagePathKey = "storage_path";
+  static const documentTypeKey = 'document_type';
+  static const tagsKey = 'tags';
+  static const storagePathKey = 'storage_path';
 
   final int id;
   final String title;
@@ -121,7 +121,7 @@ class DocumentModel extends Equatable {
   List<Object?> get props => [
         id,
         title,
-        content,
+        content.hashCode,
         tags,
         documentType,
         storagePath,

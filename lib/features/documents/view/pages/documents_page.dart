@@ -37,26 +37,21 @@ class DocumentsPage extends StatefulWidget {
 }
 
 class _DocumentsPageState extends State<DocumentsPage> {
-  final PagingController<int, DocumentModel> _pagingController =
-      PagingController<int, DocumentModel>(
+  final _pagingController = PagingController<int, DocumentModel>(
     firstPageKey: 1,
   );
 
-  final PanelController _filterPanelController = PanelController();
+  final _filterPanelController = PanelController();
 
   @override
   void initState() {
     super.initState();
-    _initDocuments();
-    _pagingController.addPageRequestListener(_loadNewPage);
-  }
-
-  Future<void> _initDocuments() async {
     try {
       BlocProvider.of<DocumentsCubit>(context).load();
     } on ErrorMessage catch (error, stackTrace) {
       showErrorMessage(context, error, stackTrace);
     }
+    _pagingController.addPageRequestListener(_loadNewPage);
   }
 
   @override
@@ -120,7 +115,10 @@ class _DocumentsPageState extends State<DocumentsPage> {
           return Scaffold(
             drawer: BlocProvider.value(
               value: BlocProvider.of<AuthenticationCubit>(context),
-              child: const InfoDrawer(),
+              child: InfoDrawer(
+                afterInboxClosed: () =>
+                    BlocProvider.of<DocumentsCubit>(context).reload(),
+              ),
             ),
             resizeToAvoidBottomInset: true,
             body: SlidingUpPanel(

@@ -16,7 +16,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.1.0+5
+version: 1.2.0+6
 
 environment:
   sdk: ">=2.17.0 <3.0.0"
@@ -64,11 +64,9 @@ dependencies:
       ref: main
   form_builder_validators: ^8.3.0
   infinite_scroll_pagination: ^3.2.0
-  flutter_chips_input: ^2.0.0
   sliding_up_panel: ^2.0.0+1
   package_info_plus: ^1.4.3+1
   font_awesome_flutter: ^10.1.0
-  badges: ^2.0.3
   local_auth: ^2.1.2
   connectivity_plus: ^2.3.9
 
@@ -138,6 +136,7 @@ flutter:
   # see https://flutter.dev/custom-fonts/#from-packages
 flutter_intl:
   enabled: true
+  main_locale: en
   localizely:
     project_id: 84b4144d-a628-4ba6-a8d0-4f9917444057
 

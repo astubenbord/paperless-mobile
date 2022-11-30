@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:injectable/injectable.dart';
 import 'package:paperless_mobile/features/documents/model/document.model.dart';
 import 'package:paperless_mobile/features/documents/repository/document_repository.dart';
 

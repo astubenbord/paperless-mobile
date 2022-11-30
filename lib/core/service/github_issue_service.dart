@@ -1,8 +1,6 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:paperless_mobile/core/model/github_error_report.model.dart';
 import 'package:paperless_mobile/core/widgets/error_report_page.dart';
 import 'package:url_launcher/url_launcher.dart';
