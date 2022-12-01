@@ -126,6 +126,9 @@ flutter install
 ## Languages and Translations
 If you want to contribute to translate the app into your language, create an issue and you will be invited to the Localizely project.
 
+Thanks to the following contributors for providing translations:
+- Czech language by <a href="https://github.com/svetlemodry">svetlemodry</a>
+
 <!-- ROADMAP -->
 ## Roadmap
 - [x] Add download functionality (implemented, but flutter cannot download to useful directories except app directory)
