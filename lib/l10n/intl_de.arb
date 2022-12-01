@@ -190,7 +190,7 @@
   "@errorMessageCorrespondentLoadFailed": {},
   "errorMessageCreateSavedViewError": "Gespeicherte Ansicht konnte nicht erstellt werden, bitte versuche es erneut.",
   "@errorMessageCreateSavedViewError": {},
-  "errorMessageDeleteSavedViewError": "Gespeicherte Ansicht konnte nicht geklöscht werden, bitte versuche es erneut.",
+  "errorMessageDeleteSavedViewError": "Gespeicherte Ansicht konnte nicht gelöscht werden, bitte versuche es erneut.",
   "@errorMessageDeleteSavedViewError": {},
   "errorMessageDeviceOffline": "Daten konnten nicht geladen werden: Eine Verbindung zum Internet konnte nicht hergestellt werden.",
   "@errorMessageDeviceOffline": {},
