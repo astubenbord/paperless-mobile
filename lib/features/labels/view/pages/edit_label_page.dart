@@ -3,11 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:paperless_mobile/core/model/error_message.dart';
+import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/type/types.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
-import 'package:paperless_mobile/features/labels/document_type/model/matching_algorithm.dart';
-import 'package:paperless_mobile/features/labels/model/label.model.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:paperless_mobile/util.dart';
 
@@ -146,7 +144,7 @@ class _EditLabelPageState<T extends Label> extends State<EditLabelPage<T>> {
         Navigator.pop(context);
       } on PaperlessValidationErrors catch (errorMessages) {
         setState(() => _errors = errorMessages);
-      } on ErrorMessage catch (error, stackTrace) {
+      } on PaperlessServerException catch (error, stackTrace) {
         showErrorMessage(context, error, stackTrace);
       }
     }

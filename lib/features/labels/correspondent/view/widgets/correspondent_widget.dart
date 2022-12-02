@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:paperless_mobile/core/model/error_message.dart';
-import 'package:paperless_mobile/di_initializer.dart';
+import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
-import 'package:paperless_mobile/features/documents/model/query_parameters/correspondent_query.dart';
 import 'package:paperless_mobile/features/labels/correspondent/bloc/correspondents_cubit.dart';
-import 'package:paperless_mobile/features/labels/correspondent/model/correspondent.model.dart';
-import 'package:paperless_mobile/features/labels/model/label_state.dart';
+import 'package:paperless_mobile/features/labels/bloc/label_state.dart';
 import 'package:paperless_mobile/util.dart';
 
 class CorrespondentWidget extends StatelessWidget {
@@ -60,7 +57,7 @@ class CorrespondentWidget extends StatelessWidget {
         );
       }
       afterSelected?.call();
-    } on ErrorMessage catch (error, stackTrace) {
+    } on PaperlessServerException catch (error, stackTrace) {
       showErrorMessage(context, error, stackTrace);
     }
   }

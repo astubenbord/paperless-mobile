@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:paperless_mobile/core/model/error_message.dart';
+import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:local_auth/local_auth.dart';
 
@@ -12,7 +12,8 @@ class LocalAuthenticationCubit extends Cubit<LocalAuthenticationState> {
     if (isAuthenticationSuccessful) {
       emit(LocalAuthenticationState(true));
     } else {
-      throw const ErrorMessage(ErrorCode.biometricAuthenticationFailed);
+      throw const PaperlessServerException(
+          ErrorCode.biometricAuthenticationFailed);
     }
   }
 }

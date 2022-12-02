@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
 import 'package:paperless_mobile/features/labels/bloc/label_cubit.dart';
 import 'package:paperless_mobile/core/widgets/offline_widget.dart';
-import 'package:paperless_mobile/features/documents/model/document_filter.dart';
-import 'package:paperless_mobile/features/labels/model/label.model.dart';
-import 'package:paperless_mobile/features/labels/model/label_state.dart';
+import 'package:paperless_mobile/features/labels/bloc/label_state.dart';
 import 'package:paperless_mobile/features/labels/view/widgets/label_item.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 

@@ -2,21 +2,17 @@ import 'dart:typed_data';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
+import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
-import 'package:paperless_mobile/features/documents/model/bulk_edit.model.dart';
-import 'package:paperless_mobile/features/documents/model/document.model.dart';
-import 'package:paperless_mobile/features/documents/model/document_filter.dart';
-import 'package:paperless_mobile/features/documents/model/paged_search_result.dart';
-import 'package:paperless_mobile/features/documents/repository/document_repository.dart';
 
 @singleton
 class DocumentsCubit extends Cubit<DocumentsState> {
-  final DocumentRepository documentRepository;
+  final PaperlessDocumentsApi _api;
 
-  DocumentsCubit(this.documentRepository) : super(DocumentsState.initial);
+  DocumentsCubit(this._api) : super(DocumentsState.initial);
 
   Future<void> bulkRemove(List<DocumentModel> documents) async {
-    await documentRepository.bulkAction(
+    await _api.bulkAction(
       BulkDeleteAction(documents.map((doc) => doc.id)),
     );
     await reload();
@@ -27,7 +23,7 @@ class DocumentsCubit extends Cubit<DocumentsState> {
     Iterable<int> addTags = const [],
     Iterable<int> removeTags = const [],
   }) async {
-    await documentRepository.bulkAction(BulkModifyTagsAction(
+    await _api.bulkAction(BulkModifyTagsAction(
       documents.map((doc) => doc.id),
       addTags: addTags,
       removeTags: removeTags,
@@ -40,13 +36,13 @@ class DocumentsCubit extends Cubit<DocumentsState> {
     bool updateRemote = true,
   ]) async {
     if (updateRemote) {
-      await documentRepository.update(document);
+      await _api.update(document);
     }
     await reload();
   }
 
   Future<void> load() async {
-    final result = await documentRepository.find(state.filter);
+    final result = await _api.find(state.filter);
     emit(DocumentsState(
       isLoaded: true,
       value: [...state.value, result],
@@ -60,15 +56,14 @@ class DocumentsCubit extends Cubit<DocumentsState> {
     }
     var newPages = <PagedSearchResult>[];
     for (final page in state.value) {
-      final result = await documentRepository
-          .find(state.filter.copyWith(page: page.pageKey));
+      final result = await _api.find(state.filter.copyWith(page: page.pageKey));
       newPages.add(result);
     }
     emit(DocumentsState(isLoaded: true, value: newPages, filter: state.filter));
   }
 
   Future<void> _bulkReloadDocuments() async {
-    final result = await documentRepository
+    final result = await _api
         .find(state.filter.copyWith(page: 1, pageSize: state.documents.length));
     emit(DocumentsState(isLoaded: true, value: [result], filter: state.filter));
   }
@@ -78,7 +73,7 @@ class DocumentsCubit extends Cubit<DocumentsState> {
       return;
     }
     final newFilter = state.filter.copyWith(page: state.filter.page + 1);
-    final result = await documentRepository.find(newFilter);
+    final result = await _api.find(newFilter);
     emit(
       DocumentsState(
           isLoaded: true, value: [...state.value, result], filter: newFilter),
@@ -91,7 +86,7 @@ class DocumentsCubit extends Cubit<DocumentsState> {
   Future<void> updateFilter({
     final DocumentFilter filter = DocumentFilter.initial,
   }) async {
-    final result = await documentRepository.find(filter.copyWith(page: 1));
+    final result = await _api.find(filter.copyWith(page: 1));
     emit(DocumentsState(filter: filter, value: [result], isLoaded: true));
   }
 

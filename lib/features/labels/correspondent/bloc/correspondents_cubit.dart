@@ -1,5 +1,5 @@
+import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/features/labels/bloc/label_cubit.dart';
-import 'package:paperless_mobile/features/labels/correspondent/model/correspondent.model.dart';
 import 'package:injectable/injectable.dart';
 
 @singleton
@@ -8,18 +8,17 @@ class CorrespondentCubit extends LabelCubit<Correspondent> {
 
   @override
   Future<void> initialize() async {
-    return labelRepository.getCorrespondents().then(loadFrom);
+    return labelsApi.getCorrespondents().then(loadFrom);
   }
 
   @override
   Future<Correspondent> save(Correspondent item) =>
-      labelRepository.saveCorrespondent(item);
+      labelsApi.saveCorrespondent(item);
 
   @override
   Future<Correspondent> update(Correspondent item) =>
-      labelRepository.updateCorrespondent(item);
+      labelsApi.updateCorrespondent(item);
 
   @override
-  Future<int> delete(Correspondent item) =>
-      labelRepository.deleteCorrespondent(item);
+  Future<int> delete(Correspondent item) => labelsApi.deleteCorrespondent(item);
 }

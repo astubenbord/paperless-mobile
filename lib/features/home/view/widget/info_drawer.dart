@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/bloc/paperless_server_information_cubit.dart';
-import 'package:paperless_mobile/core/model/error_message.dart';
-import 'package:paperless_mobile/core/model/paperless_server_information.dart';
+import 'package:paperless_mobile/core/bloc/paperless_server_information_state.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
@@ -67,8 +67,12 @@ class InfoDrawer extends StatelessWidget {
                   Align(
                     alignment: Alignment.bottomRight,
                     child: BlocBuilder<PaperlessServerInformationCubit,
-                        PaperlessServerInformation>(
+                        PaperlessServerInformationState>(
                       builder: (context, state) {
+                        if (!state.isLoaded) {
+                          return Container();
+                        }
+                        final info = state.information!;
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
@@ -77,7 +81,7 @@ class InfoDrawer extends StatelessWidget {
                               dense: true,
                               title: Text(
                                 S.of(context).appDrawerHeaderLoggedInAsText +
-                                    (state.username ?? '?'),
+                                    (info.username ?? '?'),
                                 style: Theme.of(context).textTheme.bodyText2,
                                 overflow: TextOverflow.ellipsis,
                                 textAlign: TextAlign.end,
@@ -87,7 +91,7 @@ class InfoDrawer extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
                                   Text(
-                                    state.host ?? '',
+                                    state.information!.host ?? '',
                                     style:
                                         Theme.of(context).textTheme.bodyText2,
                                     overflow: TextOverflow.ellipsis,
@@ -95,7 +99,7 @@ class InfoDrawer extends StatelessWidget {
                                     maxLines: 1,
                                   ),
                                   Text(
-                                    '${S.of(context).serverInformationPaperlessVersionText} ${state.version} (API v${state.apiVersion})',
+                                    '${S.of(context).serverInformationPaperlessVersionText} ${info.version} (API v${info.apiVersion})',
                                     style: Theme.of(context).textTheme.caption,
                                     overflow: TextOverflow.ellipsis,
                                     textAlign: TextAlign.end,
@@ -189,7 +193,7 @@ class InfoDrawer extends StatelessWidget {
                   getIt<DocumentTypeCubit>().reset();
                   getIt<TagCubit>().reset();
                   getIt<DocumentScannerCubit>().reset();
-                } on ErrorMessage catch (error, stackTrace) {
+                } on PaperlessServerException catch (error, stackTrace) {
                   showErrorMessage(context, error, stackTrace);
                 }
               },

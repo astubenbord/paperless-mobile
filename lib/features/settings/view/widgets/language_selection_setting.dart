@@ -14,13 +14,18 @@ class LanguageSelectionSetting extends StatefulWidget {
 }
 
 class _LanguageSelectionSettingState extends State<LanguageSelectionSetting> {
+  static const _languageOptions = {
+    'en': 'English',
+    'de': 'Deutsch',
+    'cs': 'Česky',
+  };
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ApplicationSettingsCubit, ApplicationSettingsState>(
       builder: (context, settings) {
         return ListTile(
           title: Text(S.of(context).settingsPageLanguageSettingLabel),
-          subtitle: Text(_mapSubtagToLanguage(settings.preferredLocaleSubtag)),
+          subtitle: Text(_languageOptions[settings.preferredLocaleSubtag]!),
           onTap: () => showDialog(
             context: context,
             builder: (_) => RadioSettingsDialog<String>(
@@ -28,12 +33,16 @@ class _LanguageSelectionSettingState extends State<LanguageSelectionSetting> {
               options: [
                 RadioOption(
                   value: 'en',
-                  label: _mapSubtagToLanguage('en'),
+                  label: _languageOptions['en']!,
                 ),
                 RadioOption(
                   value: 'de',
-                  label: _mapSubtagToLanguage('de'),
+                  label: _languageOptions['de']!,
                 ),
+                RadioOption(
+                  value: 'cs',
+                  label: _languageOptions['cs']!,
+                )
               ],
               initialValue: BlocProvider.of<ApplicationSettingsCubit>(context)
                   .state
@@ -44,16 +53,5 @@ class _LanguageSelectionSettingState extends State<LanguageSelectionSetting> {
         );
       },
     );
-  }
-
-  _mapSubtagToLanguage(String subtag) {
-    switch (subtag) {
-      case 'en':
-        return "English";
-      case 'de':
-        return "Deutsch";
-      default:
-        return "English";
-    }
   }
 }

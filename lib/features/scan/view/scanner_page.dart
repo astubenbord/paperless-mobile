@@ -8,13 +8,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mime/mime.dart';
+import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/features/labels/bloc/global_state_bloc_provider.dart';
 import 'package:paperless_mobile/core/global/constants.dart';
-import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/core/service/file_service.dart';
-import 'package:paperless_mobile/di_initializer.dart';
-import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
-import 'package:paperless_mobile/features/documents/repository/document_repository.dart';
 import 'package:paperless_mobile/features/documents/view/pages/document_view.dart';
 import 'package:paperless_mobile/features/home/view/widget/info_drawer.dart';
 import 'package:paperless_mobile/features/scan/bloc/document_scanner_cubit.dart';
@@ -193,7 +190,7 @@ class _ScannerPageState extends State<ScannerPage>
               try {
                 BlocProvider.of<DocumentScannerCubit>(context)
                     .removeScan(index);
-              } on ErrorMessage catch (error, stackTrace) {
+              } on PaperlessServerException catch (error, stackTrace) {
                 showErrorMessage(context, error, stackTrace);
               }
             },
@@ -206,7 +203,7 @@ class _ScannerPageState extends State<ScannerPage>
   void _reset(BuildContext context) {
     try {
       BlocProvider.of<DocumentScannerCubit>(context).reset();
-    } on ErrorMessage catch (error, stackTrace) {
+    } on PaperlessServerException catch (error, stackTrace) {
       showErrorMessage(context, error, stackTrace);
     }
   }
@@ -231,7 +228,7 @@ class _ScannerPageState extends State<ScannerPage>
       )) {
         showErrorMessage(
           context,
-          const ErrorMessage(ErrorCode.unsupportedFileFormat),
+          const PaperlessServerException(ErrorCode.unsupportedFileFormat),
         );
         return;
       }

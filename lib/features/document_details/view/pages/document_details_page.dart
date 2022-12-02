@@ -7,14 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
-import 'package:paperless_mobile/core/model/error_message.dart';
+import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/widgets/highlighted_text.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/document_details/bloc/document_details_cubit.dart';
-import 'package:paperless_mobile/features/documents/model/document.model.dart';
-import 'package:paperless_mobile/features/documents/model/document_meta_data.model.dart';
-import 'package:paperless_mobile/features/documents/repository/document_repository.dart';
 import 'package:paperless_mobile/features/documents/view/pages/document_edit_page.dart';
 import 'package:paperless_mobile/features/documents/view/pages/document_view.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/delete_document_confirmation_dialog.dart';
@@ -235,7 +232,7 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
 
   Widget _buildDocumentMetaDataView(DocumentModel document) {
     return FutureBuilder<DocumentMetaData>(
-      future: getIt<DocumentRepository>().getMetaData(document),
+      future: getIt<PaperlessDocumentsApi>().getMetaData(document),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return const Center(child: CircularProgressIndicator());
@@ -295,7 +292,7 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
   Future<void> _assignAsn(DocumentModel document) async {
     try {
       await BlocProvider.of<DocumentDetailsCubit>(context).assignAsn(document);
-    } on ErrorMessage catch (error, stackTrace) {
+    } on PaperlessServerException catch (error, stackTrace) {
       showErrorMessage(context, error, stackTrace);
     }
   }
@@ -414,7 +411,7 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
       return;
     }
     setState(() => _isDownloadPending = true);
-    getIt<DocumentRepository>().download(document).then((bytes) async {
+    getIt<PaperlessDocumentsApi>().download(document).then((bytes) async {
       final Directory dir = (await getExternalStorageDirectories(
               type: StorageDirectory.downloads))!
           .first;
@@ -431,7 +428,7 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
   ///
   Future<void> _onShare(DocumentModel document) async {
     Uint8List documentBytes =
-        await getIt<DocumentRepository>().download(document);
+        await getIt<PaperlessDocumentsApi>().download(document);
     final dir = await getTemporaryDirectory();
     final String path = "${dir.path}/${document.originalFileName}";
     await File(path).writeAsBytes(documentBytes);
@@ -459,7 +456,7 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
       try {
         await BlocProvider.of<DocumentDetailsCubit>(context).delete(document);
         showSnackBar(context, S.of(context).documentDeleteSuccessMessage);
-      } on ErrorMessage catch (error, stackTrace) {
+      } on PaperlessServerException catch (error, stackTrace) {
         showErrorMessage(context, error, stackTrace);
       } finally {
         // Document deleted => go back to primary route
@@ -472,7 +469,7 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => DocumentView(
-          documentBytes: getIt<DocumentRepository>().getPreview(document.id),
+          documentBytes: getIt<PaperlessDocumentsApi>().getPreview(document.id),
         ),
       ),
     );

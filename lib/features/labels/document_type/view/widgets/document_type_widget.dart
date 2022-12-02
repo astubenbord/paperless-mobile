@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:paperless_mobile/core/model/error_message.dart';
+import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
-import 'package:paperless_mobile/features/documents/model/query_parameters/document_type_query.dart';
 import 'package:paperless_mobile/features/labels/document_type/bloc/document_type_cubit.dart';
-import 'package:paperless_mobile/features/labels/document_type/model/document_type.model.dart';
-import 'package:paperless_mobile/features/labels/model/label_state.dart';
+import 'package:paperless_mobile/features/labels/bloc/label_state.dart';
 import 'package:paperless_mobile/util.dart';
 
 class DocumentTypeWidget extends StatelessWidget {
@@ -55,7 +53,7 @@ class DocumentTypeWidget extends StatelessWidget {
         );
       }
       afterSelected?.call();
-    } on ErrorMessage catch (error, stackTrace) {
+    } on PaperlessServerException catch (error, stackTrace) {
       showErrorMessage(context, error, stackTrace);
     }
   }

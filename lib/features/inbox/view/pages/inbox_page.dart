@@ -1,19 +1,18 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
-import 'package:paperless_mobile/core/model/error_message.dart';
+import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/widgets/documents_list_loading_widget.dart';
+import 'package:paperless_mobile/extensions/dart_extensions.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
-import 'package:paperless_mobile/features/documents/model/document.model.dart';
 import 'package:paperless_mobile/features/inbox/bloc/inbox_cubit.dart';
 import 'package:paperless_mobile/features/inbox/bloc/state/inbox_state.dart';
-import 'package:paperless_mobile/features/inbox/view/widgets/inbox_item.dart';
 import 'package:paperless_mobile/features/inbox/view/widgets/inbox_empty_widget.dart';
+import 'package:paperless_mobile/features/inbox/view/widgets/inbox_item.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:paperless_mobile/util.dart';
-import 'package:collection/collection.dart';
-import 'package:paperless_mobile/extensions/dart_extensions.dart';
 
 class InboxPage extends StatefulWidget {
   const InboxPage({super.key});
@@ -230,13 +229,13 @@ class _InboxPageState extends State<InboxPage> {
         ),
       );
       return true;
-    } on ErrorMessage catch (error, stackTrace) {
+    } on PaperlessServerException catch (error, stackTrace) {
       showErrorMessage(context, error, stackTrace);
       return false;
     } catch (error) {
       showErrorMessage(
         context,
-        const ErrorMessage.unknown(),
+        const PaperlessServerException.unknown(),
       );
       return false;
     }
@@ -249,7 +248,7 @@ class _InboxPageState extends State<InboxPage> {
     try {
       await BlocProvider.of<InboxCubit>(context)
           .undoRemove(document, removedTags);
-    } on ErrorMessage catch (error, stackTrace) {
+    } on PaperlessServerException catch (error, stackTrace) {
       showErrorMessage(context, error, stackTrace);
     }
   }

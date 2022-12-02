@@ -1,20 +1,19 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
-import 'package:paperless_mobile/di_initializer.dart';
-import 'package:paperless_mobile/features/documents/model/saved_view.model.dart';
-import 'package:paperless_mobile/features/documents/repository/saved_views_repository.dart';
+import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/features/saved_view/bloc/saved_view_state.dart';
 
 @singleton
 class SavedViewCubit extends Cubit<SavedViewState> {
-  SavedViewCubit() : super(SavedViewState(value: {}));
+  final PaperlessSavedViewsApi _api;
+  SavedViewCubit(this._api) : super(SavedViewState(value: {}));
 
   void selectView(SavedView? view) {
     emit(SavedViewState(value: state.value, selectedSavedViewId: view?.id));
   }
 
   Future<SavedView> add(SavedView view) async {
-    final savedView = await getIt<SavedViewsRepository>().save(view);
+    final savedView = await _api.save(view);
     emit(
       SavedViewState(
         value: {...state.value, savedView.id!: savedView},
@@ -25,7 +24,7 @@ class SavedViewCubit extends Cubit<SavedViewState> {
   }
 
   Future<int> remove(SavedView view) async {
-    final id = await getIt<SavedViewsRepository>().delete(view);
+    final id = await _api.delete(view);
     final newValue = {...state.value};
     newValue.removeWhere((key, value) => key == id);
     emit(
@@ -40,7 +39,7 @@ class SavedViewCubit extends Cubit<SavedViewState> {
   }
 
   Future<void> initialize() async {
-    final views = await getIt<SavedViewsRepository>().getAll();
+    final views = await _api.getAll();
     final values = {for (var element in views) element.id!: element};
     emit(SavedViewState(value: values));
   }

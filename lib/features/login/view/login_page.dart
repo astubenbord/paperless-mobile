@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:paperless_mobile/core/model/error_message.dart';
+import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/login/bloc/authentication_cubit.dart';
 import 'package:paperless_mobile/features/login/view/widgets/client_certificate_form_field.dart';
@@ -97,12 +97,12 @@ class _LoginPageState extends State<LoginPage> {
           clientCertificate:
               form[ClientCertificateFormField.fkClientCertificate],
         );
-      } on ErrorMessage catch (error, stackTrace) {
+      } on PaperlessServerException catch (error, stackTrace) {
         showErrorMessage(context, error, stackTrace);
       } on Map<String, dynamic> catch (error, stackTrace) {
         showGenericError(context, error.values.first, stackTrace);
       } catch (unknownError, stackTrace) {
-        showErrorMessage(context, ErrorMessage.unknown(), stackTrace);
+        showGenericError(context, unknownError.toString(), stackTrace);
       } finally {
         setState(() => _isLoginLoading = false);
       }

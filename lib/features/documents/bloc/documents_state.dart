@@ -1,7 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:paperless_mobile/features/documents/model/document.model.dart';
-import 'package:paperless_mobile/features/documents/model/document_filter.dart';
-import 'package:paperless_mobile/features/documents/model/paged_search_result.dart';
+import 'package:paperless_api/paperless_api.dart';
 
 class DocumentsState extends Equatable {
   final bool isLoaded;

@@ -57,3 +57,6 @@ di_initializer.config.dart
 # l10n generated files:
 lib/generated/*
 untranslated_messages.txt
+
+#lakos generated files
+**/dot_images/*

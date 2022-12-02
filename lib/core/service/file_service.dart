@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:paperless_mobile/core/model/error_message.dart';
+import 'package:paperless_api/paperless_api.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 
@@ -12,7 +12,7 @@ class FileService {
   ) async {
     final dir = await documentsDirectory;
     if (dir == null) {
-      throw const ErrorMessage.unknown(); //TODO: better handling
+      throw const PaperlessServerException.unknown(); //TODO: better handling
     }
     File file = File("${dir.path}/$filename");
     return file..writeAsBytes(bytes);

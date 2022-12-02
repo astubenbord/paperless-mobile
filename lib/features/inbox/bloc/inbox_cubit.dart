@@ -1,28 +1,20 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
-import 'package:paperless_mobile/features/documents/model/bulk_edit.model.dart';
-import 'package:paperless_mobile/features/documents/model/document.model.dart';
-import 'package:paperless_mobile/features/documents/model/document_filter.dart';
-import 'package:paperless_mobile/features/documents/model/query_parameters/sort_field.dart';
-import 'package:paperless_mobile/features/documents/model/query_parameters/tags_query.dart';
-import 'package:paperless_mobile/features/documents/repository/document_repository.dart';
+import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/features/inbox/bloc/state/inbox_state.dart';
-import 'package:paperless_mobile/features/labels/repository/label_repository.dart';
 
 @injectable
 class InboxCubit extends Cubit<InboxState> {
-  final LabelRepository _labelRepository;
-  final DocumentRepository _documentRepository;
+  final PaperlessLabelsApi _labelApi;
+  final PaperlessDocumentsApi _documentsApi;
 
-  InboxCubit(this._labelRepository, this._documentRepository)
-      : super(const InboxState());
+  InboxCubit(this._labelApi, this._documentsApi) : super(const InboxState());
 
   ///
   /// Fetches inbox tag ids and loads the inbox items (documents).
   ///
   Future<void> loadInbox() async {
-    final inboxTags = await _labelRepository.getTags().then(
+    final inboxTags = await _labelApi.getTags().then(
           (tags) => tags.where((t) => t.isInboxTag ?? false).map((t) => t.id!),
         );
     if (inboxTags.isEmpty) {
@@ -33,7 +25,7 @@ class InboxCubit extends Cubit<InboxState> {
         inboxTags: [],
       ));
     }
-    final inboxDocuments = await _documentRepository
+    final inboxDocuments = await _documentsApi
         .find(DocumentFilter(
           tags: AnyAssignedTagsQuery(tagIds: inboxTags),
           sortField: SortField.added,
@@ -57,7 +49,7 @@ class InboxCubit extends Cubit<InboxState> {
 
     final updatedTags = {...document.tags}..removeAll(tagsToRemove);
 
-    await _documentRepository.update(
+    await _documentsApi.update(
       document.copyWith(
         tags: updatedTags,
         overwriteTags: true,
@@ -85,7 +77,7 @@ class InboxCubit extends Cubit<InboxState> {
       tags: {...document.tags, ...removedTags},
       overwriteTags: true,
     );
-    await _documentRepository.update(updatedDoc);
+    await _documentsApi.update(updatedDoc);
     emit(
       InboxState(
         isLoaded: true,
@@ -100,7 +92,7 @@ class InboxCubit extends Cubit<InboxState> {
   /// Removes inbox tags from all documents in the inbox.
   ///
   Future<void> clearInbox() async {
-    await _documentRepository.bulkAction(
+    await _documentsApi.bulkAction(
       BulkModifyTagsAction.removeTags(
         state.inboxItems.map((e) => e.id),
         state.inboxTags,

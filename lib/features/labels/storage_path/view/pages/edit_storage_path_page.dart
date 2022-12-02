@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:paperless_mobile/core/logic/error_code_localization_mapper.dart';
-import 'package:paperless_mobile/core/model/error_message.dart';
+import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
-import 'package:paperless_mobile/features/documents/model/query_parameters/storage_path_query.dart';
 import 'package:paperless_mobile/features/labels/storage_path/bloc/storage_path_cubit.dart';
-import 'package:paperless_mobile/features/labels/storage_path/model/storage_path.model.dart';
 import 'package:paperless_mobile/features/labels/storage_path/view/widgets/storage_path_autofill_form_builder_field.dart';
 import 'package:paperless_mobile/features/labels/view/pages/edit_label_page.dart';
 import 'package:paperless_mobile/util.dart';
@@ -43,7 +40,7 @@ class EditStoragePathPage extends StatelessWidget {
         );
       }
       Navigator.pop(context);
-    } on ErrorMessage catch (error, stackTrace) {
+    } on PaperlessServerException catch (error, stackTrace) {
       showErrorMessage(context, error, stackTrace);
     }
   }

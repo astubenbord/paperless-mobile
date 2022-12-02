@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:paperless_mobile/features/documents/model/saved_view.model.dart';
+import 'package:paperless_api/paperless_api.dart';
 
 class SavedViewState with EquatableMixin {
   final Map<int, SavedView> value;
@@ -11,5 +11,8 @@ class SavedViewState with EquatableMixin {
   });
 
   @override
-  List<Object?> get props => [value, selectedSavedViewId];
+  List<Object?> get props => [
+        value,
+        selectedSavedViewId,
+      ];
 }

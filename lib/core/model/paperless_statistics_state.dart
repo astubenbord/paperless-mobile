@@ -1,8 +1,8 @@
-import 'package:paperless_mobile/core/model/paperless_statistics.dart';
+import 'package:paperless_api/paperless_api.dart';
 
 class PaperlessStatisticsState {
   final bool isLoaded;
-  final PaperlessStatistics? statistics;
+  final PaperlessServerStatisticsModel? statistics;
 
   PaperlessStatisticsState({
     required this.isLoaded,

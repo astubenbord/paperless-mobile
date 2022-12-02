@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:paperless_mobile/features/documents/model/query_parameters/sort_field.dart';
+import 'package:paperless_api/paperless_api.dart';
 
 class OrderByDropdown extends StatefulWidget {
   static const fkOrderBy = "orderBy";

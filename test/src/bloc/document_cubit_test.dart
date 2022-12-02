@@ -1,19 +1,13 @@
 import 'package:bloc_test/bloc_test.dart';
+import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
-import 'package:paperless_mobile/features/documents/model/document.model.dart';
-import 'package:paperless_mobile/features/documents/model/document_filter.dart';
-import 'package:paperless_mobile/features/documents/model/paged_search_result.dart';
-import 'package:paperless_mobile/features/documents/repository/document_repository.dart';
-import 'package:paperless_mobile/features/labels/correspondent/model/correspondent.model.dart';
-import 'package:paperless_mobile/features/labels/document_type/model/document_type.model.dart';
-import 'package:paperless_mobile/features/labels/tags/model/tag.model.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
 import '../../utils.dart';
-@GenerateNiceMocks([MockSpec<DocumentRepository>()])
+@GenerateNiceMocks([MockSpec<PaperlessDocumentsApi>()])
 import 'document_cubit_test.mocks.dart';
 
 void main() async {
@@ -35,7 +29,8 @@ void main() async {
         DocumentType.fromJson),
   );
 
-  final MockDocumentRepository documentRepository = MockDocumentRepository();
+  final MockPaperlessDocumentsApi documentRepository =
+      MockPaperlessDocumentsApi();
 
   group("Test DocumentsCubit reloadDocuments", () {
     test("Assert correct initial state", () {

@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
-import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/document_details/bloc/document_details_cubit.dart';
 import 'package:paperless_mobile/features/document_details/view/pages/document_details_page.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
-import 'package:paperless_mobile/features/documents/model/document.model.dart';
-import 'package:paperless_mobile/features/documents/model/query_parameters/tags_query.dart';
-import 'package:paperless_mobile/features/documents/repository/document_repository.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/documents_empty_state.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/grid/document_grid.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/list/document_list.dart';
@@ -48,7 +45,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
     super.initState();
     try {
       BlocProvider.of<DocumentsCubit>(context).load();
-    } on ErrorMessage catch (error, stackTrace) {
+    } on PaperlessServerException catch (error, stackTrace) {
       showErrorMessage(context, error, stackTrace);
     }
     _pagingController.addPageRequestListener(_loadNewPage);
@@ -69,7 +66,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
     }
     try {
       await documentsCubit.loadMore();
-    } on ErrorMessage catch (error, stackTrace) {
+    } on PaperlessServerException catch (error, stackTrace) {
       showErrorMessage(context, error, stackTrace);
     }
   }
@@ -83,7 +80,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
       await BlocProvider.of<DocumentsCubit>(context).updateCurrentFilter(
         (filter) => filter.copyWith(page: 1),
       );
-    } on ErrorMessage catch (error, stackTrace) {
+    } on PaperlessServerException catch (error, stackTrace) {
       showErrorMessage(context, error, stackTrace);
     }
   }
@@ -254,7 +251,8 @@ class _DocumentsPageState extends State<DocumentsPage> {
             value: BlocProvider.of<StoragePathCubit>(context),
           ),
           BlocProvider.value(
-            value: DocumentDetailsCubit(getIt<DocumentRepository>(), document),
+            value:
+                DocumentDetailsCubit(getIt<PaperlessDocumentsApi>(), document),
           ),
         ],
         child: const DocumentDetailsPage(),
@@ -281,7 +279,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
           ),
         );
       }
-    } on ErrorMessage catch (error, stackTrace) {
+    } on PaperlessServerException catch (error, stackTrace) {
       showErrorMessage(context, error, stackTrace);
     }
   }

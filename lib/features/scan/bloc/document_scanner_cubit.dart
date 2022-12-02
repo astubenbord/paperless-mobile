@@ -4,18 +4,18 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:injectable/injectable.dart';
-import 'package:paperless_mobile/features/documents/model/document.model.dart';
-import 'package:paperless_mobile/features/documents/repository/document_repository.dart';
+import 'package:paperless_api/paperless_api.dart';
+import 'package:paperless_mobile/di_initializer.dart';
+import 'package:paperless_mobile/features/login/bloc/authentication_cubit.dart';
 
 @injectable
 class DocumentScannerCubit extends Cubit<List<File>> {
-  final DocumentRepository documentRepository;
+  final PaperlessDocumentsApi _api;
 
   static List<File> initialState = [];
 
-  DocumentScannerCubit(this.documentRepository) : super(initialState);
+  DocumentScannerCubit(this._api) : super(initialState);
 
   void addScan(File file) => emit([...state, file]);
 
@@ -26,7 +26,7 @@ class DocumentScannerCubit extends Cubit<List<File>> {
       scans.removeAt(fileIndex);
       emit(scans);
     } catch (_) {
-      throw const ErrorMessage(ErrorCode.scanRemoveFailed);
+      throw const PaperlessServerException(ErrorCode.scanRemoveFailed);
     }
   }
 
@@ -41,7 +41,7 @@ class DocumentScannerCubit extends Cubit<List<File>> {
       imageCache.clear();
       emit(initialState);
     } catch (_) {
-      throw const ErrorMessage(ErrorCode.scanRemoveFailed);
+      throw const PaperlessServerException(ErrorCode.scanRemoveFailed);
     }
   }
 
@@ -55,17 +55,23 @@ class DocumentScannerCubit extends Cubit<List<File>> {
     Iterable<int> tags = const [],
     DateTime? createdAt,
   }) async {
-    await documentRepository.create(
+    final auth = getIt<AuthenticationCubit>().state.authentication;
+    if (auth == null) {
+      throw const PaperlessServerException(ErrorCode.notAuthenticated);
+    }
+    await _api.create(
       bytes,
-      fileName,
+      filename: fileName,
       title: title,
       documentType: documentType,
       correspondent: correspondent,
       tags: tags,
       createdAt: createdAt,
+      authToken: auth.token,
+      serverUrl: auth.serverUrl,
     );
     if (onConsumptionFinished != null) {
-      documentRepository
+      _api
           .waitForConsumptionFinished(fileName, title)
           .then((value) => onConsumptionFinished(value));
     }

@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:paperless_mobile/features/documents/model/query_parameters/tags_query.dart';
-import 'package:paperless_mobile/features/labels/model/label_state.dart';
+import 'package:paperless_api/paperless_api.dart';
+import 'package:paperless_mobile/features/labels/bloc/label_state.dart';
 import 'package:paperless_mobile/features/labels/tags/bloc/tags_cubit.dart';
-import 'package:paperless_mobile/features/labels/tags/model/tag.model.dart';
 import 'package:paperless_mobile/features/labels/tags/view/pages/add_tag_page.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 

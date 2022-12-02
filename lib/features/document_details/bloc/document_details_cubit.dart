@@ -1,29 +1,28 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:paperless_mobile/features/documents/model/document.model.dart';
-import 'package:paperless_mobile/features/documents/repository/document_repository.dart';
+import 'package:paperless_api/paperless_api.dart';
 
 part 'document_details_state.dart';
 
 class DocumentDetailsCubit extends Cubit<DocumentDetailsState> {
-  final DocumentRepository _documentRepository;
+  final PaperlessDocumentsApi _api;
 
-  DocumentDetailsCubit(this._documentRepository, DocumentModel initialDocument)
+  DocumentDetailsCubit(this._api, DocumentModel initialDocument)
       : super(DocumentDetailsState(document: initialDocument));
 
   Future<void> delete(DocumentModel document) async {
-    await _documentRepository.delete(document);
+    await _api.delete(document);
     emit(const DocumentDetailsState());
   }
 
   Future<void> update(DocumentModel document) async {
-    final updatedDocument = await _documentRepository.update(document);
+    final updatedDocument = await _api.update(document);
     emit(DocumentDetailsState(document: updatedDocument));
   }
 
   Future<void> assignAsn(DocumentModel document) async {
     if (document.archiveSerialNumber == null) {
-      final int asn = await _documentRepository.findNextAsn();
+      final int asn = await _api.findNextAsn();
       update(document.copyWith(archiveSerialNumber: asn));
     }
   }

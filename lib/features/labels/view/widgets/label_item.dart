@@ -1,13 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/features/labels/bloc/global_state_bloc_provider.dart';
-import 'package:paperless_mobile/core/logic/error_code_localization_mapper.dart';
-import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/di_initializer.dart';
-import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
-import 'package:paperless_mobile/features/documents/model/document_filter.dart';
-import 'package:paperless_mobile/features/documents/repository/document_repository.dart';
-import 'package:paperless_mobile/features/labels/model/label.model.dart';
 import 'package:paperless_mobile/features/linked_documents_preview/bloc/linked_documents_cubit.dart';
 import 'package:paperless_mobile/features/linked_documents_preview/view/pages/linked_documents_page.dart';
 

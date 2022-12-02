@@ -6,26 +6,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:intl/intl.dart';
-import 'package:paperless_mobile/core/model/error_message.dart';
+import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
-import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
-import 'package:paperless_mobile/features/documents/model/document.model.dart';
-import 'package:paperless_mobile/features/documents/model/query_parameters/correspondent_query.dart';
-import 'package:paperless_mobile/features/documents/model/query_parameters/document_type_query.dart';
-import 'package:paperless_mobile/features/documents/model/query_parameters/id_query_parameter.dart';
-import 'package:paperless_mobile/features/documents/model/query_parameters/storage_path_query.dart';
-import 'package:paperless_mobile/features/documents/model/query_parameters/tags_query.dart';
-import 'package:paperless_mobile/features/documents/repository/document_repository.dart';
 import 'package:paperless_mobile/features/labels/correspondent/bloc/correspondents_cubit.dart';
-import 'package:paperless_mobile/features/labels/correspondent/model/correspondent.model.dart';
 import 'package:paperless_mobile/features/labels/correspondent/view/pages/add_correspondent_page.dart';
 import 'package:paperless_mobile/features/labels/document_type/bloc/document_type_cubit.dart';
-import 'package:paperless_mobile/features/labels/document_type/model/document_type.model.dart';
 import 'package:paperless_mobile/features/labels/document_type/view/pages/add_document_type_page.dart';
-import 'package:paperless_mobile/features/labels/model/label_state.dart';
+import 'package:paperless_mobile/features/labels/bloc/label_state.dart';
 import 'package:paperless_mobile/features/labels/storage_path/bloc/storage_path_cubit.dart';
-import 'package:paperless_mobile/features/labels/storage_path/model/storage_path.model.dart';
 import 'package:paperless_mobile/features/labels/storage_path/view/pages/add_storage_path_page.dart';
 import 'package:paperless_mobile/features/labels/tags/view/widgets/tags_form_field.dart';
 import 'package:paperless_mobile/features/labels/view/widgets/label_form_field.dart';
@@ -62,7 +51,8 @@ class _DocumentEditPageState extends State<DocumentEditPage> {
   @override
   void initState() {
     super.initState();
-    documentBytes = getIt<DocumentRepository>().getPreview(widget.document.id);
+    documentBytes =
+        getIt<PaperlessDocumentsApi>().getPreview(widget.document.id);
   }
 
   @override
@@ -92,7 +82,7 @@ class _DocumentEditPageState extends State<DocumentEditPage> {
             try {
               await widget.onEdit(updatedDocument);
               showSnackBar(context, S.of(context).documentUpdateSuccessMessage);
-            } on ErrorMessage catch (error, stackTrace) {
+            } on PaperlessServerException catch (error, stackTrace) {
               showErrorMessage(context, error, stackTrace);
             } finally {
               setState(() {

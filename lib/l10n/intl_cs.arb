@@ -415,5 +415,7 @@
   "tagInboxTagPropertyLabel": "Tag inboxu",
   "@tagInboxTagPropertyLabel": {},
   "uploadPageAutomaticallInferredFieldsHintText": "Pokud specifikuješ hodnoty pro tato pole, paperless instance nebude automaticky přiřazovat naučené hodnoty. Pokud mají být tato pole automaticky vyplňována, nevyplňujte zde nic.",
-  "@uploadPageAutomaticallInferredFieldsHintText": {}
+  "@uploadPageAutomaticallInferredFieldsHintText": {},
+  "inboxPageNoNewDocumentsText": "You do not have unseen documents.",
+  "inboxPageNoNewDocumentsRefreshLabel": "Refresh"
 }

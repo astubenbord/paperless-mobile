@@ -1,8 +1,8 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:paperless_mobile/core/model/error_message.dart';
+import 'package:injectable/injectable.dart';
+import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/store/local_vault.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/login/model/authentication_information.dart';
@@ -10,18 +10,19 @@ import 'package:paperless_mobile/features/login/model/client_certificate.dart';
 import 'package:paperless_mobile/features/login/model/user_credentials.model.dart';
 import 'package:paperless_mobile/features/login/services/authentication.service.dart';
 import 'package:paperless_mobile/features/settings/model/application_settings_state.dart';
-import 'package:injectable/injectable.dart';
 
 const authenticationKey = "authentication";
 
 @singleton
 class AuthenticationCubit extends Cubit<AuthenticationState> {
+  final LocalAuthenticationService _localAuthService;
+  final PaperlessAuthenticationApi _authApi;
   final LocalVault localStore;
-  final AuthenticationService authenticationService;
 
   AuthenticationCubit(
     this.localStore,
-    this.authenticationService,
+    this._localAuthService,
+    this._authApi,
   ) : super(AuthenticationState.initial);
 
   Future<void> initialize() {
@@ -49,7 +50,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
           ),
         ),
       );
-      final token = await authenticationService.login(
+      final token = await _authApi.login(
         username: credentials.username!,
         password: credentials.password!,
         serverUrl: serverUrl,
@@ -70,14 +71,14 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
         authentication: auth,
       ));
     } on TlsException catch (_) {
-      const error =
-          ErrorMessage(ErrorCode.invalidClientCertificateConfiguration);
+      const error = PaperlessServerException(
+          ErrorCode.invalidClientCertificateConfiguration);
       throw error;
     } on SocketException catch (err) {
       if (err.message.contains("connection timed out")) {
-        throw const ErrorMessage(ErrorCode.requestTimedOut);
+        throw const PaperlessServerException(ErrorCode.requestTimedOut);
       } else {
-        throw ErrorMessage.unknown();
+        throw const PaperlessServerException.unknown();
       }
     }
   }
@@ -95,7 +96,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
       emit(AuthenticationState(isAuthenticated: false, wasLoginStored: false));
     } else {
       if (!appSettings.isLocalAuthenticationEnabled ||
-          await authenticationService
+          await _localAuthService
               .authenticateLocalUser("Authenticate to log back in")) {
         registerSecurityContext(storedAuth.clientCertificate);
         emit(

@@ -78,6 +78,8 @@ dependencies:
   uuid: ^3.0.6
   flutter_typeahead: ^4.1.1
   fluttertoast: ^8.1.1
+  paperless_api:
+    path: packages/paperless_api
 
 dev_dependencies:
   integration_test:

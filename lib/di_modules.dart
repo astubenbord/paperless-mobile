@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:encrypted_shared_preferences/encrypted_shared_preferences.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/interceptor/authentication.interceptor.dart';
 import 'package:paperless_mobile/core/interceptor/language_header.interceptor.dart';
 import 'package:paperless_mobile/core/interceptor/response_conversion.interceptor.dart';
@@ -51,4 +52,28 @@ abstract class RegisterModule {
 
   CacheManager getCacheManager(BaseClient client) => CacheManager(
       Config('cacheKey', fileService: HttpFileService(httpClient: client)));
+
+  PaperlessAuthenticationApi authenticationModule(BaseClient client) =>
+      PaperlessAuthenticationApiImpl(client);
+
+  PaperlessLabelsApi labelsModule(
+    @Named('timeoutClient') BaseClient timeoutClient,
+  ) =>
+      PaperlessLabelApiImpl(timeoutClient);
+
+  PaperlessDocumentsApi documentsModule(
+    @Named('timeoutClient') BaseClient timeoutClient,
+    HttpClient httpClient,
+  ) =>
+      PaperlessDocumentsApiImpl(timeoutClient, httpClient);
+
+  PaperlessSavedViewsApi savedViewsModule(
+    @Named('timeoutClient') BaseClient timeoutClient,
+  ) =>
+      PaperlessSavedViewsApiImpl(timeoutClient);
+
+  PaperlessServerStatsApi serverStatsModule(
+    @Named('timeoutClient') BaseClient timeoutClient,
+  ) =>
+      PaperlessServerStatsApiImpl(timeoutClient);
 }

@@ -1,25 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:paperless_mobile/core/model/error_message.dart';
+import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
-import 'package:paperless_mobile/features/documents/model/document.model.dart';
-import 'package:paperless_mobile/features/documents/model/document_filter.dart';
-import 'package:paperless_mobile/features/documents/model/query_parameters/correspondent_query.dart';
-import 'package:paperless_mobile/features/documents/model/query_parameters/document_type_query.dart';
-import 'package:paperless_mobile/features/documents/model/query_parameters/query_type.dart';
-import 'package:paperless_mobile/features/documents/model/query_parameters/storage_path_query.dart';
-import 'package:paperless_mobile/features/documents/model/query_parameters/tags_query.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/search/query_type_form_field.dart';
 import 'package:paperless_mobile/features/labels/correspondent/bloc/correspondents_cubit.dart';
-import 'package:paperless_mobile/features/labels/correspondent/model/correspondent.model.dart';
 import 'package:paperless_mobile/features/labels/document_type/bloc/document_type_cubit.dart';
-import 'package:paperless_mobile/features/labels/document_type/model/document_type.model.dart';
-import 'package:paperless_mobile/features/labels/model/label_state.dart';
+import 'package:paperless_mobile/features/labels/bloc/label_state.dart';
 import 'package:paperless_mobile/features/labels/storage_path/bloc/storage_path_cubit.dart';
-import 'package:paperless_mobile/features/labels/storage_path/model/storage_path.model.dart';
 import 'package:paperless_mobile/features/labels/tags/view/widgets/tags_form_field.dart';
 import 'package:paperless_mobile/features/labels/view/widgets/label_form_field.dart';
 import 'package:paperless_mobile/features/saved_view/bloc/saved_view_cubit.dart';
@@ -468,7 +458,7 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
         BlocProvider.of<SavedViewCubit>(context).resetSelection();
         FocusScope.of(context).unfocus();
         widget.panelController.close();
-      } on ErrorMessage catch (error, stackTrace) {
+      } on PaperlessServerException catch (error, stackTrace) {
         showErrorMessage(context, error, stackTrace);
       }
     }

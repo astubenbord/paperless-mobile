@@ -1,21 +1,16 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:developer';
-import 'dart:io';
-import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:paperless_mobile/core/logic/error_code_localization_mapper.dart';
-import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:intl/intl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:paperless_api/paperless_api.dart';
+import 'package:paperless_mobile/core/logic/error_code_localization_mapper.dart';
 import 'package:paperless_mobile/core/service/github_issue_service.dart';
-import 'package:paperless_mobile/generated/intl/messages_de.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
-import 'package:path_provider/path_provider.dart';
 
 final dateFormat = DateFormat("yyyy-MM-dd");
 final GlobalKey<ScaffoldState> rootScaffoldKey = GlobalKey<ScaffoldState>();
@@ -65,7 +60,7 @@ void showGenericError(
 
 void showErrorMessage(
   BuildContext context,
-  ErrorMessage error, [
+  PaperlessServerException error, [
   StackTrace? stackTrace,
 ]) {
   showSnackBar(

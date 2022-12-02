@@ -1,12 +1,9 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
-import 'package:paperless_mobile/features/documents/model/query_parameters/sort_field.dart';
-import 'package:paperless_mobile/features/documents/model/query_parameters/sort_order.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 
@@ -20,16 +17,6 @@ class SortFieldSelectionBottomSheet extends StatefulWidget {
 
 class _SortFieldSelectionBottomSheetState
     extends State<SortFieldSelectionBottomSheet> {
-  static const _sortFields = [
-    SortField.created,
-    SortField.added,
-    SortField.modified,
-    SortField.title,
-    SortField.correspondentName,
-    SortField.documentType,
-    SortField.archiveSerialNumber
-  ];
-
   SortField? _selectedFieldLoading;
   SortOrder? _selectedOrderLoading;
 
@@ -49,7 +36,7 @@ class _SortFieldSelectionBottomSheetState
               ).padded(
                   const EdgeInsets.symmetric(horizontal: 16, vertical: 16)),
               Column(
-                children: _sortFields
+                children: SortField.values
                     .map(
                       (e) => _buildSortOption(
                         e,

@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'dart:convert';
 
-import 'package:paperless_mobile/core/model/error_message.dart';
+import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/service/connectivity_status.service.dart';
 import 'package:paperless_mobile/core/type/types.dart';
 import 'package:paperless_mobile/di_initializer.dart';
@@ -24,8 +24,8 @@ class TimeoutClient implements BaseClient {
   Future<StreamedResponse> send(BaseRequest request) async {
     return getIt<BaseClient>().send(request).timeout(
           requestTimeout,
-          onTimeout: () =>
-              Future.error(const ErrorMessage(ErrorCode.requestTimedOut)),
+          onTimeout: () => Future.error(
+              const PaperlessServerException(ErrorCode.requestTimedOut)),
         );
   }
 
@@ -47,8 +47,8 @@ class TimeoutClient implements BaseClient {
           .delete(url, headers: headers, body: body, encoding: encoding)
           .timeout(
             requestTimeout,
-            onTimeout: () =>
-                Future.error(const ErrorMessage(ErrorCode.requestTimedOut)),
+            onTimeout: () => Future.error(
+                const PaperlessServerException(ErrorCode.requestTimedOut)),
           ),
     );
   }
@@ -62,8 +62,8 @@ class TimeoutClient implements BaseClient {
     return _handle400Error(
       await getIt<BaseClient>().get(url, headers: headers).timeout(
             requestTimeout,
-            onTimeout: () =>
-                Future.error(const ErrorMessage(ErrorCode.requestTimedOut)),
+            onTimeout: () => Future.error(
+                const PaperlessServerException(ErrorCode.requestTimedOut)),
           ),
     );
   }
@@ -77,8 +77,8 @@ class TimeoutClient implements BaseClient {
     return _handle400Error(
       await getIt<BaseClient>().head(url, headers: headers).timeout(
             requestTimeout,
-            onTimeout: () =>
-                Future.error(const ErrorMessage(ErrorCode.requestTimedOut)),
+            onTimeout: () => Future.error(
+                const PaperlessServerException(ErrorCode.requestTimedOut)),
           ),
     );
   }
@@ -96,8 +96,8 @@ class TimeoutClient implements BaseClient {
           .patch(url, headers: headers, body: body, encoding: encoding)
           .timeout(
             requestTimeout,
-            onTimeout: () =>
-                Future.error(const ErrorMessage(ErrorCode.requestTimedOut)),
+            onTimeout: () => Future.error(
+                const PaperlessServerException(ErrorCode.requestTimedOut)),
           ),
     );
   }
@@ -115,8 +115,8 @@ class TimeoutClient implements BaseClient {
           .post(url, headers: headers, body: body, encoding: encoding)
           .timeout(
             requestTimeout,
-            onTimeout: () =>
-                Future.error(const ErrorMessage(ErrorCode.requestTimedOut)),
+            onTimeout: () => Future.error(
+                const PaperlessServerException(ErrorCode.requestTimedOut)),
           ),
     );
   }
@@ -134,8 +134,8 @@ class TimeoutClient implements BaseClient {
           .put(url, headers: headers, body: body, encoding: encoding)
           .timeout(
             requestTimeout,
-            onTimeout: () =>
-                Future.error(const ErrorMessage(ErrorCode.requestTimedOut)),
+            onTimeout: () => Future.error(
+                const PaperlessServerException(ErrorCode.requestTimedOut)),
           ),
     );
   }
@@ -148,8 +148,8 @@ class TimeoutClient implements BaseClient {
     await _handleOfflineState();
     return getIt<BaseClient>().read(url, headers: headers).timeout(
           requestTimeout,
-          onTimeout: () =>
-              Future.error(const ErrorMessage(ErrorCode.requestTimedOut)),
+          onTimeout: () => Future.error(
+              const PaperlessServerException(ErrorCode.requestTimedOut)),
         );
   }
 
@@ -161,8 +161,8 @@ class TimeoutClient implements BaseClient {
     await _handleOfflineState();
     return getIt<BaseClient>().readBytes(url, headers: headers).timeout(
           requestTimeout,
-          onTimeout: () =>
-              Future.error(const ErrorMessage(ErrorCode.requestTimedOut)),
+          onTimeout: () => Future.error(
+              const PaperlessServerException(ErrorCode.requestTimedOut)),
         );
   }
 
@@ -188,7 +188,7 @@ class TimeoutClient implements BaseClient {
 
   Future<void> _handleOfflineState() async {
     if (!(await connectivityStatusService.isConnectedToInternet())) {
-      throw const ErrorMessage(ErrorCode.deviceOffline);
+      throw const PaperlessServerException(ErrorCode.deviceOffline);
     }
   }
 }

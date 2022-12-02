@@ -62,7 +62,7 @@ class _BiometricAuthenticationIntroSlideState
                       final settings =
                           BlocProvider.of<ApplicationSettingsCubit>(context)
                               .state;
-                      getIt<AuthenticationService>()
+                      getIt<LocalAuthenticationService>()
                           .authenticateLocalUser(
                               "Please authenticate to secure Paperless Mobile")
                           .then((isEnabled) {

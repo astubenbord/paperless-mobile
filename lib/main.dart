@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -11,15 +10,14 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/intl_standalone.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/bloc/bloc_changes_observer.dart';
 import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
 import 'package:paperless_mobile/features/labels/bloc/global_state_bloc_provider.dart';
 import 'package:paperless_mobile/core/bloc/paperless_server_information_cubit.dart';
-import 'package:paperless_mobile/core/global/asset_images.dart';
 import 'package:paperless_mobile/core/global/constants.dart';
 import 'package:paperless_mobile/core/global/http_self_signed_certificate_override.dart';
 import 'package:paperless_mobile/core/logic/error_code_localization_mapper.dart';
-import 'package:paperless_mobile/core/model/error_message.dart';
 import 'package:paperless_mobile/core/service/file_service.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/app_intro/application_intro_slideshow.dart';
@@ -119,15 +117,16 @@ class _PaperlessMobileEntrypointState extends State<PaperlessMobileEntrypoint> {
             supportedLocales: const [
               Locale('en'), // Default if system locale is not available
               Locale('de'),
+              Locale('cs'),
             ],
             locale: Locale.fromSubtags(
                 languageCode: settings.preferredLocaleSubtag),
             localizationsDelegates: const [
               S.delegate,
               GlobalMaterialLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
               FormBuilderLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
             ],
             home: const AuthenticationWrapper(),
           );

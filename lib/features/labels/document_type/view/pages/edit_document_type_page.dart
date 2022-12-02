@@ -1,11 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:paperless_mobile/core/logic/error_code_localization_mapper.dart';
-import 'package:paperless_mobile/core/model/error_message.dart';
+import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
-import 'package:paperless_mobile/features/documents/model/query_parameters/document_type_query.dart';
 import 'package:paperless_mobile/features/labels/document_type/bloc/document_type_cubit.dart';
-import 'package:paperless_mobile/features/labels/document_type/model/document_type.model.dart';
 import 'package:paperless_mobile/features/labels/view/pages/edit_label_page.dart';
 import 'package:paperless_mobile/util.dart';
 
@@ -33,8 +30,8 @@ class EditDocumentTypePage extends StatelessWidget {
               .copyWith(documentType: const DocumentTypeQuery.unset()),
         );
       }
-    } on ErrorMessage catch (e) {
-      showSnackBar(context, translateError(context, e.code));
+    } on PaperlessServerException catch (error, stackTrace) {
+      showErrorMessage(context, error, stackTrace);
     } finally {
       Navigator.pop(context);
     }

@@ -28,7 +28,7 @@ class BiometricAuthenticationSetting extends StatelessWidget {
                 : S
                     .of(context)
                     .appSettingsDisableBiometricAuthenticationReasonText;
-            final changeValue = await getIt<AuthenticationService>()
+            final changeValue = await getIt<LocalAuthenticationService>()
                 .authenticateLocalUser(localizedReason);
             if (changeValue) {
               settingsBloc.setIsBiometricAuthenticationEnabled(val);

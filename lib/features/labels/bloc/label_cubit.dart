@@ -1,13 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:paperless_mobile/features/labels/model/label.model.dart';
-import 'package:paperless_mobile/features/labels/model/label_state.dart';
-import 'package:paperless_mobile/features/labels/repository/label_repository.dart';
+import 'package:paperless_api/paperless_api.dart';
+import 'package:paperless_mobile/features/labels/bloc/label_state.dart';
 
 abstract class LabelCubit<T extends Label> extends Cubit<LabelState<T>> {
-  final LabelRepository labelRepository;
+  final PaperlessLabelsApi labelsApi;
 
-  LabelCubit(this.labelRepository) : super(LabelState.initial());
+  LabelCubit(this.labelsApi) : super(LabelState.initial());
 
   @protected
   void loadFrom(Iterable<T> items) {
