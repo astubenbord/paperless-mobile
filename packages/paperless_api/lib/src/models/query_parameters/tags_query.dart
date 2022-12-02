@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-abstract class TagsQuery {
+abstract class TagsQuery extends Equatable {
   const TagsQuery();
   String toQueryParameter();
 }
@@ -11,6 +11,9 @@ class OnlyNotAssignedTagsQuery extends TagsQuery {
   String toQueryParameter() {
     return '&is_tagged=0';
   }
+
+  @override
+  List<Object?> get props => [];
 }
 
 class AnyAssignedTagsQuery extends TagsQuery {
@@ -27,6 +30,9 @@ class AnyAssignedTagsQuery extends TagsQuery {
     }
     return '&tags__id__in=${tagIds.join(',')}';
   }
+
+  @override
+  List<Object?> get props => [tagIds];
 }
 
 class IdsTagsQuery extends TagsQuery {
@@ -93,12 +99,15 @@ class IdsTagsQuery extends TagsQuery {
     }
     return sb.toString();
   }
+
+  @override
+  List<Object?> get props => [_idQueries];
 }
 
-abstract class TagIdQuery with EquatableMixin {
+abstract class TagIdQuery extends Equatable {
   final int id;
 
-  TagIdQuery(this.id);
+  const TagIdQuery(this.id);
 
   String get methodName;
 
@@ -109,7 +118,7 @@ abstract class TagIdQuery with EquatableMixin {
 }
 
 class IncludeTagIdQuery extends TagIdQuery {
-  IncludeTagIdQuery(super.id);
+  const IncludeTagIdQuery(super.id);
 
   @override
   String get methodName => 'include';
@@ -121,7 +130,7 @@ class IncludeTagIdQuery extends TagIdQuery {
 }
 
 class ExcludeTagIdQuery extends TagIdQuery {
-  ExcludeTagIdQuery(super.id);
+  const ExcludeTagIdQuery(super.id);
 
   @override
   String get methodName => 'exclude';
