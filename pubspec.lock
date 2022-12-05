@@ -610,7 +610,7 @@ packages:
       name: form_builder_validators
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "8.3.0"
+    version: "8.4.0"
   frontend_server_client:
     dependency: transitive
     description:

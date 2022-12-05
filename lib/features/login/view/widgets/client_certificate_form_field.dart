@@ -23,6 +23,7 @@ class _ClientCertificateFormFieldState
   @override
   Widget build(BuildContext context) {
     return FormBuilderField<ClientCertificate?>(
+      key: const ValueKey('login-client-cert'),
       initialValue: null,
       validator: (value) {
         if (value == null) {
@@ -70,6 +71,7 @@ class _ClientCertificateFormFieldState
                   ),
                   if (_selectedFile != null) ...[
                     ObscuredInputTextFormField(
+                      key: const ValueKey('login-client-cert-passphrase'),
                       initialValue: field.value?.passphrase,
                       onChanged: (value) => field.didChange(
                         field.value?.copyWith(passphrase: value),

@@ -7,13 +7,13 @@ import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 
 final getIt = GetIt.instance..allowReassignment;
-
 @InjectableInit(
   initializerName: r'$initGetIt', // default
   preferRelativeImports: true, // default
   asExtension: false, // default
 )
-void configureDependencies() => $initGetIt(getIt);
+void configureDependencies(String environment) =>
+    $initGetIt(getIt, environment: environment);
 
 ///
 /// Registers new security context, which will be used by the HttpClient, see [RegisterModule].

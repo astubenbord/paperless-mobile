@@ -5,6 +5,8 @@ import 'package:injectable/injectable.dart';
 const interceptedRoutes = ['thumb/'];
 
 @injectable
+@dev
+@prod
 class ResponseConversionInterceptor implements InterceptorContract {
   @override
   Future<BaseRequest> interceptRequest({required BaseRequest request}) async =>

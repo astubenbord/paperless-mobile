@@ -7,6 +7,8 @@ import 'package:http_interceptor/http_interceptor.dart';
 import 'package:injectable/injectable.dart';
 
 @injectable
+@dev
+@prod
 class AuthenticationInterceptor implements InterceptorContract {
   final LocalVault _localVault;
   AuthenticationInterceptor(this._localVault);

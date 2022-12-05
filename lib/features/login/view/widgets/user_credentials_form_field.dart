@@ -24,6 +24,7 @@ class _UserCredentialsFormFieldState extends State<UserCredentialsFormField> {
         child: Column(
           children: [
             TextFormField(
+              key: const ValueKey('login-username'),
               textCapitalization: TextCapitalization.words,
               autovalidateMode: AutovalidateMode.onUserInteraction,
               // USERNAME
@@ -41,6 +42,7 @@ class _UserCredentialsFormFieldState extends State<UserCredentialsFormField> {
               ),
             ),
             ObscuredInputTextFormField(
+              key: const ValueKey('login-password'),
               label: S.of(context).loginPagePasswordFieldLabel,
               onChanged: (password) => field.didChange(
                 field.value?.copyWith(password: password) ??

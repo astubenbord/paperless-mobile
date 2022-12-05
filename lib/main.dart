@@ -33,7 +33,7 @@ import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:paperless_mobile/util.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
-void main() async {
+Future<void> startAppProd() async {
   Bloc.observer = BlocChangesObserver();
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
@@ -42,23 +42,20 @@ void main() async {
   // Required for self signed client certificates
   HttpOverrides.global = X509HttpOverrides();
 
-  configureDependencies();
+  configureDependencies('prod');
   // Remove temporarily downloaded files.
   (await FileService.temporaryDirectory).deleteSync(recursive: true);
   kPackageInfo = await PackageInfo.fromPlatform();
   // Load application settings and stored authentication data
-  getIt<ConnectivityCubit>().initialize();
+  await getIt<ConnectivityCubit>().initialize();
   await getIt<ApplicationSettingsCubit>().initialize();
   await getIt<AuthenticationCubit>().initialize();
 
-  // Preload asset images
-  // WARNING: This seems to bloat up the app up to almost 200mb!
-  // await Future.forEach<AssetImage>(
-  //   AssetImages.values.map((e) => e.image),
-  //   (img) => loadImage(img),
-  // );
-
   runApp(const PaperlessMobileEntrypoint());
+}
+
+void main() async {
+  await startAppProd();
 }
 
 class PaperlessMobileEntrypoint extends StatefulWidget {
@@ -114,11 +111,7 @@ class _PaperlessMobileEntrypointState extends State<PaperlessMobileEntrypoint> {
               ),
             ),
             themeMode: settings.preferredThemeMode,
-            supportedLocales: const [
-              Locale('en'), // Default if system locale is not available
-              Locale('de'),
-              Locale('cs'),
-            ],
+            supportedLocales: S.delegate.supportedLocales,
             locale: Locale.fromSubtags(
                 languageCode: settings.preferredLocaleSubtag),
             localizationsDelegates: const [

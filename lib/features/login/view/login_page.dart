@@ -72,6 +72,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _buildLoginButton() {
     return ElevatedButton(
+      key: const ValueKey('login-login-button'),
       style: ButtonStyle(
         backgroundColor: MaterialStatePropertyAll(
           Theme.of(context).colorScheme.primaryContainer,

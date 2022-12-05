@@ -21,6 +21,7 @@ class _ServerAddressFormFieldState extends State<ServerAddressFormField> {
   @override
   Widget build(BuildContext context) {
     return FormBuilderTextField(
+      key: const ValueKey('login-server-address'),
       name: ServerAddressFormField.fkServerAddress,
       validator: FormBuilderValidators.required(
         errorText: S.of(context).loginPageServerUrlValidatorMessageText,

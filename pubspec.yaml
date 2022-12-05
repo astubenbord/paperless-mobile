@@ -62,7 +62,7 @@ dependencies:
     git:
       url: https://github.com/flutter-form-builder-ecosystem/form_builder_extra_fields.git
       ref: main
-  form_builder_validators: ^8.3.0
+  form_builder_validators: ^8.4.0
   infinite_scroll_pagination: ^3.2.0
   sliding_up_panel: ^2.0.0+1
   package_info_plus: ^1.4.3+1

@@ -8,15 +8,27 @@ import 'package:paperless_mobile/features/login/model/client_certificate.dart';
 import 'package:paperless_mobile/features/settings/model/application_settings_state.dart';
 import 'package:injectable/injectable.dart';
 
-@singleton
-class LocalVault {
+abstract class LocalVault {
+  Future<void> storeAuthenticationInformation(AuthenticationInformation auth);
+  Future<AuthenticationInformation?> loadAuthenticationInformation();
+  Future<ClientCertificate?> loadCertificate();
+  Future<bool> storeApplicationSettings(ApplicationSettingsState settings);
+  Future<ApplicationSettingsState?> loadApplicationSettings();
+  Future<void> clear();
+}
+
+@Injectable(as: LocalVault)
+@prod
+@dev
+class LocalVaultImpl implements LocalVault {
   static const applicationSettingsKey = "applicationSettings";
   static const authenticationKey = "authentication";
 
   final EncryptedSharedPreferences sharedPreferences;
 
-  LocalVault(this.sharedPreferences);
+  LocalVaultImpl(this.sharedPreferences);
 
+  @override
   Future<void> storeAuthenticationInformation(
     AuthenticationInformation auth,
   ) async {
@@ -26,6 +38,7 @@ class LocalVault {
     );
   }
 
+  @override
   Future<AuthenticationInformation?> loadAuthenticationInformation() async {
     if ((await sharedPreferences.getString(authenticationKey)).isEmpty) {
       return null;
@@ -35,11 +48,13 @@ class LocalVault {
     );
   }
 
+  @override
   Future<ClientCertificate?> loadCertificate() async {
     return loadAuthenticationInformation()
         .then((value) => value?.clientCertificate);
   }
 
+  @override
   Future<bool> storeApplicationSettings(ApplicationSettingsState settings) {
     return sharedPreferences.setString(
       applicationSettingsKey,
@@ -47,6 +62,7 @@ class LocalVault {
     );
   }
 
+  @override
   Future<ApplicationSettingsState?> loadApplicationSettings() async {
     final settings = await sharedPreferences.getString(applicationSettingsKey);
     if (settings.isEmpty) {
@@ -58,6 +74,7 @@ class LocalVault {
     );
   }
 
+  @override
   Future<void> clear() {
     return sharedPreferences.clear();
   }
