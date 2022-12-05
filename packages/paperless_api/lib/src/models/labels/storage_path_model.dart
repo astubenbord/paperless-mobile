@@ -1,9 +1,11 @@
+import 'package:json_annotation/json_annotation.dart';
 import 'package:paperless_api/src/models/labels/label_model.dart';
 import 'package:paperless_api/src/models/labels/matching_algorithm.dart';
+part 'storage_path_model.g.dart';
 
+@JsonSerializable(includeIfNull: false, fieldRename: FieldRename.snake)
 class StoragePath extends Label {
   static const pathKey = 'path';
-
   late String? path;
 
   StoragePath({
@@ -17,21 +19,12 @@ class StoragePath extends Label {
     required this.path,
   });
 
-  StoragePath.fromJson(Map<String, dynamic> json)
-      : path = json[pathKey],
-        super.fromJson(json);
+  factory StoragePath.fromJson(Map<String, dynamic> json) =>
+      _$StoragePathFromJson(json);
 
   @override
   String toString() {
     return name;
-  }
-
-  @override
-  void addSpecificFieldsToJson(Map<String, dynamic> json) {
-    json.putIfAbsent(
-      pathKey,
-      () => path,
-    );
   }
 
   @override
@@ -59,4 +52,19 @@ class StoragePath extends Label {
 
   @override
   String get queryEndpoint => 'storage_paths';
+
+  @override
+  List<Object?> get props => [
+        id,
+        name,
+        slug,
+        isInsensitive,
+        documentCount,
+        path,
+        matchingAlgorithm,
+        match,
+      ];
+
+  @override
+  Map<String, dynamic> toJson() => _$StoragePathToJson(this);
 }

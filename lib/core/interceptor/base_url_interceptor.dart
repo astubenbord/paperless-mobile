@@ -1,32 +1,23 @@
-import 'dart:developer';
-
-import 'package:flutter/foundation.dart';
 import 'package:http_interceptor/http_interceptor.dart';
 import 'package:injectable/injectable.dart';
 import 'package:paperless_mobile/core/store/local_vault.dart';
 
 @prod
 @injectable
-class AuthenticationInterceptor implements InterceptorContract {
+class BaseUrlInterceptor implements InterceptorContract {
   final LocalVault _localVault;
-  AuthenticationInterceptor(this._localVault);
 
+  BaseUrlInterceptor(this._localVault);
   @override
   Future<BaseRequest> interceptRequest({required BaseRequest request}) async {
     final auth = await _localVault.loadAuthenticationInformation();
-
-    if (kDebugMode) {
-      log("Intercepted ${request.method} request to ${request.url.toString()}");
+    if (auth == null) {
+      throw Exception(
+        "Authentication information not available, cannot perform request!",
+      );
     }
-
     return request.copyWith(
-      //Append server Url
-      headers: auth?.token?.isEmpty ?? true
-          ? request.headers
-          : {
-              ...request.headers,
-              'Authorization': 'Token ${auth!.token}',
-            },
+      url: Uri.parse(auth.serverUrl + request.url.toString()),
     );
   }
 

@@ -33,7 +33,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   get_it: ^7.2.0
-  injectable: ^1.5.3
+  injectable: ^2.1.0
   encrypted_shared_preferences: ^3.0.0
   permission_handler: ^9.2.0
   pdf: ^3.8.1
@@ -80,6 +80,7 @@ dependencies:
   fluttertoast: ^8.1.1
   paperless_api:
     path: packages/paperless_api
+  hive: ^2.2.3
 
 dev_dependencies:
   integration_test:
@@ -87,7 +88,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   build_runner: ^2.1.11
-  injectable_generator: ^1.5.3
+  injectable_generator: ^2.1.0
   mockito: ^5.3.2
   bloc_test: ^9.1.0
   dependency_validator: ^3.0.0

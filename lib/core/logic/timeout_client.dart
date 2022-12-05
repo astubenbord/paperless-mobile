@@ -12,10 +12,9 @@ import 'package:injectable/injectable.dart';
 ///
 /// Convenience class which handles timeout errors.
 ///
-@Injectable(as: BaseClient)
-@dev
 @prod
 @Named("timeoutClient")
+@Injectable(as: BaseClient)
 class TimeoutClient implements BaseClient {
   final ConnectivityStatusService connectivityStatusService;
   static const Duration requestTimeout = Duration(seconds: 25);

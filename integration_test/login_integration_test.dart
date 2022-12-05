@@ -45,7 +45,6 @@ void main() async {
       when(getIt<PaperlessAuthenticationApi>().login(
         username: testUsername,
         password: testPassword,
-        serverUrl: testServerUrl,
       )).thenAnswer((i) => Future.value("eyTestToken"));
 
       await getIt<ConnectivityCubit>().initialize();
@@ -74,7 +73,6 @@ void main() async {
     verify(getIt<PaperlessAuthenticationApi>().login(
       username: testUsername,
       password: testPassword,
-      serverUrl: testServerUrl,
     )).called(1);
   });
 
@@ -125,7 +123,6 @@ void main() async {
             .login(
       username: testUsername,
       password: testPassword,
-      serverUrl: testServerUrl,
     ));
     expect(
       find.textContaining(t.translations.loginPagePasswordValidatorMessageText),
@@ -175,7 +172,6 @@ void main() async {
             .login(
       username: testUsername,
       password: testPassword,
-      serverUrl: testServerUrl,
     ));
     expect(
       find.textContaining(t.translations.loginPageUsernameValidatorMessageText),
@@ -224,7 +220,6 @@ void main() async {
     verifyNever(getIt<PaperlessAuthenticationApi>().login(
       username: testUsername,
       password: testPassword,
-      serverUrl: testServerUrl,
     ));
     expect(
       find.textContaining(

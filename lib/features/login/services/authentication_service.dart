@@ -2,7 +2,7 @@ import 'package:injectable/injectable.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:paperless_mobile/core/store/local_vault.dart';
 
-@singleton
+@lazySingleton
 class LocalAuthenticationService {
   final LocalVault localStore;
   final LocalAuthentication localAuthentication;

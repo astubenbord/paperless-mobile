@@ -32,8 +32,9 @@ import 'package:paperless_mobile/features/settings/model/application_settings_st
 import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:paperless_mobile/util.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
+import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 
-Future<void> startAppProd() async {
+void main() async {
   Bloc.observer = BlocChangesObserver();
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
@@ -54,10 +55,6 @@ Future<void> startAppProd() async {
   runApp(const PaperlessMobileEntrypoint());
 }
 
-void main() async {
-  await startAppProd();
-}
-
 class PaperlessMobileEntrypoint extends StatefulWidget {
   const PaperlessMobileEntrypoint({Key? key}) : super(key: key);
 
@@ -71,10 +68,18 @@ class _PaperlessMobileEntrypointState extends State<PaperlessMobileEntrypoint> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider.value(value: getIt<ConnectivityCubit>()),
-        BlocProvider.value(value: getIt<AuthenticationCubit>()),
-        BlocProvider.value(value: getIt<PaperlessServerInformationCubit>()),
-        BlocProvider.value(value: getIt<ApplicationSettingsCubit>()),
+        BlocProvider<ConnectivityCubit>.value(
+          value: getIt<ConnectivityCubit>(),
+        ),
+        BlocProvider<AuthenticationCubit>.value(
+          value: getIt<AuthenticationCubit>(),
+        ),
+        BlocProvider<PaperlessServerInformationCubit>.value(
+          value: getIt<PaperlessServerInformationCubit>(),
+        ),
+        BlocProvider<ApplicationSettingsCubit>.value(
+          value: getIt<ApplicationSettingsCubit>(),
+        ),
       ],
       child: BlocBuilder<ApplicationSettingsCubit, ApplicationSettingsState>(
         builder: (context, settings) {
@@ -234,9 +239,53 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
               child: const HomePage(),
             );
           } else {
+            if (authentication.wasLoginStored &&
+                !(authentication.wasLocalAuthenticationSuccessful ?? false)) {
+              return BiometricAuthenticationPage();
+            }
             return const LoginPage();
           }
         },
+      ),
+    );
+  }
+}
+
+class BiometricAuthenticationPage extends StatelessWidget {
+  const BiometricAuthenticationPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            "The app is locked!",
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          Text(
+            "You can now either try to authenticate again or disconnect from the current server.",
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.caption,
+          ).padded(),
+          const SizedBox(height: 48),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              ElevatedButton(
+                onPressed: () =>
+                    BlocProvider.of<AuthenticationCubit>(context).logout(),
+                child: Text("Log out"),
+              ),
+              ElevatedButton(
+                onPressed: () => BlocProvider.of<AuthenticationCubit>(context)
+                    .restoreSessionState(),
+                child: Text("Authenticate"),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

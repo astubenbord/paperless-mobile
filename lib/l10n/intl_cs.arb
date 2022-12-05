@@ -70,6 +70,8 @@
   "@documentDetailsPageTabOverviewLabel": {},
   "documentDocumentTypePropertyLabel": "Typ dokumentu",
   "@documentDocumentTypePropertyLabel": {},
+  "documentDownloadSuccessMessage": "Document successfully downloaded.",
+  "@documentDownloadSuccessMessage": {},
   "documentEditPageTitle": "Upravit dokument",
   "@documentEditPageTitle": {},
   "documentMetaDataChecksumLabel": "MD5 součet originálu",
@@ -270,6 +272,10 @@
   "@inboxPageMarkAllAsSeenLabel": {},
   "inboxPageMarkAsSeenText": "Označit jako shlédnuté",
   "@inboxPageMarkAsSeenText": {},
+  "inboxPageNoNewDocumentsRefreshLabel": "Refresh",
+  "@inboxPageNoNewDocumentsRefreshLabel": {},
+  "inboxPageNoNewDocumentsText": "You do not have unseen documents.",
+  "@inboxPageNoNewDocumentsText": {},
   "inboxPageTodayText": "Dnes",
   "@inboxPageTodayText": {},
   "inboxPageUndoRemoveText": "VRÁTIT",
@@ -415,7 +421,5 @@
   "tagInboxTagPropertyLabel": "Tag inboxu",
   "@tagInboxTagPropertyLabel": {},
   "uploadPageAutomaticallInferredFieldsHintText": "Pokud specifikuješ hodnoty pro tato pole, paperless instance nebude automaticky přiřazovat naučené hodnoty. Pokud mají být tato pole automaticky vyplňována, nevyplňujte zde nic.",
-  "@uploadPageAutomaticallInferredFieldsHintText": {},
-  "inboxPageNoNewDocumentsText": "You do not have unseen documents.",
-  "inboxPageNoNewDocumentsRefreshLabel": "Refresh"
+  "@uploadPageAutomaticallInferredFieldsHintText": {}
 }

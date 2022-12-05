@@ -67,7 +67,7 @@ class DocumentScannerCubit extends Cubit<List<File>> {
       correspondent: correspondent,
       tags: tags,
       createdAt: createdAt,
-      authToken: auth.token,
+      authToken: auth.token!,
       serverUrl: auth.serverUrl,
     );
     if (onConsumptionFinished != null) {

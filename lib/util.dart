@@ -22,15 +22,17 @@ void showSnackBar(
   String? details,
   SnackBarAction? action,
 }) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text(
-        message + (details != null ? ' ($details)' : ''),
+  ScaffoldMessenger.of(context)
+    ..hideCurrentSnackBar()
+    ..showSnackBar(
+      SnackBar(
+        content: Text(
+          message + (details != null ? ' ($details)' : ''),
+        ),
+        action: action,
+        duration: const Duration(seconds: 5),
       ),
-      action: action,
-      duration: const Duration(seconds: 5),
-    ),
-  );
+    );
 }
 
 void showGenericError(

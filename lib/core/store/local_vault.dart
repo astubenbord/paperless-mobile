@@ -17,9 +17,8 @@ abstract class LocalVault {
   Future<void> clear();
 }
 
-@Injectable(as: LocalVault)
 @prod
-@dev
+@Injectable(as: LocalVault)
 class LocalVaultImpl implements LocalVault {
   static const applicationSettingsKey = "applicationSettings";
   static const authenticationKey = "authentication";

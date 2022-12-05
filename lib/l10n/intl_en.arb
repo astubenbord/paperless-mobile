@@ -70,6 +70,8 @@
   "@documentDetailsPageTabOverviewLabel": {},
   "documentDocumentTypePropertyLabel": "Document Type",
   "@documentDocumentTypePropertyLabel": {},
+  "documentDownloadSuccessMessage": "Document successfully downloaded.",
+  "@documentDownloadSuccessMessage": {},
   "documentEditPageTitle": "Edit Document",
   "@documentEditPageTitle": {},
   "documentMetaDataChecksumLabel": "Original MD5-Checksum",
@@ -262,7 +264,7 @@
   "@genericMessageOfflineText": {},
   "inboxPageDocumentRemovedMessageText": "Document removed from inbox.",
   "@inboxPageDocumentRemovedMessageText": {},
-  "inboxPageMarkAllAsSeenConfirmationDialogText": "Are you sure you want to mark all documents as seen? This will perform a bulk edit operation removing all inbox tags from the documents.\nThis action is not reversible! Are you sure you want to continue?",
+  "inboxPageMarkAllAsSeenConfirmationDialogText": "Are you sure you want to mark all documents as seen? This will perform a bulk edit operation removing all inbox tags from the documents.\\nThis action is not reversible! Are you sure you want to continue?",
   "@inboxPageMarkAllAsSeenConfirmationDialogText": {},
   "inboxPageMarkAllAsSeenConfirmationDialogTitleText": "Mark all as seen?",
   "@inboxPageMarkAllAsSeenConfirmationDialogTitleText": {},
@@ -270,6 +272,10 @@
   "@inboxPageMarkAllAsSeenLabel": {},
   "inboxPageMarkAsSeenText": "Mark as seen",
   "@inboxPageMarkAsSeenText": {},
+  "inboxPageNoNewDocumentsRefreshLabel": "Refresh",
+  "@inboxPageNoNewDocumentsRefreshLabel": {},
+  "inboxPageNoNewDocumentsText": "You do not have unseen documents.",
+  "@inboxPageNoNewDocumentsText": {},
   "inboxPageTodayText": "Today",
   "@inboxPageTodayText": {},
   "inboxPageUndoRemoveText": "UNDO",
@@ -415,7 +421,5 @@
   "tagInboxTagPropertyLabel": "Inbox-Tag",
   "@tagInboxTagPropertyLabel": {},
   "uploadPageAutomaticallInferredFieldsHintText": "If you specify values for these fields, your paperless instance will not automatically derive a value. If you want these values to be automatically populated by your server, leave the fields blank.",
-  "@uploadPageAutomaticallInferredFieldsHintText": {},
-  "inboxPageNoNewDocumentsText": "You do not have unseen documents.",
-  "inboxPageNoNewDocumentsRefreshLabel": "Refresh"
+  "@uploadPageAutomaticallInferredFieldsHintText": {}
 }

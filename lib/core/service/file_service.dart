@@ -56,7 +56,7 @@ class FileService {
     }
   }
 
-  static Future<Directory?> get downloadsDirectory async {
+  static Future<Directory> get downloadsDirectory async {
     if (Platform.isAndroid) {
       return (await getExternalStorageDirectories(
               type: StorageDirectory.downloads))!

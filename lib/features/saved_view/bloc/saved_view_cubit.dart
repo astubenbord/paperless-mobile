@@ -3,7 +3,9 @@ import 'package:injectable/injectable.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/features/saved_view/bloc/saved_view_state.dart';
 
-@singleton
+@prod
+@test
+@lazySingleton
 class SavedViewCubit extends Cubit<SavedViewState> {
   final PaperlessSavedViewsApi _api;
   SavedViewCubit(this._api) : super(SavedViewState(value: {}));

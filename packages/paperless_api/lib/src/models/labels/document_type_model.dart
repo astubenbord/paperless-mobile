@@ -1,8 +1,11 @@
+import 'package:json_annotation/json_annotation.dart';
 import 'package:paperless_api/src/models/labels/label_model.dart';
 import 'package:paperless_api/src/models/labels/matching_algorithm.dart';
+part 'document_type_model.g.dart';
 
+@JsonSerializable(includeIfNull: false, fieldRename: FieldRename.snake)
 class DocumentType extends Label {
-  DocumentType({
+  const DocumentType({
     required super.id,
     required super.name,
     super.slug,
@@ -12,10 +15,8 @@ class DocumentType extends Label {
     super.documentCount,
   });
 
-  DocumentType.fromJson(Map<String, dynamic> json) : super.fromJson(json);
-
-  @override
-  void addSpecificFieldsToJson(Map<String, dynamic> json) {}
+  factory DocumentType.fromJson(Map<String, dynamic> json) =>
+      _$DocumentTypeFromJson(json);
 
   @override
   String get queryEndpoint => 'document_types';
@@ -40,4 +41,18 @@ class DocumentType extends Label {
       slug: slug ?? this.slug,
     );
   }
+
+  @override
+  Map<String, dynamic> toJson() => _$DocumentTypeToJson(this);
+
+  @override
+  List<Object?> get props => [
+        id,
+        name,
+        slug,
+        isInsensitive,
+        documentCount,
+        matchingAlgorithm,
+        match,
+      ];
 }

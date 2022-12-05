@@ -120,11 +120,15 @@ class _EditLabelPageState<T extends Label> extends State<EditLabelPage<T>> {
               child: Text(S.of(context).genericActionCancelLabel),
             ),
             TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  widget.onDelete(widget.label);
-                },
-                child: Text(S.of(context).genericActionDeleteLabel)),
+              onPressed: () {
+                Navigator.pop(context);
+                widget.onDelete(widget.label);
+              },
+              child: Text(
+                S.of(context).genericActionDeleteLabel,
+                style: TextStyle(color: Theme.of(context).errorColor),
+              ),
+            ),
           ],
         ),
       );

@@ -1,12 +1,14 @@
+import 'package:json_annotation/json_annotation.dart';
 import 'package:paperless_api/src/models/labels/label_model.dart';
 import 'package:paperless_api/src/models/labels/matching_algorithm.dart';
 
+part 'correspondent_model.g.dart';
+
+@JsonSerializable(includeIfNull: false, fieldRename: FieldRename.snake)
 class Correspondent extends Label {
-  static const lastCorrespondenceKey = 'last_correspondence';
+  final DateTime? lastCorrespondence;
 
-  late DateTime? lastCorrespondence;
-
-  Correspondent({
+  const Correspondent({
     required super.id,
     required super.name,
     super.slug,
@@ -17,22 +19,14 @@ class Correspondent extends Label {
     this.lastCorrespondence,
   });
 
-  Correspondent.fromJson(Map<String, dynamic> json)
-      : lastCorrespondence =
-            DateTime.tryParse(json[lastCorrespondenceKey] ?? ''),
-        super.fromJson(json);
+  factory Correspondent.fromJson(Map<String, dynamic> json) =>
+      _$CorrespondentFromJson(json);
+
+  Map<String, dynamic> toJson() => _$CorrespondentToJson(this);
 
   @override
   String toString() {
     return name;
-  }
-
-  @override
-  void addSpecificFieldsToJson(Map<String, dynamic> json) {
-    if (lastCorrespondence != null) {
-      json.putIfAbsent(
-          lastCorrespondenceKey, () => lastCorrespondence!.toIso8601String());
-    }
   }
 
   @override
@@ -51,13 +45,25 @@ class Correspondent extends Label {
       name: name ?? this.name,
       documentCount: documentCount ?? documentCount,
       isInsensitive: isInsensitive ?? isInsensitive,
-      lastCorrespondence: lastCorrespondence ?? this.lastCorrespondence,
       match: match ?? this.match,
       matchingAlgorithm: matchingAlgorithm ?? this.matchingAlgorithm,
       slug: slug ?? this.slug,
+      lastCorrespondence: lastCorrespondence ?? this.lastCorrespondence,
     );
   }
 
   @override
   String get queryEndpoint => 'correspondents';
+
+  @override
+  List<Object?> get props => [
+        id,
+        name,
+        slug,
+        isInsensitive,
+        documentCount,
+        lastCorrespondence,
+        matchingAlgorithm,
+        match,
+      ];
 }

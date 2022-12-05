@@ -12,6 +12,7 @@ import 'package:paperless_mobile/core/widgets/highlighted_text.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/document_details/bloc/document_details_cubit.dart';
+import 'package:paperless_mobile/features/document_details/view/widgets/document_download_button.dart';
 import 'package:paperless_mobile/features/documents/view/pages/document_edit_page.dart';
 import 'package:paperless_mobile/features/documents/view/pages/document_view.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/delete_document_confirmation_dialog.dart';
@@ -82,12 +83,9 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
                           ? () => _onDelete(state.document!)
                           : null,
                     ).padded(const EdgeInsets.symmetric(horizontal: 4)),
-                    IconButton(
-                      icon: const Icon(Icons.download),
-                      onPressed: Platform.isAndroid && state.document != null
-                          ? () => _onDownload(state.document!)
-                          : null,
-                    ).padded(const EdgeInsets.only(right: 4)),
+                    DocumentDownloadButton(
+                      document: state.document,
+                    ),
                     IconButton(
                       icon: const Icon(Icons.open_in_new),
                       onPressed: state.document != null
@@ -402,25 +400,6 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
 
   Widget _separator() {
     return const SizedBox(height: 32.0);
-  }
-
-  Future<void> _onDownload(DocumentModel document) async {
-    if (!Platform.isAndroid) {
-      showSnackBar(
-          context, "This feature is currently only supported on Android!");
-      return;
-    }
-    setState(() => _isDownloadPending = true);
-    getIt<PaperlessDocumentsApi>().download(document).then((bytes) async {
-      final Directory dir = (await getExternalStorageDirectories(
-              type: StorageDirectory.downloads))!
-          .first;
-      String filePath = "${dir.path}/${document.originalFileName}";
-      //TODO: Add replacement mechanism here (ask user if file should be replaced if exists)
-      await File(filePath).writeAsBytes(bytes);
-      setState(() => _isDownloadPending = false);
-      dev.log("File downloaded to $filePath");
-    });
   }
 
   ///

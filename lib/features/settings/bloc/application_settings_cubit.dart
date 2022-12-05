@@ -5,7 +5,9 @@ import 'package:paperless_mobile/features/settings/model/application_settings_st
 import 'package:injectable/injectable.dart';
 import 'package:paperless_mobile/features/settings/model/view_type.dart';
 
-@singleton
+@prod
+@test
+@lazySingleton
 class ApplicationSettingsCubit extends Cubit<ApplicationSettingsState> {
   final LocalVault localVault;
 

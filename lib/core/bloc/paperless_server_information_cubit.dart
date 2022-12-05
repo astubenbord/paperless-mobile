@@ -3,7 +3,9 @@ import 'package:injectable/injectable.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/bloc/paperless_server_information_state.dart';
 
-@singleton
+@prod
+@test
+@lazySingleton
 class PaperlessServerInformationCubit
     extends Cubit<PaperlessServerInformationState> {
   final PaperlessServerStatsApi service;

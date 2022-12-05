@@ -64,7 +64,6 @@ class _SortFieldSelectionBottomSheetState
       contentPadding: const EdgeInsets.symmetric(horizontal: 32),
       title: Text(
         _localizedSortField(field),
-        style: Theme.of(context).textTheme.bodyText2,
       ),
       trailing: isNextSelected
           ? (_buildOrderIcon(_selectedOrderLoading!))

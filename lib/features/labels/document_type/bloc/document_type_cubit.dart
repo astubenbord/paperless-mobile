@@ -2,7 +2,9 @@ import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/features/labels/bloc/label_cubit.dart';
 import 'package:injectable/injectable.dart';
 
-@singleton
+@prod
+@test
+@lazySingleton
 class DocumentTypeCubit extends LabelCubit<DocumentType> {
   DocumentTypeCubit(super.metaDataService);
 

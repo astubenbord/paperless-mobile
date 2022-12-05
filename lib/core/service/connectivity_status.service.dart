@@ -9,7 +9,8 @@ abstract class ConnectivityStatusService {
   Stream<bool> connectivityChanges();
 }
 
-@Injectable(as: ConnectivityStatusService, env: ['prod', 'dev'])
+@prod
+@Injectable(as: ConnectivityStatusService)
 class ConnectivityStatusServiceImpl implements ConnectivityStatusService {
   final Connectivity connectivity;
 

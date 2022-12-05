@@ -1,3 +1,6 @@
+import 'package:json_annotation/json_annotation.dart';
+
+@JsonEnum(valueField: 'value')
 enum MatchingAlgorithm {
   anyWord(1, "Any: Match one of the following words"),
   allWords(2, "All: Match all of the following words"),

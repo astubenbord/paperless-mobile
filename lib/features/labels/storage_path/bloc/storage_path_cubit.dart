@@ -2,7 +2,9 @@ import 'package:injectable/injectable.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/features/labels/bloc/label_cubit.dart';
 
-@singleton
+@prod
+@test
+@lazySingleton
 class StoragePathCubit extends LabelCubit<StoragePath> {
   StoragePathCubit(super.metaDataService);
 

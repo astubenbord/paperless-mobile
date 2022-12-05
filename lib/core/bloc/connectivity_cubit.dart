@@ -4,7 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_mobile/core/service/connectivity_status.service.dart';
 import 'package:injectable/injectable.dart';
 
-@singleton
+@prod
+@test
+@lazySingleton
 class ConnectivityCubit extends Cubit<ConnectivityState> {
   final ConnectivityStatusService connectivityStatusService;
   StreamSubscription<bool>? _sub;

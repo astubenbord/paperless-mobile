@@ -14,13 +14,15 @@ class PaperlessAuthenticationApiImpl implements PaperlessAuthenticationApi {
   Future<String> login({
     required String username,
     required String password,
-    required String serverUrl,
   }) async {
     late Response response;
     try {
       response = await client.post(
         Uri.parse("/api/token/"),
-        body: {"username": username, "password": password},
+        body: {
+          "username": username,
+          "password": password,
+        },
       );
     } on FormatException catch (e) {
       final source = e.source;

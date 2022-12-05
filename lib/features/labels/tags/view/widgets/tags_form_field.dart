@@ -159,7 +159,7 @@ class _TagFormFieldState extends State<TagFormField> {
                           (query) => _buildTag(
                             field,
                             query,
-                            tagState.getLabel(query.id)!,
+                            tagState.getLabel(query.id),
                           ),
                         )
                         .toList(),
@@ -235,11 +235,13 @@ class _TagFormFieldState extends State<TagFormField> {
   Widget _buildTag(
     FormFieldState<TagsQuery> field,
     TagIdQuery query,
-    Tag tag,
+    Tag? tag,
   ) {
     final currentQuery = field.value as IdsTagsQuery;
     final isIncludedTag = currentQuery.includedIds.contains(query.id);
-
+    if (tag == null) {
+      return Container();
+    }
     return InputChip(
       label: Text(
         tag.name,
