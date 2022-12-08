@@ -1,59 +1,43 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_api/paperless_api.dart';
+import 'package:paperless_mobile/core/repository/label_repository.dart';
 import 'package:paperless_mobile/features/labels/bloc/label_state.dart';
 
-abstract class LabelCubit<T extends Label> extends Cubit<LabelState<T>> {
-  final PaperlessLabelsApi labelsApi;
+class LabelCubit<T extends Label> extends Cubit<LabelState<T>> {
+  final LabelRepository<T> _repository;
 
-  LabelCubit(this.labelsApi) : super(LabelState.initial());
+  late StreamSubscription _subscription;
 
-  @protected
-  void loadFrom(Iterable<T> items) {
-    emit(
-      LabelState(
-        isLoaded: true,
-        labels: Map.fromIterable(items, key: (e) => (e as T).id!),
-      ),
+  LabelCubit(this._repository) : super(LabelState.initial()) {
+    _subscription = _repository.labels.listen(
+      (update) => emit(LabelState(isLoaded: true, labels: update)),
     );
   }
 
+  ///
+  /// Adds  [item] to the current state. A new state is automatically pushed
+  /// due to the subscription to the repository, which updates the state on
+  /// operation.
+  ///
   Future<T> add(T item) async {
     assert(item.id == null);
-    final addedItem = await save(item);
-    final newValues = {...state.labels};
-    newValues.putIfAbsent(addedItem.id!, () => addedItem);
-    emit(
-      LabelState(
-        isLoaded: true,
-        labels: newValues,
-      ),
-    );
+    final addedItem = await _repository.create(item);
     return addedItem;
   }
 
   Future<T> replace(T item) async {
     assert(item.id != null);
-    final updatedItem = await update(item);
-    final updatedValues = {...state.labels};
-    updatedValues[item.id!] = updatedItem;
-    emit(
-      LabelState(
-        isLoaded: state.isLoaded,
-        labels: updatedValues,
-      ),
-    );
+    final updatedItem = await _repository.update(item);
     return updatedItem;
   }
 
   Future<void> remove(T item) async {
     assert(item.id != null);
     if (state.labels.containsKey(item.id)) {
-      final deletedId = await delete(item);
-      final updatedValues = {...state.labels}..remove(deletedId);
-      emit(
-        LabelState(isLoaded: true, labels: updatedValues),
-      );
+      await _repository.delete(item);
     }
   }
 
@@ -61,14 +45,9 @@ abstract class LabelCubit<T extends Label> extends Cubit<LabelState<T>> {
     emit(LabelState(isLoaded: false, labels: {}));
   }
 
-  Future<void> initialize();
-
-  @protected
-  Future<T> save(T item);
-
-  @protected
-  Future<T> update(T item);
-
-  @protected
-  Future<int> delete(T item);
+  @override
+  Future<void> close() {
+    _subscription.cancel();
+    return super.close();
+  }
 }

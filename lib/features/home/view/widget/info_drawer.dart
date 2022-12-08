@@ -3,15 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/bloc/paperless_server_information_cubit.dart';
 import 'package:paperless_mobile/core/bloc/paperless_server_information_state.dart';
+import 'package:paperless_mobile/core/repository/label_repository.dart';
+import 'package:paperless_mobile/core/repository/provider/label_repositories_provider.dart';
+import 'package:paperless_mobile/core/repository/saved_view_repository.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/inbox/bloc/inbox_cubit.dart';
 import 'package:paperless_mobile/features/inbox/view/pages/inbox_page.dart';
-import 'package:paperless_mobile/features/labels/bloc/global_state_bloc_provider.dart';
-import 'package:paperless_mobile/features/labels/correspondent/bloc/correspondents_cubit.dart';
-import 'package:paperless_mobile/features/labels/document_type/bloc/document_type_cubit.dart';
-import 'package:paperless_mobile/features/labels/tags/bloc/tags_cubit.dart';
 import 'package:paperless_mobile/features/login/bloc/authentication_cubit.dart';
 import 'package:paperless_mobile/features/scan/bloc/document_scanner_cubit.dart';
 import 'package:paperless_mobile/features/settings/bloc/application_settings_cubit.dart';
@@ -188,11 +187,14 @@ class InfoDrawer extends StatelessWidget {
               onTap: () {
                 try {
                   BlocProvider.of<AuthenticationCubit>(context).logout();
-                  getIt<DocumentsCubit>().reset();
-                  getIt<CorrespondentCubit>().reset();
-                  getIt<DocumentTypeCubit>().reset();
-                  getIt<TagCubit>().reset();
-                  getIt<DocumentScannerCubit>().reset();
+                  RepositoryProvider.of<LabelRepository<Tag>>(context).clear();
+                  RepositoryProvider.of<LabelRepository<Correspondent>>(context)
+                      .clear();
+                  RepositoryProvider.of<LabelRepository<DocumentType>>(context)
+                      .clear();
+                  RepositoryProvider.of<LabelRepository<StoragePath>>(context)
+                      .clear();
+                  RepositoryProvider.of<SavedViewRepository>(context).clear();
                 } on PaperlessServerException catch (error, stackTrace) {
                   showErrorMessage(context, error, stackTrace);
                 }
@@ -208,13 +210,14 @@ class InfoDrawer extends StatelessWidget {
   Future<void> _onOpenInbox(BuildContext context) async {
     await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => GlobalStateBlocProvider(
-          additionalProviders: [
-            BlocProvider<InboxCubit>.value(
-              value: getIt<InboxCubit>()..loadInbox(),
+        builder: (_) => LabelRepositoriesProvider(
+          child: BlocProvider(
+            create: (context) => InboxCubit(
+              RepositoryProvider.of<LabelRepository<Tag>>(context),
+              getIt<PaperlessDocumentsApi>(),
             ),
-          ],
-          child: const InboxPage(),
+            child: const InboxPage(),
+          ),
         ),
         maintainState: false,
       ),

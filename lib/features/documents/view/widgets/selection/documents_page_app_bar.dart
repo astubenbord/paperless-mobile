@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_api/paperless_api.dart';
+import 'package:paperless_mobile/core/repository/saved_view_repository.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
-import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/selection/bulk_delete_confirmation_dialog.dart';
+import 'package:paperless_mobile/features/saved_view/cubit/saved_view_cubit.dart';
 import 'package:paperless_mobile/features/saved_view/view/saved_view_selection_widget.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:paperless_mobile/util.dart';
@@ -79,7 +80,6 @@ class _DocumentsPageAppBarState extends State<DocumentsPageAppBar> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-//TODO: replace with sorting stuff...
             SavedViewSelectionWidget(height: 48, enabled: enabled),
           ],
         ),

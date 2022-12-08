@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_api/paperless_api.dart';
+import 'package:paperless_mobile/core/repository/label_repository.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
-import 'package:paperless_mobile/features/labels/document_type/bloc/document_type_cubit.dart';
+import 'package:paperless_mobile/features/labels/bloc/label_cubit.dart';
 import 'package:paperless_mobile/features/labels/bloc/label_state.dart';
 import 'package:paperless_mobile/util.dart';
 
@@ -19,20 +20,26 @@ class DocumentTypeWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AbsorbPointer(
-      absorbing: !isClickable,
-      child: GestureDetector(
-        onTap: () => _addDocumentTypeToFilter(context),
-        child: BlocBuilder<DocumentTypeCubit, LabelState<DocumentType>>(
-          builder: (context, state) {
-            return Text(
-              state.labels[documentTypeId]?.toString() ?? "-",
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyText2!
-                  .copyWith(color: Theme.of(context).colorScheme.tertiary),
-            );
-          },
+    return BlocProvider(
+      create: (context) => LabelCubit<DocumentType>(
+        RepositoryProvider.of<LabelRepository<DocumentType>>(context),
+      ),
+      child: AbsorbPointer(
+        absorbing: !isClickable,
+        child: GestureDetector(
+          onTap: () => _addDocumentTypeToFilter(context),
+          child:
+              BlocBuilder<LabelCubit<DocumentType>, LabelState<DocumentType>>(
+            builder: (context, state) {
+              return Text(
+                state.labels[documentTypeId]?.toString() ?? "-",
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyText2!
+                    .copyWith(color: Theme.of(context).colorScheme.tertiary),
+              );
+            },
+          ),
         ),
       ),
     );

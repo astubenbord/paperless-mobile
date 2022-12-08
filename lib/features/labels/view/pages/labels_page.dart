@@ -1,22 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_api/paperless_api.dart';
-import 'package:paperless_mobile/di_initializer.dart';
-import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
+import 'package:paperless_mobile/core/repository/label_repository.dart';
+import 'package:paperless_mobile/features/edit_label/view/impl/add_correspondent_page.dart';
+import 'package:paperless_mobile/features/edit_label/view/impl/add_document_type_page.dart';
+import 'package:paperless_mobile/features/edit_label/view/impl/add_storage_path_page.dart';
+import 'package:paperless_mobile/features/edit_label/view/impl/add_tag_page.dart';
+import 'package:paperless_mobile/features/edit_label/view/impl/edit_correspondent_page.dart';
+import 'package:paperless_mobile/features/edit_label/view/impl/edit_document_type_page.dart';
+import 'package:paperless_mobile/features/edit_label/view/impl/edit_storage_path_page.dart';
+import 'package:paperless_mobile/features/edit_label/view/impl/edit_tag_page.dart';
 import 'package:paperless_mobile/features/home/view/widget/info_drawer.dart';
-import 'package:paperless_mobile/features/labels/bloc/global_state_bloc_provider.dart';
-import 'package:paperless_mobile/features/labels/correspondent/bloc/correspondents_cubit.dart';
-import 'package:paperless_mobile/features/labels/correspondent/view/pages/add_correspondent_page.dart';
-import 'package:paperless_mobile/features/labels/correspondent/view/pages/edit_correspondent_page.dart';
-import 'package:paperless_mobile/features/labels/document_type/bloc/document_type_cubit.dart';
-import 'package:paperless_mobile/features/labels/document_type/view/pages/add_document_type_page.dart';
-import 'package:paperless_mobile/features/labels/document_type/view/pages/edit_document_type_page.dart';
-import 'package:paperless_mobile/features/labels/storage_path/bloc/storage_path_cubit.dart';
-import 'package:paperless_mobile/features/labels/storage_path/view/pages/add_storage_path_page.dart';
-import 'package:paperless_mobile/features/labels/storage_path/view/pages/edit_storage_path_page.dart';
-import 'package:paperless_mobile/features/labels/tags/bloc/tags_cubit.dart';
-import 'package:paperless_mobile/features/labels/tags/view/pages/add_tag_page.dart';
-import 'package:paperless_mobile/features/labels/tags/view/pages/edit_tag_page.dart';
+import 'package:paperless_mobile/features/labels/bloc/label_cubit.dart';
 import 'package:paperless_mobile/features/labels/view/widgets/label_tab_view.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 
@@ -35,10 +30,6 @@ class _LabelsPageState extends State<LabelsPage>
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<CorrespondentCubit>(context).initialize();
-    BlocProvider.of<DocumentTypeCubit>(context).initialize();
-    BlocProvider.of<TagCubit>(context).initialize();
-
     _tabController = TabController(length: 4, vsync: this)
       ..addListener(() => setState(() => _currentIndex = _tabController.index));
   }
@@ -60,7 +51,12 @@ class _LabelsPageState extends State<LabelsPage>
           ),
           actions: [
             IconButton(
-              onPressed: _onAddPressed,
+              onPressed: [
+                _openAddCorrespondentPage,
+                _openAddDocumentTypePage,
+                _openAddTagPage,
+                _openAddStoragePathPage,
+              ][_currentIndex],
               icon: const Icon(Icons.add),
             )
           ],
@@ -104,69 +100,87 @@ class _LabelsPageState extends State<LabelsPage>
         body: TabBarView(
           controller: _tabController,
           children: [
-            LabelTabView<Correspondent>(
-              cubit: BlocProvider.of<CorrespondentCubit>(context),
-              filterBuilder: (label) => DocumentFilter(
-                correspondent: CorrespondentQuery.fromId(label.id),
-                pageSize: label.documentCount ?? 0,
+            BlocProvider(
+              create: (context) => LabelCubit(
+                RepositoryProvider.of<LabelRepository<Correspondent>>(context),
               ),
-              onOpenEditPage: _openEditCorrespondentPage,
-              emptyStateActionButtonLabel:
-                  S.of(context).labelsPageCorrespondentEmptyStateAddNewLabel,
-              emptyStateDescription: S
-                  .of(context)
-                  .labelsPageCorrespondentEmptyStateDescriptionText,
-              onOpenAddNewPage: _onAddPressed,
+              child: LabelTabView<Correspondent>(
+                filterBuilder: (label) => DocumentFilter(
+                  correspondent: CorrespondentQuery.fromId(label.id),
+                  pageSize: label.documentCount ?? 0,
+                ),
+                onEdit: _openEditCorrespondentPage,
+                emptyStateActionButtonLabel:
+                    S.of(context).labelsPageCorrespondentEmptyStateAddNewLabel,
+                emptyStateDescription: S
+                    .of(context)
+                    .labelsPageCorrespondentEmptyStateDescriptionText,
+                onAddNew: _openAddCorrespondentPage,
+              ),
             ),
-            LabelTabView<DocumentType>(
-              cubit: BlocProvider.of<DocumentTypeCubit>(context),
-              filterBuilder: (label) => DocumentFilter(
-                documentType: DocumentTypeQuery.fromId(label.id),
-                pageSize: label.documentCount ?? 0,
+            BlocProvider(
+              create: (context) => LabelCubit(
+                RepositoryProvider.of<LabelRepository<DocumentType>>(context),
               ),
-              onOpenEditPage: _openEditDocumentTypePage,
-              emptyStateActionButtonLabel:
-                  S.of(context).labelsPageDocumentTypeEmptyStateAddNewLabel,
-              emptyStateDescription:
-                  S.of(context).labelsPageDocumentTypeEmptyStateDescriptionText,
-              onOpenAddNewPage: _onAddPressed,
+              child: LabelTabView<DocumentType>(
+                filterBuilder: (label) => DocumentFilter(
+                  documentType: DocumentTypeQuery.fromId(label.id),
+                  pageSize: label.documentCount ?? 0,
+                ),
+                onEdit: _openEditDocumentTypePage,
+                emptyStateActionButtonLabel:
+                    S.of(context).labelsPageDocumentTypeEmptyStateAddNewLabel,
+                emptyStateDescription: S
+                    .of(context)
+                    .labelsPageDocumentTypeEmptyStateDescriptionText,
+                onAddNew: _openAddDocumentTypePage,
+              ),
             ),
-            LabelTabView<Tag>(
-              cubit: BlocProvider.of<TagCubit>(context),
-              filterBuilder: (label) => DocumentFilter(
-                tags: IdsTagsQuery.fromIds([label.id!]),
-                pageSize: label.documentCount ?? 0,
+            BlocProvider(
+              create: (context) => LabelCubit<Tag>(
+                RepositoryProvider.of<LabelRepository<Tag>>(context),
               ),
-              onOpenEditPage: _openEditTagPage,
-              leadingBuilder: (t) => CircleAvatar(
-                backgroundColor: t.color,
-                child: t.isInboxTag ?? false
-                    ? Icon(
-                        Icons.inbox,
-                        color: t.textColor,
-                      )
-                    : null,
+              child: LabelTabView<Tag>(
+                filterBuilder: (label) => DocumentFilter(
+                  tags: IdsTagsQuery.fromIds([label.id!]),
+                  pageSize: label.documentCount ?? 0,
+                ),
+                onEdit: _openEditTagPage,
+                leadingBuilder: (t) => CircleAvatar(
+                  backgroundColor: t.color,
+                  child: t.isInboxTag ?? false
+                      ? Icon(
+                          Icons.inbox,
+                          color: t.textColor,
+                        )
+                      : null,
+                ),
+                contentBuilder: (t) => Text(t.match ?? ''),
+                emptyStateActionButtonLabel:
+                    S.of(context).labelsPageTagsEmptyStateAddNewLabel,
+                emptyStateDescription:
+                    S.of(context).labelsPageTagsEmptyStateDescriptionText,
+                onAddNew: _openAddTagPage,
               ),
-              contentBuilder: (t) => Text(t.match ?? ''),
-              emptyStateActionButtonLabel:
-                  S.of(context).labelsPageTagsEmptyStateAddNewLabel,
-              emptyStateDescription:
-                  S.of(context).labelsPageTagsEmptyStateDescriptionText,
-              onOpenAddNewPage: _onAddPressed,
             ),
-            LabelTabView<StoragePath>(
-              cubit: BlocProvider.of<StoragePathCubit>(context),
-              onOpenEditPage: _openEditStoragePathPage,
-              filterBuilder: (label) => DocumentFilter(
-                storagePath: StoragePathQuery.fromId(label.id),
-                pageSize: label.documentCount ?? 0,
+            BlocProvider(
+              create: (context) => LabelCubit<StoragePath>(
+                RepositoryProvider.of<LabelRepository<StoragePath>>(context),
               ),
-              contentBuilder: (path) => Text(path.path ?? ""),
-              emptyStateActionButtonLabel:
-                  S.of(context).labelsPageStoragePathEmptyStateAddNewLabel,
-              emptyStateDescription:
-                  S.of(context).labelsPageStoragePathEmptyStateDescriptionText,
-              onOpenAddNewPage: _onAddPressed,
+              child: LabelTabView<StoragePath>(
+                onEdit: _openEditStoragePathPage,
+                filterBuilder: (label) => DocumentFilter(
+                  storagePath: StoragePathQuery.fromId(label.id),
+                  pageSize: label.documentCount ?? 0,
+                ),
+                contentBuilder: (path) => Text(path.path ?? ""),
+                emptyStateActionButtonLabel:
+                    S.of(context).labelsPageStoragePathEmptyStateAddNewLabel,
+                emptyStateDescription: S
+                    .of(context)
+                    .labelsPageStoragePathEmptyStateDescriptionText,
+                onAddNew: _openAddStoragePathPage,
+              ),
             ),
           ],
         ),
@@ -178,12 +192,8 @@ class _LabelsPageState extends State<LabelsPage>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => GlobalStateBlocProvider(
-          additionalProviders: [
-            BlocProvider<DocumentsCubit>.value(
-              value: BlocProvider.of<DocumentsCubit>(context),
-            ),
-          ],
+        builder: (_) => RepositoryProvider.value(
+          value: RepositoryProvider.of<LabelRepository<Correspondent>>(context),
           child: EditCorrespondentPage(correspondent: correspondent),
         ),
       ),
@@ -194,12 +204,8 @@ class _LabelsPageState extends State<LabelsPage>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => GlobalStateBlocProvider(
-          additionalProviders: [
-            BlocProvider<DocumentsCubit>.value(
-              value: BlocProvider.of<DocumentsCubit>(context),
-            ),
-          ],
+        builder: (_) => RepositoryProvider.value(
+          value: RepositoryProvider.of<LabelRepository<DocumentType>>(context),
           child: EditDocumentTypePage(documentType: docType),
         ),
       ),
@@ -210,12 +216,8 @@ class _LabelsPageState extends State<LabelsPage>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => GlobalStateBlocProvider(
-          additionalProviders: [
-            BlocProvider<DocumentsCubit>.value(
-              value: BlocProvider.of<DocumentsCubit>(context),
-            ),
-          ],
+        builder: (_) => RepositoryProvider.value(
+          value: RepositoryProvider.of<LabelRepository<Tag>>(context),
           child: EditTagPage(tag: tag),
         ),
       ),
@@ -226,37 +228,61 @@ class _LabelsPageState extends State<LabelsPage>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => GlobalStateBlocProvider(
-          additionalProviders: [
-            BlocProvider<DocumentsCubit>.value(
-              value: getIt<DocumentsCubit>(),
-            ),
-          ],
-          child: EditStoragePathPage(storagePath: path),
+        builder: (_) => RepositoryProvider.value(
+          value: RepositoryProvider.of<LabelRepository<StoragePath>>(context),
+          child: EditStoragePathPage(
+            storagePath: path,
+          ),
         ),
       ),
     );
   }
 
-  void _onAddPressed() {
-    Navigator.push(context, MaterialPageRoute(
-      builder: (context) {
-        late final Widget page;
-        switch (_currentIndex) {
-          case 0:
-            page = const AddCorrespondentPage();
-            break;
-          case 1:
-            page = const AddDocumentTypePage();
-            break;
-          case 2:
-            page = const AddTagPage();
-            break;
-          case 3:
-            page = const AddStoragePathPage();
-        }
-        return GlobalStateBlocProvider(child: page);
-      },
-    ));
+  void _openAddCorrespondentPage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => RepositoryProvider.value(
+          value: RepositoryProvider.of<LabelRepository<Correspondent>>(context),
+          child: const AddCorrespondentPage(),
+        ),
+      ),
+    );
+  }
+
+  void _openAddDocumentTypePage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => RepositoryProvider.value(
+          value: RepositoryProvider.of<LabelRepository<DocumentType>>(context),
+          child: const AddDocumentTypePage(),
+        ),
+      ),
+    );
+  }
+
+  void _openAddTagPage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => RepositoryProvider.value(
+          value: RepositoryProvider.of<LabelRepository<Tag>>(context),
+          child: const AddTagPage(),
+        ),
+      ),
+    );
+  }
+
+  void _openAddStoragePathPage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => RepositoryProvider.value(
+          value: RepositoryProvider.of<LabelRepository<StoragePath>>(context),
+          child: const AddStoragePathPage(),
+        ),
+      ),
+    );
   }
 }

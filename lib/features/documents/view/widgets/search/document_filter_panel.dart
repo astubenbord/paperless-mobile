@@ -4,15 +4,12 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
-import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/search/query_type_form_field.dart';
-import 'package:paperless_mobile/features/labels/correspondent/bloc/correspondents_cubit.dart';
-import 'package:paperless_mobile/features/labels/document_type/bloc/document_type_cubit.dart';
+import 'package:paperless_mobile/features/labels/bloc/label_cubit.dart';
 import 'package:paperless_mobile/features/labels/bloc/label_state.dart';
-import 'package:paperless_mobile/features/labels/storage_path/bloc/storage_path_cubit.dart';
 import 'package:paperless_mobile/features/labels/tags/view/widgets/tags_form_field.dart';
 import 'package:paperless_mobile/features/labels/view/widgets/label_form_field.dart';
-import 'package:paperless_mobile/features/saved_view/bloc/saved_view_cubit.dart';
+import 'package:paperless_mobile/features/saved_view/cubit/saved_view_cubit.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:intl/intl.dart';
 import 'package:paperless_mobile/util.dart';
@@ -24,10 +21,15 @@ class DocumentFilterPanel extends StatefulWidget {
   final PanelController panelController;
   final ScrollController scrollController;
 
+  final DocumentFilter initialFilter;
+
+  final void Function(DocumentFilter filter) onFilterChanged;
   const DocumentFilterPanel({
     Key? key,
     required this.panelController,
     required this.scrollController,
+    required this.onFilterChanged,
+    required this.initialFilter,
   }) : super(key: key);
 
   @override
@@ -63,93 +65,84 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
         topLeft: Radius.circular(16),
         topRight: Radius.circular(16),
       ),
-      child: BlocConsumer<DocumentsCubit, DocumentsState>(
-        listener: (context, state) {
-          // Set initial values, otherwise they would not automatically update.
-          _patchFromFilter(state.filter);
-        },
-        builder: (context, state) {
-          return FormBuilder(
-            key: _formKey,
-            child: Column(
+      child: FormBuilder(
+        key: _formKey,
+        child: Column(
+          children: [
+            Stack(
+              alignment: Alignment.center,
               children: [
-                Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    _buildDragLine(),
-                    Align(
-                      alignment: Alignment.topRight,
-                      child: TextButton.icon(
-                        icon: const Icon(Icons.refresh),
-                        label: Text(
-                            S.of(context).documentsFilterPageResetFilterLabel),
-                        onPressed: () => _resetFilter(context),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 8.0,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      S.of(context).documentsFilterPageTitle,
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    TextButton(
-                      onPressed: _onApplyFilter,
-                      child: Text(
-                          S.of(context).documentsFilterPageApplyFilterLabel),
-                    ),
-                  ],
-                ).padded(),
-                const SizedBox(
-                  height: 16.0,
-                ),
-                Expanded(
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(16.0),
-                      topRight: Radius.circular(16.0),
-                    ),
-                    child: ListView(
-                      controller: widget.scrollController,
-                      children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                              S.of(context).documentsFilterPageSearchLabel),
-                        ).padded(const EdgeInsets.only(left: 8.0)),
-                        _buildQueryFormField(state),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                              S.of(context).documentsFilterPageAdvancedLabel),
-                        ).padded(const EdgeInsets.only(left: 8.0, top: 8.0)),
-                        _buildCreatedDateRangePickerFormField(state).padded(),
-                        _buildAddedDateRangePickerFormField(state).padded(),
-                        _buildCorrespondentFormField(state).padded(),
-                        _buildDocumentTypeFormField(state).padded(),
-                        _buildStoragePathFormField(state).padded(),
-                        TagFormField(
-                          name: DocumentModel.tagsKey,
-                          initialValue: state.filter.tags,
-                          allowCreation: false,
-                        ).padded(),
-                        // Required in order for the storage path field to be visible when typing
-                        const SizedBox(
-                          height: 150,
-                        ),
-                      ],
-                    ).padded(),
+                _buildDragLine(),
+                Align(
+                  alignment: Alignment.topRight,
+                  child: TextButton.icon(
+                    icon: const Icon(Icons.refresh),
+                    label:
+                        Text(S.of(context).documentsFilterPageResetFilterLabel),
+                    onPressed: () => _resetFilter(context),
                   ),
                 ),
               ],
             ),
-          );
-        },
+            const SizedBox(
+              height: 8.0,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  S.of(context).documentsFilterPageTitle,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                TextButton(
+                  onPressed: _onApplyFilter,
+                  child:
+                      Text(S.of(context).documentsFilterPageApplyFilterLabel),
+                ),
+              ],
+            ).padded(),
+            const SizedBox(
+              height: 16.0,
+            ),
+            Expanded(
+              child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(16.0),
+                  topRight: Radius.circular(16.0),
+                ),
+                child: ListView(
+                  controller: widget.scrollController,
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(S.of(context).documentsFilterPageSearchLabel),
+                    ).padded(const EdgeInsets.only(left: 8.0)),
+                    _buildQueryFormField(),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child:
+                          Text(S.of(context).documentsFilterPageAdvancedLabel),
+                    ).padded(const EdgeInsets.only(left: 8.0, top: 8.0)),
+                    _buildCreatedDateRangePickerFormField().padded(),
+                    _buildAddedDateRangePickerFormField().padded(),
+                    _buildCorrespondentFormField().padded(),
+                    _buildDocumentTypeFormField().padded(),
+                    _buildStoragePathFormField().padded(),
+                    TagFormField(
+                      name: DocumentModel.tagsKey,
+                      initialValue: widget.initialFilter.tags,
+                      allowCreation: false,
+                    ).padded(),
+                    // Required in order for the storage path field to be visible when typing
+                    const SizedBox(
+                      height: 150,
+                    ),
+                  ],
+                ).padded(),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -163,15 +156,16 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
     }
   }
 
-  Widget _buildDocumentTypeFormField(DocumentsState docState) {
-    return BlocBuilder<DocumentTypeCubit, LabelState<DocumentType>>(
+  //TODO: Check if the blocs can be found in the context, otherwise just provide repository and create new bloc inside LabelFormField!
+  Widget _buildDocumentTypeFormField() {
+    return BlocBuilder<LabelCubit<DocumentType>, LabelState<DocumentType>>(
       builder: (context, state) {
         return LabelFormField<DocumentType, DocumentTypeQuery>(
           formBuilderState: _formKey.currentState,
           name: fkDocumentType,
           state: state.labels,
           label: S.of(context).documentDocumentTypePropertyLabel,
-          initialValue: docState.filter.documentType,
+          initialValue: widget.initialFilter.documentType,
           queryParameterIdBuilder: DocumentTypeQuery.fromId,
           queryParameterNotAssignedBuilder: DocumentTypeQuery.notAssigned,
           prefixIcon: const Icon(Icons.description_outlined),
@@ -180,15 +174,15 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
     );
   }
 
-  Widget _buildCorrespondentFormField(DocumentsState docState) {
-    return BlocBuilder<CorrespondentCubit, LabelState<Correspondent>>(
+  Widget _buildCorrespondentFormField() {
+    return BlocBuilder<LabelCubit<Correspondent>, LabelState<Correspondent>>(
       builder: (context, state) {
         return LabelFormField<Correspondent, CorrespondentQuery>(
           formBuilderState: _formKey.currentState,
           name: fkCorrespondent,
           state: state.labels,
           label: S.of(context).documentCorrespondentPropertyLabel,
-          initialValue: docState.filter.correspondent,
+          initialValue: widget.initialFilter.correspondent,
           queryParameterIdBuilder: CorrespondentQuery.fromId,
           queryParameterNotAssignedBuilder: CorrespondentQuery.notAssigned,
           prefixIcon: const Icon(Icons.person_outline),
@@ -197,15 +191,15 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
     );
   }
 
-  Widget _buildStoragePathFormField(DocumentsState docState) {
-    return BlocBuilder<StoragePathCubit, LabelState<StoragePath>>(
+  Widget _buildStoragePathFormField() {
+    return BlocBuilder<LabelCubit<StoragePath>, LabelState<StoragePath>>(
       builder: (context, state) {
         return LabelFormField<StoragePath, StoragePathQuery>(
           formBuilderState: _formKey.currentState,
           name: fkStoragePath,
           state: state.labels,
           label: S.of(context).documentStoragePathPropertyLabel,
-          initialValue: docState.filter.storagePath,
+          initialValue: widget.initialFilter.storagePath,
           queryParameterIdBuilder: StoragePathQuery.fromId,
           queryParameterNotAssignedBuilder: StoragePathQuery.notAssigned,
           prefixIcon: const Icon(Icons.folder_outlined),
@@ -214,7 +208,7 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
     );
   }
 
-  Widget _buildQueryFormField(DocumentsState state) {
+  Widget _buildQueryFormField() {
     final queryType =
         _formKey.currentState?.getRawValue(QueryTypeFormField.fkQueryType) ??
             QueryType.titleAndContent;
@@ -239,16 +233,15 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
         prefixIcon: const Icon(Icons.search_outlined),
         labelText: label,
         suffixIcon: QueryTypeFormField(
-          initialValue: state.filter.queryType,
+          initialValue: widget.initialFilter.queryType,
           afterSelected: (queryType) => setState(() {}),
         ),
       ),
-      initialValue: state.filter.queryText,
+      initialValue: widget.initialFilter.queryText,
     ).padded();
   }
 
-  Widget _buildDateRangePickerHelper(
-      DocumentsState state, String formFieldKey) {
+  Widget _buildDateRangePickerHelper(String formFieldKey) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
@@ -328,13 +321,13 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
     );
   }
 
-  Widget _buildCreatedDateRangePickerFormField(DocumentsState state) {
+  Widget _buildCreatedDateRangePickerFormField() {
     return Column(
       children: [
         FormBuilderDateRangePicker(
           initialValue: _dateTimeRangeOfNullable(
-            state.filter.createdDateAfter,
-            state.filter.createdDateBefore,
+            widget.initialFilter.createdDateAfter,
+            widget.initialFilter.createdDateBefore,
           ),
           // Workaround for theme data not being correctly passed to daterangepicker, see
           // https://github.com/flutter/flutter/issues/87580
@@ -371,18 +364,18 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
           ),
         ),
         const SizedBox(height: 4.0),
-        _buildDateRangePickerHelper(state, fkCreatedAt),
+        _buildDateRangePickerHelper(fkCreatedAt),
       ],
     );
   }
 
-  Widget _buildAddedDateRangePickerFormField(DocumentsState state) {
+  Widget _buildAddedDateRangePickerFormField() {
     return Column(
       children: [
         FormBuilderDateRangePicker(
           initialValue: _dateTimeRangeOfNullable(
-            state.filter.addedDateAfter,
-            state.filter.addedDateBefore,
+            widget.initialFilter.addedDateAfter,
+            widget.initialFilter.addedDateBefore,
           ),
           // Workaround for theme data not being correctly passed to daterangepicker, see
           // https://github.com/flutter/flutter/issues/87580
@@ -419,7 +412,7 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
           ),
         ),
         const SizedBox(height: 4.0),
-        _buildDateRangePickerHelper(state, fkAddedAt),
+        _buildDateRangePickerHelper(fkAddedAt),
       ],
     );
   }

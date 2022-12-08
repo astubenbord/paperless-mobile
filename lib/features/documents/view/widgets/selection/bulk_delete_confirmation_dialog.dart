@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:paperless_api/paperless_api.dart';
-import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
+import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 
 class BulkDeleteConfirmationDialog extends StatelessWidget {

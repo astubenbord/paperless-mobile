@@ -81,6 +81,7 @@ dependencies:
   paperless_api:
     path: packages/paperless_api
   hive: ^2.2.3
+  rxdart: ^0.27.7
 
 dev_dependencies:
   integration_test:

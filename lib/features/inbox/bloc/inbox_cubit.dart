@@ -1,20 +1,21 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:paperless_api/paperless_api.dart';
+import 'package:paperless_mobile/core/repository/label_repository.dart';
 import 'package:paperless_mobile/features/inbox/bloc/state/inbox_state.dart';
 
-@injectable
 class InboxCubit extends Cubit<InboxState> {
-  final PaperlessLabelsApi _labelApi;
+  final LabelRepository<Tag> _tagsRepository;
   final PaperlessDocumentsApi _documentsApi;
 
-  InboxCubit(this._labelApi, this._documentsApi) : super(const InboxState());
+  InboxCubit(this._tagsRepository, this._documentsApi)
+      : super(const InboxState());
 
   ///
   /// Fetches inbox tag ids and loads the inbox items (documents).
   ///
   Future<void> loadInbox() async {
-    final inboxTags = await _labelApi.getTags().then(
+    final inboxTags = await _tagsRepository.findAll().then(
           (tags) => tags.where((t) => t.isInboxTag ?? false).map((t) => t.id!),
         );
     if (inboxTags.isEmpty) {

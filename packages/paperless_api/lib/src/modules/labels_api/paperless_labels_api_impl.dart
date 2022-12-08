@@ -35,7 +35,7 @@ class PaperlessLabelApiImpl implements PaperlessLabelsApi {
   }
 
   @override
-  Future<List<Tag>> getTags({List<int>? ids}) async {
+  Future<List<Tag>> getTags([Iterable<int>? ids]) async {
     final results = await getCollection(
       "/api/tags/?page=1&page_size=100000",
       Tag.fromJson,
@@ -59,23 +59,31 @@ class PaperlessLabelApiImpl implements PaperlessLabelsApi {
   }
 
   @override
-  Future<List<Correspondent>> getCorrespondents() {
-    return getCollection(
+  Future<List<Correspondent>> getCorrespondents([Iterable<int>? ids]) async {
+    final results = await getCollection(
       "/api/correspondents/?page=1&page_size=100000",
       Correspondent.fromJson,
       ErrorCode.correspondentLoadFailed,
       client: client,
     );
+
+    return results
+        .where((element) => ids?.contains(element.id) ?? true)
+        .toList();
   }
 
   @override
-  Future<List<DocumentType>> getDocumentTypes() {
-    return getCollection(
+  Future<List<DocumentType>> getDocumentTypes([Iterable<int>? ids]) async {
+    final results = await getCollection(
       "/api/document_types/?page=1&page_size=100000",
       DocumentType.fromJson,
       ErrorCode.documentTypeLoadFailed,
       client: client,
     );
+
+    return results
+        .where((element) => ids?.contains(element.id) ?? true)
+        .toList();
   }
 
   @override
@@ -261,13 +269,17 @@ class PaperlessLabelApiImpl implements PaperlessLabelsApi {
   }
 
   @override
-  Future<List<StoragePath>> getStoragePaths() {
-    return getCollection(
+  Future<List<StoragePath>> getStoragePaths([Iterable<int>? ids]) async {
+    final results = await getCollection(
       "/api/storage_paths/?page=1&page_size=100000",
       StoragePath.fromJson,
       ErrorCode.storagePathLoadFailed,
       client: client,
     );
+
+    return results
+        .where((element) => ids?.contains(element.id) ?? true)
+        .toList();
   }
 
   @override

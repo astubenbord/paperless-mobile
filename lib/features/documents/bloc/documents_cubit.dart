@@ -1,11 +1,9 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:injectable/injectable.dart';
 import 'package:paperless_api/paperless_api.dart';
-import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
 
-@prod
-@test
-@lazySingleton
+part 'documents_state.dart';
+
 class DocumentsCubit extends Cubit<DocumentsState> {
   final PaperlessDocumentsApi _api;
 

@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:paperless_api/paperless_api.dart';
+import 'package:paperless_mobile/core/repository/label_repository.dart';
 import 'package:paperless_mobile/core/widgets/highlighted_text.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
@@ -17,7 +18,6 @@ import 'package:paperless_mobile/features/documents/view/pages/document_edit_pag
 import 'package:paperless_mobile/features/documents/view/pages/document_view.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/delete_document_confirmation_dialog.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/document_preview.dart';
-import 'package:paperless_mobile/features/labels/bloc/global_state_bloc_provider.dart';
 import 'package:paperless_mobile/features/labels/correspondent/view/widgets/correspondent_widget.dart';
 import 'package:paperless_mobile/features/labels/document_type/view/widgets/document_type_widget.dart';
 import 'package:paperless_mobile/features/labels/storage_path/view/widgets/storage_path_widget.dart';
@@ -213,7 +213,29 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
       Navigator.push<bool>(
         context,
         MaterialPageRoute(
-          builder: (_) => GlobalStateBlocProvider(
+          builder: (_) => MultiRepositoryProvider(
+            providers: [
+              RepositoryProvider.value(
+                value: RepositoryProvider.of<LabelRepository<DocumentType>>(
+                  context,
+                ),
+              ),
+              RepositoryProvider.value(
+                value: RepositoryProvider.of<LabelRepository<Tag>>(
+                  context,
+                ),
+              ),
+              RepositoryProvider.value(
+                value: RepositoryProvider.of<LabelRepository<StoragePath>>(
+                  context,
+                ),
+              ),
+              RepositoryProvider.value(
+                value: RepositoryProvider.of<LabelRepository<Correspondent>>(
+                  context,
+                ),
+              ),
+            ],
             child: DocumentEditPage(
               document: cubit.state.document!,
               onEdit: (updatedDocument) {

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
-import 'package:paperless_mobile/features/labels/correspondent/bloc/correspondents_cubit.dart';
+import 'package:paperless_mobile/features/labels/bloc/label_cubit.dart';
+import 'package:paperless_mobile/features/labels/bloc/providers/correspondent_bloc_provider.dart';
 import 'package:paperless_mobile/features/labels/bloc/label_state.dart';
 import 'package:paperless_mobile/util.dart';
 
@@ -22,22 +23,25 @@ class CorrespondentWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AbsorbPointer(
-      absorbing: !isClickable,
-      child: BlocBuilder<CorrespondentCubit, LabelState<Correspondent>>(
-        builder: (context, state) {
-          return GestureDetector(
-            onTap: () => _addCorrespondentToFilter(context),
-            child: Text(
-              (state.getLabel(correspondentId)?.name) ?? "-",
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.bodyText2?.copyWith(
-                    color: textColor ?? Theme.of(context).colorScheme.primary,
-                  ),
-            ),
-          );
-        },
+    return CorrespondentBlocProvider(
+      child: AbsorbPointer(
+        absorbing: !isClickable,
+        child:
+            BlocBuilder<LabelCubit<Correspondent>, LabelState<Correspondent>>(
+          builder: (context, state) {
+            return GestureDetector(
+              onTap: () => _addCorrespondentToFilter(context),
+              child: Text(
+                (state.getLabel(correspondentId)?.name) ?? "-",
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.bodyText2?.copyWith(
+                      color: textColor ?? Theme.of(context).colorScheme.primary,
+                    ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }

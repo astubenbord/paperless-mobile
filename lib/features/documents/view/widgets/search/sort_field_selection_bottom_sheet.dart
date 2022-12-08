@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_api/paperless_api.dart';
-import 'package:paperless_mobile/di_initializer.dart';
-import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
-import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
-import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
+import 'package:paperless_mobile/generated/l10n.dart';
 
 class SortFieldSelectionBottomSheet extends StatefulWidget {
-  const SortFieldSelectionBottomSheet({super.key});
+  final SortOrder initialSortOrder;
+  final SortField initialSortField;
+
+  final Future Function(SortField field, SortOrder order) onSubmit;
+
+  const SortFieldSelectionBottomSheet({
+    super.key,
+    required this.initialSortOrder,
+    required this.initialSortField,
+    required this.onSubmit,
+  });
 
   @override
   State<SortFieldSelectionBottomSheet> createState() =>
@@ -17,81 +23,60 @@ class SortFieldSelectionBottomSheet extends StatefulWidget {
 
 class _SortFieldSelectionBottomSheetState
     extends State<SortFieldSelectionBottomSheet> {
-  SortField? _selectedFieldLoading;
-  SortOrder? _selectedOrderLoading;
+  late SortField _currentSortField;
+  late SortOrder _currentSortOrder;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentSortField = widget.initialSortField;
+    _currentSortOrder = widget.initialSortOrder;
+  }
 
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      child: BlocBuilder<DocumentsCubit, DocumentsState>(
-        bloc: getIt<DocumentsCubit>(),
-        builder: (context, state) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 S.of(context).documentsPageOrderByLabel,
                 style: Theme.of(context).textTheme.caption,
                 textAlign: TextAlign.start,
               ).padded(
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 16)),
-              Column(
-                children: SortField.values
-                    .map(
-                      (e) => _buildSortOption(
-                        e,
-                        state.filter.sortOrder,
-                        state.filter.sortField == e,
-                        _selectedFieldLoading == e,
-                      ),
-                    )
-                    .toList(),
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              ),
+              TextButton(
+                child: Text(S.of(context).documentsFilterPageApplyFilterLabel),
+                onPressed: () => widget.onSubmit(
+                  _currentSortField,
+                  _currentSortOrder,
+                ),
               ),
             ],
-          );
-        },
+          ),
+          Column(
+            children: SortField.values.map(_buildSortOption).toList(),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildSortOption(
     SortField field,
-    SortOrder order,
-    bool isCurrentlySelected,
-    bool isNextSelected,
   ) {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 32),
       title: Text(
         _localizedSortField(field),
       ),
-      trailing: isNextSelected
-          ? (_buildOrderIcon(_selectedOrderLoading!))
-          : (_selectedOrderLoading == null && isCurrentlySelected
-              ? _buildOrderIcon(order)
-              : null),
-      onTap: () async {
-        setState(() {
-          _selectedFieldLoading = field;
-          _selectedOrderLoading =
-              isCurrentlySelected ? order.toggle() : SortOrder.descending;
-        });
-        BlocProvider.of<DocumentsCubit>(context)
-            .updateCurrentFilter((filter) => filter.copyWith(
-                  sortOrder: isCurrentlySelected
-                      ? order.toggle()
-                      : SortOrder.descending,
-                  sortField: field,
-                ))
-            .whenComplete(() {
-          if (mounted) {
-            setState(() {
-              _selectedFieldLoading = null;
-              _selectedOrderLoading = null;
-            });
-          }
-        });
-      },
+      trailing: _currentSortField == field
+          ? _buildOrderIcon(_currentSortOrder)
+          : null,
     );
   }
 

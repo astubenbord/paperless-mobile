@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/search/sort_field_selection_bottom_sheet.dart';
 
@@ -33,11 +32,19 @@ class _SortDocumentsButtonState extends State<SortDocumentsButton> {
           topRight: Radius.circular(16),
         ),
       ),
-      builder: (context) => BlocProvider.value(
-        value: getIt<DocumentsCubit>(),
-        child: const FractionallySizedBox(
-          heightFactor: .6,
-          child: SortFieldSelectionBottomSheet(),
+      builder: (context) => FractionallySizedBox(
+        heightFactor: .6,
+        child: BlocBuilder<DocumentsCubit, DocumentsState>(
+          builder: (context, state) {
+            return SortFieldSelectionBottomSheet(
+              initialSortField: state.filter.sortField,
+              initialSortOrder: state.filter.sortOrder,
+              onSubmit: (field, order) =>
+                  BlocProvider.of<DocumentsCubit>(context).updateCurrentFilter(
+                (filter) => filter.copyWith(sortField: field, sortOrder: order),
+              ),
+            );
+          },
         ),
       ),
     );

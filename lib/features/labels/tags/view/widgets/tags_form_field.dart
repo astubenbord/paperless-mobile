@@ -3,9 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:paperless_api/paperless_api.dart';
+import 'package:paperless_mobile/core/repository/label_repository.dart';
+import 'package:paperless_mobile/core/repository/provider/label_repositories_provider.dart';
+import 'package:paperless_mobile/features/edit_label/view/impl/add_tag_page.dart';
+import 'package:paperless_mobile/features/labels/bloc/label_cubit.dart';
 import 'package:paperless_mobile/features/labels/bloc/label_state.dart';
-import 'package:paperless_mobile/features/labels/tags/bloc/tags_cubit.dart';
-import 'package:paperless_mobile/features/labels/tags/view/pages/add_tag_page.dart';
+import 'package:paperless_mobile/features/labels/bloc/providers/tag_bloc_provider.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 
 class TagFormField extends StatefulWidget {
@@ -41,11 +44,13 @@ class _TagFormFieldState extends State<TagFormField> {
   @override
   void initState() {
     super.initState();
-    final state = BlocProvider.of<TagCubit>(context).state;
     _textEditingController = TextEditingController()
       ..addListener(() {
         setState(() {
-          _showCreationSuffixIcon = state.labels.values
+          _showCreationSuffixIcon = BlocProvider.of<LabelCubit<Tag>>(context)
+                  .state
+                  .labels
+                  .values
                   .where(
                     (item) => item.name.toLowerCase().startsWith(
                           _textEditingController.text.toLowerCase(),
@@ -61,117 +66,122 @@ class _TagFormFieldState extends State<TagFormField> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<TagCubit, LabelState<Tag>>(
-      builder: (context, tagState) {
-        return FormBuilderField<TagsQuery>(
-          builder: (field) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TypeAheadField<int>(
-                  textFieldConfiguration: TextFieldConfiguration(
-                    decoration: InputDecoration(
-                      prefixIcon: const Icon(
-                        Icons.label_outline,
+    return TagBlocProvider(
+      child: BlocBuilder<LabelCubit<Tag>, LabelState<Tag>>(
+        builder: (context, tagState) {
+          return FormBuilderField<TagsQuery>(
+            builder: (field) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TypeAheadField<int>(
+                    textFieldConfiguration: TextFieldConfiguration(
+                      decoration: InputDecoration(
+                        prefixIcon: const Icon(
+                          Icons.label_outline,
+                        ),
+                        suffixIcon: _buildSuffixIcon(context, field),
+                        labelText: S.of(context).documentTagsPropertyLabel,
+                        hintText: S.of(context).tagFormFieldSearchHintText,
                       ),
-                      suffixIcon: _buildSuffixIcon(context, field),
-                      labelText: S.of(context).documentTagsPropertyLabel,
-                      hintText: S.of(context).tagFormFieldSearchHintText,
+                      controller: _textEditingController,
                     ),
-                    controller: _textEditingController,
-                  ),
-                  suggestionsCallback: (query) {
-                    final suggestions = tagState.labels.values
-                        .where((element) => element.name
-                            .toLowerCase()
-                            .startsWith(query.toLowerCase()))
-                        .map((e) => e.id!)
-                        .toList();
-                    if (field.value is IdsTagsQuery) {
-                      suggestions.removeWhere((element) =>
-                          (field.value as IdsTagsQuery).ids.contains(element));
-                    }
-                    if (widget.notAssignedSelectable &&
-                        field.value is! OnlyNotAssignedTagsQuery) {
-                      suggestions.insert(0, _onlyNotAssignedId);
-                    }
-                    if (widget.anyAssignedSelectable &&
-                        field.value is! AnyAssignedTagsQuery) {
-                      suggestions.insert(0, _anyAssignedId);
-                    }
-                    return suggestions;
-                  },
-                  getImmediateSuggestions: true,
-                  animationStart: 1,
-                  itemBuilder: (context, data) {
-                    if (data == _onlyNotAssignedId) {
+                    suggestionsCallback: (query) {
+                      final suggestions = tagState.labels.values
+                          .where((element) => element.name
+                              .toLowerCase()
+                              .startsWith(query.toLowerCase()))
+                          .map((e) => e.id!)
+                          .toList();
+                      if (field.value is IdsTagsQuery) {
+                        suggestions.removeWhere((element) =>
+                            (field.value as IdsTagsQuery)
+                                .ids
+                                .contains(element));
+                      }
+                      if (widget.notAssignedSelectable &&
+                          field.value is! OnlyNotAssignedTagsQuery) {
+                        suggestions.insert(0, _onlyNotAssignedId);
+                      }
+                      if (widget.anyAssignedSelectable &&
+                          field.value is! AnyAssignedTagsQuery) {
+                        suggestions.insert(0, _anyAssignedId);
+                      }
+                      return suggestions;
+                    },
+                    getImmediateSuggestions: true,
+                    animationStart: 1,
+                    itemBuilder: (context, data) {
+                      if (data == _onlyNotAssignedId) {
+                        return ListTile(
+                          title: Text(S.of(context).labelNotAssignedText),
+                        );
+                      } else if (data == _anyAssignedId) {
+                        return ListTile(
+                          title: Text(S.of(context).labelAnyAssignedText),
+                        );
+                      }
+                      final tag = tagState.getLabel(data)!;
                       return ListTile(
-                        title: Text(S.of(context).labelNotAssignedText),
+                        leading: Icon(
+                          Icons.circle,
+                          color: tag.color,
+                        ),
+                        title: Text(
+                          tag.name,
+                          style: TextStyle(
+                              color:
+                                  Theme.of(context).colorScheme.onBackground),
+                        ),
                       );
-                    } else if (data == _anyAssignedId) {
-                      return ListTile(
-                        title: Text(S.of(context).labelAnyAssignedText),
-                      );
-                    }
-                    final tag = tagState.getLabel(data)!;
-                    return ListTile(
-                      leading: Icon(
-                        Icons.circle,
-                        color: tag.color,
-                      ),
-                      title: Text(
-                        tag.name,
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.onBackground),
-                      ),
-                    );
-                  },
-                  onSuggestionSelected: (id) {
-                    if (id == _onlyNotAssignedId) {
-                      //Not assigned tag
-                      field.didChange(const OnlyNotAssignedTagsQuery());
-                      return;
-                    } else if (id == _anyAssignedId) {
-                      field.didChange(const AnyAssignedTagsQuery());
-                    } else {
-                      final tagsQuery = field.value is IdsTagsQuery
-                          ? field.value as IdsTagsQuery
-                          : const IdsTagsQuery();
-                      field.didChange(tagsQuery
-                          .withIdQueriesAdded([IncludeTagIdQuery(id)]));
-                    }
-                    _textEditingController.clear();
-                  },
-                  direction: AxisDirection.up,
-                ),
-                if (field.value is OnlyNotAssignedTagsQuery) ...[
-                  _buildNotAssignedTag(field)
-                ] else if (field.value is AnyAssignedTagsQuery) ...[
-                  _buildAnyAssignedTag(field)
-                ] else ...[
-                  // field.value is IdsTagsQuery
-                  Wrap(
-                    alignment: WrapAlignment.start,
-                    runAlignment: WrapAlignment.start,
-                    spacing: 8.0,
-                    children: ((field.value as IdsTagsQuery).queries)
-                        .map(
-                          (query) => _buildTag(
-                            field,
-                            query,
-                            tagState.getLabel(query.id),
-                          ),
-                        )
-                        .toList(),
+                    },
+                    onSuggestionSelected: (id) {
+                      if (id == _onlyNotAssignedId) {
+                        //Not assigned tag
+                        field.didChange(const OnlyNotAssignedTagsQuery());
+                        return;
+                      } else if (id == _anyAssignedId) {
+                        field.didChange(const AnyAssignedTagsQuery());
+                      } else {
+                        final tagsQuery = field.value is IdsTagsQuery
+                            ? field.value as IdsTagsQuery
+                            : const IdsTagsQuery();
+                        field.didChange(tagsQuery
+                            .withIdQueriesAdded([IncludeTagIdQuery(id)]));
+                      }
+                      _textEditingController.clear();
+                    },
+                    direction: AxisDirection.up,
                   ),
-                ]
-              ],
-            );
-          },
-          initialValue: widget.initialValue ?? const IdsTagsQuery(),
-          name: widget.name,
-        );
-      },
+                  if (field.value is OnlyNotAssignedTagsQuery) ...[
+                    _buildNotAssignedTag(field)
+                  ] else if (field.value is AnyAssignedTagsQuery) ...[
+                    _buildAnyAssignedTag(field)
+                  ] else ...[
+                    // field.value is IdsTagsQuery
+                    Wrap(
+                      alignment: WrapAlignment.start,
+                      runAlignment: WrapAlignment.start,
+                      spacing: 8.0,
+                      children: ((field.value as IdsTagsQuery).queries)
+                          .map(
+                            (query) => _buildTag(
+                              field,
+                              query,
+                              tagState.getLabel(query.id),
+                            ),
+                          )
+                          .toList(),
+                    ),
+                  ]
+                ],
+              );
+            },
+            initialValue: widget.initialValue ?? const IdsTagsQuery(),
+            name: widget.name,
+          );
+        },
+      ),
     );
   }
 
@@ -199,8 +209,8 @@ class _TagFormFieldState extends State<TagFormField> {
   void _onAddTag(BuildContext context, FormFieldState<TagsQuery> field) async {
     final Tag? tag = await Navigator.of(context).push<Tag>(
       MaterialPageRoute(
-        builder: (_) => BlocProvider.value(
-          value: BlocProvider.of<TagCubit>(context),
+        builder: (_) => RepositoryProvider.value(
+          value: RepositoryProvider.of<LabelRepository<Tag>>(context),
           child: AddTagPage(initialValue: _textEditingController.text),
         ),
       ),

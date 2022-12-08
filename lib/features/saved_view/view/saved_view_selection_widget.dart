@@ -5,8 +5,8 @@ import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/saved_view/view/add_saved_view_page.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/selection/confirm_delete_saved_view_dialog.dart';
-import 'package:paperless_mobile/features/saved_view/bloc/saved_view_cubit.dart';
-import 'package:paperless_mobile/features/saved_view/bloc/saved_view_state.dart';
+import 'package:paperless_mobile/features/saved_view/cubit/saved_view_cubit.dart';
+import 'package:paperless_mobile/features/saved_view/cubit/saved_view_state.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:paperless_mobile/util.dart';
 
@@ -94,17 +94,10 @@ class SavedViewSelectionWidget extends StatelessWidget {
 
   void _onSelected(
       bool isSelected, BuildContext context, SavedView view) async {
-    try {
-      if (isSelected) {
-        BlocProvider.of<DocumentsCubit>(context)
-            .updateFilter(filter: view.toDocumentFilter());
-        BlocProvider.of<SavedViewCubit>(context).selectView(view);
-      } else {
-        BlocProvider.of<DocumentsCubit>(context).updateFilter();
-        BlocProvider.of<SavedViewCubit>(context).selectView(null);
-      }
-    } on PaperlessServerException catch (error, stackTrace) {
-      showErrorMessage(context, error, stackTrace);
+    if (isSelected) {
+      BlocProvider.of<SavedViewCubit>(context).selectView(view);
+    } else {
+      BlocProvider.of<SavedViewCubit>(context).selectView(null);
     }
   }
 

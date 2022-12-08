@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:paperless_api/paperless_api.dart';
+import 'package:paperless_mobile/core/repository/provider/label_repositories_provider.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/document_details/bloc/document_details_cubit.dart';
-import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/document_details/view/pages/document_details_page.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/document_preview.dart';
-import 'package:paperless_mobile/features/labels/bloc/global_state_bloc_provider.dart';
 import 'package:paperless_mobile/features/labels/tags/view/widgets/tags_widget.dart';
 
 class InboxItem extends StatelessWidget {
@@ -49,18 +48,16 @@ class InboxItem extends StatelessWidget {
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => GlobalStateBlocProvider(
-            additionalProviders: [
-              BlocProvider<DocumentDetailsCubit>(
-                create: (context) => DocumentDetailsCubit(
-                  getIt<PaperlessDocumentsApi>(),
-                  document,
-                ),
+          builder: (_) => BlocProvider.value(
+            value: DocumentDetailsCubit(
+              getIt<PaperlessDocumentsApi>(),
+              document,
+            ),
+            child: const LabelRepositoriesProvider(
+              child: DocumentDetailsPage(
+                allowEdit: false,
+                isLabelClickable: false,
               ),
-            ],
-            child: const DocumentDetailsPage(
-              allowEdit: false,
-              isLabelClickable: false,
             ),
           ),
         ),

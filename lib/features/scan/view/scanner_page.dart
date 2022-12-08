@@ -9,13 +9,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mime/mime.dart';
 import 'package:paperless_api/paperless_api.dart';
-import 'package:paperless_mobile/features/labels/bloc/global_state_bloc_provider.dart';
 import 'package:paperless_mobile/core/global/constants.dart';
+import 'package:paperless_mobile/core/repository/label_repository.dart';
+import 'package:paperless_mobile/core/repository/provider/label_repositories_provider.dart';
 import 'package:paperless_mobile/core/service/file_service.dart';
+import 'package:paperless_mobile/core/store/local_vault.dart';
+import 'package:paperless_mobile/di_initializer.dart';
+import 'package:paperless_mobile/features/document_upload/cubit/document_upload_cubit.dart';
+import 'package:paperless_mobile/features/document_upload/view/document_upload_preparation_page.dart';
 import 'package:paperless_mobile/features/documents/view/pages/document_view.dart';
 import 'package:paperless_mobile/features/home/view/widget/info_drawer.dart';
 import 'package:paperless_mobile/features/scan/bloc/document_scanner_cubit.dart';
-import 'package:paperless_mobile/features/scan/view/document_upload_page.dart';
 import 'package:paperless_mobile/features/scan/view/widgets/grid_image_item_widget.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:paperless_mobile/util.dart';
@@ -124,14 +128,26 @@ class _ScannerPageState extends State<ScannerPage>
     final bytes = await doc.save();
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => GlobalStateBlocProvider(
-          additionalProviders: [
-            BlocProvider<DocumentScannerCubit>.value(
-              value: BlocProvider.of<DocumentScannerCubit>(context),
+        builder: (_) => LabelRepositoriesProvider(
+          child: BlocProvider(
+            create: (context) => DocumentUploadCubit(
+              localVault: getIt<LocalVault>(),
+              documentApi: getIt<PaperlessDocumentsApi>(),
+              correspondentRepository:
+                  RepositoryProvider.of<LabelRepository<Correspondent>>(
+                context,
+              ),
+              documentTypeRepository:
+                  RepositoryProvider.of<LabelRepository<DocumentType>>(
+                context,
+              ),
+              tagRepository: RepositoryProvider.of<LabelRepository<Tag>>(
+                context,
+              ),
             ),
-          ],
-          child: DocumentUploadPage(
-            fileBytes: bytes,
+            child: DocumentUploadPreparationPage(
+              fileBytes: bytes,
+            ),
           ),
         ),
       ),
@@ -243,15 +259,27 @@ class _ScannerPageState extends State<ScannerPage>
       }
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (_) => GlobalStateBlocProvider(
-            additionalProviders: [
-              BlocProvider<DocumentScannerCubit>.value(
-                value: BlocProvider.of<DocumentScannerCubit>(context),
+          builder: (_) => LabelRepositoriesProvider(
+            child: BlocProvider(
+              create: (context) => DocumentUploadCubit(
+                localVault: getIt<LocalVault>(),
+                documentApi: getIt<PaperlessDocumentsApi>(),
+                correspondentRepository:
+                    RepositoryProvider.of<LabelRepository<Correspondent>>(
+                  context,
+                ),
+                documentTypeRepository:
+                    RepositoryProvider.of<LabelRepository<DocumentType>>(
+                  context,
+                ),
+                tagRepository: RepositoryProvider.of<LabelRepository<Tag>>(
+                  context,
+                ),
               ),
-            ],
-            child: DocumentUploadPage(
-              filename: filename,
-              fileBytes: fileBytes,
+              child: DocumentUploadPreparationPage(
+                fileBytes: fileBytes,
+                filename: filename,
+              ),
             ),
           ),
         ),

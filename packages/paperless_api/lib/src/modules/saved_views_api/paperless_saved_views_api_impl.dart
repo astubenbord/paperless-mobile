@@ -14,13 +14,15 @@ class PaperlessSavedViewsApiImpl implements PaperlessSavedViewsApi {
   PaperlessSavedViewsApiImpl(this.client);
 
   @override
-  Future<List<SavedView>> getAll() {
-    return getCollection(
+  Future<Iterable<SavedView>> findAll([Iterable<int>? ids]) async {
+    final result = await getCollection(
       "/api/saved_views/",
       SavedView.fromJson,
       ErrorCode.loadSavedViewsError,
       client: client,
     );
+
+    return result.where((view) => ids?.contains(view.id!) ?? true);
   }
 
   @override
@@ -49,6 +51,16 @@ class PaperlessSavedViewsApiImpl implements PaperlessSavedViewsApi {
     throw PaperlessServerException(
       ErrorCode.deleteSavedViewError,
       httpStatusCode: response.statusCode,
+    );
+  }
+
+  @override
+  Future<SavedView> find(int id) {
+    return getSingleResult(
+      "/api/saved_views/$id/",
+      SavedView.fromJson,
+      ErrorCode.loadSavedViewsError,
+      client: client,
     );
   }
 }

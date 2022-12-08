@@ -1147,12 +1147,12 @@ packages:
     source: hosted
     version: "1.4.5"
   rxdart:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: rxdart
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.27.4"
+    version: "0.27.7"
   share_plus:
     dependency: "direct main"
     description:

@@ -3,18 +3,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
 import 'package:paperless_mobile/core/bloc/paperless_server_information_cubit.dart';
+import 'package:paperless_mobile/core/repository/label_repository.dart';
+import 'package:paperless_mobile/core/repository/saved_view_repository.dart';
 import 'package:paperless_mobile/core/widgets/offline_banner.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/documents/view/pages/documents_page.dart';
 import 'package:paperless_mobile/features/home/view/widget/bottom_navigation_bar.dart';
 import 'package:paperless_mobile/features/home/view/widget/info_drawer.dart';
-import 'package:paperless_mobile/features/labels/correspondent/bloc/correspondents_cubit.dart';
-import 'package:paperless_mobile/features/labels/document_type/bloc/document_type_cubit.dart';
-import 'package:paperless_mobile/features/labels/storage_path/bloc/storage_path_cubit.dart';
-import 'package:paperless_mobile/features/labels/tags/bloc/tags_cubit.dart';
 import 'package:paperless_mobile/features/labels/view/pages/labels_page.dart';
-import 'package:paperless_mobile/features/saved_view/bloc/saved_view_cubit.dart';
+import 'package:paperless_mobile/features/saved_view/cubit/saved_view_cubit.dart';
 import 'package:paperless_mobile/features/scan/bloc/document_scanner_cubit.dart';
 import 'package:paperless_mobile/features/scan/view/scanner_page.dart';
 import 'package:paperless_mobile/util.dart';
@@ -59,17 +57,17 @@ class _HomePageState extends State<HomePage> {
             MultiBlocProvider(
               providers: [
                 BlocProvider.value(
-                  value: getIt<DocumentsCubit>(),
+                  value: DocumentsCubit(getIt<PaperlessDocumentsApi>()),
                 ),
               ],
               child: const DocumentsPage(),
             ),
             BlocProvider.value(
-              value: getIt<DocumentScannerCubit>(),
+              value: DocumentScannerCubit(),
               child: const ScannerPage(),
             ),
             BlocProvider.value(
-              value: getIt<DocumentsCubit>(),
+              value: DocumentsCubit(getIt<PaperlessDocumentsApi>()),
               child: const LabelsPage(),
             ),
           ][_currentIndex],
@@ -78,20 +76,17 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Future<void> _initializeData(BuildContext context) {
+  void _initializeData(BuildContext context) {
     try {
-      return Future.wait([
-        BlocProvider.of<PaperlessServerInformationCubit>(context)
-            .updateInformtion(),
-        getIt<DocumentTypeCubit>().initialize(),
-        getIt<CorrespondentCubit>().initialize(),
-        getIt<TagCubit>().initialize(),
-        getIt<StoragePathCubit>().initialize(),
-        getIt<SavedViewCubit>().initialize(),
-      ]);
+      RepositoryProvider.of<LabelRepository<Tag>>(context).findAll();
+      RepositoryProvider.of<LabelRepository<Correspondent>>(context).findAll();
+      RepositoryProvider.of<LabelRepository<DocumentType>>(context).findAll();
+      RepositoryProvider.of<LabelRepository<StoragePath>>(context).findAll();
+      RepositoryProvider.of<SavedViewRepository>(context).findAll();
+      BlocProvider.of<PaperlessServerInformationCubit>(context)
+          .updateInformtion();
     } on PaperlessServerException catch (error, stackTrace) {
       showErrorMessage(context, error, stackTrace);
-      return Future.error(error);
     }
   }
 }

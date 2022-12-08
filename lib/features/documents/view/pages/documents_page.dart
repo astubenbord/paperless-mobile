@@ -3,11 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
+import 'package:paperless_mobile/core/repository/provider/label_repositories_provider.dart';
+import 'package:paperless_mobile/core/repository/saved_view_repository.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/document_details/bloc/document_details_cubit.dart';
 import 'package:paperless_mobile/features/document_details/view/pages/document_details_page.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
-import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/documents_empty_state.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/grid/document_grid.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/list/document_list.dart';
@@ -15,11 +16,10 @@ import 'package:paperless_mobile/features/documents/view/widgets/search/document
 import 'package:paperless_mobile/features/documents/view/widgets/selection/documents_page_app_bar.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/sort_documents_button.dart';
 import 'package:paperless_mobile/features/home/view/widget/info_drawer.dart';
-import 'package:paperless_mobile/features/labels/correspondent/bloc/correspondents_cubit.dart';
-import 'package:paperless_mobile/features/labels/document_type/bloc/document_type_cubit.dart';
-import 'package:paperless_mobile/features/labels/storage_path/bloc/storage_path_cubit.dart';
-import 'package:paperless_mobile/features/labels/tags/bloc/tags_cubit.dart';
+import 'package:paperless_mobile/features/labels/bloc/providers/labels_bloc_provider.dart';
 import 'package:paperless_mobile/features/login/bloc/authentication_cubit.dart';
+import 'package:paperless_mobile/features/saved_view/cubit/saved_view_cubit.dart';
+import 'package:paperless_mobile/features/saved_view/cubit/saved_view_state.dart';
 import 'package:paperless_mobile/features/settings/bloc/application_settings_cubit.dart';
 import 'package:paperless_mobile/features/settings/model/application_settings_state.dart';
 import 'package:paperless_mobile/features/settings/model/view_type.dart';
@@ -132,9 +132,20 @@ class _DocumentsPageState extends State<DocumentsPage> {
               ),
               body: _buildBody(connectivityState),
               color: Theme.of(context).scaffoldBackgroundColor,
-              panelBuilder: (scrollController) => DocumentFilterPanel(
-                panelController: _filterPanelController,
-                scrollController: scrollController,
+              panelBuilder: (scrollController) =>
+                  BlocBuilder<DocumentsCubit, DocumentsState>(
+                builder: (context, state) {
+                  return LabelsBlocProvider(
+                    child: DocumentFilterPanel(
+                      panelController: _filterPanelController,
+                      scrollController: scrollController,
+                      initialFilter: state.filter,
+                      onFilterChanged: (filter) =>
+                          BlocProvider.of<DocumentsCubit>(context)
+                              .updateFilter(filter: filter),
+                    ),
+                  );
+                },
               ),
             ),
           );
@@ -192,21 +203,46 @@ class _DocumentsPageState extends State<DocumentsPage> {
               onRefresh: _onRefresh,
               child: CustomScrollView(
                 slivers: [
-                  DocumentsPageAppBar(
-                    actions: [
-                      const SortDocumentsButton(),
-                      IconButton(
-                        icon: Icon(
-                          settings.preferredViewType == ViewType.grid
-                              ? Icons.list
-                              : Icons.grid_view,
-                        ),
-                        onPressed: () =>
-                            BlocProvider.of<ApplicationSettingsCubit>(context)
-                                .setViewType(
-                                    settings.preferredViewType.toggle()),
+                  BlocProvider(
+                    create: (context) => SavedViewCubit(
+                        RepositoryProvider.of<SavedViewRepository>(context)),
+                    child: BlocListener<SavedViewCubit, SavedViewState>(
+                      listener: (context, state) {
+                        final documentsCubit =
+                            BlocProvider.of<DocumentsCubit>(context);
+                        try {
+                          if (state.selectedSavedViewId == null) {
+                            documentsCubit.updateFilter();
+                          } else {
+                            final newFilter = state
+                                .value[state.selectedSavedViewId]
+                                ?.toDocumentFilter();
+                            if (newFilter != null) {
+                              documentsCubit.updateFilter(filter: newFilter);
+                            }
+                          }
+                        } on PaperlessServerException catch (error, stackTrace) {
+                          showErrorMessage(context, error, stackTrace);
+                        }
+                      },
+                      child: DocumentsPageAppBar(
+                        actions: [
+                          const SortDocumentsButton(),
+                          IconButton(
+                            icon: Icon(
+                              settings.preferredViewType == ViewType.grid
+                                  ? Icons.list
+                                  : Icons.grid_view,
+                            ),
+                            onPressed: () =>
+                                BlocProvider.of<ApplicationSettingsCubit>(
+                                        context)
+                                    .setViewType(
+                                        settings.preferredViewType.toggle()),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                   child,
                   SliverToBoxAdapter(
@@ -233,29 +269,11 @@ class _DocumentsPageState extends State<DocumentsPage> {
   MaterialPageRoute<DocumentModel?> _buildDetailsPageRoute(
       DocumentModel document) {
     return MaterialPageRoute(
-      builder: (_) => MultiBlocProvider(
-        providers: [
-          BlocProvider.value(
-            value: BlocProvider.of<DocumentsCubit>(context),
-          ),
-          BlocProvider.value(
-            value: BlocProvider.of<CorrespondentCubit>(context),
-          ),
-          BlocProvider.value(
-            value: BlocProvider.of<DocumentTypeCubit>(context),
-          ),
-          BlocProvider.value(
-            value: BlocProvider.of<TagCubit>(context),
-          ),
-          BlocProvider.value(
-            value: BlocProvider.of<StoragePathCubit>(context),
-          ),
-          BlocProvider.value(
-            value:
-                DocumentDetailsCubit(getIt<PaperlessDocumentsApi>(), document),
-          ),
-        ],
-        child: const DocumentDetailsPage(),
+      builder: (_) => BlocProvider.value(
+        value: DocumentDetailsCubit(getIt<PaperlessDocumentsApi>(), document),
+        child: const LabelRepositoriesProvider(
+          child: DocumentDetailsPage(),
+        ),
       ),
     );
   }

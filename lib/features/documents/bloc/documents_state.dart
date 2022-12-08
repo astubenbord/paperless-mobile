@@ -1,5 +1,4 @@
-import 'package:equatable/equatable.dart';
-import 'package:paperless_api/paperless_api.dart';
+part of 'documents_cubit.dart';
 
 class DocumentsState extends Equatable {
   final bool isLoaded;

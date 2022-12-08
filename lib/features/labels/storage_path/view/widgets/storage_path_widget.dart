@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_api/paperless_api.dart';
+import 'package:paperless_mobile/core/repository/label_repository.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
+import 'package:paperless_mobile/features/labels/bloc/label_cubit.dart';
 import 'package:paperless_mobile/features/labels/bloc/label_state.dart';
-import 'package:paperless_mobile/features/labels/storage_path/bloc/storage_path_cubit.dart';
 import 'package:paperless_mobile/util.dart';
 
 class StoragePathWidget extends StatelessWidget {
@@ -22,22 +23,27 @@ class StoragePathWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AbsorbPointer(
-      absorbing: !isClickable,
-      child: BlocBuilder<StoragePathCubit, LabelState<StoragePath>>(
-        builder: (context, state) {
-          return GestureDetector(
-            onTap: () => _addStoragePathToFilter(context),
-            child: Text(
-              state.getLabel(pathId)?.name ?? "-",
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.bodyText2?.copyWith(
-                    color: textColor ?? Theme.of(context).colorScheme.primary,
-                  ),
-            ),
-          );
-        },
+    return BlocProvider(
+      create: (context) => LabelCubit<StoragePath>(
+        RepositoryProvider.of<LabelRepository<StoragePath>>(context),
+      ),
+      child: AbsorbPointer(
+        absorbing: !isClickable,
+        child: BlocBuilder<LabelCubit<StoragePath>, LabelState<StoragePath>>(
+          builder: (context, state) {
+            return GestureDetector(
+              onTap: () => _addStoragePathToFilter(context),
+              child: Text(
+                state.getLabel(pathId)?.name ?? "-",
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.bodyText2?.copyWith(
+                      color: textColor ?? Theme.of(context).colorScheme.primary,
+                    ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }

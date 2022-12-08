@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_api/paperless_api.dart';
-import 'package:paperless_mobile/features/labels/bloc/global_state_bloc_provider.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/linked_documents_preview/bloc/linked_documents_cubit.dart';
 import 'package:paperless_mobile/features/linked_documents_preview/view/pages/linked_documents_page.dart';
@@ -46,12 +45,11 @@ class LabelItem<T extends Label> extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => GlobalStateBlocProvider(
-                    additionalProviders: [
-                      BlocProvider<LinkedDocumentsCubit>.value(
-                          value: getIt<LinkedDocumentsCubit>()
-                            ..initialize(filter)),
-                    ],
+                  builder: (context) => BlocProvider.value(
+                    value: LinkedDocumentsCubit(
+                      getIt<PaperlessDocumentsApi>(),
+                      filter,
+                    ),
                     child: const LinkedDocumentsPage(),
                   ),
                 ),

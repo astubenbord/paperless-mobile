@@ -7,7 +7,6 @@ import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/document_details/bloc/document_details_cubit.dart';
 import 'package:paperless_mobile/features/document_details/view/pages/document_details_page.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/list/document_list_item.dart';
-import 'package:paperless_mobile/features/labels/bloc/global_state_bloc_provider.dart';
 import 'package:paperless_mobile/features/linked_documents_preview/bloc/linked_documents_cubit.dart';
 import 'package:paperless_mobile/features/linked_documents_preview/bloc/state/linked_documents_state.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
@@ -64,15 +63,12 @@ class _LinkedDocumentsPageState extends State<LinkedDocumentsPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (ctxt) => GlobalStateBlocProvider(
-                                    additionalProviders: [
+                                  builder: (context) =>
                                       BlocProvider<DocumentDetailsCubit>.value(
-                                        value: DocumentDetailsCubit(
-                                          getIt<PaperlessDocumentsApi>(),
-                                          document,
-                                        ),
-                                      ),
-                                    ],
+                                    value: DocumentDetailsCubit(
+                                      getIt<PaperlessDocumentsApi>(),
+                                      document,
+                                    ),
                                     child: const DocumentDetailsPage(
                                       isLabelClickable: false,
                                       allowEdit: false,

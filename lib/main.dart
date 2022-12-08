@@ -13,26 +13,31 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/bloc/bloc_changes_observer.dart';
 import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
-import 'package:paperless_mobile/features/labels/bloc/global_state_bloc_provider.dart';
 import 'package:paperless_mobile/core/bloc/paperless_server_information_cubit.dart';
 import 'package:paperless_mobile/core/global/constants.dart';
 import 'package:paperless_mobile/core/global/http_self_signed_certificate_override.dart';
 import 'package:paperless_mobile/core/logic/error_code_localization_mapper.dart';
+import 'package:paperless_mobile/core/repository/impl/correspondent_repository_impl.dart';
+import 'package:paperless_mobile/core/repository/impl/document_type_repository_impl.dart';
+import 'package:paperless_mobile/core/repository/impl/saved_view_repository_impl.dart';
+import 'package:paperless_mobile/core/repository/impl/storage_path_repository_impl.dart';
+import 'package:paperless_mobile/core/repository/impl/tag_repository_impl.dart';
+import 'package:paperless_mobile/core/repository/label_repository.dart';
+import 'package:paperless_mobile/core/repository/saved_view_repository.dart';
 import 'package:paperless_mobile/core/service/file_service.dart';
 import 'package:paperless_mobile/di_initializer.dart';
+import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/app_intro/application_intro_slideshow.dart';
-import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
+import 'package:paperless_mobile/features/document_upload/view/document_upload_preparation_page.dart';
 import 'package:paperless_mobile/features/home/view/home_page.dart';
 import 'package:paperless_mobile/features/login/bloc/authentication_cubit.dart';
 import 'package:paperless_mobile/features/login/view/login_page.dart';
 import 'package:paperless_mobile/features/scan/bloc/document_scanner_cubit.dart';
-import 'package:paperless_mobile/features/scan/view/document_upload_page.dart';
 import 'package:paperless_mobile/features/settings/bloc/application_settings_cubit.dart';
 import 'package:paperless_mobile/features/settings/model/application_settings_state.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:paperless_mobile/util.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
-import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 
 void main() async {
   Bloc.observer = BlocChangesObserver();
@@ -52,7 +57,30 @@ void main() async {
   await getIt<ApplicationSettingsCubit>().initialize();
   await getIt<AuthenticationCubit>().initialize();
 
-  runApp(const PaperlessMobileEntrypoint());
+  // Create repositories
+  final LabelRepository<Tag> tagRepository =
+      TagRepositoryImpl(getIt<PaperlessLabelsApi>());
+  final LabelRepository<Correspondent> correspondentRepository =
+      CorrespondentRepositoryImpl(getIt<PaperlessLabelsApi>());
+  final LabelRepository<DocumentType> documentTypeRepository =
+      DocumentTypeRepositoryImpl(getIt<PaperlessLabelsApi>());
+  final LabelRepository<StoragePath> storagePathRepository =
+      StoragePathRepositoryImpl(getIt<PaperlessLabelsApi>());
+  final SavedViewRepository savedViewRepository =
+      SavedViewRepositoryImpl(getIt<PaperlessSavedViewsApi>());
+
+  runApp(
+    MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider.value(value: tagRepository),
+        RepositoryProvider.value(value: correspondentRepository),
+        RepositoryProvider.value(value: documentTypeRepository),
+        RepositoryProvider.value(value: storagePathRepository),
+        RepositoryProvider.value(value: savedViewRepository),
+      ],
+      child: const PaperlessMobileEntrypoint(),
+    ),
+  );
 }
 
 class PaperlessMobileEntrypoint extends StatefulWidget {
@@ -70,9 +98,6 @@ class _PaperlessMobileEntrypointState extends State<PaperlessMobileEntrypoint> {
       providers: [
         BlocProvider<ConnectivityCubit>.value(
           value: getIt<ConnectivityCubit>(),
-        ),
-        BlocProvider<AuthenticationCubit>.value(
-          value: getIt<AuthenticationCubit>(),
         ),
         BlocProvider<PaperlessServerInformationCubit>.value(
           value: getIt<PaperlessServerInformationCubit>(),
@@ -126,7 +151,10 @@ class _PaperlessMobileEntrypointState extends State<PaperlessMobileEntrypoint> {
               GlobalWidgetsLocalizations.delegate,
               FormBuilderLocalizations.delegate,
             ],
-            home: const AuthenticationWrapper(),
+            home: BlocProvider<AuthenticationCubit>.value(
+              value: getIt<AuthenticationCubit>(),
+              child: const AuthenticationWrapper(),
+            ),
           );
         },
       ),
@@ -177,21 +205,21 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
     }
     final filename = extractFilenameFromPath(file.path);
     final bytes = File(file.path).readAsBytesSync();
-    Navigator.push(
+    final success = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => GlobalStateBlocProvider(
-          additionalProviders: [
-            BlocProvider.value(value: getIt<DocumentScannerCubit>()),
-          ],
-          child: DocumentUploadPage(
+        builder: (context) => BlocProvider.value(
+          value: getIt<DocumentScannerCubit>(),
+          child: DocumentUploadPreparationPage(
             fileBytes: bytes,
-            afterUpload: SystemNavigator.pop,
             filename: filename,
           ),
         ),
       ),
     );
+    if (success) {
+      SystemNavigator.pop();
+    }
   }
 
   @override
@@ -232,17 +260,12 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
         },
         builder: (context, authentication) {
           if (authentication.isAuthenticated) {
-            return GlobalStateBlocProvider(
-              additionalProviders: [
-                BlocProvider.value(value: getIt<DocumentsCubit>()),
-              ],
-              child: const HomePage(),
-            );
+            return const HomePage();
           } else {
-            if (authentication.wasLoginStored &&
-                !(authentication.wasLocalAuthenticationSuccessful ?? false)) {
-              return BiometricAuthenticationPage();
-            }
+            // if (authentication.wasLoginStored &&
+            //     !(authentication.wasLocalAuthenticationSuccessful ?? false)) {
+            //   return const BiometricAuthenticationPage();
+            // }
             return const LoginPage();
           }
         },
