@@ -34,6 +34,7 @@ class DocumentsPage extends StatefulWidget {
 }
 
 class _DocumentsPageState extends State<DocumentsPage> {
+  late final DocumentsCubit _documentsCubit;
   final _pagingController = PagingController<int, DocumentModel>(
     firstPageKey: 1,
   );
@@ -43,8 +44,9 @@ class _DocumentsPageState extends State<DocumentsPage> {
   @override
   void initState() {
     super.initState();
+    _documentsCubit = BlocProvider.of<DocumentsCubit>(context);
     try {
-      BlocProvider.of<DocumentsCubit>(context).load();
+      _documentsCubit.load();
     } on PaperlessServerException catch (error, stackTrace) {
       showErrorMessage(context, error, stackTrace);
     }
@@ -58,26 +60,25 @@ class _DocumentsPageState extends State<DocumentsPage> {
   }
 
   Future<void> _loadNewPage(int pageKey) async {
-    final documentsCubit = BlocProvider.of<DocumentsCubit>(context);
-    final pageCount = documentsCubit.state
-        .inferPageCount(pageSize: documentsCubit.state.filter.pageSize);
+    final pageCount = _documentsCubit.state
+        .inferPageCount(pageSize: _documentsCubit.state.filter.pageSize);
     if (pageCount <= pageKey + 1) {
       _pagingController.nextPageKey = null;
     }
     try {
-      await documentsCubit.loadMore();
+      await _documentsCubit.loadMore();
     } on PaperlessServerException catch (error, stackTrace) {
       showErrorMessage(context, error, stackTrace);
     }
   }
 
   void _onSelected(DocumentModel model) {
-    BlocProvider.of<DocumentsCubit>(context).toggleDocumentSelection(model);
+    _documentsCubit.toggleDocumentSelection(model);
   }
 
   Future<void> _onRefresh() async {
     try {
-      await BlocProvider.of<DocumentsCubit>(context).updateCurrentFilter(
+      await _documentsCubit.updateCurrentFilter(
         (filter) => filter.copyWith(page: 1),
       );
     } on PaperlessServerException catch (error, stackTrace) {
@@ -94,9 +95,8 @@ class _DocumentsPageState extends State<DocumentsPage> {
           _filterPanelController.close();
           return false;
         }
-        final documentsCubit = BlocProvider.of<DocumentsCubit>(context);
-        if (documentsCubit.state.selection.isNotEmpty) {
-          documentsCubit.resetSelection();
+        if (_documentsCubit.state.selection.isNotEmpty) {
+          _documentsCubit.resetSelection();
           return false;
         }
         return true;
@@ -106,15 +106,14 @@ class _DocumentsPageState extends State<DocumentsPage> {
             previous != ConnectivityState.connected &&
             current == ConnectivityState.connected,
         listener: (context, state) {
-          BlocProvider.of<DocumentsCubit>(context).load();
+          _documentsCubit.load();
         },
         builder: (context, connectivityState) {
           return Scaffold(
             drawer: BlocProvider.value(
               value: BlocProvider.of<AuthenticationCubit>(context),
               child: InfoDrawer(
-                afterInboxClosed: () =>
-                    BlocProvider.of<DocumentsCubit>(context).reload(),
+                afterInboxClosed: () => _documentsCubit.reload(),
               ),
             ),
             resizeToAvoidBottomInset: true,
@@ -141,8 +140,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
                       scrollController: scrollController,
                       initialFilter: state.filter,
                       onFilterChanged: (filter) =>
-                          BlocProvider.of<DocumentsCubit>(context)
-                              .updateFilter(filter: filter),
+                          _documentsCubit.updateFilter(filter: filter),
                     ),
                   );
                 },
@@ -208,17 +206,15 @@ class _DocumentsPageState extends State<DocumentsPage> {
                         RepositoryProvider.of<SavedViewRepository>(context)),
                     child: BlocListener<SavedViewCubit, SavedViewState>(
                       listener: (context, state) {
-                        final documentsCubit =
-                            BlocProvider.of<DocumentsCubit>(context);
                         try {
                           if (state.selectedSavedViewId == null) {
-                            documentsCubit.updateFilter();
+                            _documentsCubit.updateFilter();
                           } else {
                             final newFilter = state
                                 .value[state.selectedSavedViewId]
                                 ?.toDocumentFilter();
                             if (newFilter != null) {
-                              documentsCubit.updateFilter(filter: newFilter);
+                              _documentsCubit.updateFilter(filter: newFilter);
                             }
                           }
                         } on PaperlessServerException catch (error, stackTrace) {
@@ -263,7 +259,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
     await Navigator.of(context).push<DocumentModel?>(
       _buildDetailsPageRoute(document),
     );
-    BlocProvider.of<DocumentsCubit>(context).reload();
+    _documentsCubit.reload();
   }
 
   MaterialPageRoute<DocumentModel?> _buildDetailsPageRoute(
@@ -279,19 +275,18 @@ class _DocumentsPageState extends State<DocumentsPage> {
   }
 
   void _addTagToFilter(int tagId) {
-    final cubit = BlocProvider.of<DocumentsCubit>(context);
     try {
-      final tagsQuery = cubit.state.filter.tags is IdsTagsQuery
-          ? cubit.state.filter.tags as IdsTagsQuery
+      final tagsQuery = _documentsCubit.state.filter.tags is IdsTagsQuery
+          ? _documentsCubit.state.filter.tags as IdsTagsQuery
           : const IdsTagsQuery();
       if (tagsQuery.includedIds.contains(tagId)) {
-        cubit.updateCurrentFilter(
+        _documentsCubit.updateCurrentFilter(
           (filter) => filter.copyWith(
             tags: tagsQuery.withIdsRemoved([tagId]),
           ),
         );
       } else {
-        cubit.updateCurrentFilter(
+        _documentsCubit.updateCurrentFilter(
           (filter) => filter.copyWith(
             tags: tagsQuery.withIdQueriesAdded([IncludeTagIdQuery(tagId)]),
           ),
