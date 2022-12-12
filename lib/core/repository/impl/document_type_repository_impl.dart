@@ -63,4 +63,7 @@ class DocumentTypeRepositoryImpl implements LabelRepository<DocumentType> {
   void clear() {
     _subject.add(const {});
   }
+
+  @override
+  Map<int, DocumentType> get current => _subject.value;
 }

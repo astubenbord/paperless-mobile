@@ -25,4 +25,10 @@ class BaseUrlInterceptor implements InterceptorContract {
   Future<BaseResponse> interceptResponse(
           {required BaseResponse response}) async =>
       response;
+
+  @override
+  Future<bool> shouldInterceptRequest() async => true;
+
+  @override
+  Future<bool> shouldInterceptResponse() async => true;
 }

@@ -107,6 +107,7 @@ class _ScannerPageState extends State<ScannerPage>
     if (kDebugMode) {
       dev.log('[ScannerPage] Created temporary file: ${file.path}');
     }
+
     final success = await EdgeDetection.detectEdge(file.path);
     if (!success) {
       if (kDebugMode) {

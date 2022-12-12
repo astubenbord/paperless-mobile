@@ -30,6 +30,7 @@ class _LabelsPageState extends State<LabelsPage>
   @override
   void initState() {
     super.initState();
+
     _tabController = TabController(length: 4, vsync: this)
       ..addListener(() => setState(() => _currentIndex = _tabController.index));
   }

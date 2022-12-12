@@ -11,9 +11,13 @@ class LabelCubit<T extends Label> extends Cubit<LabelState<T>> {
 
   late StreamSubscription _subscription;
 
-  LabelCubit(this._repository) : super(LabelState.initial()) {
+  LabelCubit(LabelRepository<T> repository)
+      : _repository = repository,
+        super(LabelState(labels: repository.current, isLoaded: true)) {
     _subscription = _repository.labels.listen(
-      (update) => emit(LabelState(isLoaded: true, labels: update)),
+      (update) => emit(
+        LabelState(isLoaded: true, labels: update),
+      ),
     );
   }
 
@@ -26,6 +30,10 @@ class LabelCubit<T extends Label> extends Cubit<LabelState<T>> {
     assert(item.id == null);
     final addedItem = await _repository.create(item);
     return addedItem;
+  }
+
+  Future<void> reload() {
+    return _repository.findAll();
   }
 
   Future<T> replace(T item) async {

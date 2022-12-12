@@ -28,7 +28,7 @@ class AddLabelPage<T extends Label> extends StatelessWidget {
       ),
       child: AddLabelFormWidget(
         pageTitle: pageTitle,
-        label: fromJsonT({'name': initialName}),
+        label: initialName != null ? fromJsonT({'name': initialName}) : null,
         additionalFields: additionalFields,
         fromJsonT: fromJsonT,
       ),

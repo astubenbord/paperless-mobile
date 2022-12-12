@@ -17,9 +17,9 @@ class EditLabelCubit<T extends Label> extends Cubit<EditLabelState<T>> {
         .listen((labels) => emit(EditLabelState(labels: labels)));
   }
 
-  Future<void> create(T label) => _repository.create(label);
+  Future<T> create(T label) => _repository.create(label);
 
-  Future<void> update(T label) => _repository.update(label);
+  Future<T> update(T label) => _repository.update(label);
 
   Future<void> delete(T label) => _repository.delete(label);
 

@@ -3,6 +3,8 @@ import 'package:paperless_api/paperless_api.dart';
 abstract class LabelRepository<T extends Label> {
   Stream<Map<int, T>> get labels;
 
+  Map<int, T> get current;
+
   Future<T> create(T label);
   Future<T?> find(int id);
   Future<Iterable<T>> findAll([Iterable<int>? ids]);

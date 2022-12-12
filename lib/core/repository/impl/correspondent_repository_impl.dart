@@ -64,4 +64,7 @@ class CorrespondentRepositoryImpl implements LabelRepository<Correspondent> {
   void clear() {
     _subject.add(const {});
   }
+
+  @override
+  Map<int, Correspondent> get current => _subject.value;
 }

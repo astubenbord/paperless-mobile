@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
+import 'package:paperless_mobile/features/labels/bloc/label_cubit.dart';
+import 'package:paperless_mobile/features/labels/bloc/label_state.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 
 class SortFieldSelectionBottomSheet extends StatefulWidget {
@@ -46,30 +49,58 @@ class _SortFieldSelectionBottomSheetState
                 S.of(context).documentsPageOrderByLabel,
                 style: Theme.of(context).textTheme.caption,
                 textAlign: TextAlign.start,
-              ).padded(
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               ),
               TextButton(
                 child: Text(S.of(context).documentsFilterPageApplyFilterLabel),
-                onPressed: () => widget.onSubmit(
-                  _currentSortField,
-                  _currentSortOrder,
-                ),
+                onPressed: () {
+                  widget.onSubmit(
+                    _currentSortField,
+                    _currentSortOrder,
+                  );
+                  Navigator.pop(context);
+                },
               ),
             ],
-          ),
+          ).paddedSymmetrically(horizontal: 16, vertical: 8.0),
           Column(
-            children: SortField.values.map(_buildSortOption).toList(),
+            children: [
+              _buildSortOption(SortField.archiveSerialNumber),
+              BlocBuilder<LabelCubit<Correspondent>, LabelState<Correspondent>>(
+                builder: (context, state) {
+                  return _buildSortOption(
+                    SortField.correspondentName,
+                    enabled: state.labels.values.fold<bool>(
+                        false,
+                        (previousValue, element) =>
+                            previousValue || (element.documentCount ?? 0) > 0),
+                  );
+                },
+              ),
+              _buildSortOption(SortField.title),
+              BlocBuilder<LabelCubit<DocumentType>, LabelState<DocumentType>>(
+                builder: (context, state) {
+                  return _buildSortOption(
+                    SortField.documentType,
+                    enabled: state.labels.values.fold<bool>(
+                        false,
+                        (previousValue, element) =>
+                            previousValue || (element.documentCount ?? 0) > 0),
+                  );
+                },
+              ),
+              _buildSortOption(SortField.created),
+              _buildSortOption(SortField.added),
+              _buildSortOption(SortField.modified),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _buildSortOption(
-    SortField field,
-  ) {
+  Widget _buildSortOption(SortField field, {bool enabled = true}) {
     return ListTile(
+      enabled: enabled,
       contentPadding: const EdgeInsets.symmetric(horizontal: 32),
       title: Text(
         _localizedSortField(field),
@@ -77,6 +108,14 @@ class _SortFieldSelectionBottomSheetState
       trailing: _currentSortField == field
           ? _buildOrderIcon(_currentSortOrder)
           : null,
+      onTap: () {
+        setState(() {
+          _currentSortOrder = (_currentSortField == field
+              ? _currentSortOrder.toggle()
+              : SortOrder.descending);
+          _currentSortField = field;
+        });
+      },
     );
   }
 

@@ -1,5 +1,4 @@
-import 'package:http/http.dart';
-import 'package:http_interceptor/http/http.dart';
+import 'package:http_interceptor/http_interceptor.dart';
 import 'package:injectable/injectable.dart';
 
 const interceptedRoutes = ['thumb/'];
@@ -33,4 +32,10 @@ class ResponseConversionInterceptor implements InterceptorContract {
     }
     return response;
   }
+
+  @override
+  Future<bool> shouldInterceptRequest() async => true;
+
+  @override
+  Future<bool> shouldInterceptResponse() async => true;
 }

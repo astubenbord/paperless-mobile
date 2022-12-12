@@ -63,4 +63,7 @@ class StoragePathRepositoryImpl implements LabelRepository<StoragePath> {
   void clear() {
     _subject.add(const {});
   }
+
+  @override
+  Map<int, StoragePath> get current => _subject.value;
 }

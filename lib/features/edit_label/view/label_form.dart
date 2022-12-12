@@ -10,7 +10,7 @@ import 'package:paperless_mobile/util.dart';
 class SubmitButtonConfig<T extends Label> {
   final Widget icon;
   final Widget label;
-  final Future<void> Function(T) onSubmit;
+  final Future<T> Function(T) onSubmit;
 
   SubmitButtonConfig({
     required this.icon,
@@ -117,8 +117,9 @@ class _LabelFormState<T extends Label> extends State<LabelForm<T>> {
           ...widget.initialValue?.toJson() ?? {},
           ..._formKey.currentState!.value
         };
-        await widget.submitButtonConfig.onSubmit(widget.fromJsonT(mergedJson));
-        Navigator.pop(context);
+        final createdLabel = await widget.submitButtonConfig
+            .onSubmit(widget.fromJsonT(mergedJson));
+        Navigator.pop(context, createdLabel);
       } on PaperlessValidationErrors catch (errorMessages) {
         setState(() => _errors = errorMessages);
       } on PaperlessServerException catch (error, stackTrace) {

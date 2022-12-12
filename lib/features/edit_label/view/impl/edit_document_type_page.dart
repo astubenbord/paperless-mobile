@@ -2,8 +2,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/repository/label_repository.dart';
+import 'package:paperless_mobile/features/edit_label/cubit/edit_label_cubit.dart';
 import 'package:paperless_mobile/features/edit_label/view/edit_label_page.dart';
-import 'package:paperless_mobile/features/labels/bloc/label_cubit.dart';
 
 class EditDocumentTypePage extends StatelessWidget {
   final DocumentType documentType;
@@ -12,7 +12,7 @@ class EditDocumentTypePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => LabelCubit<DocumentType>(
+      create: (context) => EditLabelCubit<DocumentType>(
         RepositoryProvider.of<LabelRepository<DocumentType>>(context),
       ),
       child: EditLabelPage<DocumentType>(

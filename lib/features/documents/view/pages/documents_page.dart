@@ -1,10 +1,10 @@
+import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
 import 'package:paperless_mobile/core/repository/provider/label_repositories_provider.dart';
-import 'package:paperless_mobile/core/repository/saved_view_repository.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/document_details/bloc/document_details_cubit.dart';
 import 'package:paperless_mobile/features/document_details/view/pages/document_details_page.dart';
@@ -24,7 +24,6 @@ import 'package:paperless_mobile/features/settings/bloc/application_settings_cub
 import 'package:paperless_mobile/features/settings/model/application_settings_state.dart';
 import 'package:paperless_mobile/features/settings/model/view_type.dart';
 import 'package:paperless_mobile/util.dart';
-import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class DocumentsPage extends StatefulWidget {
   const DocumentsPage({Key? key}) : super(key: key);
@@ -35,16 +34,17 @@ class DocumentsPage extends StatefulWidget {
 
 class _DocumentsPageState extends State<DocumentsPage> {
   late final DocumentsCubit _documentsCubit;
+  late final SavedViewCubit _savedViewCubit;
+
   final _pagingController = PagingController<int, DocumentModel>(
     firstPageKey: 1,
   );
-
-  final _filterPanelController = PanelController();
 
   @override
   void initState() {
     super.initState();
     _documentsCubit = BlocProvider.of<DocumentsCubit>(context);
+    _savedViewCubit = BlocProvider.of<SavedViewCubit>(context);
     try {
       _documentsCubit.load();
     } on PaperlessServerException catch (error, stackTrace) {
@@ -59,97 +59,69 @@ class _DocumentsPageState extends State<DocumentsPage> {
     super.dispose();
   }
 
-  Future<void> _loadNewPage(int pageKey) async {
-    final pageCount = _documentsCubit.state
-        .inferPageCount(pageSize: _documentsCubit.state.filter.pageSize);
-    if (pageCount <= pageKey + 1) {
-      _pagingController.nextPageKey = null;
-    }
-    try {
-      await _documentsCubit.loadMore();
-    } on PaperlessServerException catch (error, stackTrace) {
-      showErrorMessage(context, error, stackTrace);
-    }
-  }
-
-  void _onSelected(DocumentModel model) {
-    _documentsCubit.toggleDocumentSelection(model);
-  }
-
-  Future<void> _onRefresh() async {
-    try {
-      await _documentsCubit.updateCurrentFilter(
-        (filter) => filter.copyWith(page: 1),
-      );
-    } on PaperlessServerException catch (error, stackTrace) {
-      showErrorMessage(context, error, stackTrace);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        if (_filterPanelController.isPanelOpen) {
-          FocusScope.of(context).unfocus();
-          _filterPanelController.close();
-          return false;
-        }
-        if (_documentsCubit.state.selection.isNotEmpty) {
-          _documentsCubit.resetSelection();
-          return false;
-        }
-        return true;
+    return BlocConsumer<ConnectivityCubit, ConnectivityState>(
+      listenWhen: (previous, current) =>
+          previous != ConnectivityState.connected &&
+          current == ConnectivityState.connected,
+      listener: (context, state) {
+        _documentsCubit.load();
       },
-      child: BlocConsumer<ConnectivityCubit, ConnectivityState>(
-        listenWhen: (previous, current) =>
-            previous != ConnectivityState.connected &&
-            current == ConnectivityState.connected,
-        listener: (context, state) {
-          _documentsCubit.load();
-        },
-        builder: (context, connectivityState) {
-          return Scaffold(
+      builder: (context, connectivityState) {
+        return Scaffold(
             drawer: BlocProvider.value(
               value: BlocProvider.of<AuthenticationCubit>(context),
               child: InfoDrawer(
                 afterInboxClosed: () => _documentsCubit.reload(),
               ),
             ),
-            resizeToAvoidBottomInset: true,
-            body: SlidingUpPanel(
-              backdropEnabled: true,
-              parallaxEnabled: true,
-              parallaxOffset: .5,
-              controller: _filterPanelController,
-              defaultPanelState: PanelState.CLOSED,
-              minHeight: 48,
-              maxHeight: (MediaQuery.of(context).size.height * 3) / 4,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(16),
-                topRight: Radius.circular(16),
-              ),
-              body: _buildBody(connectivityState),
-              color: Theme.of(context).scaffoldBackgroundColor,
-              panelBuilder: (scrollController) =>
-                  BlocBuilder<DocumentsCubit, DocumentsState>(
-                builder: (context, state) {
-                  return LabelsBlocProvider(
-                    child: DocumentFilterPanel(
-                      panelController: _filterPanelController,
-                      scrollController: scrollController,
-                      initialFilter: state.filter,
-                      onFilterChanged: (filter) =>
-                          _documentsCubit.updateFilter(filter: filter),
-                    ),
-                  );
-                },
-              ),
+            floatingActionButton: BlocBuilder<DocumentsCubit, DocumentsState>(
+              builder: (context, state) {
+                final appliedFiltersCount = state.filter.appliedFiltersCount;
+                return Badge(
+                  toAnimate: false,
+                  showBadge: appliedFiltersCount > 0,
+                  badgeContent: appliedFiltersCount > 0
+                      ? Text(state.filter.appliedFiltersCount.toString())
+                      : null,
+                  child: FloatingActionButton(
+                    child: const Icon(Icons.filter_alt),
+                    onPressed: _openDocumentFilter,
+                  ),
+                );
+              },
             ),
-          );
-        },
+            resizeToAvoidBottomInset: true,
+            body: _buildBody(connectivityState));
+      },
+    );
+  }
+
+  void _openDocumentFilter() async {
+    final filter = await showModalBottomSheet(
+      context: context,
+      builder: (context) => SizedBox(
+        height: MediaQuery.of(context).size.height - kToolbarHeight - 16,
+        child: LabelsBlocProvider(
+          child: DocumentFilterPanel(
+            initialFilter: _documentsCubit.state.filter,
+          ),
+        ),
+      ),
+      isDismissible: true,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(16.0),
+          topRight: Radius.circular(16.0),
+        ),
       ),
     );
+    if (filter != null) {
+      _documentsCubit.updateFilter(filter: filter);
+      _savedViewCubit.resetSelection();
+    }
   }
 
   Widget _buildBody(ConnectivityState connectivityState) {
@@ -193,6 +165,10 @@ class _DocumentsPageState extends State<DocumentsPage> {
               child = SliverToBoxAdapter(
                 child: DocumentsEmptyState(
                   state: state,
+                  onReset: () {
+                    _documentsCubit.updateFilter();
+                    _savedViewCubit.resetSelection();
+                  },
                 ),
               );
             }
@@ -201,51 +177,45 @@ class _DocumentsPageState extends State<DocumentsPage> {
               onRefresh: _onRefresh,
               child: CustomScrollView(
                 slivers: [
-                  BlocProvider(
-                    create: (context) => SavedViewCubit(
-                        RepositoryProvider.of<SavedViewRepository>(context)),
-                    child: BlocListener<SavedViewCubit, SavedViewState>(
-                      listener: (context, state) {
-                        try {
-                          if (state.selectedSavedViewId == null) {
-                            _documentsCubit.updateFilter();
-                          } else {
-                            final newFilter = state
-                                .value[state.selectedSavedViewId]
-                                ?.toDocumentFilter();
-                            if (newFilter != null) {
-                              _documentsCubit.updateFilter(filter: newFilter);
-                            }
+                  BlocListener<SavedViewCubit, SavedViewState>(
+                    listenWhen: (previous, current) =>
+                        previous.selectedSavedViewId !=
+                        current.selectedSavedViewId,
+                    listener: (context, state) {
+                      try {
+                        if (state.selectedSavedViewId == null) {
+                          _documentsCubit.updateFilter();
+                        } else {
+                          final newFilter = state
+                              .value[state.selectedSavedViewId]
+                              ?.toDocumentFilter();
+                          if (newFilter != null) {
+                            _documentsCubit.updateFilter(filter: newFilter);
                           }
-                        } on PaperlessServerException catch (error, stackTrace) {
-                          showErrorMessage(context, error, stackTrace);
                         }
-                      },
-                      child: DocumentsPageAppBar(
-                        actions: [
-                          const SortDocumentsButton(),
-                          IconButton(
-                            icon: Icon(
-                              settings.preferredViewType == ViewType.grid
-                                  ? Icons.list
-                                  : Icons.grid_view,
-                            ),
-                            onPressed: () =>
-                                BlocProvider.of<ApplicationSettingsCubit>(
-                                        context)
-                                    .setViewType(
-                                        settings.preferredViewType.toggle()),
+                      } on PaperlessServerException catch (error, stackTrace) {
+                        showErrorMessage(context, error, stackTrace);
+                      }
+                    },
+                    child: DocumentsPageAppBar(
+                      actions: [
+                        const SortDocumentsButton(),
+                        IconButton(
+                          icon: Icon(
+                            settings.preferredViewType == ViewType.grid
+                                ? Icons.list
+                                : Icons.grid_view,
                           ),
-                        ],
-                      ),
+                          onPressed: () =>
+                              BlocProvider.of<ApplicationSettingsCubit>(context)
+                                  .setViewType(
+                            settings.preferredViewType.toggle(),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   child,
-                  SliverToBoxAdapter(
-                    child: SizedBox(
-                      height: MediaQuery.of(context).size.height / 4,
-                    ),
-                  )
                 ],
               ),
             );
@@ -292,6 +262,33 @@ class _DocumentsPageState extends State<DocumentsPage> {
           ),
         );
       }
+    } on PaperlessServerException catch (error, stackTrace) {
+      showErrorMessage(context, error, stackTrace);
+    }
+  }
+
+  Future<void> _loadNewPage(int pageKey) async {
+    final pageCount = _documentsCubit.state
+        .inferPageCount(pageSize: _documentsCubit.state.filter.pageSize);
+    if (pageCount <= pageKey + 1) {
+      _pagingController.nextPageKey = null;
+    }
+    try {
+      await _documentsCubit.loadMore();
+    } on PaperlessServerException catch (error, stackTrace) {
+      showErrorMessage(context, error, stackTrace);
+    }
+  }
+
+  void _onSelected(DocumentModel model) {
+    _documentsCubit.toggleDocumentSelection(model);
+  }
+
+  Future<void> _onRefresh() async {
+    try {
+      await _documentsCubit.updateCurrentFilter(
+        (filter) => filter.copyWith(page: 1),
+      );
     } on PaperlessServerException catch (error, stackTrace) {
       showErrorMessage(context, error, stackTrace);
     }

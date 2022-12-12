@@ -81,7 +81,8 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
       appSettings = ApplicationSettingsState.defaultSettings;
     }
     if (storedAuth == null || !storedAuth.isValid) {
-      emit(AuthenticationState(isAuthenticated: false, wasLoginStored: false));
+      return emit(
+          AuthenticationState(isAuthenticated: false, wasLoginStored: false));
     } else {
       if (appSettings.isLocalAuthenticationEnabled) {
         final localAuthSuccess = await _localAuthService
@@ -103,8 +104,13 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
             wasLocalAuthenticationSuccessful: false,
           ));
         }
+      } else {
+        return emit(AuthenticationState(
+          isAuthenticated: true,
+          authentication: storedAuth,
+          wasLoginStored: true,
+        ));
       }
-      emit(AuthenticationState(isAuthenticated: false, wasLoginStored: true));
     }
   }
 

@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -33,7 +32,7 @@ class _DocumentDownloadButtonState extends State<DocumentDownloadButton> {
       onPressed: Platform.isAndroid && widget.document != null
           ? () => _onDownload(widget.document!)
           : null,
-    ).padded(const EdgeInsets.only(right: 4));
+    ).paddedOnly(right: 4);
   }
 
   Future<void> _onDownload(DocumentModel document) async {

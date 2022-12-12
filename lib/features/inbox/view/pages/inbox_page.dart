@@ -54,12 +54,12 @@ class _InboxPageState extends State<InboxPage> {
                       '${state.inboxItems.length} ${S.of(context).inboxPageUnseenText}',
                       textAlign: TextAlign.start,
                       style: Theme.of(context).textTheme.caption,
-                    ).padded(const EdgeInsets.symmetric(horizontal: 4.0)),
+                    ).paddedSymmetrically(horizontal: 4.0),
                   ),
                 ),
               );
             },
-          ).padded(const EdgeInsets.symmetric(horizontal: 8.0)),
+          ).paddedSymmetrically(horizontal: 8.0),
         ),
       ),
       floatingActionButton: BlocBuilder<InboxCubit, InboxState>(
@@ -108,7 +108,7 @@ class _InboxPageState extends State<InboxPage> {
                           textAlign: TextAlign.center,
                         ).padded(),
                       ),
-                    ).padded(const EdgeInsets.only(top: 8.0)),
+                    ).paddedOnly(top: 8.0),
                   ),
                   SliverList(
                     delegate: SliverChildBuilderDelegate(
@@ -137,14 +137,7 @@ class _InboxPageState extends State<InboxPage> {
                           S.of(context).inboxPageUsageHintText,
                           textAlign: TextAlign.center,
                           style: Theme.of(context).textTheme.caption,
-                        ).padded(
-                          const EdgeInsets.only(
-                            top: 8.0,
-                            left: 8.0,
-                            right: 8.0,
-                            bottom: 8.0,
-                          ),
-                        ),
+                        ).padded(),
                       ),
                       ...slivers
                     ],

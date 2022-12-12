@@ -70,33 +70,38 @@ class EditLabelForm<T extends Label> extends StatelessWidget {
     );
   }
 
-  void _onDelete(BuildContext context) {
+  void _onDelete(BuildContext context) async {
     if ((label.documentCount ?? 0) > 0) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text(S.of(context).editLabelPageConfirmDeletionDialogTitle),
-          content: Text(
-            S.of(context).editLabelPageDeletionDialogText,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(S.of(context).genericActionCancelLabel),
-            ),
-            TextButton(
-              onPressed: () {
-                BlocProvider.of<EditLabelCubit<T>>(context).delete(label);
-                Navigator.pop(context);
-              },
-              child: Text(
-                S.of(context).genericActionDeleteLabel,
-                style: TextStyle(color: Theme.of(context).errorColor),
+      final shouldDelete = await showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title:
+                  Text(S.of(context).editLabelPageConfirmDeletionDialogTitle),
+              content: Text(
+                S.of(context).editLabelPageDeletionDialogText,
               ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: Text(S.of(context).genericActionCancelLabel),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context, true);
+                  },
+                  child: Text(
+                    S.of(context).genericActionDeleteLabel,
+                    style: TextStyle(color: Theme.of(context).errorColor),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      );
+          ) ??
+          false;
+      if (shouldDelete) {
+        BlocProvider.of<EditLabelCubit<T>>(context).delete(label);
+        Navigator.pop(context);
+      }
     } else {
       BlocProvider.of<EditLabelCubit<T>>(context).delete(label);
       Navigator.pop(context);

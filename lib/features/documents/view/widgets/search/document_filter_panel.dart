@@ -1,34 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:intl/intl.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
-import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/search/query_type_form_field.dart';
 import 'package:paperless_mobile/features/labels/bloc/label_cubit.dart';
 import 'package:paperless_mobile/features/labels/bloc/label_state.dart';
 import 'package:paperless_mobile/features/labels/tags/view/widgets/tags_form_field.dart';
 import 'package:paperless_mobile/features/labels/view/widgets/label_form_field.dart';
-import 'package:paperless_mobile/features/saved_view/cubit/saved_view_cubit.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
-import 'package:intl/intl.dart';
 import 'package:paperless_mobile/util.dart';
-import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 enum DateRangeSelection { before, after }
 
 class DocumentFilterPanel extends StatefulWidget {
-  final PanelController panelController;
-  final ScrollController scrollController;
-
   final DocumentFilter initialFilter;
 
-  final void Function(DocumentFilter filter) onFilterChanged;
   const DocumentFilterPanel({
     Key? key,
-    required this.panelController,
-    required this.scrollController,
-    required this.onFilterChanged,
     required this.initialFilter,
   }) : super(key: key);
 
@@ -60,33 +50,17 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
 
   @override
   Widget build(BuildContext context) {
+    const radius = Radius.circular(16);
     return ClipRRect(
       borderRadius: const BorderRadius.only(
-        topLeft: Radius.circular(16),
-        topRight: Radius.circular(16),
+        topLeft: radius,
+        topRight: radius,
       ),
       child: FormBuilder(
         key: _formKey,
         child: Column(
           children: [
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                _buildDragLine(),
-                Align(
-                  alignment: Alignment.topRight,
-                  child: TextButton.icon(
-                    icon: const Icon(Icons.refresh),
-                    label:
-                        Text(S.of(context).documentsFilterPageResetFilterLabel),
-                    onPressed: () => _resetFilter(context),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(
-              height: 8.0,
-            ),
+            _buildDraggableResetHeader(),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -101,9 +75,6 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
                 ),
               ],
             ).padded(),
-            const SizedBox(
-              height: 16.0,
-            ),
             Expanded(
               child: ClipRRect(
                 borderRadius: const BorderRadius.only(
@@ -111,34 +82,30 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
                   topRight: Radius.circular(16.0),
                 ),
                 child: ListView(
-                  controller: widget.scrollController,
                   children: [
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Text(S.of(context).documentsFilterPageSearchLabel),
-                    ).padded(const EdgeInsets.only(left: 8.0)),
-                    _buildQueryFormField(),
+                    ).paddedOnly(left: 8.0),
+                    _buildQueryFormField().padded(),
                     Align(
                       alignment: Alignment.centerLeft,
                       child:
                           Text(S.of(context).documentsFilterPageAdvancedLabel),
-                    ).padded(const EdgeInsets.only(left: 8.0, top: 8.0)),
-                    _buildCreatedDateRangePickerFormField().padded(),
-                    _buildAddedDateRangePickerFormField().padded(),
+                    ).padded(),
+                    _buildCreatedDateRangePickerFormField(),
+                    _buildAddedDateRangePickerFormField(),
                     _buildCorrespondentFormField().padded(),
                     _buildDocumentTypeFormField().padded(),
                     _buildStoragePathFormField().padded(),
-                    TagFormField(
-                      name: DocumentModel.tagsKey,
-                      initialValue: widget.initialFilter.tags,
-                      allowCreation: false,
-                    ).padded(),
+                    _buildTagsFormField()
+                        .paddedSymmetrically(horizontal: 8, vertical: 4.0),
                     // Required in order for the storage path field to be visible when typing
                     const SizedBox(
                       height: 150,
                     ),
                   ],
-                ).padded(),
+                ),
               ),
             ),
           ],
@@ -147,13 +114,39 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
     );
   }
 
+  BlocBuilder<LabelCubit<Tag>, LabelState<Tag>> _buildTagsFormField() {
+    return BlocBuilder<LabelCubit<Tag>, LabelState<Tag>>(
+      builder: (context, state) {
+        return TagFormField(
+          name: DocumentModel.tagsKey,
+          initialValue: widget.initialFilter.tags,
+          allowCreation: false,
+          selectableOptions: state.labels,
+        );
+      },
+    );
+  }
+
+  Stack _buildDraggableResetHeader() {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        _buildDragLine(),
+        Align(
+          alignment: Alignment.topRight,
+          child: TextButton.icon(
+            icon: const Icon(Icons.refresh),
+            label: Text(S.of(context).documentsFilterPageResetFilterLabel),
+            onPressed: () => _resetFilter(context),
+          ),
+        ),
+      ],
+    );
+  }
+
   void _resetFilter(BuildContext context) async {
     FocusScope.of(context).unfocus();
-    await BlocProvider.of<DocumentsCubit>(context).updateFilter();
-    BlocProvider.of<SavedViewCubit>(context).resetSelection();
-    if (!widget.panelController.isPanelClosed) {
-      widget.panelController.close();
-    }
+    Navigator.pop(context, DocumentFilter.initial);
   }
 
   //TODO: Check if the blocs can be found in the context, otherwise just provide repository and create new bloc inside LabelFormField!
@@ -238,14 +231,17 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
         ),
       ),
       initialValue: widget.initialFilter.queryText,
-    ).padded();
+    );
   }
 
   Widget _buildDateRangePickerHelper(String formFieldKey) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
+    const spacer = SizedBox(width: 8.0);
+    return SizedBox(
+      height: 64,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
         children: [
+          spacer,
           ActionChip(
             label: Text(
               S.of(context).documentsFilterPageDateRangeLastSevenDaysLabel,
@@ -258,7 +254,8 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
                 ),
               );
             },
-          ).padded(const EdgeInsets.only(right: 8.0)),
+          ),
+          spacer,
           ActionChip(
             label: Text(
               S.of(context).documentsFilterPageDateRangeLastMonthLabel,
@@ -275,7 +272,8 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
                 ),
               );
             },
-          ).padded(const EdgeInsets.only(right: 8.0)),
+          ),
+          spacer,
           ActionChip(
             label: Text(
               S.of(context).documentsFilterPageDateRangeLastThreeMonthsLabel,
@@ -295,7 +293,8 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
                 ),
               );
             },
-          ).padded(const EdgeInsets.only(right: 8.0)),
+          ),
+          spacer,
           ActionChip(
             label: Text(
               S.of(context).documentsFilterPageDateRangeLastYearLabel,
@@ -316,6 +315,7 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
               );
             },
           ),
+          spacer,
         ],
       ),
     );
@@ -358,12 +358,12 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
             labelText: S.of(context).documentCreatedPropertyLabel,
             suffixIcon: IconButton(
               icon: const Icon(Icons.clear),
-              onPressed: () =>
-                  _formKey.currentState?.fields[fkCreatedAt]?.didChange(null),
+              onPressed: () {
+                _formKey.currentState?.fields[fkCreatedAt]?.didChange(null);
+              },
             ),
           ),
-        ),
-        const SizedBox(height: 4.0),
+        ).paddedSymmetrically(horizontal: 8, vertical: 4.0),
         _buildDateRangePickerHelper(fkCreatedAt),
       ],
     );
@@ -393,7 +393,7 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
             ),
             child: child!,
           ),
-          format: DateFormat.yMMMd(Localizations.localeOf(context).toString()),
+          format: DateFormat.yMMMd(),
           fieldStartLabelText:
               S.of(context).documentsFilterPageDateRangeFieldStartLabel,
           fieldEndLabelText:
@@ -406,11 +406,12 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
             labelText: S.of(context).documentAddedPropertyLabel,
             suffixIcon: IconButton(
               icon: const Icon(Icons.clear),
-              onPressed: () =>
-                  _formKey.currentState?.fields[fkAddedAt]?.didChange(null),
+              onPressed: () {
+                _formKey.currentState?.fields[fkAddedAt]?.didChange(null);
+              },
             ),
           ),
-        ),
+        ).paddedSymmetrically(horizontal: 8),
         const SizedBox(height: 4.0),
         _buildDateRangePickerHelper(fkAddedAt),
       ],
@@ -429,28 +430,33 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
   }
 
   void _onApplyFilter() async {
-    if (_formKey.currentState?.saveAndValidate() ?? false) {
+    _formKey.currentState?.save();
+    if (_formKey.currentState?.validate() ?? false) {
       final v = _formKey.currentState!.value;
-      final docCubit = BlocProvider.of<DocumentsCubit>(context);
-      DocumentFilter newFilter = docCubit.state.filter.copyWith(
+      DocumentFilter newFilter = DocumentFilter(
         createdDateBefore: (v[fkCreatedAt] as DateTimeRange?)?.end,
         createdDateAfter: (v[fkCreatedAt] as DateTimeRange?)?.start,
-        correspondent: v[fkCorrespondent] as CorrespondentQuery?,
-        documentType: v[fkDocumentType] as DocumentTypeQuery?,
-        storagePath: v[fkStoragePath] as StoragePathQuery?,
-        tags: v[DocumentModel.tagsKey] as TagsQuery?,
-        page: 1,
+        correspondent: v[fkCorrespondent] as CorrespondentQuery? ??
+            DocumentFilter.initial.correspondent,
+        documentType: v[fkDocumentType] as DocumentTypeQuery? ??
+            DocumentFilter.initial.documentType,
+        storagePath: v[fkStoragePath] as StoragePathQuery? ??
+            DocumentFilter.initial.storagePath,
+        tags: v[DocumentModel.tagsKey] as TagsQuery? ??
+            DocumentFilter.initial.tags,
         queryText: v[fkQuery] as String?,
         addedDateBefore: (v[fkAddedAt] as DateTimeRange?)?.end,
         addedDateAfter: (v[fkAddedAt] as DateTimeRange?)?.start,
         queryType: v[QueryTypeFormField.fkQueryType] as QueryType,
+        asnQuery: widget.initialFilter.asnQuery,
+        page: 1,
+        pageSize: widget.initialFilter.pageSize,
+        sortField: widget.initialFilter.sortField,
+        sortOrder: widget.initialFilter.sortOrder,
       );
       try {
-        await BlocProvider.of<DocumentsCubit>(context)
-            .updateFilter(filter: newFilter);
-        BlocProvider.of<SavedViewCubit>(context).resetSelection();
         FocusScope.of(context).unfocus();
-        widget.panelController.close();
+        Navigator.pop(context, newFilter);
       } on PaperlessServerException catch (error, stackTrace) {
         showErrorMessage(context, error, stackTrace);
       }

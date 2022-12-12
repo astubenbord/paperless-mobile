@@ -8,11 +8,9 @@ import 'package:paperless_mobile/core/repository/provider/label_repositories_pro
 import 'package:paperless_mobile/core/repository/saved_view_repository.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
-import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/inbox/bloc/inbox_cubit.dart';
 import 'package:paperless_mobile/features/inbox/view/pages/inbox_page.dart';
 import 'package:paperless_mobile/features/login/bloc/authentication_cubit.dart';
-import 'package:paperless_mobile/features/scan/bloc/document_scanner_cubit.dart';
 import 'package:paperless_mobile/features/settings/bloc/application_settings_cubit.dart';
 import 'package:paperless_mobile/features/settings/view/settings_page.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
@@ -52,7 +50,7 @@ class InfoDrawer extends StatelessWidget {
                         height: 32,
                         width: 32,
                         color: Theme.of(context).colorScheme.onPrimaryContainer,
-                      ).padded(const EdgeInsets.only(right: 8.0)),
+                      ).paddedOnly(right: 8.0),
                       Text(
                         S.of(context).appTitleText,
                         style: Theme.of(context).textTheme.headline5?.copyWith(
@@ -215,7 +213,7 @@ class InfoDrawer extends StatelessWidget {
             create: (context) => InboxCubit(
               RepositoryProvider.of<LabelRepository<Tag>>(context),
               getIt<PaperlessDocumentsApi>(),
-            ),
+            )..loadInbox(),
             child: const InboxPage(),
           ),
         ),

@@ -62,18 +62,21 @@ class LabelTabView<T extends Label> extends StatelessWidget {
                 ),
               );
             }
-            return ListView(
-              children: labels
-                  .map((l) => LabelItem<T>(
-                        name: l.name,
-                        content:
-                            contentBuilder?.call(l) ?? Text(l.match ?? '-'),
-                        onOpenEditPage: onEdit,
-                        filterBuilder: filterBuilder,
-                        leading: leadingBuilder?.call(l),
-                        label: l,
-                      ))
-                  .toList(),
+            return RefreshIndicator(
+              onRefresh: BlocProvider.of<LabelCubit<T>>(context).reload,
+              child: ListView(
+                children: labels
+                    .map((l) => LabelItem<T>(
+                          name: l.name,
+                          content:
+                              contentBuilder?.call(l) ?? Text(l.match ?? '-'),
+                          onOpenEditPage: onEdit,
+                          filterBuilder: filterBuilder,
+                          leading: leadingBuilder?.call(l),
+                          label: l,
+                        ))
+                    .toList(),
+              ),
             );
           },
         );

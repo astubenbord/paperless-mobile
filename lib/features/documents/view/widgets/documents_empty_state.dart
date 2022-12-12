@@ -9,9 +9,11 @@ import 'package:paperless_mobile/generated/l10n.dart';
 
 class DocumentsEmptyState extends StatelessWidget {
   final DocumentsState state;
+  final VoidCallback onReset;
   const DocumentsEmptyState({
     Key? key,
     required this.state,
+    required this.onReset,
   }) : super(key: key);
 
   @override
@@ -22,10 +24,7 @@ class DocumentsEmptyState extends StatelessWidget {
         subtitle: S.of(context).documentsPageEmptyStateNothingHereText,
         bottomChild: state.filter != DocumentFilter.initial
             ? TextButton(
-                onPressed: () async {
-                  await BlocProvider.of<DocumentsCubit>(context).updateFilter();
-                  BlocProvider.of<SavedViewCubit>(context).resetSelection();
-                },
+                onPressed: onReset,
                 child: Text(
                   S.of(context).documentsFilterPageResetFilterLabel,
                 ),

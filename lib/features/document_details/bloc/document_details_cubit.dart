@@ -12,18 +12,18 @@ class DocumentDetailsCubit extends Cubit<DocumentDetailsState> {
 
   Future<void> delete(DocumentModel document) async {
     await _api.delete(document);
-    emit(const DocumentDetailsState());
-  }
-
-  Future<void> update(DocumentModel document) async {
-    final updatedDocument = await _api.update(document);
-    emit(DocumentDetailsState(document: updatedDocument));
   }
 
   Future<void> assignAsn(DocumentModel document) async {
     if (document.archiveSerialNumber == null) {
       final int asn = await _api.findNextAsn();
-      update(document.copyWith(archiveSerialNumber: asn));
+      final updatedDocument =
+          await _api.update(document.copyWith(archiveSerialNumber: asn));
+      emit(DocumentDetailsState(document: updatedDocument));
     }
+  }
+
+  void replaceDocument(DocumentModel document) {
+    emit(DocumentDetailsState(document: document));
   }
 }

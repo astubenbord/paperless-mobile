@@ -3,13 +3,12 @@ import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:encrypted_shared_preferences/encrypted_shared_preferences.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:http_interceptor/http_interceptor.dart';
 import 'package:paperless_mobile/core/interceptor/authentication.interceptor.dart';
 import 'package:paperless_mobile/core/interceptor/base_url_interceptor.dart';
 import 'package:paperless_mobile/core/interceptor/language_header.interceptor.dart';
 import 'package:paperless_mobile/core/interceptor/response_conversion.interceptor.dart';
-import 'package:http/http.dart';
 import 'package:http/io_client.dart';
-import 'package:http_interceptor/http/http.dart';
 import 'package:injectable/injectable.dart';
 import 'package:local_auth/local_auth.dart';
 

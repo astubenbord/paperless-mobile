@@ -187,7 +187,7 @@ class PaperlessDocumentsApiImpl implements PaperlessDocumentsApi {
     const DocumentFilter asnQueryFilter = DocumentFilter(
       sortField: SortField.archiveSerialNumber,
       sortOrder: SortOrder.descending,
-      asn: AsnQuery.anyAssigned(),
+      asnQuery: AsnQuery.anyAssigned(),
       page: 1,
       pageSize: 1,
     );

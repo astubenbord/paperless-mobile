@@ -18,6 +18,7 @@ import 'package:paperless_mobile/features/documents/view/pages/document_edit_pag
 import 'package:paperless_mobile/features/documents/view/pages/document_view.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/delete_document_confirmation_dialog.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/document_preview.dart';
+import 'package:paperless_mobile/features/edit_document/cubit/edit_document_cubit.dart';
 import 'package:paperless_mobile/features/labels/correspondent/view/widgets/correspondent_widget.dart';
 import 'package:paperless_mobile/features/labels/document_type/view/widgets/document_type_widget.dart';
 import 'package:paperless_mobile/features/labels/storage_path/view/widgets/storage_path_widget.dart';
@@ -65,9 +66,13 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
         child: Scaffold(
           floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
           floatingActionButton: widget.allowEdit
-              ? FloatingActionButton(
-                  child: const Icon(Icons.edit),
-                  onPressed: _onEdit,
+              ? BlocBuilder<DocumentDetailsCubit, DocumentDetailsState>(
+                  builder: (context, state) {
+                    return FloatingActionButton(
+                      child: const Icon(Icons.edit),
+                      onPressed: () => _onEdit(state.document),
+                    );
+                  },
                 )
               : null,
           bottomNavigationBar:
@@ -79,24 +84,20 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
                   children: [
                     IconButton(
                       icon: const Icon(Icons.delete),
-                      onPressed: widget.allowEdit && state.document != null
-                          ? () => _onDelete(state.document!)
+                      onPressed: widget.allowEdit
+                          ? () => _onDelete(state.document)
                           : null,
-                    ).padded(const EdgeInsets.symmetric(horizontal: 4)),
+                    ).paddedSymmetrically(horizontal: 4),
                     DocumentDownloadButton(
                       document: state.document,
                     ),
                     IconButton(
                       icon: const Icon(Icons.open_in_new),
-                      onPressed: state.document != null
-                          ? () => _onOpen(state.document!)
-                          : null,
-                    ).padded(const EdgeInsets.only(right: 4)),
+                      onPressed: () => _onOpen(state.document),
+                    ).paddedOnly(right: 4.0),
                     IconButton(
                       icon: const Icon(Icons.share),
-                      onPressed: state.document != null
-                          ? () => _onShare(state.document!)
-                          : null,
+                      onPressed: () => _onShare(state.document),
                     ),
                   ],
                 ),
@@ -123,15 +124,10 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
                 expandedHeight: 200.0,
                 flexibleSpace:
                     BlocBuilder<DocumentDetailsCubit, DocumentDetailsState>(
-                  builder: (context, state) {
-                    if (state.document == null) {
-                      return Container(height: 200);
-                    }
-                    return DocumentPreview(
-                      id: state.document!.id,
-                      fit: BoxFit.cover,
-                    );
-                  },
+                  builder: (context, state) => DocumentPreview(
+                    id: state.document.id,
+                    fit: BoxFit.cover,
+                  ),
                 ),
                 bottom: ColoredTabBar(
                   backgroundColor:
@@ -172,27 +168,18 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
             ],
             body: BlocBuilder<DocumentDetailsCubit, DocumentDetailsState>(
               builder: (context, state) {
-                if (state.document == null) {
-                  return TabBarView(
-                    children: [
-                      Container(),
-                      Container(),
-                      Container(),
-                    ],
-                  );
-                }
                 return TabBarView(
                   children: [
                     _buildDocumentOverview(
-                      state.document!,
+                      state.document,
                       widget.titleAndContentQueryString,
                     ),
                     _buildDocumentContentView(
-                      state.document!,
+                      state.document,
                       widget.titleAndContentQueryString,
                     ),
                     _buildDocumentMetaDataView(
-                      state.document!,
+                      state.document,
                     ),
                   ].padded(),
                 );
@@ -204,47 +191,42 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
     );
   }
 
-  Future<void> _onEdit() async {
+  Future<void> _onEdit(DocumentModel document) async {
     {
       final cubit = BlocProvider.of<DocumentDetailsCubit>(context);
-      if (cubit.state.document == null) {
-        return;
-      }
       Navigator.push<bool>(
         context,
         MaterialPageRoute(
-          builder: (_) => MultiRepositoryProvider(
-            providers: [
-              RepositoryProvider.value(
-                value: RepositoryProvider.of<LabelRepository<DocumentType>>(
-                  context,
-                ),
+          builder: (context) => BlocProvider(
+            create: (context) => EditDocumentCubit(
+              document,
+              documentsApi: getIt<PaperlessDocumentsApi>(),
+              correspondentRepository:
+                  RepositoryProvider.of<LabelRepository<Correspondent>>(
+                context,
               ),
-              RepositoryProvider.value(
-                value: RepositoryProvider.of<LabelRepository<Tag>>(
-                  context,
-                ),
+              documentTypeRepository:
+                  RepositoryProvider.of<LabelRepository<DocumentType>>(
+                context,
               ),
-              RepositoryProvider.value(
-                value: RepositoryProvider.of<LabelRepository<StoragePath>>(
-                  context,
-                ),
+              storagePathRepository:
+                  RepositoryProvider.of<LabelRepository<StoragePath>>(
+                context,
               ),
-              RepositoryProvider.value(
-                value: RepositoryProvider.of<LabelRepository<Correspondent>>(
-                  context,
-                ),
+              tagRepository: RepositoryProvider.of<LabelRepository<Tag>>(
+                context,
               ),
-            ],
-            child: DocumentEditPage(
-              document: cubit.state.document!,
-              onEdit: (updatedDocument) {
-                return BlocProvider.of<DocumentDetailsCubit>(context)
-                    .update(updatedDocument);
+            ),
+            child: BlocListener<EditDocumentCubit, EditDocumentState>(
+              listenWhen: (previous, current) =>
+                  previous.document != current.document,
+              listener: (context, state) {
+                cubit.replaceDocument(state.document);
               },
+              child: const DocumentEditPage(),
             ),
           ),
-          maintainState: false,
+          maintainState: true,
         ),
       );
     }

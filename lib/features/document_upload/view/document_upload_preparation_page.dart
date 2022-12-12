@@ -200,11 +200,12 @@ class _DocumentUploadPreparationPageState
                       CorrespondentQuery.notAssigned,
                   prefixIcon: const Icon(Icons.person_outline),
                 ),
-                const TagFormField(
+                TagFormField(
                   name: DocumentModel.tagsKey,
                   notAssignedSelectable: false,
                   anyAssignedSelectable: false,
                   excludeAllowed: false,
+                  selectableOptions: state.tags,
                   //Label: "Tags" + " *",
                 ),
                 Text(

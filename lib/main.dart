@@ -120,6 +120,10 @@ class _PaperlessMobileEntrypointState extends State<PaperlessMobileEntrypoint> {
               ),
               inputDecorationTheme: const InputDecorationTheme(
                 border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 16.0,
+                ),
               ),
               chipTheme: ChipThemeData(
                 backgroundColor: Colors.lightGreen[50],
@@ -134,8 +138,11 @@ class _PaperlessMobileEntrypointState extends State<PaperlessMobileEntrypoint> {
                 scrolledUnderElevation: 0.0,
               ),
               inputDecorationTheme: const InputDecorationTheme(
-                border: OutlineInputBorder(),
-              ),
+                  border: OutlineInputBorder(),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 16.0,
+                  )),
               chipTheme: ChipThemeData(
                 backgroundColor: Colors.green[900],
               ),

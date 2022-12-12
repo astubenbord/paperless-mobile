@@ -62,4 +62,7 @@ class TagRepositoryImpl implements LabelRepository<Tag> {
   void clear() {
     _subject.add(const {});
   }
+
+  @override
+  Map<int, Tag> get current => _subject.value;
 }

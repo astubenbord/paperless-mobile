@@ -25,7 +25,7 @@ class DocumentFilter extends Equatable {
   final DocumentTypeQuery documentType;
   final CorrespondentQuery correspondent;
   final StoragePathQuery storagePath;
-  final AsnQuery asn;
+  final AsnQuery asnQuery;
   final TagsQuery tags;
   final SortField sortField;
   final SortOrder sortOrder;
@@ -42,7 +42,7 @@ class DocumentFilter extends Equatable {
     this.documentType = const DocumentTypeQuery.unset(),
     this.correspondent = const CorrespondentQuery.unset(),
     this.storagePath = const StoragePathQuery.unset(),
-    this.asn = const AsnQuery.unset(),
+    this.asnQuery = const AsnQuery.unset(),
     this.tags = const IdsTagsQuery(),
     this.sortField = SortField.created,
     this.sortOrder = SortOrder.descending,
@@ -60,7 +60,7 @@ class DocumentFilter extends Equatable {
     sb.write(correspondent.toQueryParameter());
     sb.write(tags.toQueryParameter());
     sb.write(storagePath.toQueryParameter());
-    sb.write(asn.toQueryParameter());
+    sb.write(asnQuery.toQueryParameter());
 
     if (queryText?.isNotEmpty ?? false) {
       sb.write("&${queryType.queryParam}=$queryText");
@@ -104,6 +104,7 @@ class DocumentFilter extends Equatable {
     DocumentTypeQuery? documentType,
     CorrespondentQuery? correspondent,
     StoragePathQuery? storagePath,
+    AsnQuery? asnQuery,
     TagsQuery? tags,
     SortField? sortField,
     SortOrder? sortOrder,
@@ -129,6 +130,7 @@ class DocumentFilter extends Equatable {
       queryText: queryText ?? this.queryText,
       createdDateBefore: createdDateBefore ?? this.createdDateBefore,
       createdDateAfter: createdDateAfter ?? this.createdDateAfter,
+      asnQuery: asnQuery ?? this.asnQuery,
     );
   }
 
@@ -153,6 +155,19 @@ class DocumentFilter extends Equatable {
     return null;
   }
 
+  int get appliedFiltersCount => [
+        documentType != initial.documentType,
+        correspondent != initial.correspondent,
+        storagePath != initial.storagePath,
+        tags != initial.tags,
+        (addedDateAfter != initial.addedDateAfter ||
+            addedDateBefore != initial.addedDateBefore),
+        (createdDateAfter != initial.createdDateAfter ||
+            createdDateBefore != initial.createdDateBefore),
+        asnQuery != initial.asnQuery,
+        (queryType != initial.queryType || queryText != initial.queryText),
+      ].fold(0, (previousValue, element) => previousValue += element ? 1 : 0);
+
   @override
   List<Object?> get props => [
         pageSize,
@@ -160,7 +175,7 @@ class DocumentFilter extends Equatable {
         documentType,
         correspondent,
         storagePath,
-        asn,
+        asnQuery,
         tags,
         sortField,
         sortOrder,

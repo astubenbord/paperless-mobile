@@ -71,8 +71,7 @@ Note: If you have the GitHub Android app installed, the descriptions will not be
                   Text(
                     'Stack Trace',
                     style: Theme.of(context).textTheme.subtitle1,
-                  ).padded(
-                      const EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0)),
+                  ).paddedOnly(top: 8.0, left: 8.0, right: 8.0),
                   TextButton.icon(
                     label: const Text('Copy'),
                     icon: const Icon(Icons.copy),

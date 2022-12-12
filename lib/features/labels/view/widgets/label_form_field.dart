@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:paperless_api/paperless_api.dart';
@@ -55,13 +57,15 @@ class _LabelFormFieldState<T extends Label, R extends IdQueryParameter>
     super.initState();
     _showClearSuffixIcon = widget.state.containsKey(widget.initialValue?.id);
     _textEditingController = TextEditingController(
-        text: widget.state[widget.initialValue?.id]?.name ?? '')
-      ..addListener(() {
+      text: widget.state[widget.initialValue?.id]?.name ?? '',
+    )..addListener(() {
         setState(() {
           _showCreationSuffixIcon = widget.state.values
-              .where((item) => item.name.toLowerCase().startsWith(
-                    _textEditingController.text.toLowerCase(),
-                  ))
+              .where(
+                (item) => item.name.toLowerCase().startsWith(
+                      _textEditingController.text.toLowerCase(),
+                    ),
+              )
               .isEmpty;
         });
         setState(() =>
@@ -71,7 +75,13 @@ class _LabelFormFieldState<T extends Label, R extends IdQueryParameter>
 
   @override
   Widget build(BuildContext context) {
+    final isEnabled = widget.state.values.fold<bool>(
+            false,
+            (previousValue, element) =>
+                previousValue || (element.documentCount ?? 0) > 0) ||
+        widget.labelCreationWidgetBuilder != null;
     return FormBuilderTypeAhead<IdQueryParameter>(
+      enabled: isEnabled,
       noItemsFoundBuilder: (context) => Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: Text(
@@ -88,13 +98,20 @@ class _LabelFormFieldState<T extends Label, R extends IdQueryParameter>
             S.of(context).labelNotAssignedText),
       ),
       suggestionsCallback: (pattern) {
-        final List<IdQueryParameter> suggestions = widget.state.keys
-            .where((item) =>
-                widget.state[item]!.name
-                    .toLowerCase()
-                    .startsWith(pattern.toLowerCase()) ||
-                pattern.isEmpty)
-            .map((id) => widget.queryParameterIdBuilder(id))
+        final List<IdQueryParameter> suggestions = widget.state.entries
+            .where(
+              (entry) =>
+                  widget.state[entry.key]!.name
+                      .toLowerCase()
+                      .contains(pattern.toLowerCase()) ||
+                  pattern.isEmpty,
+            )
+            .where(
+              (entry) =>
+                  widget.labelCreationWidgetBuilder != null ||
+                  (entry.value.documentCount ?? 0) > 0,
+            )
+            .map((entry) => widget.queryParameterIdBuilder(entry.key))
             .toList();
         if (widget.notAssignedSelectable) {
           suggestions.insert(0, widget.queryParameterNotAssignedBuilder());
@@ -128,21 +145,23 @@ class _LabelFormFieldState<T extends Label, R extends IdQueryParameter>
   Widget? _buildSuffixIcon(BuildContext context) {
     if (_showCreationSuffixIcon && widget.labelCreationWidgetBuilder != null) {
       return IconButton(
-        onPressed: () => Navigator.of(context)
-            .push<T>(MaterialPageRoute(
-                builder: (context) => widget
-                    .labelCreationWidgetBuilder!(_textEditingController.text)))
-            .then((value) {
-          if (value != null) {
+        onPressed: () async {
+          FocusScope.of(context).unfocus();
+          final createdLabel = await showDialog(
+            context: context,
+            builder: (context) => widget.labelCreationWidgetBuilder!(
+              _textEditingController.text,
+            ),
+          );
+          if (createdLabel != null) {
             // If new label has been created, set form field value and text of this form field and unfocus keyboard (we assume user is done).
             widget.formBuilderState?.fields[widget.name]
-                ?.didChange(widget.queryParameterIdBuilder(value.id));
-            _textEditingController.text = value.name;
-            FocusScope.of(context).unfocus();
+                ?.didChange(widget.queryParameterIdBuilder(createdLabel.id));
+            _textEditingController.text = createdLabel.name;
           } else {
             _reset();
           }
-        }),
+        },
         icon: const Icon(
           Icons.new_label,
         ),
@@ -158,8 +177,9 @@ class _LabelFormFieldState<T extends Label, R extends IdQueryParameter>
   }
 
   void _reset() {
-    widget.formBuilderState?.fields[widget.name]
-        ?.didChange(widget.queryParameterIdBuilder(null));
+    widget.formBuilderState?.fields[widget.name]?.didChange(
+      widget.queryParameterIdBuilder(null), // equivalnt to IdQueryParam.unset()
+    );
     _textEditingController.clear();
   }
 
@@ -169,9 +189,7 @@ class _LabelFormFieldState<T extends Label, R extends IdQueryParameter>
     } else if (T == DocumentType) {
       return S.of(context).documentTypeFormFieldSearchHintText;
     } else {
-      return S
-          .of(context)
-          .tagFormFieldSearchHintText; //TODO: Update tag form field once there is multi selection support.
+      return S.of(context).tagFormFieldSearchHintText;
     }
   }
 }

@@ -59,6 +59,11 @@ class _HomePageState extends State<HomePage> {
                 BlocProvider.value(
                   value: DocumentsCubit(getIt<PaperlessDocumentsApi>()),
                 ),
+                BlocProvider(
+                  create: (context) => SavedViewCubit(
+                    RepositoryProvider.of<SavedViewRepository>(context),
+                  ),
+                ),
               ],
               child: const DocumentsPage(),
             ),
