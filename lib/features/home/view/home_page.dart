@@ -49,8 +49,11 @@ class _HomePageState extends State<HomePage> {
           key: rootScaffoldKey,
           bottomNavigationBar: BottomNavBar(
             selectedIndex: _currentIndex,
-            onNavigationChanged: (index) =>
-                setState(() => _currentIndex = index),
+            onNavigationChanged: (index) {
+              if (_currentIndex != index) {
+                setState(() => _currentIndex = index);
+              }
+            },
           ),
           drawer: const InfoDrawer(),
           body: [
