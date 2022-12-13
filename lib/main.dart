@@ -7,6 +7,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/intl_standalone.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -25,14 +26,15 @@ import 'package:paperless_mobile/core/repository/impl/tag_repository_impl.dart';
 import 'package:paperless_mobile/core/repository/label_repository.dart';
 import 'package:paperless_mobile/core/repository/saved_view_repository.dart';
 import 'package:paperless_mobile/core/service/file_service.dart';
+import 'package:paperless_mobile/core/store/local_vault.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/app_intro/application_intro_slideshow.dart';
+import 'package:paperless_mobile/features/document_upload/cubit/document_upload_cubit.dart';
 import 'package:paperless_mobile/features/document_upload/view/document_upload_preparation_page.dart';
 import 'package:paperless_mobile/features/home/view/home_page.dart';
 import 'package:paperless_mobile/features/login/bloc/authentication_cubit.dart';
 import 'package:paperless_mobile/features/login/view/login_page.dart';
-import 'package:paperless_mobile/features/scan/bloc/document_scanner_cubit.dart';
 import 'package:paperless_mobile/features/settings/bloc/application_settings_cubit.dart';
 import 'package:paperless_mobile/features/settings/model/application_settings_state.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
@@ -114,8 +116,7 @@ class _PaperlessMobileEntrypointState extends State<PaperlessMobileEntrypoint> {
             theme: ThemeData(
               brightness: Brightness.light,
               useMaterial3: true,
-              colorScheme:
-                  ColorScheme.fromSeed(seedColor: Colors.lightGreen).copyWith(),
+              colorSchemeSeed: Colors.lightGreen,
               appBarTheme: const AppBarTheme(
                 scrolledUnderElevation: 0.0,
               ),
@@ -123,7 +124,7 @@ class _PaperlessMobileEntrypointState extends State<PaperlessMobileEntrypoint> {
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
-                contentPadding: EdgeInsets.symmetric(
+                contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16.0,
                   vertical: 16.0,
                 ),
@@ -143,7 +144,7 @@ class _PaperlessMobileEntrypointState extends State<PaperlessMobileEntrypoint> {
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
-                contentPadding: EdgeInsets.symmetric(
+                contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16.0,
                   vertical: 16.0,
                 ),
@@ -195,7 +196,7 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
     }
     late final SharedMediaFile file;
     if (Platform.isIOS) {
-      // Workaround: https://stackoverflow.com/a/72813212
+      // Workaround for file not found on iOS: https://stackoverflow.com/a/72813212
       file = SharedMediaFile(
         files.first.path.replaceAll('file://', ''),
         files.first.thumbnail,
@@ -221,8 +222,22 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
     final success = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => BlocProvider.value(
-          value: getIt<DocumentScannerCubit>(),
+        builder: (context) => BlocProvider(
+          create: (BuildContext context) => DocumentUploadCubit(
+            localVault: getIt<LocalVault>(),
+            documentApi: getIt<PaperlessDocumentsApi>(),
+            tagRepository: RepositoryProvider.of<LabelRepository<Tag>>(
+              context,
+            ),
+            correspondentRepository:
+                RepositoryProvider.of<LabelRepository<Correspondent>>(
+              context,
+            ),
+            documentTypeRepository:
+                RepositoryProvider.of<LabelRepository<DocumentType>>(
+              context,
+            ),
+          ),
           child: DocumentUploadPreparationPage(
             fileBytes: bytes,
             filename: filename,
@@ -244,6 +259,7 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
   @override
   void initState() {
     super.initState();
+    initializeDateFormatting();
     // For sharing files coming from outside the app while the app is still opened
     ReceiveSharingIntent.getMediaStream().listen(handleReceivedFiles);
     // For sharing files coming from outside the app while the app is closed
@@ -312,12 +328,12 @@ class BiometricAuthenticationPage extends StatelessWidget {
               ElevatedButton(
                 onPressed: () =>
                     BlocProvider.of<AuthenticationCubit>(context).logout(),
-                child: Text("Log out"),
+                child: const Text("Log out"),
               ),
               ElevatedButton(
                 onPressed: () => BlocProvider.of<AuthenticationCubit>(context)
                     .restoreSessionState(),
-                child: Text("Authenticate"),
+                child: const Text("Authenticate"),
               ),
             ],
           ),

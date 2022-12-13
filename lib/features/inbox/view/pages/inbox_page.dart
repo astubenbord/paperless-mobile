@@ -216,7 +216,7 @@ class _InboxPageState extends State<InboxPage> {
       showSnackBar(
         context,
         S.of(context).inboxPageDocumentRemovedMessageText,
-        action: SnackBarAction(
+        action: SnackBarActionConfig(
           label: S.of(context).inboxPageUndoRemoveText,
           onPressed: () => _onUndoMarkAsSeen(doc, removedTags),
         ),

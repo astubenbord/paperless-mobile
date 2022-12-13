@@ -66,55 +66,66 @@ class _DocumentsPageState extends State<DocumentsPage> {
           previous != ConnectivityState.connected &&
           current == ConnectivityState.connected,
       listener: (context, state) {
-        _documentsCubit.load();
+        try {
+          _documentsCubit.load();
+        } on PaperlessServerException catch (error, stackTrace) {
+          showErrorMessage(context, error, stackTrace);
+        }
       },
       builder: (context, connectivityState) {
         return Scaffold(
-            drawer: BlocProvider.value(
-              value: BlocProvider.of<AuthenticationCubit>(context),
-              child: InfoDrawer(
-                afterInboxClosed: () => _documentsCubit.reload(),
-              ),
+          drawer: BlocProvider.value(
+            value: BlocProvider.of<AuthenticationCubit>(context),
+            child: InfoDrawer(
+              afterInboxClosed: () => _documentsCubit.reload(),
             ),
-            floatingActionButton: BlocBuilder<DocumentsCubit, DocumentsState>(
-              builder: (context, state) {
-                final appliedFiltersCount = state.filter.appliedFiltersCount;
-                return Badge(
-                  toAnimate: false,
-                  showBadge: appliedFiltersCount > 0,
-                  badgeContent: appliedFiltersCount > 0
-                      ? Text(state.filter.appliedFiltersCount.toString())
-                      : null,
-                  child: FloatingActionButton(
-                    child: const Icon(Icons.filter_alt),
-                    onPressed: _openDocumentFilter,
-                  ),
-                );
-              },
-            ),
-            resizeToAvoidBottomInset: true,
-            body: _buildBody(connectivityState));
+          ),
+          floatingActionButton: BlocBuilder<DocumentsCubit, DocumentsState>(
+            builder: (context, state) {
+              final appliedFiltersCount = state.filter.appliedFiltersCount;
+              return Badge(
+                toAnimate: false,
+                animationType: BadgeAnimationType.fade,
+                showBadge: appliedFiltersCount > 0,
+                badgeContent: appliedFiltersCount > 0
+                    ? Text(
+                        state.filter.appliedFiltersCount.toString(),
+                        style: const TextStyle(color: Colors.white),
+                      )
+                    : null,
+                child: FloatingActionButton(
+                  child: const Icon(Icons.filter_alt_rounded),
+                  onPressed: _openDocumentFilter,
+                ),
+              );
+            },
+          ),
+          resizeToAvoidBottomInset: true,
+          body: _buildBody(connectivityState),
+        );
       },
     );
   }
 
   void _openDocumentFilter() async {
-    final filter = await showModalBottomSheet(
+    final filter = await showModalBottomSheet<DocumentFilter>(
       context: context,
-      builder: (context) => SizedBox(
-        height: MediaQuery.of(context).size.height - kToolbarHeight - 16,
-        child: LabelsBlocProvider(
-          child: DocumentFilterPanel(
-            initialFilter: _documentsCubit.state.filter,
-          ),
-        ),
-      ),
-      isDismissible: true,
-      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(16.0),
-          topRight: Radius.circular(16.0),
+          topLeft: Radius.circular(16),
+          topRight: Radius.circular(16),
+        ),
+      ),
+      isScrollControlled: true,
+      builder: (context) => DraggableScrollableSheet(
+        expand: false,
+        snap: true,
+        initialChildSize: .9,
+        builder: (context, controller) => LabelsBlocProvider(
+          child: DocumentFilterPanel(
+            initialFilter: _documentsCubit.state.filter,
+            scrollController: controller,
+          ),
         ),
       ),
     );
@@ -125,6 +136,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
   }
 
   Widget _buildBody(ConnectivityState connectivityState) {
+    final isConnected = connectivityState == ConnectivityState.connected;
     return BlocBuilder<ApplicationSettingsCubit, ApplicationSettingsState>(
       builder: (context, settings) {
         return BlocBuilder<DocumentsCubit, DocumentsState>(
@@ -143,8 +155,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
                   state: state,
                   onSelected: _onSelected,
                   pagingController: _pagingController,
-                  hasInternetConnection:
-                      connectivityState == ConnectivityState.connected,
+                  hasInternetConnection: isConnected,
                   onTagSelected: _addTagToFilter,
                 );
                 break;
@@ -154,8 +165,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
                   state: state,
                   onSelected: _onSelected,
                   pagingController: _pagingController,
-                  hasInternetConnection:
-                      connectivityState == ConnectivityState.connected,
+                  hasInternetConnection: isConnected,
                   onTagSelected: _addTagToFilter,
                 );
                 break;
@@ -175,6 +185,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
 
             return RefreshIndicator(
               onRefresh: _onRefresh,
+              notificationPredicate: (_) => isConnected,
               child: CustomScrollView(
                 slivers: [
                   BlocListener<SavedViewCubit, SavedViewState>(
@@ -198,6 +209,8 @@ class _DocumentsPageState extends State<DocumentsPage> {
                       }
                     },
                     child: DocumentsPageAppBar(
+                      isOffline:
+                          connectivityState != ConnectivityState.connected,
                       actions: [
                         const SortDocumentsButton(),
                         IconButton(

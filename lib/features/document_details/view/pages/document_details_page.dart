@@ -45,21 +45,15 @@ class DocumentDetailsPage extends StatefulWidget {
 }
 
 class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
-  @override
-  void initState() {
-    super.initState();
-    initializeDateFormatting();
-  }
-
   bool _isDownloadPending = false;
 
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () {
+      onWillPop: () async {
         Navigator.of(context)
             .pop(BlocProvider.of<DocumentDetailsCubit>(context).state.document);
-        return Future.value(false);
+        return false;
       },
       child: DefaultTabController(
         length: 3,
@@ -325,7 +319,7 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
         ),
         _separator(),
         _DetailsItem.text(
-          DateFormat().format(document.created),
+          DateFormat.yMMMd().format(document.created),
           context: context,
           label: S.of(context).documentCreatedPropertyLabel,
         ),

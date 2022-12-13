@@ -26,7 +26,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
-
+  final DocumentScannerCubit _scannerCubit = DocumentScannerCubit();
   @override
   void initState() {
     super.initState();
@@ -35,52 +35,47 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<ConnectivityCubit, ConnectivityState>(
+    return BlocListener<ConnectivityCubit, ConnectivityState>(
       //Only re-initialize data if the connectivity changed from not connected to connected
       listenWhen: (previous, current) => current == ConnectivityState.connected,
       listener: (context, state) {
         _initializeData(context);
       },
-      builder: (context, connectivityState) {
-        return Scaffold(
-          appBar: connectivityState == ConnectivityState.connected
-              ? null
-              : const OfflineBanner(),
-          key: rootScaffoldKey,
-          bottomNavigationBar: BottomNavBar(
-            selectedIndex: _currentIndex,
-            onNavigationChanged: (index) {
-              if (_currentIndex != index) {
-                setState(() => _currentIndex = index);
-              }
-            },
+      child: Scaffold(
+        key: rootScaffoldKey,
+        bottomNavigationBar: BottomNavBar(
+          selectedIndex: _currentIndex,
+          onNavigationChanged: (index) {
+            if (_currentIndex != index) {
+              setState(() => _currentIndex = index);
+            }
+          },
+        ),
+        drawer: const InfoDrawer(),
+        body: [
+          MultiBlocProvider(
+            providers: [
+              BlocProvider.value(
+                value: DocumentsCubit(getIt<PaperlessDocumentsApi>()),
+              ),
+              BlocProvider(
+                create: (context) => SavedViewCubit(
+                  RepositoryProvider.of<SavedViewRepository>(context),
+                ),
+              ),
+            ],
+            child: const DocumentsPage(),
           ),
-          drawer: const InfoDrawer(),
-          body: [
-            MultiBlocProvider(
-              providers: [
-                BlocProvider.value(
-                  value: DocumentsCubit(getIt<PaperlessDocumentsApi>()),
-                ),
-                BlocProvider(
-                  create: (context) => SavedViewCubit(
-                    RepositoryProvider.of<SavedViewRepository>(context),
-                  ),
-                ),
-              ],
-              child: const DocumentsPage(),
-            ),
-            BlocProvider.value(
-              value: DocumentScannerCubit(),
-              child: const ScannerPage(),
-            ),
-            BlocProvider.value(
-              value: DocumentsCubit(getIt<PaperlessDocumentsApi>()),
-              child: const LabelsPage(),
-            ),
-          ][_currentIndex],
-        );
-      },
+          BlocProvider.value(
+            value: _scannerCubit,
+            child: const ScannerPage(),
+          ),
+          BlocProvider.value(
+            value: DocumentsCubit(getIt<PaperlessDocumentsApi>()),
+            child: const LabelsPage(),
+          ),
+        ][_currentIndex],
+      ),
     );
   }
 

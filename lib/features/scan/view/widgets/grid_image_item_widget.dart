@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:photo_view/photo_view.dart';
 
 typedef DeleteCallback = void Function();
@@ -28,7 +29,6 @@ class GridImageItemWidget extends StatefulWidget {
 }
 
 class _GridImageItemWidgetState extends State<GridImageItemWidget> {
-  bool isProcessing = false;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -37,50 +37,71 @@ class _GridImageItemWidgetState extends State<GridImageItemWidget> {
     );
   }
 
-  Card _buildImageItem(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 8.0),
+  Widget _buildImageItem(BuildContext context) {
+    final borderRadius = BorderRadius.circular(12);
+    return ClipRRect(
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: borderRadius,
+        ),
+        clipBehavior: Clip.antiAliasWithSaveLayer,
         child: Stack(
+          clipBehavior: Clip.antiAliasWithSaveLayer,
           children: [
-            Align(alignment: Alignment.bottomCenter, child: _buildNumbering()),
             Align(
-              alignment: Alignment.topRight,
-              child: IconButton(
-                onPressed: widget.onDelete,
-                icon: const Icon(Icons.close),
+              alignment: Alignment.topCenter,
+              child: ClipRRect(
+                borderRadius: borderRadius,
+                child: SizedBox(
+                  height: 100,
+                  child: Stack(
+                    children: [
+                      SizedBox(
+                        width: double.infinity,
+                        height: 100,
+                        child: FittedBox(
+                          fit: BoxFit.fill,
+                          clipBehavior: Clip.antiAliasWithSaveLayer,
+                          alignment: Alignment.center,
+                          child: Image.file(
+                            widget.file,
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        top: 0,
+                        right: 0,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8.0,
+                            vertical: 4.0,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.background,
+                            borderRadius: const BorderRadius.only(
+                              bottomLeft: Radius.circular(12),
+                            ),
+                          ),
+                          child: Text(
+                            "${widget.index + 1}/${widget.totalNumberOfFiles}",
+                            style: Theme.of(context).textTheme.caption,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
-            isProcessing
-                ? _buildIsProcessing()
-                : Align(
-                    alignment: Alignment.center,
-                    child: AspectRatio(
-                      aspectRatio: 4 / 3,
-                      child: Image.file(
-                        widget.file,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: TextButton(
+                onPressed: widget.onDelete,
+                child: Text("Remove"),
+              ),
+            ),
           ],
         ),
-      ),
-    );
-  }
-
-  Center _buildIsProcessing() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: const [
-          CircularProgressIndicator(),
-          Text(
-            "Processing transformation...",
-            textAlign: TextAlign.center,
-          ),
-        ],
       ),
     );
   }
@@ -90,17 +111,12 @@ class _GridImageItemWidgetState extends State<GridImageItemWidget> {
       MaterialPageRoute(
         builder: (context) => Scaffold(
           appBar: AppBar(
-            title: _buildNumbering(prefix: "Image"),
+            title: Text(
+                "${S.of(context).scannerPageImagePreviewTitle} ${widget.index + 1}/${widget.totalNumberOfFiles}"),
           ),
           body: PhotoView(imageProvider: FileImage(widget.file)),
         ),
       ),
-    );
-  }
-
-  Widget _buildNumbering({String? prefix}) {
-    return Text(
-      "${prefix ?? ""} ${widget.index + 1}/${widget.totalNumberOfFiles}",
     );
   }
 }

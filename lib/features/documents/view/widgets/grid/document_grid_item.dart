@@ -41,6 +41,7 @@ class DocumentGridItem extends StatelessWidget {
                 ? Theme.of(context).colorScheme.inversePrimary
                 : Theme.of(context).cardColor,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 AspectRatio(
                   aspectRatio: 1,
@@ -74,8 +75,9 @@ class DocumentGridItem extends StatelessWidget {
                         ),
                         const Spacer(),
                         Text(
-                          DateFormat.yMMMd(Intl.getCurrentLocale())
-                              .format(document.created),
+                          DateFormat.yMMMd().format(
+                            document.created,
+                          ),
                           style: Theme.of(context).textTheme.caption,
                         ),
                       ],

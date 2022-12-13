@@ -9,11 +9,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mime/mime.dart';
 import 'package:paperless_api/paperless_api.dart';
+import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
 import 'package:paperless_mobile/core/global/constants.dart';
 import 'package:paperless_mobile/core/repository/label_repository.dart';
 import 'package:paperless_mobile/core/repository/provider/label_repositories_provider.dart';
 import 'package:paperless_mobile/core/service/file_service.dart';
 import 'package:paperless_mobile/core/store/local_vault.dart';
+import 'package:paperless_mobile/core/widgets/offline_banner.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/document_upload/cubit/document_upload_cubit.dart';
 import 'package:paperless_mobile/features/document_upload/view/document_upload_preparation_page.dart';
@@ -38,23 +40,28 @@ class _ScannerPageState extends State<ScannerPage>
     with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: const InfoDrawer(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _openDocumentScanner(context),
-        child: const Icon(Icons.add_a_photo_outlined),
-      ),
-      appBar: _buildAppBar(context),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: _buildBody(),
-      ),
+    return BlocBuilder<ConnectivityCubit, ConnectivityState>(
+      builder: (context, connectedState) {
+        return Scaffold(
+          drawer: const InfoDrawer(),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () => _openDocumentScanner(context),
+            child: const Icon(Icons.add_a_photo_outlined),
+          ),
+          appBar: _buildAppBar(context, connectedState.isConnected),
+          body: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: _buildBody(connectedState.isConnected),
+          ),
+        );
+      },
     );
   }
 
-  AppBar _buildAppBar(BuildContext context) {
+  AppBar _buildAppBar(BuildContext context, bool isConnected) {
     return AppBar(
       title: Text(S.of(context).documentScannerPageTitle),
+      bottom: !isConnected ? const OfflineBanner() : null,
       actions: [
         BlocBuilder<DocumentScannerCubit, List<File>>(
           builder: (context, state) {
@@ -86,7 +93,7 @@ class _ScannerPageState extends State<ScannerPage>
         BlocBuilder<DocumentScannerCubit, List<File>>(
           builder: (context, state) {
             return IconButton(
-              onPressed: state.isEmpty
+              onPressed: state.isEmpty || !isConnected
                   ? null
                   : () => _onPrepareDocumentUpload(context),
               icon: const Icon(Icons.done),
@@ -127,35 +134,39 @@ class _ScannerPageState extends State<ScannerPage>
       BlocProvider.of<DocumentScannerCubit>(context).state,
     );
     final bytes = await doc.save();
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => LabelRepositoriesProvider(
-          child: BlocProvider(
-            create: (context) => DocumentUploadCubit(
-              localVault: getIt<LocalVault>(),
-              documentApi: getIt<PaperlessDocumentsApi>(),
-              correspondentRepository:
-                  RepositoryProvider.of<LabelRepository<Correspondent>>(
-                context,
+    final uploaded = await Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => LabelRepositoriesProvider(
+              child: BlocProvider(
+                create: (context) => DocumentUploadCubit(
+                  localVault: getIt<LocalVault>(),
+                  documentApi: getIt<PaperlessDocumentsApi>(),
+                  correspondentRepository:
+                      RepositoryProvider.of<LabelRepository<Correspondent>>(
+                    context,
+                  ),
+                  documentTypeRepository:
+                      RepositoryProvider.of<LabelRepository<DocumentType>>(
+                    context,
+                  ),
+                  tagRepository: RepositoryProvider.of<LabelRepository<Tag>>(
+                    context,
+                  ),
+                ),
+                child: DocumentUploadPreparationPage(
+                  fileBytes: bytes,
+                ),
               ),
-              documentTypeRepository:
-                  RepositoryProvider.of<LabelRepository<DocumentType>>(
-                context,
-              ),
-              tagRepository: RepositoryProvider.of<LabelRepository<Tag>>(
-                context,
-              ),
-            ),
-            child: DocumentUploadPreparationPage(
-              fileBytes: bytes,
             ),
           ),
-        ),
-      ),
-    );
+        ) ??
+        false;
+    if (uploaded) {
+      BlocProvider.of<DocumentScannerCubit>(context).reset();
+    }
   }
 
-  Widget _buildBody() {
+  Widget _buildBody(bool isConnected) {
     return BlocBuilder<DocumentScannerCubit, List<File>>(
       builder: (context, scans) {
         if (scans.isNotEmpty) {
@@ -181,7 +192,7 @@ class _ScannerPageState extends State<ScannerPage>
                   child: Text(S
                       .of(context)
                       .documentScannerPageUploadFromThisDeviceButtonLabel),
-                  onPressed: _onUploadFromFilesystem,
+                  onPressed: isConnected ? _onUploadFromFilesystem : null,
                 ),
               ],
             ),
@@ -195,7 +206,7 @@ class _ScannerPageState extends State<ScannerPage>
     return GridView.builder(
         itemCount: scans.length,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
+          crossAxisCount: 3,
           childAspectRatio: 1 / sqrt(2),
           crossAxisSpacing: 10,
           mainAxisSpacing: 10,

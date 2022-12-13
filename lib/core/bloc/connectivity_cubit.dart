@@ -37,4 +37,10 @@ class ConnectivityCubit extends Cubit<ConnectivityState> {
   }
 }
 
-enum ConnectivityState { connected, notConnected, undefined }
+enum ConnectivityState {
+  connected,
+  notConnected,
+  undefined;
+
+  bool get isConnected => this == connected;
+}

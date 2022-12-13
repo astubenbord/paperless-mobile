@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_api/paperless_api.dart';
+import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
 import 'package:paperless_mobile/core/repository/label_repository.dart';
+import 'package:paperless_mobile/core/widgets/offline_banner.dart';
 import 'package:paperless_mobile/features/edit_label/view/impl/add_correspondent_page.dart';
 import 'package:paperless_mobile/features/edit_label/view/impl/add_document_type_page.dart';
 import 'package:paperless_mobile/features/edit_label/view/impl/add_storage_path_page.dart';
@@ -39,152 +41,176 @@ class _LabelsPageState extends State<LabelsPage>
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 3,
-      child: Scaffold(
-        drawer: const InfoDrawer(),
-        appBar: AppBar(
-          title: Text(
-            [
-              S.of(context).labelsPageCorrespondentsTitleText,
-              S.of(context).labelsPageDocumentTypesTitleText,
-              S.of(context).labelsPageTagsTitleText,
-              S.of(context).labelsPageStoragePathTitleText
-            ][_currentIndex],
-          ),
-          actions: [
-            IconButton(
-              onPressed: [
-                _openAddCorrespondentPage,
-                _openAddDocumentTypePage,
-                _openAddTagPage,
-                _openAddStoragePathPage,
-              ][_currentIndex],
-              icon: const Icon(Icons.add),
-            )
-          ],
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(kToolbarHeight),
-            child: ColoredBox(
-              color: Theme.of(context).bottomAppBarColor,
-              child: TabBar(
-                indicatorColor: Theme.of(context).colorScheme.primary,
-                controller: _tabController,
-                tabs: [
-                  Tab(
-                    icon: Icon(
-                      Icons.person_outline,
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+      child: BlocBuilder<ConnectivityCubit, ConnectivityState>(
+        builder: (context, connectedState) {
+          return Scaffold(
+            drawer: const InfoDrawer(),
+            appBar: AppBar(
+              title: Text(
+                [
+                  S.of(context).labelsPageCorrespondentsTitleText,
+                  S.of(context).labelsPageDocumentTypesTitleText,
+                  S.of(context).labelsPageTagsTitleText,
+                  S.of(context).labelsPageStoragePathTitleText
+                ][_currentIndex],
+              ),
+              actions: [
+                IconButton(
+                  onPressed: [
+                    _openAddCorrespondentPage,
+                    _openAddDocumentTypePage,
+                    _openAddTagPage,
+                    _openAddStoragePathPage,
+                  ][_currentIndex],
+                  icon: const Icon(Icons.add),
+                )
+              ],
+              bottom: PreferredSize(
+                preferredSize: Size.fromHeight(
+                    kToolbarHeight + (!connectedState.isConnected ? 16 : 0)),
+                child: Column(
+                  children: [
+                    if (!connectedState.isConnected) const OfflineBanner(),
+                    ColoredBox(
+                      color: Theme.of(context).bottomAppBarColor,
+                      child: TabBar(
+                        indicatorColor: Theme.of(context).colorScheme.primary,
+                        controller: _tabController,
+                        tabs: [
+                          Tab(
+                            icon: Icon(
+                              Icons.person_outline,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimaryContainer,
+                            ),
+                          ),
+                          Tab(
+                            icon: Icon(
+                              Icons.description_outlined,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimaryContainer,
+                            ),
+                          ),
+                          Tab(
+                            icon: Icon(
+                              Icons.label_outline,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimaryContainer,
+                            ),
+                          ),
+                          Tab(
+                            icon: Icon(
+                              Icons.folder_open,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimaryContainer,
+                            ),
+                          )
+                        ],
+                      ),
                     ),
+                  ],
+                ),
+              ),
+            ),
+            body: TabBarView(
+              controller: _tabController,
+              children: [
+                BlocProvider(
+                  create: (context) => LabelCubit(
+                    RepositoryProvider.of<LabelRepository<Correspondent>>(
+                        context),
                   ),
-                  Tab(
-                    icon: Icon(
-                      Icons.description_outlined,
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  child: LabelTabView<Correspondent>(
+                    filterBuilder: (label) => DocumentFilter(
+                      correspondent: CorrespondentQuery.fromId(label.id),
+                      pageSize: label.documentCount ?? 0,
                     ),
+                    onEdit: _openEditCorrespondentPage,
+                    emptyStateActionButtonLabel: S
+                        .of(context)
+                        .labelsPageCorrespondentEmptyStateAddNewLabel,
+                    emptyStateDescription: S
+                        .of(context)
+                        .labelsPageCorrespondentEmptyStateDescriptionText,
+                    onAddNew: _openAddCorrespondentPage,
                   ),
-                  Tab(
-                    icon: Icon(
-                      Icons.label_outline,
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
-                    ),
+                ),
+                BlocProvider(
+                  create: (context) => LabelCubit(
+                    RepositoryProvider.of<LabelRepository<DocumentType>>(
+                        context),
                   ),
-                  Tab(
-                    icon: Icon(
-                      Icons.folder_open,
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  child: LabelTabView<DocumentType>(
+                    filterBuilder: (label) => DocumentFilter(
+                      documentType: DocumentTypeQuery.fromId(label.id),
+                      pageSize: label.documentCount ?? 0,
                     ),
-                  )
-                ],
-              ),
-            ),
-          ),
-        ),
-        body: TabBarView(
-          controller: _tabController,
-          children: [
-            BlocProvider(
-              create: (context) => LabelCubit(
-                RepositoryProvider.of<LabelRepository<Correspondent>>(context),
-              ),
-              child: LabelTabView<Correspondent>(
-                filterBuilder: (label) => DocumentFilter(
-                  correspondent: CorrespondentQuery.fromId(label.id),
-                  pageSize: label.documentCount ?? 0,
+                    onEdit: _openEditDocumentTypePage,
+                    emptyStateActionButtonLabel: S
+                        .of(context)
+                        .labelsPageDocumentTypeEmptyStateAddNewLabel,
+                    emptyStateDescription: S
+                        .of(context)
+                        .labelsPageDocumentTypeEmptyStateDescriptionText,
+                    onAddNew: _openAddDocumentTypePage,
+                  ),
                 ),
-                onEdit: _openEditCorrespondentPage,
-                emptyStateActionButtonLabel:
-                    S.of(context).labelsPageCorrespondentEmptyStateAddNewLabel,
-                emptyStateDescription: S
-                    .of(context)
-                    .labelsPageCorrespondentEmptyStateDescriptionText,
-                onAddNew: _openAddCorrespondentPage,
-              ),
-            ),
-            BlocProvider(
-              create: (context) => LabelCubit(
-                RepositoryProvider.of<LabelRepository<DocumentType>>(context),
-              ),
-              child: LabelTabView<DocumentType>(
-                filterBuilder: (label) => DocumentFilter(
-                  documentType: DocumentTypeQuery.fromId(label.id),
-                  pageSize: label.documentCount ?? 0,
+                BlocProvider(
+                  create: (context) => LabelCubit<Tag>(
+                    RepositoryProvider.of<LabelRepository<Tag>>(context),
+                  ),
+                  child: LabelTabView<Tag>(
+                    filterBuilder: (label) => DocumentFilter(
+                      tags: IdsTagsQuery.fromIds([label.id!]),
+                      pageSize: label.documentCount ?? 0,
+                    ),
+                    onEdit: _openEditTagPage,
+                    leadingBuilder: (t) => CircleAvatar(
+                      backgroundColor: t.color,
+                      child: t.isInboxTag ?? false
+                          ? Icon(
+                              Icons.inbox,
+                              color: t.textColor,
+                            )
+                          : null,
+                    ),
+                    contentBuilder: (t) => Text(t.match ?? ''),
+                    emptyStateActionButtonLabel:
+                        S.of(context).labelsPageTagsEmptyStateAddNewLabel,
+                    emptyStateDescription:
+                        S.of(context).labelsPageTagsEmptyStateDescriptionText,
+                    onAddNew: _openAddTagPage,
+                  ),
                 ),
-                onEdit: _openEditDocumentTypePage,
-                emptyStateActionButtonLabel:
-                    S.of(context).labelsPageDocumentTypeEmptyStateAddNewLabel,
-                emptyStateDescription: S
-                    .of(context)
-                    .labelsPageDocumentTypeEmptyStateDescriptionText,
-                onAddNew: _openAddDocumentTypePage,
-              ),
-            ),
-            BlocProvider(
-              create: (context) => LabelCubit<Tag>(
-                RepositoryProvider.of<LabelRepository<Tag>>(context),
-              ),
-              child: LabelTabView<Tag>(
-                filterBuilder: (label) => DocumentFilter(
-                  tags: IdsTagsQuery.fromIds([label.id!]),
-                  pageSize: label.documentCount ?? 0,
+                BlocProvider(
+                  create: (context) => LabelCubit<StoragePath>(
+                    RepositoryProvider.of<LabelRepository<StoragePath>>(
+                        context),
+                  ),
+                  child: LabelTabView<StoragePath>(
+                    onEdit: _openEditStoragePathPage,
+                    filterBuilder: (label) => DocumentFilter(
+                      storagePath: StoragePathQuery.fromId(label.id),
+                      pageSize: label.documentCount ?? 0,
+                    ),
+                    contentBuilder: (path) => Text(path.path ?? ""),
+                    emptyStateActionButtonLabel: S
+                        .of(context)
+                        .labelsPageStoragePathEmptyStateAddNewLabel,
+                    emptyStateDescription: S
+                        .of(context)
+                        .labelsPageStoragePathEmptyStateDescriptionText,
+                    onAddNew: _openAddStoragePathPage,
+                  ),
                 ),
-                onEdit: _openEditTagPage,
-                leadingBuilder: (t) => CircleAvatar(
-                  backgroundColor: t.color,
-                  child: t.isInboxTag ?? false
-                      ? Icon(
-                          Icons.inbox,
-                          color: t.textColor,
-                        )
-                      : null,
-                ),
-                contentBuilder: (t) => Text(t.match ?? ''),
-                emptyStateActionButtonLabel:
-                    S.of(context).labelsPageTagsEmptyStateAddNewLabel,
-                emptyStateDescription:
-                    S.of(context).labelsPageTagsEmptyStateDescriptionText,
-                onAddNew: _openAddTagPage,
-              ),
+              ],
             ),
-            BlocProvider(
-              create: (context) => LabelCubit<StoragePath>(
-                RepositoryProvider.of<LabelRepository<StoragePath>>(context),
-              ),
-              child: LabelTabView<StoragePath>(
-                onEdit: _openEditStoragePathPage,
-                filterBuilder: (label) => DocumentFilter(
-                  storagePath: StoragePathQuery.fromId(label.id),
-                  pageSize: label.documentCount ?? 0,
-                ),
-                contentBuilder: (path) => Text(path.path ?? ""),
-                emptyStateActionButtonLabel:
-                    S.of(context).labelsPageStoragePathEmptyStateAddNewLabel,
-                emptyStateDescription: S
-                    .of(context)
-                    .labelsPageStoragePathEmptyStateDescriptionText,
-                onAddNew: _openAddStoragePathPage,
-              ),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

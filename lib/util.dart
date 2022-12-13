@@ -16,11 +16,21 @@ final dateFormat = DateFormat("yyyy-MM-dd");
 final GlobalKey<ScaffoldState> rootScaffoldKey = GlobalKey<ScaffoldState>();
 late PackageInfo kPackageInfo;
 
+class SnackBarActionConfig {
+  final String label;
+  final VoidCallback onPressed;
+
+  SnackBarActionConfig({
+    required this.label,
+    required this.onPressed,
+  });
+}
+
 void showSnackBar(
   BuildContext context,
   String message, {
   String? details,
-  SnackBarAction? action,
+  SnackBarActionConfig? action,
 }) {
   ScaffoldMessenger.of(context)
     ..hideCurrentSnackBar()
@@ -29,7 +39,13 @@ void showSnackBar(
         content: Text(
           message + (details != null ? ' ($details)' : ''),
         ),
-        action: action,
+        action: action != null
+            ? SnackBarAction(
+                label: action.label,
+                onPressed: action.onPressed,
+                textColor: Theme.of(context).colorScheme.onInverseSurface,
+              )
+            : null,
         duration: const Duration(seconds: 5),
       ),
     );
@@ -43,9 +59,8 @@ void showGenericError(
   showSnackBar(
     context,
     error.toString(),
-    action: SnackBarAction(
+    action: SnackBarActionConfig(
       label: S.of(context).errorReportLabel,
-      textColor: Colors.amber,
       onPressed: () => GithubIssueService.createIssueFromError(
         context,
         stackTrace: stackTrace,
@@ -69,14 +84,6 @@ void showErrorMessage(
     context,
     translateError(context, error.code),
     details: error.details,
-    action: SnackBarAction(
-      label: S.of(context).errorReportLabel,
-      textColor: Colors.amber,
-      onPressed: () => GithubIssueService.createIssueFromError(
-        context,
-        stackTrace: stackTrace,
-      ),
-    ),
   );
   log(
     "An error has occurred.",

@@ -6,20 +6,26 @@ class OfflineBanner extends StatelessWidget with PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Theme.of(context).disabledColor,
+    return ColoredBox(
+      color: Theme.of(context).colorScheme.errorContainer,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(horizontal: 8.0),
             child: Icon(
               Icons.cloud_off,
               size: 24,
+              color: Theme.of(context).colorScheme.onErrorContainer,
             ),
           ),
-          Text(S.of(context).genericMessageOfflineText),
+          Text(
+            S.of(context).genericMessageOfflineText,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onErrorContainer,
+            ),
+          ),
         ],
       ),
     );

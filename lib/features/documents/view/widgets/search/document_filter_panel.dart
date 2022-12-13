@@ -16,10 +16,11 @@ enum DateRangeSelection { before, after }
 
 class DocumentFilterPanel extends StatefulWidget {
   final DocumentFilter initialFilter;
-
+  final ScrollController scrollController;
   const DocumentFilterPanel({
     Key? key,
     required this.initialFilter,
+    required this.scrollController,
   }) : super(key: key);
 
   @override
@@ -36,80 +37,68 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
 
   final _formKey = GlobalKey<FormBuilderState>();
 
-  DateTimeRange? _dateTimeRangeOfNullable(DateTime? start, DateTime? end) {
-    if (start == null && end == null) {
-      return null;
-    }
-    if (start != null && end != null) {
-      return DateTimeRange(start: start, end: end);
-    }
-    assert(start != null || end != null);
-    final singleDate = (start ?? end)!;
-    return DateTimeRange(start: singleDate, end: singleDate);
-  }
-
   @override
   Widget build(BuildContext context) {
-    const radius = Radius.circular(16);
     return ClipRRect(
       borderRadius: const BorderRadius.only(
-        topLeft: radius,
-        topRight: radius,
+        topLeft: Radius.circular(16),
+        topRight: Radius.circular(16),
       ),
       child: Scaffold(
+        floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+        floatingActionButton: Visibility(
+          visible: MediaQuery.of(context).viewInsets.bottom == 0,
+          child: FloatingActionButton.extended(
+            icon: const Icon(Icons.done),
+            label: Text(S.of(context).documentFilterApplyFilterLabel),
+            onPressed: _onApplyFilter,
+          ),
+        ),
+        bottomNavigationBar: BottomAppBar(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              TextButton.icon(
+                onPressed: _resetFilter,
+                icon: const Icon(Icons.refresh),
+                label: Text(S.of(context).documentFilterResetLabel),
+              )
+            ],
+          ),
+        ),
         resizeToAvoidBottomInset: true,
         body: FormBuilder(
           key: _formKey,
-          child: Column(
+          child: ListView(
+            controller: widget.scrollController,
             children: [
-              _buildDraggableResetHeader(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    S.of(context).documentFilterTitle,
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  TextButton(
-                    onPressed: _onApplyFilter,
-                    child: Text(S.of(context).documentFilterApplyFilterLabel),
-                  ),
-                ],
-              ).padded(),
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(16.0),
-                    topRight: Radius.circular(16.0),
-                  ),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(S.of(context).documentFilterSearchLabel),
-                        ).paddedOnly(left: 8.0),
-                        _buildQueryFormField().padded(),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            S.of(context).documentFilterAdvancedLabel,
-                          ),
-                        ).padded(),
-                        _buildCreatedDateRangePickerFormField(),
-                        _buildAddedDateRangePickerFormField(),
-                        _buildCorrespondentFormField().padded(),
-                        _buildDocumentTypeFormField().padded(),
-                        _buildStoragePathFormField().padded(),
-                        _buildTagsFormField()
-                            .paddedSymmetrically(horizontal: 8, vertical: 4.0),
-                      ],
-                    ).paddedOnly(bottom: 16),
-                  ),
-                ),
+              Text(
+                S.of(context).documentFilterTitle,
+                style: Theme.of(context).textTheme.headlineSmall,
+              ).paddedOnly(
+                top: 16.0,
+                left: 16.0,
+                bottom: 24,
               ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(S.of(context).documentFilterSearchLabel),
+              ).paddedOnly(left: 8.0),
+              _buildQueryFormField().padded(),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  S.of(context).documentFilterAdvancedLabel,
+                ),
+              ).padded(),
+              _buildCreatedDateRangePickerFormField(),
+              _buildAddedDateRangePickerFormField(),
+              _buildCorrespondentFormField().padded(),
+              _buildDocumentTypeFormField().padded(),
+              _buildStoragePathFormField().padded(),
+              _buildTagsFormField().padded(),
             ],
-          ),
+          ).paddedOnly(bottom: 16),
         ),
       ),
     );
@@ -128,29 +117,11 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
     );
   }
 
-  Stack _buildDraggableResetHeader() {
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        _buildDragLine(),
-        Align(
-          alignment: Alignment.topRight,
-          child: TextButton.icon(
-            icon: const Icon(Icons.refresh),
-            label: Text(S.of(context).documentFilterResetLabel),
-            onPressed: () => _resetFilter(context),
-          ),
-        ),
-      ],
-    );
-  }
-
-  void _resetFilter(BuildContext context) async {
+  void _resetFilter() async {
     FocusScope.of(context).unfocus();
     Navigator.pop(context, DocumentFilter.initial);
   }
 
-  //TODO: Check if the blocs can be found in the context, otherwise just provide repository and create new bloc inside LabelFormField!
   Widget _buildDocumentTypeFormField() {
     return BlocBuilder<LabelCubit<DocumentType>, LabelState<DocumentType>>(
       builder: (context, state) {
@@ -416,42 +387,11 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
     );
   }
 
-  Widget _buildDragLine() {
-    return Container(
-      width: 48,
-      height: 5,
-      decoration: BoxDecoration(
-        color: Colors.grey[300],
-        borderRadius: const BorderRadius.all(Radius.circular(12.0)),
-      ),
-    );
-  }
-
   void _onApplyFilter() async {
     _formKey.currentState?.save();
     if (_formKey.currentState?.validate() ?? false) {
       final v = _formKey.currentState!.value;
-      DocumentFilter newFilter = DocumentFilter(
-        createdDateBefore: (v[fkCreatedAt] as DateTimeRange?)?.end,
-        createdDateAfter: (v[fkCreatedAt] as DateTimeRange?)?.start,
-        correspondent: v[fkCorrespondent] as CorrespondentQuery? ??
-            DocumentFilter.initial.correspondent,
-        documentType: v[fkDocumentType] as DocumentTypeQuery? ??
-            DocumentFilter.initial.documentType,
-        storagePath: v[fkStoragePath] as StoragePathQuery? ??
-            DocumentFilter.initial.storagePath,
-        tags: v[DocumentModel.tagsKey] as TagsQuery? ??
-            DocumentFilter.initial.tags,
-        queryText: v[fkQuery] as String?,
-        addedDateBefore: (v[fkAddedAt] as DateTimeRange?)?.end,
-        addedDateAfter: (v[fkAddedAt] as DateTimeRange?)?.start,
-        queryType: v[QueryTypeFormField.fkQueryType] as QueryType,
-        asnQuery: widget.initialFilter.asnQuery,
-        page: 1,
-        pageSize: widget.initialFilter.pageSize,
-        sortField: widget.initialFilter.sortField,
-        sortOrder: widget.initialFilter.sortOrder,
-      );
+      DocumentFilter newFilter = _assembleFilter();
       try {
         FocusScope.of(context).unfocus();
         Navigator.pop(context, newFilter);
@@ -461,23 +401,40 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
     }
   }
 
-  void _patchFromFilter(DocumentFilter f) {
-    _formKey.currentState?.patchValue({
-      fkCorrespondent: f.correspondent,
-      fkDocumentType: f.documentType,
-      fkQuery: f.queryText,
-      fkStoragePath: f.storagePath,
-      DocumentModel.tagsKey: f.tags,
-      DocumentModel.titleKey: f.queryText,
-      QueryTypeFormField.fkQueryType: f.queryType,
-      fkCreatedAt: _dateTimeRangeOfNullable(
-        f.createdDateAfter,
-        f.createdDateBefore,
-      ),
-      fkAddedAt: _dateTimeRangeOfNullable(
-        f.addedDateAfter,
-        f.addedDateBefore,
-      ),
-    });
+  DocumentFilter _assembleFilter() {
+    final v = _formKey.currentState!.value;
+    return DocumentFilter(
+      createdDateBefore: (v[fkCreatedAt] as DateTimeRange?)?.end,
+      createdDateAfter: (v[fkCreatedAt] as DateTimeRange?)?.start,
+      correspondent: v[fkCorrespondent] as CorrespondentQuery? ??
+          DocumentFilter.initial.correspondent,
+      documentType: v[fkDocumentType] as DocumentTypeQuery? ??
+          DocumentFilter.initial.documentType,
+      storagePath: v[fkStoragePath] as StoragePathQuery? ??
+          DocumentFilter.initial.storagePath,
+      tags:
+          v[DocumentModel.tagsKey] as TagsQuery? ?? DocumentFilter.initial.tags,
+      queryText: v[fkQuery] as String?,
+      addedDateBefore: (v[fkAddedAt] as DateTimeRange?)?.end,
+      addedDateAfter: (v[fkAddedAt] as DateTimeRange?)?.start,
+      queryType: v[QueryTypeFormField.fkQueryType] as QueryType,
+      asnQuery: widget.initialFilter.asnQuery,
+      page: 1,
+      pageSize: widget.initialFilter.pageSize,
+      sortField: widget.initialFilter.sortField,
+      sortOrder: widget.initialFilter.sortOrder,
+    );
   }
+}
+
+DateTimeRange? _dateTimeRangeOfNullable(DateTime? start, DateTime? end) {
+  if (start == null && end == null) {
+    return null;
+  }
+  if (start != null && end != null) {
+    return DateTimeRange(start: start, end: end);
+  }
+  assert(start != null || end != null);
+  final singleDate = (start ?? end)!;
+  return DateTimeRange(start: singleDate, end: singleDate);
 }
