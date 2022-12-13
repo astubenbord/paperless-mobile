@@ -51,7 +51,7 @@ class _SortFieldSelectionBottomSheetState
                 textAlign: TextAlign.start,
               ),
               TextButton(
-                child: Text(S.of(context).documentsFilterPageApplyFilterLabel),
+                child: Text(S.of(context).documentFilterApplyFilterLabel),
                 onPressed: () {
                   widget.onSubmit(
                     _currentSortField,

@@ -54,8 +54,9 @@ class _TagFormFieldState extends State<TagFormField> {
                   .isEmpty ||
               _textEditingController.text.isEmpty;
         });
-        setState(() =>
-            _showClearSuffixIcon = _textEditingController.text.isNotEmpty);
+        setState(
+          () => _showClearSuffixIcon = _textEditingController.text.isNotEmpty,
+        );
       });
   }
 
@@ -85,6 +86,15 @@ class _TagFormFieldState extends State<TagFormField> {
                   hintText: S.of(context).tagFormFieldSearchHintText,
                 ),
                 controller: _textEditingController,
+              ),
+              suggestionsBoxDecoration: SuggestionsBoxDecoration(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  side: BorderSide(
+                    color: Theme.of(context).colorScheme.primary,
+                    width: 2.0,
+                  ),
+                ),
               ),
               suggestionsCallback: (query) {
                 final suggestions = widget.selectableOptions.entries

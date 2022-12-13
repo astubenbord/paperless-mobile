@@ -156,7 +156,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
                   pagingController: _pagingController,
                   hasInternetConnection:
                       connectivityState == ConnectivityState.connected,
-                  onTagSelected: (int tagId) => _addTagToFilter,
+                  onTagSelected: _addTagToFilter,
                 );
                 break;
             }

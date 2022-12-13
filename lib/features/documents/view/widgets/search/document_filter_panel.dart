@@ -56,59 +56,60 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
         topLeft: radius,
         topRight: radius,
       ),
-      child: FormBuilder(
-        key: _formKey,
-        child: Column(
-          children: [
-            _buildDraggableResetHeader(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  S.of(context).documentsFilterPageTitle,
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                TextButton(
-                  onPressed: _onApplyFilter,
-                  child:
-                      Text(S.of(context).documentsFilterPageApplyFilterLabel),
-                ),
-              ],
-            ).padded(),
-            Expanded(
-              child: ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(16.0),
-                  topRight: Radius.circular(16.0),
-                ),
-                child: ListView(
-                  children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(S.of(context).documentsFilterPageSearchLabel),
-                    ).paddedOnly(left: 8.0),
-                    _buildQueryFormField().padded(),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child:
-                          Text(S.of(context).documentsFilterPageAdvancedLabel),
-                    ).padded(),
-                    _buildCreatedDateRangePickerFormField(),
-                    _buildAddedDateRangePickerFormField(),
-                    _buildCorrespondentFormField().padded(),
-                    _buildDocumentTypeFormField().padded(),
-                    _buildStoragePathFormField().padded(),
-                    _buildTagsFormField()
-                        .paddedSymmetrically(horizontal: 8, vertical: 4.0),
-                    // Required in order for the storage path field to be visible when typing
-                    const SizedBox(
-                      height: 150,
-                    ),
-                  ],
+      child: Scaffold(
+        resizeToAvoidBottomInset: true,
+        body: FormBuilder(
+          key: _formKey,
+          child: Column(
+            children: [
+              _buildDraggableResetHeader(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    S.of(context).documentFilterTitle,
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  TextButton(
+                    onPressed: _onApplyFilter,
+                    child: Text(S.of(context).documentFilterApplyFilterLabel),
+                  ),
+                ],
+              ).padded(),
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(16.0),
+                    topRight: Radius.circular(16.0),
+                  ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(S.of(context).documentFilterSearchLabel),
+                        ).paddedOnly(left: 8.0),
+                        _buildQueryFormField().padded(),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            S.of(context).documentFilterAdvancedLabel,
+                          ),
+                        ).padded(),
+                        _buildCreatedDateRangePickerFormField(),
+                        _buildAddedDateRangePickerFormField(),
+                        _buildCorrespondentFormField().padded(),
+                        _buildDocumentTypeFormField().padded(),
+                        _buildStoragePathFormField().padded(),
+                        _buildTagsFormField()
+                            .paddedSymmetrically(horizontal: 8, vertical: 4.0),
+                      ],
+                    ).paddedOnly(bottom: 16),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -136,7 +137,7 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
           alignment: Alignment.topRight,
           child: TextButton.icon(
             icon: const Icon(Icons.refresh),
-            label: Text(S.of(context).documentsFilterPageResetFilterLabel),
+            label: Text(S.of(context).documentFilterResetLabel),
             onPressed: () => _resetFilter(context),
           ),
         ),
@@ -208,14 +209,13 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
     late String label;
     switch (queryType) {
       case QueryType.title:
-        label = S.of(context).documentsFilterPageQueryOptionsTitleLabel;
+        label = S.of(context).documentFilterQueryOptionsTitleLabel;
         break;
       case QueryType.titleAndContent:
-        label =
-            S.of(context).documentsFilterPageQueryOptionsTitleAndContentLabel;
+        label = S.of(context).documentFilterQueryOptionsTitleAndContentLabel;
         break;
       case QueryType.extended:
-        label = S.of(context).documentsFilterPageQueryOptionsExtendedLabel;
+        label = S.of(context).documentFilterQueryOptionsExtendedLabel;
         break;
     }
 
@@ -244,7 +244,7 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
           spacer,
           ActionChip(
             label: Text(
-              S.of(context).documentsFilterPageDateRangeLastSevenDaysLabel,
+              S.of(context).documentFilterDateRangeLastSevenDaysLabel,
             ),
             onPressed: () {
               _formKey.currentState?.fields[formFieldKey]?.didChange(
@@ -258,7 +258,7 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
           spacer,
           ActionChip(
             label: Text(
-              S.of(context).documentsFilterPageDateRangeLastMonthLabel,
+              S.of(context).documentFilterDateRangeLastMonthLabel,
             ),
             onPressed: () {
               final now = DateTime.now();
@@ -276,7 +276,7 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
           spacer,
           ActionChip(
             label: Text(
-              S.of(context).documentsFilterPageDateRangeLastThreeMonthsLabel,
+              S.of(context).documentFilterDateRangeLastThreeMonthsLabel,
             ),
             onPressed: () {
               final now = DateTime.now();
@@ -297,7 +297,7 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
           spacer,
           ActionChip(
             label: Text(
-              S.of(context).documentsFilterPageDateRangeLastYearLabel,
+              S.of(context).documentFilterDateRangeLastYearLabel,
             ),
             onPressed: () {
               final now = DateTime.now();
@@ -347,9 +347,8 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
           ),
           format: DateFormat.yMMMd(Localizations.localeOf(context).toString()),
           fieldStartLabelText:
-              S.of(context).documentsFilterPageDateRangeFieldStartLabel,
-          fieldEndLabelText:
-              S.of(context).documentsFilterPageDateRangeFieldEndLabel,
+              S.of(context).documentFilterDateRangeFieldStartLabel,
+          fieldEndLabelText: S.of(context).documentFilterDateRangeFieldEndLabel,
           firstDate: DateTime.fromMicrosecondsSinceEpoch(0),
           lastDate: DateTime.now(),
           name: fkCreatedAt,
@@ -395,9 +394,8 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
           ),
           format: DateFormat.yMMMd(),
           fieldStartLabelText:
-              S.of(context).documentsFilterPageDateRangeFieldStartLabel,
-          fieldEndLabelText:
-              S.of(context).documentsFilterPageDateRangeFieldEndLabel,
+              S.of(context).documentFilterDateRangeFieldStartLabel,
+          fieldEndLabelText: S.of(context).documentFilterDateRangeFieldEndLabel,
           firstDate: DateTime.fromMicrosecondsSinceEpoch(0),
           lastDate: DateTime.now(),
           name: fkAddedAt,

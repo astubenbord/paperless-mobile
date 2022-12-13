@@ -1,10 +1,9 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:form_builder_extra_fields/form_builder_extra_fields.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
-import 'package:form_builder_extra_fields/form_builder_extra_fields.dart';
 
 ///
 /// Form field allowing to select labels (i.e. correspondent, documentType)
@@ -83,7 +82,7 @@ class _LabelFormFieldState<T extends Label, R extends IdQueryParameter>
     return FormBuilderTypeAhead<IdQueryParameter>(
       enabled: isEnabled,
       noItemsFoundBuilder: (context) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        padding: const EdgeInsets.symmetric(vertical: 8),
         child: Text(
           S.of(context).labelFormFieldNoItemsFoundText,
           textAlign: TextAlign.center,
@@ -93,9 +92,24 @@ class _LabelFormFieldState<T extends Label, R extends IdQueryParameter>
       ),
       initialValue: widget.initialValue ?? widget.queryParameterIdBuilder(null),
       name: widget.name,
+      suggestionsBoxDecoration: SuggestionsBoxDecoration(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(
+            color: Theme.of(context).colorScheme.primary,
+            width: 2.0,
+          ),
+        ),
+      ),
       itemBuilder: (context, suggestion) => ListTile(
-        title: Text(widget.state[suggestion.id]?.name ??
-            S.of(context).labelNotAssignedText),
+        title: Text(
+          widget.state[suggestion.id]?.name ??
+              S.of(context).labelNotAssignedText,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        dense: true,
+        style: ListTileStyle.list,
       ),
       suggestionsCallback: (pattern) {
         final List<IdQueryParameter> suggestions = widget.state.entries

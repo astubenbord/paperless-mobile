@@ -45,4 +45,8 @@ class ApplicationSettingsCubit extends Cubit<ApplicationSettingsState> {
     await localVault.storeApplicationSettings(settings);
     emit(settings);
   }
+
+  void clear() {
+    emit(ApplicationSettingsState.defaultSettings);
+  }
 }

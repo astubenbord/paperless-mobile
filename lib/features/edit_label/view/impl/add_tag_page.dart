@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -30,7 +32,8 @@ class AddTagPage extends StatelessWidget {
               label: Text(S.of(context).tagColorPropertyLabel),
             ),
             colorPickerType: ColorPickerType.materialPicker,
-            initialValue: null,
+            initialValue: Color((Random().nextDouble() * 0xFFFFFF).toInt())
+                .withOpacity(1.0),
           ),
           FormBuilderCheckbox(
             name: Tag.isInboxTagKey,

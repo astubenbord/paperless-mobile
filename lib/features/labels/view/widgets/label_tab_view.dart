@@ -66,15 +66,17 @@ class LabelTabView<T extends Label> extends StatelessWidget {
               onRefresh: BlocProvider.of<LabelCubit<T>>(context).reload,
               child: ListView(
                 children: labels
-                    .map((l) => LabelItem<T>(
-                          name: l.name,
-                          content:
-                              contentBuilder?.call(l) ?? Text(l.match ?? '-'),
-                          onOpenEditPage: onEdit,
-                          filterBuilder: filterBuilder,
-                          leading: leadingBuilder?.call(l),
-                          label: l,
-                        ))
+                    .map(
+                      (l) => LabelItem<T>(
+                        name: l.name,
+                        content:
+                            contentBuilder?.call(l) ?? Text(l.match ?? '-'),
+                        onOpenEditPage: onEdit,
+                        filterBuilder: filterBuilder,
+                        leading: leadingBuilder?.call(l),
+                        label: l,
+                      ),
+                    )
                     .toList(),
               ),
             );

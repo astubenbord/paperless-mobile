@@ -17,7 +17,7 @@ class DocumentUploadCubit extends Cubit<DocumentUploadState> {
   final LabelRepository<Correspondent> _correspondentRepository;
   final LabelRepository<DocumentType> _documentTypeRepository;
 
-  final List<StreamSubscription> _subs = const [];
+  final List<StreamSubscription> _subs = [];
 
   DocumentUploadCubit({
     required LocalVault localVault,

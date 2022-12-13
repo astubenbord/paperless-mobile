@@ -6,6 +6,7 @@ import 'package:paperless_mobile/core/bloc/paperless_server_information_state.da
 import 'package:paperless_mobile/core/repository/label_repository.dart';
 import 'package:paperless_mobile/core/repository/provider/label_repositories_provider.dart';
 import 'package:paperless_mobile/core/repository/saved_view_repository.dart';
+import 'package:paperless_mobile/core/store/local_vault.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/inbox/bloc/inbox_cubit.dart';
@@ -185,6 +186,8 @@ class InfoDrawer extends StatelessWidget {
               onTap: () {
                 try {
                   BlocProvider.of<AuthenticationCubit>(context).logout();
+                  getIt<LocalVault>().clear();
+                  BlocProvider.of<ApplicationSettingsCubit>(context).clear();
                   RepositoryProvider.of<LabelRepository<Tag>>(context).clear();
                   RepositoryProvider.of<LabelRepository<Correspondent>>(context)
                       .clear();

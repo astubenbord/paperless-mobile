@@ -20,23 +20,21 @@ class QueryTypeFormField extends StatelessWidget {
         itemBuilder: (context) => [
           PopupMenuItem(
             child: ListTile(
-              title: Text(S
-                  .of(context)
-                  .documentsFilterPageQueryOptionsTitleAndContentLabel),
+              title: Text(
+                  S.of(context).documentFilterQueryOptionsTitleAndContentLabel),
             ),
             value: QueryType.titleAndContent,
           ),
           PopupMenuItem(
             child: ListTile(
-              title:
-                  Text(S.of(context).documentsFilterPageQueryOptionsTitleLabel),
+              title: Text(S.of(context).documentFilterQueryOptionsTitleLabel),
             ),
             value: QueryType.title,
           ),
           PopupMenuItem(
             child: ListTile(
-              title: Text(
-                  S.of(context).documentsFilterPageQueryOptionsExtendedLabel),
+              title:
+                  Text(S.of(context).documentFilterQueryOptionsExtendedLabel),
             ),
             value: QueryType.extended,
           ),

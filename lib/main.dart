@@ -114,12 +114,15 @@ class _PaperlessMobileEntrypointState extends State<PaperlessMobileEntrypoint> {
             theme: ThemeData(
               brightness: Brightness.light,
               useMaterial3: true,
-              colorSchemeSeed: Colors.lightGreen,
+              colorScheme:
+                  ColorScheme.fromSeed(seedColor: Colors.lightGreen).copyWith(),
               appBarTheme: const AppBarTheme(
                 scrolledUnderElevation: 0.0,
               ),
-              inputDecorationTheme: const InputDecorationTheme(
-                border: OutlineInputBorder(),
+              inputDecorationTheme: InputDecorationTheme(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
                 contentPadding: EdgeInsets.symmetric(
                   horizontal: 16.0,
                   vertical: 16.0,
@@ -133,16 +136,18 @@ class _PaperlessMobileEntrypointState extends State<PaperlessMobileEntrypoint> {
               brightness: Brightness.dark,
               useMaterial3: true,
               colorSchemeSeed: Colors.lightGreen,
-              //primarySwatch: Colors.green,
               appBarTheme: const AppBarTheme(
                 scrolledUnderElevation: 0.0,
               ),
-              inputDecorationTheme: const InputDecorationTheme(
-                  border: OutlineInputBorder(),
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 16.0,
-                  )),
+              inputDecorationTheme: InputDecorationTheme(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 16.0,
+                ),
+              ),
               chipTheme: ChipThemeData(
                 backgroundColor: Colors.green[900],
               ),
@@ -150,7 +155,8 @@ class _PaperlessMobileEntrypointState extends State<PaperlessMobileEntrypoint> {
             themeMode: settings.preferredThemeMode,
             supportedLocales: S.delegate.supportedLocales,
             locale: Locale.fromSubtags(
-                languageCode: settings.preferredLocaleSubtag),
+              languageCode: settings.preferredLocaleSubtag,
+            ),
             localizationsDelegates: const [
               S.delegate,
               GlobalMaterialLocalizations.delegate,
