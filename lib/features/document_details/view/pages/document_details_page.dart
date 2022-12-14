@@ -45,8 +45,6 @@ class DocumentDetailsPage extends StatefulWidget {
 }
 
 class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
-  bool _isDownloadPending = false;
-
   @override
   Widget build(BuildContext context) {
     return WillPopScope(

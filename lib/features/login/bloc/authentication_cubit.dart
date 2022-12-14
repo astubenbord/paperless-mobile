@@ -28,7 +28,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
   }) async {
     assert(credentials.username != null && credentials.password != null);
     try {
-      registerSecurityContext(clientCertificate);
+      await registerSecurityContext(clientCertificate);
       //TODO: Workaround for new architecture, listen for security context changes in timeout_client, possibly persisted in hive.
       _authApi = getIt<PaperlessAuthenticationApi>();
       // Store information required to make requests
