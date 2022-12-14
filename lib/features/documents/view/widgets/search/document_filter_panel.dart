@@ -82,13 +82,17 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
               ),
               Align(
                 alignment: Alignment.centerLeft,
-                child: Text(S.of(context).documentFilterSearchLabel),
+                child: Text(
+                  S.of(context).documentFilterSearchLabel,
+                  style: Theme.of(context).textTheme.caption,
+                ),
               ).paddedOnly(left: 8.0),
               _buildQueryFormField().padded(),
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
                   S.of(context).documentFilterAdvancedLabel,
+                  style: Theme.of(context).textTheme.caption,
                 ),
               ).padded(),
               _buildCreatedDateRangePickerFormField(),
