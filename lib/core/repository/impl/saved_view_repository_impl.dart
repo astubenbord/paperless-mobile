@@ -16,7 +16,9 @@ class SavedViewRepositoryImpl implements SavedViewRepository {
       _subject.stream.asBroadcastStream();
 
   @override
-  void clear() {}
+  void clear() {
+    _subject.add(const {});
+  }
 
   @override
   Future<SavedView> create(SavedView view) async {
