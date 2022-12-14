@@ -123,7 +123,12 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
 
   void _resetFilter() async {
     FocusScope.of(context).unfocus();
-    Navigator.pop(context, DocumentFilter.initial);
+    Navigator.pop(
+        context,
+        DocumentFilter.initial.copyWith(
+          sortField: widget.initialFilter.sortField,
+          sortOrder: widget.initialFilter.sortOrder,
+        ));
   }
 
   Widget _buildDocumentTypeFormField() {

@@ -49,7 +49,6 @@ void main() async {
 
       await getIt<ConnectivityCubit>().initialize();
       await getIt<ApplicationSettingsCubit>().initialize();
-      await getIt<AuthenticationCubit>().initialize();
     });
 
     // Mocked classes
@@ -97,7 +96,6 @@ void main() async {
 
       await getIt<ConnectivityCubit>().initialize();
       await getIt<ApplicationSettingsCubit>().initialize();
-      await getIt<AuthenticationCubit>().initialize();
     });
     // Mocked classes
 
@@ -149,7 +147,6 @@ void main() async {
               ));
       await getIt<ConnectivityCubit>().initialize();
       await getIt<ApplicationSettingsCubit>().initialize();
-      await getIt<AuthenticationCubit>().initialize();
     });
 
     await t.binding.waitUntilFirstFrameRasterized;
@@ -199,7 +196,6 @@ void main() async {
 
       await getIt<ConnectivityCubit>().initialize();
       await getIt<ApplicationSettingsCubit>().initialize();
-      await getIt<AuthenticationCubit>().initialize();
     });
 
     await t.binding.waitUntilFirstFrameRasterized;

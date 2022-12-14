@@ -14,7 +14,10 @@ class DocumentListItem extends StatelessWidget {
   final bool isLabelClickable;
   final bool Function(int tagId) isTagSelectedPredicate;
 
-  final void Function(int tagId) onTagSelected;
+  final void Function(int tagId)? onTagSelected;
+  final void Function(int? correspondentId)? onCorrespondentSelected;
+  final void Function(int? documentTypeId)? onDocumentTypeSelected;
+  final void Function(int? id)? onStoragePathSelected;
 
   const DocumentListItem({
     Key? key,
@@ -25,7 +28,10 @@ class DocumentListItem extends StatelessWidget {
     required this.isAtLeastOneSelected,
     this.isLabelClickable = true,
     required this.isTagSelectedPredicate,
-    required this.onTagSelected,
+    this.onTagSelected,
+    this.onCorrespondentSelected,
+    this.onDocumentTypeSelected,
+    this.onStoragePathSelected,
   }) : super(key: key);
 
   @override
@@ -48,6 +54,7 @@ class DocumentListItem extends StatelessWidget {
                   child: CorrespondentWidget(
                     isClickable: isLabelClickable,
                     correspondentId: document.correspondent,
+                    onSelected: onCorrespondentSelected,
                   ),
                 ),
               ],
@@ -68,7 +75,7 @@ class DocumentListItem extends StatelessWidget {
               tagIds: document.tags,
               isMultiLine: false,
               isSelectedPredicate: isTagSelectedPredicate,
-              onTagSelected: onTagSelected,
+              onTagSelected: (id) => onTagSelected?.call(id),
             ),
           ),
         ),

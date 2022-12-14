@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/repository/provider/label_repositories_provider.dart';
 import 'package:paperless_mobile/core/widgets/documents_list_loading_widget.dart';
@@ -16,7 +15,10 @@ class DocumentListView extends StatelessWidget {
   final DocumentsState state;
   final bool hasInternetConnection;
   final bool isLabelClickable;
-  final void Function(int tagId) onTagSelected;
+  final void Function(int id)? onTagSelected;
+  final void Function(int? id)? onCorrespondentSelected;
+  final void Function(int? id)? onDocumentTypeSelected;
+  final void Function(int? id)? onStoragePathSelected;
 
   const DocumentListView({
     super.key,
@@ -26,7 +28,10 @@ class DocumentListView extends StatelessWidget {
     required this.onSelected,
     required this.hasInternetConnection,
     this.isLabelClickable = true,
-    required this.onTagSelected,
+    this.onTagSelected,
+    this.onCorrespondentSelected,
+    this.onDocumentTypeSelected,
+    this.onStoragePathSelected,
   });
 
   @override
@@ -52,6 +57,9 @@ class DocumentListView extends StatelessWidget {
                     : false;
               },
               onTagSelected: onTagSelected,
+              onCorrespondentSelected: onCorrespondentSelected,
+              onDocumentTypeSelected: onDocumentTypeSelected,
+              onStoragePathSelected: onStoragePathSelected,
             ),
           );
         },

@@ -100,7 +100,7 @@ class _LabelFormState<T extends Label> extends State<LabelForm<T>> {
             ),
             FormBuilderCheckbox(
               name: Label.isInsensitiveKey,
-              initialValue: widget.initialValue?.isInsensitive,
+              initialValue: widget.initialValue?.isInsensitive ?? true,
               title: Text(S.of(context).labelIsInsensivitePropertyLabel),
             ),
             ...widget.additionalFields,

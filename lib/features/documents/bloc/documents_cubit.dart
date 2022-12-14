@@ -88,6 +88,13 @@ class DocumentsCubit extends Cubit<DocumentsState> {
     emit(DocumentsState(filter: filter, value: [result], isLoaded: true));
   }
 
+  Future<void> resetFilter() async {
+    final filter = DocumentFilter.initial.copyWith(
+      sortField: state.filter.sortField,
+      sortOrder: state.filter.sortOrder,
+    );
+  }
+
   ///
   /// Convenience method which allows to directly use [DocumentFilter.copyWith] on the current filter.
   ///

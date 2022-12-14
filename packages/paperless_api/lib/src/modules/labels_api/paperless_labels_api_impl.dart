@@ -261,7 +261,7 @@ class PaperlessLabelApiImpl implements PaperlessLabelsApi {
   @override
   Future<StoragePath?> getStoragePath(int id) {
     return getSingleResult(
-      "/api/storage_paths/?page=1&page_size=100000",
+      "/api/storage_paths/$id/",
       StoragePath.fromJson,
       ErrorCode.storagePathLoadFailed,
       client: client,

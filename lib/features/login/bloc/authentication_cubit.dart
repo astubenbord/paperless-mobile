@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:injectable/injectable.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/store/local_vault.dart';
 import 'package:paperless_mobile/di_initializer.dart';
@@ -11,12 +10,9 @@ import 'package:paperless_mobile/features/login/model/user_credentials.model.dar
 import 'package:paperless_mobile/features/login/services/authentication_service.dart';
 import 'package:paperless_mobile/features/settings/model/application_settings_state.dart';
 
-@prod
-@test
-@singleton
 class AuthenticationCubit extends Cubit<AuthenticationState> {
   final LocalAuthenticationService _localAuthService;
-  final PaperlessAuthenticationApi _authApi;
+  PaperlessAuthenticationApi _authApi;
   final LocalVault _localVault;
 
   AuthenticationCubit(
@@ -24,10 +20,6 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     this._localAuthService,
     this._authApi,
   ) : super(AuthenticationState.initial);
-
-  Future<void> initialize() {
-    return restoreSessionState();
-  }
 
   Future<void> login({
     required UserCredentials credentials,
@@ -37,6 +29,8 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     assert(credentials.username != null && credentials.password != null);
     try {
       registerSecurityContext(clientCertificate);
+      //TODO: Workaround for new architecture, listen for security context changes in timeout_client, possibly persisted in hive.
+      _authApi = getIt<PaperlessAuthenticationApi>();
       // Store information required to make requests
       final currentAuth = AuthenticationInformation(
         serverUrl: serverUrl,
@@ -82,13 +76,16 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     }
     if (storedAuth == null || !storedAuth.isValid) {
       return emit(
-          AuthenticationState(isAuthenticated: false, wasLoginStored: false));
+        AuthenticationState(isAuthenticated: false, wasLoginStored: false),
+      );
     } else {
       if (appSettings.isLocalAuthenticationEnabled) {
         final localAuthSuccess = await _localAuthService
             .authenticateLocalUser("Authenticate to log back in");
         if (localAuthSuccess) {
-          registerSecurityContext(storedAuth.clientCertificate);
+          await registerSecurityContext(storedAuth.clientCertificate);
+          //TODO: Workaround for new architecture, listen for security context changes in timeout_client, possibly persisted in hive.
+          _authApi = getIt<PaperlessAuthenticationApi>();
           return emit(
             AuthenticationState(
               isAuthenticated: true,
@@ -105,11 +102,13 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
           ));
         }
       } else {
-        return emit(AuthenticationState(
+        await registerSecurityContext(storedAuth.clientCertificate);
+        final authState = AuthenticationState(
           isAuthenticated: true,
           authentication: storedAuth,
           wasLoginStored: true,
-        ));
+        );
+        return emit(authState);
       }
     }
   }
