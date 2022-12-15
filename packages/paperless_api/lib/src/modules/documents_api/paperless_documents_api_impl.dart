@@ -136,9 +136,12 @@ class PaperlessDocumentsApiImpl implements PaperlessDocumentsApi {
 
   @override
   Future<PagedSearchResult<DocumentModel>> find(DocumentFilter filter) async {
-    final filterParams = filter.toQueryString();
+    final filterParams = filter.toQueryParameters();
     final response = await baseClient.get(
-      Uri.parse("/api/documents/?$filterParams"),
+      Uri(
+        path: "/api/documents/?$filterParams",
+        queryParameters: filterParams,
+      ),
     );
     if (response.statusCode == 200) {
       return compute(

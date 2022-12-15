@@ -30,14 +30,16 @@ abstract class IdQueryParameter extends Equatable {
 
   String get queryParameterKey;
 
-  String toQueryParameter() {
+  Map<String, String> toQueryParameter() {
+    final Map<String, String> params = {};
     if (onlyNotAssigned || onlyAssigned) {
-      return "&${queryParameterKey}__isnull=$_assignmentStatus";
+      params.putIfAbsent(
+          '${queryParameterKey}__isnull', () => _assignmentStatus!.toString());
     }
     if (isSet) {
-      return "&${queryParameterKey}__id=$id";
+      params.putIfAbsent("${queryParameterKey}__id", () => id!.toString());
     }
-    return "";
+    return params;
   }
 
   @override

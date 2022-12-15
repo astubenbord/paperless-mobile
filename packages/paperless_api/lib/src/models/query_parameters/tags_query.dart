@@ -2,14 +2,14 @@ import 'package:equatable/equatable.dart';
 
 abstract class TagsQuery extends Equatable {
   const TagsQuery();
-  String toQueryParameter();
+  Map<String, String> toQueryParameter();
 }
 
 class OnlyNotAssignedTagsQuery extends TagsQuery {
   const OnlyNotAssignedTagsQuery();
   @override
-  String toQueryParameter() {
-    return '&is_tagged=0';
+  Map<String, String> toQueryParameter() {
+    return {'is_tagged': '0'};
   }
 
   @override
@@ -24,11 +24,11 @@ class AnyAssignedTagsQuery extends TagsQuery {
   });
 
   @override
-  String toQueryParameter() {
+  Map<String, String> toQueryParameter() {
     if (tagIds.isEmpty) {
-      return '&is_tagged=1';
+      return {'is_tagged': '1'};
     }
-    return '&tags__id__in=${tagIds.join(',')}';
+    return {'tags__id__in': tagIds.join(',')};
   }
 
   @override
@@ -89,15 +89,15 @@ class IdsTagsQuery extends TagsQuery {
   Iterable<int> get ids => [...includedIds, ...excludedIds];
 
   @override
-  String toQueryParameter() {
-    final StringBuffer sb = StringBuffer("");
+  Map<String, String> toQueryParameter() {
+    final Map<String, String> params = {};
     if (includedIds.isNotEmpty) {
-      sb.write('&tags__id__all=${includedIds.join(',')}');
+      params.putIfAbsent('tags__id__all', () => includedIds.join(','));
     }
     if (excludedIds.isNotEmpty) {
-      sb.write('&tags__id__none=${excludedIds.join(',')}');
+      params.putIfAbsent('tags__id__none', () => excludedIds.join(','));
     }
-    return sb.toString();
+    return params;
   }
 
   @override

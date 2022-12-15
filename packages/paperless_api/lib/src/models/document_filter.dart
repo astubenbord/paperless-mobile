@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:paperless_api/src/constants.dart';
 import 'package:paperless_api/src/models/query_parameters/asn_query.dart';
 import 'package:paperless_api/src/models/query_parameters/correspondent_query.dart';
+import 'package:paperless_api/src/models/query_parameters/date_range_query.dart';
 import 'package:paperless_api/src/models/query_parameters/document_type_query.dart';
 import 'package:paperless_api/src/models/query_parameters/query_type.dart';
 import 'package:paperless_api/src/models/query_parameters/sort_field.dart';
@@ -29,16 +30,12 @@ class DocumentFilter extends Equatable {
   final TagsQuery tags;
   final SortField sortField;
   final SortOrder sortOrder;
-  final DateTime? addedDateAfter;
-  final DateTime? addedDateBefore;
-  final DateTime? createdDateAfter;
-  final DateTime? createdDateBefore;
+  final DateRangeQuery added;
+  final DateRangeQuery created;
   final QueryType queryType;
   final String? queryText;
 
   const DocumentFilter({
-    this.createdDateAfter,
-    this.createdDateBefore,
     this.documentType = const DocumentTypeQuery.unset(),
     this.correspondent = const CorrespondentQuery.unset(),
     this.storagePath = const StoragePathQuery.unset(),
@@ -48,53 +45,39 @@ class DocumentFilter extends Equatable {
     this.sortOrder = SortOrder.descending,
     this.page = 1,
     this.pageSize = 25,
-    this.addedDateAfter,
-    this.addedDateBefore,
     this.queryType = QueryType.titleAndContent,
     this.queryText,
+    this.added = const UnsetDateRangeQuery(),
+    this.created = const UnsetDateRangeQuery(),
   });
 
-  String toQueryString() {
-    final StringBuffer sb = StringBuffer("page=$page&page_size=$pageSize");
-    sb.write(documentType.toQueryParameter());
-    sb.write(correspondent.toQueryParameter());
-    sb.write(tags.toQueryParameter());
-    sb.write(storagePath.toQueryParameter());
-    sb.write(asnQuery.toQueryParameter());
+  Map<String, String> toQueryParameters() {
+    Map<String, String> params = {
+      'page': page.toString(),
+      'page_size': pageSize.toString(),
+    };
 
+    params.addAll(documentType.toQueryParameter());
+    params.addAll(correspondent.toQueryParameter());
+    params.addAll(tags.toQueryParameter());
+    params.addAll(storagePath.toQueryParameter());
+    params.addAll(asnQuery.toQueryParameter());
+    params.addAll(added.toQueryParameter());
+    params.addAll(created.toQueryParameter());
+    //TODO: Rework when implementing extended queries.
     if (queryText?.isNotEmpty ?? false) {
-      sb.write("&${queryType.queryParam}=$queryText");
+      params.putIfAbsent(queryType.queryParam, () => queryText!);
     }
+    // Reverse ordering can also be encoded using &reverse=1
+    params.putIfAbsent(
+        'ordering', () => '${sortOrder.queryString}${sortField.queryString}');
 
-    sb.write("&ordering=${sortOrder.queryString}${sortField.queryString}");
-
-    // Add/subtract one day in the following because paperless uses gt/lt not gte/lte
-    if (addedDateAfter != null) {
-      sb.write(
-          "&added__date__gt=${apiDateFormat.format(addedDateAfter!.subtract(_oneDay))}");
-    }
-
-    if (addedDateBefore != null) {
-      sb.write(
-          "&added__date__lt=${apiDateFormat.format(addedDateBefore!.add(_oneDay))}");
-    }
-
-    if (createdDateAfter != null) {
-      sb.write(
-          "&created__date__gt=${apiDateFormat.format(createdDateAfter!.subtract(_oneDay))}");
-    }
-
-    if (createdDateBefore != null) {
-      sb.write(
-          "&created__date__lt=${apiDateFormat.format(createdDateBefore!.add(_oneDay))}");
-    }
-
-    return sb.toString();
+    return params;
   }
 
   @override
   String toString() {
-    return toQueryString();
+    return toQueryParameters().toString();
   }
 
   DocumentFilter copyWith({
@@ -108,10 +91,8 @@ class DocumentFilter extends Equatable {
     TagsQuery? tags,
     SortField? sortField,
     SortOrder? sortOrder,
-    DateTime? addedDateAfter,
-    DateTime? addedDateBefore,
-    DateTime? createdDateBefore,
-    DateTime? createdDateAfter,
+    DateRangeQuery? added,
+    DateRangeQuery? created,
     QueryType? queryType,
     String? queryText,
   }) {
@@ -124,13 +105,11 @@ class DocumentFilter extends Equatable {
       tags: tags ?? this.tags,
       sortField: sortField ?? this.sortField,
       sortOrder: sortOrder ?? this.sortOrder,
-      addedDateAfter: addedDateAfter ?? this.addedDateAfter,
-      addedDateBefore: addedDateBefore ?? this.addedDateBefore,
+      added: added ?? this.added,
       queryType: queryType ?? this.queryType,
       queryText: queryText ?? this.queryText,
-      createdDateBefore: createdDateBefore ?? this.createdDateBefore,
-      createdDateAfter: createdDateAfter ?? this.createdDateAfter,
       asnQuery: asnQuery ?? this.asnQuery,
+      created: created ?? this.created,
     );
   }
 
@@ -160,10 +139,8 @@ class DocumentFilter extends Equatable {
         correspondent != initial.correspondent,
         storagePath != initial.storagePath,
         tags != initial.tags,
-        (addedDateAfter != initial.addedDateAfter ||
-            addedDateBefore != initial.addedDateBefore),
-        (createdDateAfter != initial.createdDateAfter ||
-            createdDateBefore != initial.createdDateBefore),
+        (added != initial.added),
+        (created != initial.created),
         asnQuery != initial.asnQuery,
         (queryType != initial.queryType || queryText != initial.queryText),
       ].fold(0, (previousValue, element) => previousValue += element ? 1 : 0);
@@ -179,10 +156,8 @@ class DocumentFilter extends Equatable {
         tags,
         sortField,
         sortOrder,
-        addedDateAfter,
-        addedDateBefore,
-        createdDateAfter,
-        createdDateBefore,
+        added,
+        created,
         queryType,
         queryText,
       ];
