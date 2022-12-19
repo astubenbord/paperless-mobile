@@ -56,10 +56,10 @@ class RelativeDateRangeQuery extends DateRangeQuery {
   final int offset;
   final DateRangeUnit unit;
 
-  const RelativeDateRangeQuery(
-    this.offset,
-    this.unit,
-  );
+  const RelativeDateRangeQuery([
+    this.offset = 1,
+    this.unit = DateRangeUnit.day,
+  ]);
 
   @override
   List<Object?> get props => [offset, unit];
@@ -67,7 +67,7 @@ class RelativeDateRangeQuery extends DateRangeQuery {
   @override
   Map<String, String> toQueryParameter(DateRangeQueryField field) {
     return {
-      'query': '[${field.name}:$offset ${unit.name} to now]',
+      'query': '${field.name}:[-$offset ${unit.name} to now]',
     };
   }
 

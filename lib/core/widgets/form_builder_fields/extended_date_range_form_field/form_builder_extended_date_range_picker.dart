@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:intl/intl.dart';
 import 'package:paperless_api/paperless_api.dart';
-import 'package:paperless_mobile/core/widgets/form_builder_fields/extended_date_range_dialog.dart';
+import 'package:paperless_mobile/core/widgets/form_builder_fields/extended_date_range_form_field/extended_date_range_dialog.dart';
+import 'package:paperless_mobile/core/widgets/form_builder_fields/extended_date_range_form_field/relative_date_range_picker_helper.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 
 class FormBuilderExtendedDateRangePicker extends StatefulWidget {
@@ -24,13 +25,13 @@ class FormBuilderExtendedDateRangePicker extends StatefulWidget {
 
 class _FormBuilderExtendedDateRangePickerState
     extends State<FormBuilderExtendedDateRangePicker> {
-  late final TextEditingController _textEditingController;
+  final TextEditingController _textEditingController = TextEditingController();
 
   @override
-  void initState() {
-    super.initState();
-    _textEditingController = TextEditingController(
-        text: _dateRangeQueryToString(widget.initialValue));
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // This has to be initialized here and not in initState because it has to be waited until dependencies for localization have been loaded.
+    _textEditingController.text = _dateRangeQueryToString(widget.initialValue);
   }
 
   @override
@@ -52,67 +53,39 @@ class _FormBuilderExtendedDateRangePickerState
               decoration: InputDecoration(
                 prefixIcon: const Icon(Icons.date_range),
                 labelText: widget.labelText,
+                suffixIcon: _textEditingController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          field.didChange(const UnsetDateRangeQuery());
+                        },
+                      )
+                    : null,
               ),
             ),
-            _buildExtendedQueryOptions(field),
+            RelativeDateRangePickerHelper(field: field),
           ],
         );
       },
     );
   }
 
-  Widget _buildExtendedQueryOptions(FormFieldState<DateRangeQuery> field) {
-    return SizedBox(
-      height: 64,
-      child: ListView.separated(
-        itemCount: _options.length,
-        separatorBuilder: (context, index) => const SizedBox(width: 8.0),
-        itemBuilder: (context, index) {
-          final option = _options[index];
-          return FilterChip(
-            label: Text(option.title),
-            onSelected: (isSelected) => isSelected
-                ? field.didChange(option.value)
-                : field.didChange(const UnsetDateRangeQuery()),
-            selected: field.value == option.value,
-          );
-        },
-        scrollDirection: Axis.horizontal,
-      ),
-    );
-  }
-
-  List<_ExtendedDateRangeQueryOption> get _options => [
-        _ExtendedDateRangeQueryOption(
-          S.of(context).extendedDateRangePickerLastWeeksLabel(1),
-          const RelativeDateRangeQuery(1, DateRangeUnit.week),
-        ),
-        _ExtendedDateRangeQueryOption(
-          S.of(context).extendedDateRangePickerLastMonthsLabel(1),
-          const RelativeDateRangeQuery(1, DateRangeUnit.month),
-        ),
-        _ExtendedDateRangeQueryOption(
-          S.of(context).extendedDateRangePickerLastMonthsLabel(3),
-          const RelativeDateRangeQuery(3, DateRangeUnit.month),
-        ),
-        _ExtendedDateRangeQueryOption(
-          S.of(context).extendedDateRangePickerLastYearsLabel(1),
-          const RelativeDateRangeQuery(1, DateRangeUnit.year),
-        ),
-      ];
-
   String _dateRangeQueryToString(DateRangeQuery query) {
+    final df = DateFormat.yMd();
     if (query is UnsetDateRangeQuery) {
       return '';
     } else if (query is AbsoluteDateRangeQuery) {
       if (query.before != null && query.after != null) {
-        return '${DateFormat.yMd(query.after)} – ${DateFormat.yMd(query.before)}';
+        if (query.before!.isAtSameMomentAs(query.after!)) {
+          return df.format(query.before!);
+        }
+        return '${df.format(query.after!)} – ${df.format(query.before!)}';
       }
       if (query.before != null) {
-        return '${S.of(context).extendedDateRangePickerBeforeLabel} ${DateFormat.yMd(query.before)}';
+        return '${S.of(context).extendedDateRangePickerBeforeLabel} ${df.format(query.before!)}';
       }
       if (query.after != null) {
-        return '${S.of(context).extendedDateRangePickerAfterLabel} ${DateFormat.yMd(query.after)}';
+        return '${S.of(context).extendedDateRangePickerAfterLabel} ${df.format(query.after!)}';
       }
     } else if (query is RelativeDateRangeQuery) {
       switch (query.unit) {
@@ -143,20 +116,10 @@ class _FormBuilderExtendedDateRangePickerState
   ) async {
     final query = await showDialog<DateRangeQuery>(
       context: context,
-      builder: (context) => ExtendedDateRangeDialog(
-        initialValue: field.value!,
-        stringTransformer: _dateRangeQueryToString,
-      ),
+      builder: (context) => ExtendedDateRangeDialog(initialValue: field.value!),
     );
     if (query != null) {
       field.didChange(query);
     }
   }
-}
-
-class _ExtendedDateRangeQueryOption {
-  final String title;
-  final RelativeDateRangeQuery value;
-
-  _ExtendedDateRangeQueryOption(this.title, this.value);
 }

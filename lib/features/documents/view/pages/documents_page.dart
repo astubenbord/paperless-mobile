@@ -1,4 +1,3 @@
-import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
@@ -83,16 +82,11 @@ class _DocumentsPageState extends State<DocumentsPage> {
           floatingActionButton: BlocBuilder<DocumentsCubit, DocumentsState>(
             builder: (context, state) {
               final appliedFiltersCount = state.filter.appliedFiltersCount;
-              return Badge(
-                toAnimate: false,
-                animationType: BadgeAnimationType.fade,
-                showBadge: appliedFiltersCount > 0,
-                badgeContent: appliedFiltersCount > 0
-                    ? Text(
-                        state.filter.appliedFiltersCount.toString(),
-                        style: const TextStyle(color: Colors.white),
-                      )
-                    : null,
+              return Badge.count(
+                alignment: const AlignmentDirectional(44,
+                    -4), //TODO: Wait for stable version of m3, then use AlignmentDirectional.topEnd
+                isLabelVisible: appliedFiltersCount > 0,
+                count: state.filter.appliedFiltersCount,
                 child: FloatingActionButton(
                   child: const Icon(Icons.filter_alt_rounded),
                   onPressed: _openDocumentFilter,

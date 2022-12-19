@@ -1,19 +1,22 @@
+import 'dart:developer';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:intl/intl.dart';
 import 'package:paperless_api/paperless_api.dart';
-import 'package:paperless_mobile/core/widgets/form_builder_fields/form_builder_relative_date_range_field.dart';
+import 'package:paperless_mobile/core/widgets/form_builder_fields/extended_date_range_form_field/form_builder_relative_date_range_field.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 
 class ExtendedDateRangeDialog extends StatefulWidget {
   final DateRangeQuery initialValue;
-  final String Function(DateRangeQuery query) stringTransformer;
+
   const ExtendedDateRangeDialog({
     super.key,
     required this.initialValue,
-    required this.stringTransformer,
   });
 
   @override
@@ -26,12 +29,21 @@ class _ExtendedDateRangeDialogState extends State<ExtendedDateRangeDialog> {
   static const String _fkAbsoluteAfter = 'absoluteAfter';
   static const String _fkRelative = 'relative';
 
+  DateTime? _before;
+  DateTime? _after;
+
   final _formKey = GlobalKey<FormBuilderState>();
   late DateRangeType _selectedDateRangeType;
+
   @override
   void initState() {
     super.initState();
-    _selectedDateRangeType = (widget.initialValue is RelativeDateRangeQuery)
+    final initialQuery = widget.initialValue;
+    if (initialQuery is AbsoluteDateRangeQuery) {
+      _before = initialQuery.before;
+      _after = initialQuery.after;
+    }
+    _selectedDateRangeType = (initialQuery is RelativeDateRangeQuery)
         ? DateRangeType.relative
         : DateRangeType.absolute;
   }
@@ -40,13 +52,13 @@ class _ExtendedDateRangeDialogState extends State<ExtendedDateRangeDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text("Select date range"),
-      content: Form(
+      content: FormBuilder(
         key: _formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              "Hint: You can either specify absolute values by selecting concrete dates, or you can specify a time range relative to today.",
+              "Hint: You can either specify absolute values by selecting concrete dates, or you can specify a time range relative to the current date.",
               style: Theme.of(context).textTheme.caption,
             ),
             _buildDateRangeQueryTypeSelection(),
@@ -58,6 +70,7 @@ class _ExtendedDateRangeDialogState extends State<ExtendedDateRangeDialog> {
                     return _buildAbsoluteDateRangeForm();
                   case DateRangeType.relative:
                     return FormBuilderRelativeDateRangePicker(
+                      name: _fkRelative,
                       initialValue:
                           widget.initialValue is RelativeDateRangeQuery
                               ? widget.initialValue as RelativeDateRangeQuery
@@ -65,7 +78,6 @@ class _ExtendedDateRangeDialogState extends State<ExtendedDateRangeDialog> {
                                   1,
                                   DateRangeUnit.month,
                                 ),
-                      name: _fkRelative,
                     );
                 }
               },
@@ -118,23 +130,58 @@ class _ExtendedDateRangeDialogState extends State<ExtendedDateRangeDialog> {
       children: [
         FormBuilderDateTimePicker(
           name: _fkAbsoluteAfter,
-          initialDate: widget.initialValue is AbsoluteDateRangeQuery
+          initialValue: widget.initialValue is AbsoluteDateRangeQuery
               ? (widget.initialValue as AbsoluteDateRangeQuery).after
               : null,
+          initialDate: _before?.subtract(const Duration(days: 1)),
           decoration: InputDecoration(
             labelText: S.of(context).extendedDateRangePickerAfterLabel,
+            prefixIcon: const Icon(Icons.date_range),
+            suffixIcon: _after != null
+                ? IconButton(
+                    icon: const Icon(Icons.clear),
+                    onPressed: () {
+                      _formKey.currentState?.fields[_fkAbsoluteAfter]
+                          ?.didChange(null);
+                      setState(() => _after = null);
+                    },
+                  )
+                : null,
           ),
+          format: DateFormat.yMd(),
+          lastDate: _dateTimeMax(_before, DateTime.now()),
           inputType: InputType.date,
+          onChanged: (after) {
+            setState(() => _after = after);
+          },
         ),
+        const SizedBox(height: 16),
         FormBuilderDateTimePicker(
           name: _fkAbsoluteBefore,
-          initialDate: widget.initialValue is AbsoluteDateRangeQuery
+          initialValue: widget.initialValue is AbsoluteDateRangeQuery
               ? (widget.initialValue as AbsoluteDateRangeQuery).before
               : null,
           inputType: InputType.date,
           decoration: InputDecoration(
             labelText: S.of(context).extendedDateRangePickerBeforeLabel,
+            prefixIcon: const Icon(Icons.date_range),
+            suffixIcon: _before != null
+                ? IconButton(
+                    icon: const Icon(Icons.clear),
+                    onPressed: () {
+                      _formKey.currentState?.fields[_fkAbsoluteBefore]
+                          ?.didChange(null);
+                      setState(() => _before = null);
+                    },
+                  )
+                : null,
           ),
+          format: DateFormat.yMd(),
+          firstDate: _after,
+          lastDate: DateTime.now(),
+          onChanged: (before) {
+            setState(() => _before = before);
+          },
         ),
       ],
     );
@@ -149,6 +196,12 @@ class _ExtendedDateRangeDialogState extends State<ExtendedDateRangeDialog> {
     } else {
       return values[_fkRelative] as RelativeDateRangeQuery;
     }
+  }
+
+  DateTime? _dateTimeMax(DateTime? dt1, DateTime? dt2) {
+    if (dt1 == null) return dt2;
+    if (dt2 == null) return dt1;
+    return dt1.compareTo(dt2) >= 0 ? dt1 : dt2;
   }
 }
 

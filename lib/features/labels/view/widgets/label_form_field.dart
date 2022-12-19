@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:form_builder_extra_fields/form_builder_extra_fields.dart';
 import 'package:paperless_api/paperless_api.dart';
+import 'package:paperless_mobile/core/widgets/form_builder_fields/form_builder_type_ahead.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 
 ///

@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:intl/intl.dart';
 import 'package:paperless_api/paperless_api.dart';
-import 'package:paperless_mobile/core/widgets/form_builder_fields/form_builder_extended_date_range_picker.dart';
+import 'package:paperless_mobile/core/widgets/form_builder_fields/extended_date_range_form_field/form_builder_extended_date_range_picker.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/search/query_type_form_field.dart';
 import 'package:paperless_mobile/features/labels/bloc/label_cubit.dart';
@@ -101,8 +101,11 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
                 initialValue: widget.initialFilter.created,
                 labelText: S.of(context).documentCreatedPropertyLabel,
               ).padded(),
-              // _buildCreatedDateRangePickerFormField(),
-              // _buildAddedDateRangePickerFormField(),
+              FormBuilderExtendedDateRangePicker(
+                name: DocumentModel.addedKey,
+                initialValue: widget.initialFilter.added,
+                labelText: S.of(context).documentAddedPropertyLabel,
+              ).padded(),
               _buildCorrespondentFormField().padded(),
               _buildDocumentTypeFormField().padded(),
               _buildStoragePathFormField().padded(),
@@ -209,100 +212,6 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
     );
   }
 
-  // Widget _buildCreatedDateRangePickerFormField() {
-  //   return Column(
-  //     children: [
-  //       FormBuilderDateRangePicker(
-  //         initialValue: _dateTimeRangeOfNullable(
-  //           widget.initialFilter.createdDateAfter,
-  //           widget.initialFilter.createdDateBefore,
-  //         ),
-  //         // Workaround for theme data not being correctly passed to daterangepicker, see
-  //         // https://github.com/flutter/flutter/issues/87580
-  //         pickerBuilder: (context, Widget? child) => Theme(
-  //           data: Theme.of(context).copyWith(
-  //             dialogBackgroundColor: Theme.of(context).scaffoldBackgroundColor,
-  //             appBarTheme: Theme.of(context).appBarTheme.copyWith(
-  //                   iconTheme:
-  //                       IconThemeData(color: Theme.of(context).primaryColor),
-  //                 ),
-  //             colorScheme: Theme.of(context).colorScheme.copyWith(
-  //                   onPrimary: Theme.of(context).primaryColor,
-  //                   primary: Theme.of(context).colorScheme.primary,
-  //                 ),
-  //           ),
-  //           child: child!,
-  //         ),
-  //         format: DateFormat.yMMMd(Localizations.localeOf(context).toString()),
-  //         fieldStartLabelText:
-  //             S.of(context).documentFilterDateRangeFieldStartLabel,
-  //         fieldEndLabelText: S.of(context).documentFilterDateRangeFieldEndLabel,
-  //         firstDate: DateTime.fromMicrosecondsSinceEpoch(0),
-  //         lastDate: DateTime.now(),
-  //         name: fkCreatedAt,
-  //         decoration: InputDecoration(
-  //           prefixIcon: const Icon(Icons.calendar_month_outlined),
-  //           labelText: S.of(context).documentCreatedPropertyLabel,
-  //           suffixIcon: IconButton(
-  //             icon: const Icon(Icons.clear),
-  //             onPressed: () {
-  //               _formKey.currentState?.fields[fkCreatedAt]?.didChange(null);
-  //             },
-  //           ),
-  //         ),
-  //       ).paddedSymmetrically(horizontal: 8, vertical: 4.0),
-  //     ],
-  //   );
-  // }
-
-  // Widget _buildAddedDateRangePickerFormField() {
-  //   return Column(
-  //     children: [
-  //       FormBuilderDateRangePicker(
-  //         initialValue: _dateTimeRangeOfNullable(
-  //           widget.initialFilter.addedDateAfter,
-  //           widget.initialFilter.addedDateBefore,
-  //         ),
-  //         // Workaround for theme data not being correctly passed to daterangepicker, see
-  //         // https://github.com/flutter/flutter/issues/87580
-  //         pickerBuilder: (context, Widget? child) => Theme(
-  //           data: Theme.of(context).copyWith(
-  //             dialogBackgroundColor: Theme.of(context).scaffoldBackgroundColor,
-  //             appBarTheme: Theme.of(context).appBarTheme.copyWith(
-  //                   iconTheme:
-  //                       IconThemeData(color: Theme.of(context).primaryColor),
-  //                 ),
-  //             colorScheme: Theme.of(context).colorScheme.copyWith(
-  //                   onPrimary: Theme.of(context).primaryColor,
-  //                   primary: Theme.of(context).colorScheme.primary,
-  //                 ),
-  //           ),
-  //           child: child!,
-  //         ),
-  //         format: DateFormat.yMMMd(),
-  //         fieldStartLabelText:
-  //             S.of(context).documentFilterDateRangeFieldStartLabel,
-  //         fieldEndLabelText: S.of(context).documentFilterDateRangeFieldEndLabel,
-  //         firstDate: DateTime.fromMicrosecondsSinceEpoch(0),
-  //         lastDate: DateTime.now(),
-  //         name: fkAddedAt,
-  //         decoration: InputDecoration(
-  //           prefixIcon: const Icon(Icons.calendar_month_outlined),
-  //           labelText: S.of(context).documentAddedPropertyLabel,
-  //           suffixIcon: IconButton(
-  //             icon: const Icon(Icons.clear),
-  //             onPressed: () {
-  //               _formKey.currentState?.fields[fkAddedAt]?.didChange(null);
-  //             },
-  //           ),
-  //         ),
-  //       ).paddedSymmetrically(horizontal: 8),
-  //       const SizedBox(height: 4.0),
-  //       _buildDateRangePickerHelper(fkAddedAt),
-  //     ],
-  //   );
-  // }
-
   void _onApplyFilter() async {
     _formKey.currentState?.save();
     if (_formKey.currentState?.validate() ?? false) {
@@ -320,7 +229,6 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
   DocumentFilter _assembleFilter() {
     final v = _formKey.currentState!.value;
     return DocumentFilter(
-      created: (v[fkCreatedAt] as DateRangeQuery),
       correspondent: v[fkCorrespondent] as IdQueryParameter? ??
           DocumentFilter.initial.correspondent,
       documentType: v[fkDocumentType] as IdQueryParameter? ??
@@ -330,6 +238,7 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
       tags:
           v[DocumentModel.tagsKey] as TagsQuery? ?? DocumentFilter.initial.tags,
       queryText: v[fkQuery] as String?,
+      created: (v[fkCreatedAt] as DateRangeQuery),
       added: (v[fkAddedAt] as DateRangeQuery),
       queryType: v[QueryTypeFormField.fkQueryType] as QueryType,
       asnQuery: widget.initialFilter.asnQuery,

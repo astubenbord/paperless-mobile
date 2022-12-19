@@ -58,10 +58,6 @@ dependencies:
   flutter_bloc: ^8.1.1
   equatable: ^2.0.3
   flutter_form_builder: ^7.5.0
-  form_builder_extra_fields:
-    git:
-      url: https://github.com/flutter-form-builder-ecosystem/form_builder_extra_fields.git
-      ref: main
   form_builder_validators: ^8.4.0
   infinite_scroll_pagination: ^3.2.0
   package_info_plus: ^1.4.3+1
@@ -82,6 +78,7 @@ dependencies:
   hive: ^2.2.3
   rxdart: ^0.27.7
   badges: ^2.0.3
+  flutter_colorpicker: ^1.0.3
 
 dev_dependencies:
   integration_test:
