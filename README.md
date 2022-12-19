@@ -124,7 +124,13 @@ flutter install
 ```
   
 ## Languages and Translations
-If you want to contribute to translate the app into your language, create an issue and you will be invited to the Localizely project.
+If you want to contribute to translate the app into your language, create a new <a href="https://github.com/astubenbord/paperless-mobile/discussions/categories/languages-and-translations">Discussion</a> and you will be invited to the <a href="https://localizely.com/">Localizely</a> project.
+
+Thanks to the following contributors for providing translations:
+- German and English by <a href="https://github.com/astubenbord">astubenbord</a>
+- Czech language by <a href="https://github.com/svetlemodry">svetlemodry</a>
+
+This project is registered as an open source project in Localizely, which offers full benefits for free! 
 
 <!-- ROADMAP -->
 ## Roadmap

@@ -1,15 +1,10 @@
-import 'dart:developer';
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:intl/intl.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/widgets/form_builder_fields/extended_date_range_form_field/form_builder_relative_date_range_field.dart';
-import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
+import 'package:paperless_mobile/generated/l10n.dart';
 
 class ExtendedDateRangeDialog extends StatefulWidget {
   final DateRangeQuery initialValue;
@@ -56,13 +51,13 @@ class _ExtendedDateRangeDialogState extends State<ExtendedDateRangeDialog> {
         key: _formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            _buildDateRangeQueryTypeSelection(),
             Text(
               "Hint: You can either specify absolute values by selecting concrete dates, or you can specify a time range relative to the current date.",
-              style: Theme.of(context).textTheme.caption,
-            ),
-            _buildDateRangeQueryTypeSelection(),
-            const SizedBox(height: 16),
+              style: Theme.of(context).textTheme.bodySmall,
+            ).paddedOnly(top: 8, bottom: 16),
             Builder(
               builder: (context) {
                 switch (_selectedDateRangeType) {
@@ -106,21 +101,23 @@ class _ExtendedDateRangeDialogState extends State<ExtendedDateRangeDialog> {
   }
 
   Widget _buildDateRangeQueryTypeSelection() {
-    return Row(
-      children: [
-        ChoiceChip(
-          label: Text('Absolute'),
-          selected: _selectedDateRangeType == DateRangeType.absolute,
-          onSelected: (value) =>
-              setState(() => _selectedDateRangeType = DateRangeType.absolute),
-        ).paddedOnly(right: 8.0),
-        ChoiceChip(
-          label: Text('Relative'),
-          selected: _selectedDateRangeType == DateRangeType.relative,
-          onSelected: (value) =>
-              setState(() => _selectedDateRangeType = DateRangeType.relative),
+    return SegmentedButton<DateRangeType>(
+      multiSelectionEnabled: false,
+      onSelectionChanged: (selection) =>
+          setState(() => _selectedDateRangeType = selection.first),
+      segments: [
+        ButtonSegment(
+          value: DateRangeType.absolute,
+          enabled: true,
+          label: Text("Absolute"),
+        ),
+        ButtonSegment(
+          value: DateRangeType.relative,
+          enabled: true,
+          label: Text("Relative"),
         ),
       ],
+      selected: {_selectedDateRangeType},
     );
   }
 

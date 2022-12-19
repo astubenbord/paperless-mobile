@@ -12,6 +12,9 @@ class DocumentGridView extends StatelessWidget {
   final DocumentsState state;
   final bool hasInternetConnection;
   final void Function(int tagId) onTagSelected;
+  final void Function(int correspondentId) onCorrespondentSelected;
+  final void Function(int correspondentId) onDocumentTypeSelected;
+  final void Function(int? id)? onStoragePathSelected;
 
   const DocumentGridView({
     super.key,
@@ -21,6 +24,9 @@ class DocumentGridView extends StatelessWidget {
     required this.onSelected,
     required this.hasInternetConnection,
     required this.onTagSelected,
+    required this.onCorrespondentSelected,
+    required this.onDocumentTypeSelected,
+    this.onStoragePathSelected,
   });
   @override
   Widget build(BuildContext context) {

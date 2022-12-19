@@ -78,7 +78,7 @@ class DocumentGridItem extends StatelessWidget {
                           DateFormat.yMMMd().format(
                             document.created,
                           ),
-                          style: Theme.of(context).textTheme.caption,
+                          style: Theme.of(context).textTheme.bodySmall,
                         ),
                       ],
                     ),

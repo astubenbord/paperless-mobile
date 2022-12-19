@@ -97,15 +97,15 @@ class _FormBuilderRelativeDateRangePickerState
               ),
             ],
           ),
-          RelativeDateRangePickerHelper(
-            field: field,
-            onChanged: (value) {
-              if (value is RelativeDateRangeQuery) {
-                setState(() => _offset = value.offset);
-                _offsetTextEditingController.text = _offset.toString();
-              }
-            },
-          ),
+          // RelativeDateRangePickerHelper(
+          //   field: field,
+          //   onChanged: (value) {
+          //     if (value is RelativeDateRangeQuery) {
+          //       setState(() => _offset = value.offset);
+          //       _offsetTextEditingController.text = _offset.toString();
+          //     }
+          //   },
+          // ),
         ],
       ),
     );

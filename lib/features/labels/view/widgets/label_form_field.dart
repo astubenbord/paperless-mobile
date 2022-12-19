@@ -85,15 +85,18 @@ class _LabelFormFieldState<T extends Label> extends State<LabelFormField<T>> {
               TextStyle(color: Theme.of(context).disabledColor, fontSize: 18.0),
         ),
       ),
+      getImmediateSuggestions: true,
+      loadingBuilder: (context) => Container(),
       initialValue: widget.initialValue ?? const IdQueryParameter.unset(),
       name: widget.name,
       suggestionsBoxDecoration: SuggestionsBoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceVariant,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(
-            color: Theme.of(context).colorScheme.primary,
-            width: 2.0,
-          ),
+          // side: BorderSide(
+          //   color: Theme.of(context).colorScheme.primary,
+          //   width: 2.0,
+          // ),
         ),
       ),
       itemBuilder: (context, suggestion) => ListTile(
@@ -103,7 +106,11 @@ class _LabelFormFieldState<T extends Label> extends State<LabelFormField<T>> {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
+        tileColor: Theme.of(context).colorScheme.surfaceVariant,
         dense: true,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
         style: ListTileStyle.list,
       ),
       suggestionsCallback: (pattern) {

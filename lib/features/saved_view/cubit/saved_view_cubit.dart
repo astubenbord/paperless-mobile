@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:injectable/injectable.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/repository/saved_view_repository.dart';
 import 'package:paperless_mobile/features/saved_view/cubit/saved_view_state.dart';
@@ -12,22 +11,26 @@ class SavedViewCubit extends Cubit<SavedViewState> {
 
   SavedViewCubit(this._repository) : super(SavedViewState(value: {})) {
     _subscription = _repository.savedViews.listen(
-      (savedViews) => emit(state.copyWith(value: savedViews)),
+      (savedViews) {
+        if (savedViews == null) {
+          emit(state.copyWith(isLoaded: false));
+        } else {
+          emit(state.copyWith(value: savedViews, isLoaded: true));
+        }
+      },
     );
   }
 
   void selectView(SavedView? view) {
-    emit(SavedViewState(value: state.value, selectedSavedViewId: view?.id));
+    emit(state.copyWith(
+      selectedSavedViewId: view?.id,
+      overwriteSelectedSavedViewId: true,
+    ));
   }
 
   Future<SavedView> add(SavedView view) async {
     final savedView = await _repository.create(view);
-    emit(
-      SavedViewState(
-        value: {...state.value, savedView.id!: savedView},
-        selectedSavedViewId: state.selectedSavedViewId,
-      ),
-    );
+    emit(state.copyWith(value: {...state.value, savedView.id!: savedView}));
     return savedView;
   }
 
@@ -42,11 +45,16 @@ class SavedViewCubit extends Cubit<SavedViewState> {
   Future<void> initialize() async {
     final views = await _repository.findAll();
     final values = {for (var element in views) element.id!: element};
-    emit(SavedViewState(value: values));
+    emit(SavedViewState(value: values, isLoaded: true));
   }
 
+  Future<void> reload() => initialize();
+
   void resetSelection() {
-    emit(SavedViewState(value: state.value));
+    emit(SavedViewState(
+      value: state.value,
+      isLoaded: true,
+    ));
   }
 
   @override

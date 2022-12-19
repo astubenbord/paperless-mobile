@@ -7,7 +7,6 @@ import 'package:paperless_mobile/core/service/connectivity_status.service.dart';
 import 'package:paperless_mobile/core/store/local_vault.dart';
 import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/di_test_mocks.mocks.dart';
-import 'package:paperless_mobile/features/login/bloc/authentication_cubit.dart';
 import 'package:paperless_mobile/features/settings/bloc/application_settings_cubit.dart';
 import 'package:paperless_mobile/features/settings/model/application_settings_state.dart';
 import 'package:paperless_mobile/features/settings/model/view_type.dart';
@@ -49,7 +48,6 @@ void main() async {
 
       await getIt<ConnectivityCubit>().initialize();
       await getIt<ApplicationSettingsCubit>().initialize();
-      await getIt<AuthenticationCubit>().initialize();
     });
 
     // Mocked classes
@@ -97,7 +95,6 @@ void main() async {
 
       await getIt<ConnectivityCubit>().initialize();
       await getIt<ApplicationSettingsCubit>().initialize();
-      await getIt<AuthenticationCubit>().initialize();
     });
     // Mocked classes
 
@@ -149,7 +146,6 @@ void main() async {
               ));
       await getIt<ConnectivityCubit>().initialize();
       await getIt<ApplicationSettingsCubit>().initialize();
-      await getIt<AuthenticationCubit>().initialize();
     });
 
     await t.binding.waitUntilFirstFrameRasterized;
@@ -199,7 +195,6 @@ void main() async {
 
       await getIt<ConnectivityCubit>().initialize();
       await getIt<ApplicationSettingsCubit>().initialize();
-      await getIt<AuthenticationCubit>().initialize();
     });
 
     await t.binding.waitUntilFirstFrameRasterized;

@@ -73,6 +73,18 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
           child: ListView(
             controller: widget.scrollController,
             children: [
+              Align(
+                alignment: Alignment.center,
+                child: Container(
+                  width: 32,
+                  height: 4,
+                  margin: const EdgeInsets.only(top: 16),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+              ),
               Text(
                 S.of(context).documentFilterTitle,
                 style: Theme.of(context).textTheme.headlineSmall,
@@ -85,7 +97,7 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   S.of(context).documentFilterSearchLabel,
-                  style: Theme.of(context).textTheme.caption,
+                  style: Theme.of(context).textTheme.bodySmall,
                 ),
               ).paddedOnly(left: 8.0),
               _buildQueryFormField().padded(),
@@ -93,7 +105,7 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   S.of(context).documentFilterAdvancedLabel,
-                  style: Theme.of(context).textTheme.caption,
+                  style: Theme.of(context).textTheme.bodySmall,
                 ),
               ).padded(),
               FormBuilderExtendedDateRangePicker(
@@ -132,7 +144,12 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
 
   void _resetFilter() async {
     FocusScope.of(context).unfocus();
-    Navigator.pop(context, DocumentFilter.initial);
+    Navigator.pop(
+        context,
+        DocumentFilter.initial.copyWith(
+          sortField: widget.initialFilter.sortField,
+          sortOrder: widget.initialFilter.sortOrder,
+        ));
   }
 
   Widget _buildDocumentTypeFormField() {

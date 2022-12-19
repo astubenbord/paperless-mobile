@@ -45,7 +45,7 @@ Note: If you have the GitHub Android app installed, the descriptions will not be
             ).padded(),
             Text(
               'Description',
-              style: Theme.of(context).textTheme.subtitle1,
+              style: Theme.of(context).textTheme.titleMedium,
             ).padded(),
             FormBuilderTextField(
               name: shortDescriptionKey,
@@ -70,7 +70,7 @@ Note: If you have the GitHub Android app installed, the descriptions will not be
                 children: [
                   Text(
                     'Stack Trace',
-                    style: Theme.of(context).textTheme.subtitle1,
+                    style: Theme.of(context).textTheme.titleMedium,
                   ).paddedOnly(top: 8.0, left: 8.0, right: 8.0),
                   TextButton.icon(
                     label: const Text('Copy'),
@@ -81,11 +81,11 @@ Note: If you have the GitHub Android app installed, the descriptions will not be
               ),
               Text(
                 'Since stack traces cannot be attached to the GitHub issue url, please copy the content of the stackTrace and paste it in the issue description. This will greatly increase the chance of quickly resolving the issue!',
-                style: Theme.of(context).textTheme.caption,
+                style: Theme.of(context).textTheme.bodySmall,
               ).padded(),
               Text(
                 widget.stackTrace.toString(),
-                style: Theme.of(context).textTheme.overline,
+                style: Theme.of(context).textTheme.bodySmall,
               ).padded(),
             ]
           ],

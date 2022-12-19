@@ -9,16 +9,18 @@ import 'package:paperless_mobile/util.dart';
 
 class CorrespondentWidget extends StatelessWidget {
   final int? correspondentId;
-  final void Function()? afterSelected;
+  final void Function(int? id)? onSelected;
   final Color? textColor;
   final bool isClickable;
+  final TextStyle? textStyle;
 
   const CorrespondentWidget({
     Key? key,
-    this.correspondentId,
-    this.afterSelected,
+    required this.correspondentId,
     this.textColor,
     this.isClickable = true,
+    this.textStyle,
+    this.onSelected,
   }) : super(key: key);
 
   @override
@@ -30,39 +32,20 @@ class CorrespondentWidget extends StatelessWidget {
             BlocBuilder<LabelCubit<Correspondent>, LabelState<Correspondent>>(
           builder: (context, state) {
             return GestureDetector(
-              onTap: () => _addCorrespondentToFilter(context),
+              onTap: () => onSelected?.call(correspondentId!),
               child: Text(
                 (state.getLabel(correspondentId)?.name) ?? "-",
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.bodyText2?.copyWith(
-                      color: textColor ?? Theme.of(context).colorScheme.primary,
-                    ),
+                style: (textStyle ?? Theme.of(context).textTheme.bodyMedium)
+                    ?.copyWith(
+                  color: textColor ?? Theme.of(context).colorScheme.primary,
+                ),
               ),
             );
           },
         ),
       ),
     );
-  }
-
-  void _addCorrespondentToFilter(BuildContext context) {
-    final cubit = BlocProvider.of<DocumentsCubit>(context);
-    try {
-      if (cubit.state.filter.correspondent.id == correspondentId) {
-        cubit.updateCurrentFilter(
-          (filter) =>
-              filter.copyWith(correspondent: const IdQueryParameter.unset()),
-        );
-      } else {
-        cubit.updateCurrentFilter(
-          (filter) => filter.copyWith(
-              correspondent: IdQueryParameter.fromId(correspondentId)),
-        );
-      }
-      afterSelected?.call();
-    } on PaperlessServerException catch (error, stackTrace) {
-      showErrorMessage(context, error, stackTrace);
-    }
   }
 }

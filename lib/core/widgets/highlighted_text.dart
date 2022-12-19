@@ -121,7 +121,7 @@ class HighlightedText extends StatelessWidget {
   TextSpan _normalSpan(String value, BuildContext context) {
     return TextSpan(
       text: value,
-      style: style ?? Theme.of(context).textTheme.bodyText2,
+      style: style ?? Theme.of(context).textTheme.bodyMedium,
     );
   }
 }

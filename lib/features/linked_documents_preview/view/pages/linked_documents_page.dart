@@ -46,7 +46,7 @@ class _LinkedDocumentsPageState extends State<LinkedDocumentsPage> {
               Text(
                 S.of(context).referencedDocumentsReadOnlyHintText,
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.caption,
+                style: Theme.of(context).textTheme.bodySmall,
               ),
               Expanded(
                 child: CustomScrollView(

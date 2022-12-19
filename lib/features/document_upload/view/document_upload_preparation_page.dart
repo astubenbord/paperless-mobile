@@ -208,7 +208,7 @@ class _DocumentUploadPreparationPageState
                       S
                           .of(context)
                           .uploadPageAutomaticallInferredFieldsHintText,
-                  style: Theme.of(context).textTheme.caption,
+                  style: Theme.of(context).textTheme.bodySmall,
                 ),
               ].padded(),
             ),

@@ -88,7 +88,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
                 isLabelVisible: appliedFiltersCount > 0,
                 count: state.filter.appliedFiltersCount,
                 child: FloatingActionButton(
-                  child: const Icon(Icons.filter_alt_rounded),
+                  child: const Icon(Icons.filter_alt_outlined),
                   onPressed: _openDocumentFilter,
                 ),
               );
@@ -146,22 +146,28 @@ class _DocumentsPageState extends State<DocumentsPage> {
             switch (settings.preferredViewType) {
               case ViewType.list:
                 child = DocumentListView(
-                  onTap: _openDetails,
                   state: state,
+                  onTap: _openDetails,
                   onSelected: _onSelected,
                   pagingController: _pagingController,
                   hasInternetConnection: isConnected,
                   onTagSelected: _addTagToFilter,
+                  onCorrespondentSelected: _addCorrespondentToFilter,
+                  onDocumentTypeSelected: _addDocumentTypeToFilter,
+                  onStoragePathSelected: _addStoragePathToFilter,
                 );
                 break;
               case ViewType.grid:
                 child = DocumentGridView(
-                  onTap: _openDetails,
                   state: state,
+                  onTap: _openDetails,
                   onSelected: _onSelected,
                   pagingController: _pagingController,
                   hasInternetConnection: isConnected,
                   onTagSelected: _addTagToFilter,
+                  onCorrespondentSelected: _addCorrespondentToFilter,
+                  onDocumentTypeSelected: _addDocumentTypeToFilter,
+                  onStoragePathSelected: _addStoragePathToFilter,
                 );
                 break;
             }
@@ -171,7 +177,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
                 child: DocumentsEmptyState(
                   state: state,
                   onReset: () {
-                    _documentsCubit.updateFilter();
+                    _documentsCubit.resetFilter();
                     _savedViewCubit.resetSelection();
                   },
                 ),
@@ -190,7 +196,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
                     listener: (context, state) {
                       try {
                         if (state.selectedSavedViewId == null) {
-                          _documentsCubit.updateFilter();
+                          _documentsCubit.resetFilter();
                         } else {
                           final newFilter = state
                               .value[state.selectedSavedViewId]
@@ -275,6 +281,63 @@ class _DocumentsPageState extends State<DocumentsPage> {
     }
   }
 
+  void _addCorrespondentToFilter(int? correspondentId) {
+    final cubit = BlocProvider.of<DocumentsCubit>(context);
+    try {
+      if (cubit.state.filter.correspondent.id == correspondentId) {
+        cubit.updateCurrentFilter(
+          (filter) =>
+              filter.copyWith(correspondent: const IdQueryParameter.unset()),
+        );
+      } else {
+        cubit.updateCurrentFilter(
+          (filter) => filter.copyWith(
+              correspondent: IdQueryParameter.fromId(correspondentId)),
+        );
+      }
+    } on PaperlessServerException catch (error, stackTrace) {
+      showErrorMessage(context, error, stackTrace);
+    }
+  }
+
+  void _addDocumentTypeToFilter(int? documentTypeId) {
+    final cubit = BlocProvider.of<DocumentsCubit>(context);
+    try {
+      if (cubit.state.filter.documentType.id == documentTypeId) {
+        cubit.updateCurrentFilter(
+          (filter) =>
+              filter.copyWith(documentType: const IdQueryParameter.unset()),
+        );
+      } else {
+        cubit.updateCurrentFilter(
+          (filter) => filter.copyWith(
+              documentType: IdQueryParameter.fromId(documentTypeId)),
+        );
+      }
+    } on PaperlessServerException catch (error, stackTrace) {
+      showErrorMessage(context, error, stackTrace);
+    }
+  }
+
+  void _addStoragePathToFilter(int? pathId) {
+    final cubit = BlocProvider.of<DocumentsCubit>(context);
+    try {
+      if (cubit.state.filter.correspondent.id == pathId) {
+        cubit.updateCurrentFilter(
+          (filter) =>
+              filter.copyWith(storagePath: const IdQueryParameter.unset()),
+        );
+      } else {
+        cubit.updateCurrentFilter(
+          (filter) =>
+              filter.copyWith(storagePath: IdQueryParameter.fromId(pathId)),
+        );
+      }
+    } on PaperlessServerException catch (error, stackTrace) {
+      showErrorMessage(context, error, stackTrace);
+    }
+  }
+
   Future<void> _loadNewPage(int pageKey) async {
     final pageCount = _documentsCubit.state
         .inferPageCount(pageSize: _documentsCubit.state.filter.pageSize);
@@ -294,9 +357,10 @@ class _DocumentsPageState extends State<DocumentsPage> {
 
   Future<void> _onRefresh() async {
     try {
-      await _documentsCubit.updateCurrentFilter(
+      _documentsCubit.updateCurrentFilter(
         (filter) => filter.copyWith(page: 1),
       );
+      _savedViewCubit.reload();
     } on PaperlessServerException catch (error, stackTrace) {
       showErrorMessage(context, error, stackTrace);
     }

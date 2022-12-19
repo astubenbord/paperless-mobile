@@ -84,7 +84,7 @@ class _GridImageItemWidgetState extends State<GridImageItemWidget> {
                           ),
                           child: Text(
                             "${widget.index + 1}/${widget.totalNumberOfFiles}",
-                            style: Theme.of(context).textTheme.caption,
+                            style: Theme.of(context).textTheme.bodySmall,
                           ),
                         ),
                       ),

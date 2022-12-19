@@ -60,7 +60,7 @@ class _StoragePathAutofillFormBuilderFieldState
           const SizedBox(height: 8.0),
           Text(
             "Select to autofill path variable",
-            style: Theme.of(context).textTheme.caption,
+            style: Theme.of(context).textTheme.bodySmall,
           ),
           Wrap(
             alignment: WrapAlignment.start,

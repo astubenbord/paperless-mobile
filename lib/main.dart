@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:async';
 import 'dart:io';
 
@@ -35,6 +36,7 @@ import 'package:paperless_mobile/features/document_upload/cubit/document_upload_
 import 'package:paperless_mobile/features/document_upload/view/document_upload_preparation_page.dart';
 import 'package:paperless_mobile/features/home/view/home_page.dart';
 import 'package:paperless_mobile/features/login/bloc/authentication_cubit.dart';
+import 'package:paperless_mobile/features/login/services/authentication_service.dart';
 import 'package:paperless_mobile/features/login/view/login_page.dart';
 import 'package:paperless_mobile/features/settings/bloc/application_settings_cubit.dart';
 import 'package:paperless_mobile/features/settings/model/application_settings_state.dart';
@@ -58,7 +60,13 @@ void main() async {
   // Load application settings and stored authentication data
   await getIt<ConnectivityCubit>().initialize();
   await getIt<ApplicationSettingsCubit>().initialize();
-  await getIt<AuthenticationCubit>().initialize();
+
+  final authCubit = AuthenticationCubit(
+    getIt<LocalVault>(),
+    getIt<LocalAuthenticationService>(),
+    getIt<PaperlessAuthenticationApi>(),
+  );
+  await authCubit.restoreSessionState();
 
   // Create repositories
   final LabelRepository<Tag> tagRepository =
@@ -81,13 +89,17 @@ void main() async {
         RepositoryProvider.value(value: storagePathRepository),
         RepositoryProvider.value(value: savedViewRepository),
       ],
-      child: const PaperlessMobileEntrypoint(),
+      child: PaperlessMobileEntrypoint(authenticationCubit: authCubit),
     ),
   );
 }
 
 class PaperlessMobileEntrypoint extends StatefulWidget {
-  const PaperlessMobileEntrypoint({Key? key}) : super(key: key);
+  final AuthenticationCubit authenticationCubit;
+  const PaperlessMobileEntrypoint({
+    Key? key,
+    required this.authenticationCubit,
+  }) : super(key: key);
 
   @override
   State<PaperlessMobileEntrypoint> createState() =>
@@ -95,6 +107,48 @@ class PaperlessMobileEntrypoint extends StatefulWidget {
 }
 
 class _PaperlessMobileEntrypointState extends State<PaperlessMobileEntrypoint> {
+  final _lightTheme = ThemeData(
+    brightness: Brightness.light,
+    useMaterial3: true,
+    colorSchemeSeed: Colors.lightGreen,
+    appBarTheme: const AppBarTheme(
+      scrolledUnderElevation: 0.0,
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 16.0,
+        vertical: 16.0,
+      ),
+    ),
+    chipTheme: ChipThemeData(
+      backgroundColor: Colors.lightGreen[50],
+    ),
+  );
+
+  final _darkTheme = ThemeData(
+    brightness: Brightness.dark,
+    useMaterial3: true,
+    colorSchemeSeed: Colors.lightGreen,
+    appBarTheme: const AppBarTheme(
+      scrolledUnderElevation: 0.0,
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 16.0,
+        vertical: 16.0,
+      ),
+    ),
+    chipTheme: ChipThemeData(
+      backgroundColor: Colors.green[900],
+    ),
+  );
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -114,45 +168,13 @@ class _PaperlessMobileEntrypointState extends State<PaperlessMobileEntrypoint> {
           return MaterialApp(
             debugShowCheckedModeBanner: true,
             title: "Paperless Mobile",
-            theme: ThemeData(
-              brightness: Brightness.light,
-              useMaterial3: true,
-              colorSchemeSeed: Colors.lightGreen,
-              appBarTheme: const AppBarTheme(
-                scrolledUnderElevation: 0.0,
-              ),
-              inputDecorationTheme: InputDecorationTheme(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 16.0,
-                ),
-              ),
-              chipTheme: ChipThemeData(
-                backgroundColor: Colors.lightGreen[50],
-              ),
+            theme: _lightTheme.copyWith(
+              listTileTheme: _lightTheme.listTileTheme
+                  .copyWith(tileColor: Colors.transparent),
             ),
-            darkTheme: ThemeData(
-              brightness: Brightness.dark,
-              useMaterial3: true,
-              colorSchemeSeed: Colors.lightGreen,
-              appBarTheme: const AppBarTheme(
-                scrolledUnderElevation: 0.0,
-              ),
-              inputDecorationTheme: InputDecorationTheme(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 16.0,
-                ),
-              ),
-              chipTheme: ChipThemeData(
-                backgroundColor: Colors.green[900],
-              ),
+            darkTheme: _darkTheme.copyWith(
+              listTileTheme: _darkTheme.listTileTheme
+                  .copyWith(tileColor: Colors.transparent),
             ),
             themeMode: settings.preferredThemeMode,
             supportedLocales: S.delegate.supportedLocales,
@@ -166,8 +188,8 @@ class _PaperlessMobileEntrypointState extends State<PaperlessMobileEntrypoint> {
               GlobalWidgetsLocalizations.delegate,
               FormBuilderLocalizations.delegate,
             ],
-            home: BlocProvider<AuthenticationCubit>.value(
-              value: getIt<AuthenticationCubit>(),
+            home: BlocProvider.value(
+              value: widget.authenticationCubit,
               child: const AuthenticationWrapper(),
             ),
           );
@@ -270,7 +292,7 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      top: false,
+      top: true,
       left: false,
       right: false,
       bottom: false,
@@ -292,10 +314,10 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
           if (authentication.isAuthenticated) {
             return const HomePage();
           } else {
-            // if (authentication.wasLoginStored &&
-            //     !(authentication.wasLocalAuthenticationSuccessful ?? false)) {
-            //   return const BiometricAuthenticationPage();
-            // }
+            if (authentication.wasLoginStored &&
+                !(authentication.wasLocalAuthenticationSuccessful ?? false)) {
+              return const BiometricAuthenticationPage();
+            }
             return const LoginPage();
           }
         },
@@ -320,7 +342,7 @@ class BiometricAuthenticationPage extends StatelessWidget {
           Text(
             "You can now either try to authenticate again or disconnect from the current server.",
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.caption,
+            style: Theme.of(context).textTheme.bodySmall,
           ).padded(),
           const SizedBox(height: 48),
           Row(

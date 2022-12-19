@@ -45,8 +45,6 @@ class DocumentDetailsPage extends StatefulWidget {
 }
 
 class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
-  bool _isDownloadPending = false;
-
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -107,11 +105,11 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
                     color: Colors
                         .black, //TODO: check if there is a way to dynamically determine color...
                   ),
-                  onPressed: () => Navigator.pop(
-                      context,
-                      BlocProvider.of<DocumentDetailsCubit>(context)
-                          .state
-                          .document),
+                  onPressed: () => Navigator.of(context).pop(
+                    BlocProvider.of<DocumentDetailsCubit>(context)
+                        .state
+                        .document,
+                  ),
                 ),
                 floating: true,
                 pinned: true,
@@ -237,13 +235,13 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
         return ListView(
           children: [
             _DetailsItem.text(DateFormat().format(document.modified),
-                label: S.of(context).documentModifiedPropertyLabel,
-                context: context),
-            _separator(),
+                    label: S.of(context).documentModifiedPropertyLabel,
+                    context: context)
+                .paddedOnly(bottom: 16),
             _DetailsItem.text(DateFormat().format(document.added),
-                label: S.of(context).documentAddedPropertyLabel,
-                context: context),
-            _separator(),
+                    label: S.of(context).documentAddedPropertyLabel,
+                    context: context)
+                .paddedSymmetrically(vertical: 16),
             _DetailsItem(
               label: S.of(context).documentArchiveSerialNumberPropertyLongLabel,
               content: document.archiveSerialNumber != null
@@ -255,30 +253,26 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
                       onPressed:
                           widget.allowEdit ? () => _assignAsn(document) : null,
                     ),
-            ),
-            _separator(),
+            ).paddedSymmetrically(vertical: 16),
             _DetailsItem.text(
               meta.mediaFilename,
               context: context,
               label: S.of(context).documentMetaDataMediaFilenamePropertyLabel,
-            ),
-            _separator(),
+            ).paddedSymmetrically(vertical: 16),
             _DetailsItem.text(
               meta.originalChecksum,
               context: context,
               label: S.of(context).documentMetaDataChecksumLabel,
-            ),
-            _separator(),
+            ).paddedSymmetrically(vertical: 16),
             _DetailsItem.text(formatBytes(meta.originalSize, 2),
-                label: S.of(context).documentMetaDataOriginalFileSizeLabel,
-                context: context),
-            _separator(),
+                    label: S.of(context).documentMetaDataOriginalFileSizeLabel,
+                    context: context)
+                .paddedSymmetrically(vertical: 16),
             _DetailsItem.text(
               meta.originalMimeType,
               label: S.of(context).documentMetaDataOriginalMimeTypeLabel,
               context: context,
-            ),
-            _separator(),
+            ).paddedSymmetrically(vertical: 16),
           ],
         );
       },
@@ -295,16 +289,13 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
 
   Widget _buildDocumentContentView(DocumentModel document, String? match) {
     return SingleChildScrollView(
-      child: _DetailsItem(
-        content: HighlightedText(
-          text: document.content ?? "",
-          highlights: match == null ? [] : match.split(" "),
-          style: Theme.of(context).textTheme.bodyText2,
-          caseSensitive: false,
-        ),
-        label: S.of(context).documentDetailsPageTabContentLabel,
+      child: HighlightedText(
+        text: document.content ?? "",
+        highlights: match == null ? [] : match.split(" "),
+        style: Theme.of(context).textTheme.bodyMedium,
+        caseSensitive: false,
       ),
-    );
+    ).paddedOnly(top: 8);
   }
 
   Widget _buildDocumentOverview(DocumentModel document, String? match) {
@@ -314,60 +305,61 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
           content: HighlightedText(
             text: document.title,
             highlights: match?.split(" ") ?? <String>[],
+            style: Theme.of(context).textTheme.bodyLarge,
           ),
           label: S.of(context).documentTitlePropertyLabel,
-        ),
-        _separator(),
+        ).paddedOnly(bottom: 16),
         _DetailsItem.text(
           DateFormat.yMMMd().format(document.created),
           context: context,
           label: S.of(context).documentCreatedPropertyLabel,
-        ),
-        _separator(),
-        _DetailsItem(
-          content: DocumentTypeWidget(
-            isClickable: widget.isLabelClickable,
-            documentTypeId: document.documentType,
-            afterSelected: () {
-              Navigator.pop(context);
-            },
-          ),
-          label: S.of(context).documentDocumentTypePropertyLabel,
-        ),
-        _separator(),
-        _DetailsItem(
-          label: S.of(context).documentCorrespondentPropertyLabel,
-          content: CorrespondentWidget(
-            isClickable: widget.isLabelClickable,
-            correspondentId: document.correspondent,
-            afterSelected: () {
-              Navigator.pop(context);
-            },
-          ),
-        ),
-        _separator(),
-        _DetailsItem(
-          label: S.of(context).documentStoragePathPropertyLabel,
-          content: StoragePathWidget(
-            isClickable: widget.isLabelClickable,
-            pathId: document.storagePath,
-            afterSelected: () {
-              Navigator.pop(context);
-            },
-          ),
-        ),
-        _separator(),
-        _DetailsItem(
-          label: S.of(context).documentTagsPropertyLabel,
-          content: Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: TagsWidget(
+        ).paddedSymmetrically(vertical: 16),
+        Visibility(
+          visible: document.documentType != null,
+          child: _DetailsItem(
+            content: DocumentTypeWidget(
+              textStyle: Theme.of(context).textTheme.bodyLarge,
               isClickable: widget.isLabelClickable,
-              tagIds: document.tags,
-              isSelectedPredicate: (_) => false,
-              onTagSelected: (int tagId) {},
+              documentTypeId: document.documentType,
             ),
-          ),
+            label: S.of(context).documentDocumentTypePropertyLabel,
+          ).paddedSymmetrically(vertical: 16),
+        ),
+        Visibility(
+          visible: document.correspondent != null,
+          child: _DetailsItem(
+            label: S.of(context).documentCorrespondentPropertyLabel,
+            content: CorrespondentWidget(
+              textStyle: Theme.of(context).textTheme.bodyLarge,
+              isClickable: widget.isLabelClickable,
+              correspondentId: document.correspondent,
+            ),
+          ).paddedSymmetrically(vertical: 16),
+        ),
+        Visibility(
+          visible: document.storagePath != null,
+          child: _DetailsItem(
+            label: S.of(context).documentStoragePathPropertyLabel,
+            content: StoragePathWidget(
+              isClickable: widget.isLabelClickable,
+              pathId: document.storagePath,
+            ),
+          ).paddedSymmetrically(vertical: 16),
+        ),
+        Visibility(
+          visible: document.tags.isNotEmpty,
+          child: _DetailsItem(
+            label: S.of(context).documentTagsPropertyLabel,
+            content: Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: TagsWidget(
+                isClickable: widget.isLabelClickable,
+                tagIds: document.tags,
+                isSelectedPredicate: (_) => false,
+                onTagSelected: (int tagId) {},
+              ),
+            ),
+          ).paddedSymmetrically(vertical: 16),
         ),
         // _separator(),
         // FutureBuilder<List<SimilarDocumentModel>>(
@@ -394,10 +386,6 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
         //     }),
       ],
     );
-  }
-
-  Widget _separator() {
-    return const SizedBox(height: 32.0);
   }
 
   ///
@@ -477,10 +465,7 @@ class _DetailsItem extends StatelessWidget {
         children: [
           Text(
             label,
-            style: Theme.of(context)
-                .textTheme
-                .headline5
-                ?.copyWith(fontWeight: FontWeight.bold),
+            style: Theme.of(context).textTheme.caption,
           ),
           content,
         ],
@@ -492,7 +477,7 @@ class _DetailsItem extends StatelessWidget {
     String text, {
     required this.label,
     required BuildContext context,
-  }) : content = Text(text, style: Theme.of(context).textTheme.bodyText2);
+  }) : content = Text(text, style: Theme.of(context).textTheme.bodyLarge);
 }
 
 class ColoredTabBar extends Container implements PreferredSizeWidget {

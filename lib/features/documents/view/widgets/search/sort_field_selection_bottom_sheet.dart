@@ -47,7 +47,7 @@ class _SortFieldSelectionBottomSheetState
             children: [
               Text(
                 S.of(context).documentsPageOrderByLabel,
-                style: Theme.of(context).textTheme.caption,
+                style: Theme.of(context).textTheme.bodySmall,
                 textAlign: TextAlign.start,
               ),
               TextButton(

@@ -18,6 +18,7 @@ import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:paperless_mobile/util.dart';
 import 'package:url_launcher/link.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+import 'package:collection/collection.dart';
 
 class InfoDrawer extends StatelessWidget {
   final VoidCallback? afterInboxClosed;
@@ -31,6 +32,12 @@ class InfoDrawer extends StatelessWidget {
         bottomRight: Radius.circular(16.0),
       ),
       child: Drawer(
+        shape: const RoundedRectangleBorder(
+          borderRadius: const BorderRadius.only(
+            topRight: Radius.circular(16.0),
+            bottomRight: Radius.circular(16.0),
+          ),
+        ),
         child: ListView(
           children: [
             DrawerHeader(
@@ -54,11 +61,12 @@ class InfoDrawer extends StatelessWidget {
                       ).paddedOnly(right: 8.0),
                       Text(
                         S.of(context).appTitleText,
-                        style: Theme.of(context).textTheme.headline5?.copyWith(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer,
-                            ),
+                        style:
+                            Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onPrimaryContainer,
+                                ),
                       ),
                     ],
                   ),
@@ -80,7 +88,7 @@ class InfoDrawer extends StatelessWidget {
                               title: Text(
                                 S.of(context).appDrawerHeaderLoggedInAsText +
                                     (info.username ?? '?'),
-                                style: Theme.of(context).textTheme.bodyText2,
+                                style: Theme.of(context).textTheme.bodyMedium,
                                 overflow: TextOverflow.ellipsis,
                                 textAlign: TextAlign.end,
                                 maxLines: 1,
@@ -91,14 +99,15 @@ class InfoDrawer extends StatelessWidget {
                                   Text(
                                     state.information!.host ?? '',
                                     style:
-                                        Theme.of(context).textTheme.bodyText2,
+                                        Theme.of(context).textTheme.bodyMedium,
                                     overflow: TextOverflow.ellipsis,
                                     textAlign: TextAlign.end,
                                     maxLines: 1,
                                   ),
                                   Text(
                                     '${S.of(context).serverInformationPaperlessVersionText} ${info.version} (API v${info.apiVersion})',
-                                    style: Theme.of(context).textTheme.caption,
+                                    style:
+                                        Theme.of(context).textTheme.bodySmall,
                                     overflow: TextOverflow.ellipsis,
                                     textAlign: TextAlign.end,
                                     maxLines: 1,
@@ -118,90 +127,90 @@ class InfoDrawer extends StatelessWidget {
                 color: Theme.of(context).colorScheme.primaryContainer,
               ),
             ),
-            ListTile(
-              title: Text(S.of(context).bottomNavInboxPageLabel),
-              leading: const Icon(Icons.inbox),
-              onTap: () => _onOpenInbox(context),
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.settings),
-              title: Text(
-                S.of(context).appDrawerSettingsLabel,
+            ...[
+              ListTile(
+                title: Text(S.of(context).bottomNavInboxPageLabel),
+                leading: const Icon(Icons.inbox),
+                onTap: () => _onOpenInbox(context),
               ),
-              onTap: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => BlocProvider.value(
-                    value: getIt<ApplicationSettingsCubit>(),
-                    child: const SettingsPage(),
-                  ),
+              ListTile(
+                leading: const Icon(Icons.settings),
+                title: Text(
+                  S.of(context).appDrawerSettingsLabel,
                 ),
-              ),
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.bug_report),
-              title: Text(S.of(context).appDrawerReportBugLabel),
-              onTap: () {
-                launchUrlString(
-                    'https://github.com/astubenbord/paperless-mobile/issues/new');
-              },
-            ),
-            const Divider(),
-            AboutListTile(
-              icon: const Icon(Icons.info),
-              applicationIcon: const ImageIcon(
-                  AssetImage('assets/logos/paperless_logo_green.png')),
-              applicationName: 'Paperless Mobile',
-              applicationVersion:
-                  kPackageInfo.version + '+' + kPackageInfo.buildNumber,
-              aboutBoxChildren: [
-                Text(
-                    '${S.of(context).aboutDialogDevelopedByText} Anton Stubenbord'),
-                Link(
-                  uri: Uri.parse(
-                      'https://github.com/astubenbord/paperless-mobile'),
-                  builder: (context, followLink) => GestureDetector(
-                    onTap: followLink,
-                    child: Text(
-                      'https://github.com/astubenbord/paperless-mobile',
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.tertiary),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => BlocProvider.value(
+                      value: getIt<ApplicationSettingsCubit>(),
+                      child: const SettingsPage(),
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
-                Text(
-                  'Credits',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                _buildOnboardingImageCredits(),
-              ],
-              child: Text(S.of(context).appDrawerAboutLabel),
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.logout),
-              title: Text(S.of(context).appDrawerLogoutLabel),
-              onTap: () {
-                try {
-                  BlocProvider.of<AuthenticationCubit>(context).logout();
-                  getIt<LocalVault>().clear();
-                  BlocProvider.of<ApplicationSettingsCubit>(context).clear();
-                  RepositoryProvider.of<LabelRepository<Tag>>(context).clear();
-                  RepositoryProvider.of<LabelRepository<Correspondent>>(context)
-                      .clear();
-                  RepositoryProvider.of<LabelRepository<DocumentType>>(context)
-                      .clear();
-                  RepositoryProvider.of<LabelRepository<StoragePath>>(context)
-                      .clear();
-                  RepositoryProvider.of<SavedViewRepository>(context).clear();
-                } on PaperlessServerException catch (error, stackTrace) {
-                  showErrorMessage(context, error, stackTrace);
-                }
-              },
-            ),
-            const Divider(),
+              ),
+              ListTile(
+                leading: const Icon(Icons.bug_report),
+                title: Text(S.of(context).appDrawerReportBugLabel),
+                onTap: () {
+                  launchUrlString(
+                      'https://github.com/astubenbord/paperless-mobile/issues/new');
+                },
+              ),
+              AboutListTile(
+                icon: const Icon(Icons.info),
+                applicationIcon: const ImageIcon(
+                    AssetImage('assets/logos/paperless_logo_green.png')),
+                applicationName: 'Paperless Mobile',
+                applicationVersion:
+                    kPackageInfo.version + '+' + kPackageInfo.buildNumber,
+                aboutBoxChildren: [
+                  Text(
+                      '${S.of(context).aboutDialogDevelopedByText} Anton Stubenbord'),
+                  Link(
+                    uri: Uri.parse(
+                        'https://github.com/astubenbord/paperless-mobile'),
+                    builder: (context, followLink) => GestureDetector(
+                      onTap: followLink,
+                      child: Text(
+                        'https://github.com/astubenbord/paperless-mobile',
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.tertiary),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Credits',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  _buildOnboardingImageCredits(),
+                ],
+                child: Text(S.of(context).appDrawerAboutLabel),
+              ),
+              ListTile(
+                leading: const Icon(Icons.logout),
+                title: Text(S.of(context).appDrawerLogoutLabel),
+                onTap: () {
+                  try {
+                    BlocProvider.of<AuthenticationCubit>(context).logout();
+                    getIt<LocalVault>().clear();
+                    BlocProvider.of<ApplicationSettingsCubit>(context).clear();
+                    RepositoryProvider.of<LabelRepository<Tag>>(context)
+                        .clear();
+                    RepositoryProvider.of<LabelRepository<Correspondent>>(
+                            context)
+                        .clear();
+                    RepositoryProvider.of<LabelRepository<DocumentType>>(
+                            context)
+                        .clear();
+                    RepositoryProvider.of<LabelRepository<StoragePath>>(context)
+                        .clear();
+                    RepositoryProvider.of<SavedViewRepository>(context).clear();
+                  } on PaperlessServerException catch (error, stackTrace) {
+                    showErrorMessage(context, error, stackTrace);
+                  }
+                },
+              )
+            ].expand((element) => [element, const Divider()]),
           ],
         ),
       ),

@@ -1,7 +1,7 @@
 import 'package:paperless_api/paperless_api.dart';
 
 abstract class SavedViewRepository {
-  Stream<Map<int, SavedView>> get savedViews;
+  Stream<Map<int, SavedView>?> get savedViews;
 
   Future<SavedView> create(SavedView view);
   Future<SavedView?> find(int id);

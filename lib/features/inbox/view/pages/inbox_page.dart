@@ -53,7 +53,7 @@ class _InboxPageState extends State<InboxPage> {
                     child: Text(
                       '${state.inboxItems.length} ${S.of(context).inboxPageUnseenText}',
                       textAlign: TextAlign.start,
-                      style: Theme.of(context).textTheme.caption,
+                      style: Theme.of(context).textTheme.bodySmall,
                     ).paddedSymmetrically(horizontal: 4.0),
                   ),
                 ),
@@ -104,7 +104,7 @@ class _InboxPageState extends State<InboxPage> {
                         borderRadius: BorderRadius.circular(32.0),
                         child: Text(
                           entry.key,
-                          style: Theme.of(context).textTheme.caption,
+                          style: Theme.of(context).textTheme.bodySmall,
                           textAlign: TextAlign.center,
                         ).padded(),
                       ),
