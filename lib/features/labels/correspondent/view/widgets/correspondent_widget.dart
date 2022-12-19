@@ -52,12 +52,12 @@ class CorrespondentWidget extends StatelessWidget {
       if (cubit.state.filter.correspondent.id == correspondentId) {
         cubit.updateCurrentFilter(
           (filter) =>
-              filter.copyWith(correspondent: const CorrespondentQuery.unset()),
+              filter.copyWith(correspondent: const IdQueryParameter.unset()),
         );
       } else {
         cubit.updateCurrentFilter(
           (filter) => filter.copyWith(
-              correspondent: CorrespondentQuery.fromId(correspondentId)),
+              correspondent: IdQueryParameter.fromId(correspondentId)),
         );
       }
       afterSelected?.call();

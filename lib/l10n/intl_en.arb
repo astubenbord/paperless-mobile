@@ -78,18 +78,6 @@
   "@documentFilterAdvancedLabel": {},
   "documentFilterApplyFilterLabel": "Apply",
   "@documentFilterApplyFilterLabel": {},
-  "documentFilterDateRangeFieldEndLabel": "To",
-  "@documentFilterDateRangeFieldEndLabel": {},
-  "documentFilterDateRangeFieldStartLabel": "From",
-  "@documentFilterDateRangeFieldStartLabel": {},
-  "documentFilterDateRangeLastMonthLabel": "Last Month",
-  "@documentFilterDateRangeLastMonthLabel": {},
-  "documentFilterDateRangeLastSevenDaysLabel": "Last 7 Days",
-  "@documentFilterDateRangeLastSevenDaysLabel": {},
-  "documentFilterDateRangeLastThreeMonthsLabel": "Last 3 Months",
-  "@documentFilterDateRangeLastThreeMonthsLabel": {},
-  "documentFilterDateRangeLastYearLabel": "Last Year",
-  "@documentFilterDateRangeLastYearLabel": {},
   "documentFilterQueryOptionsAsnLabel": "ASN",
   "@documentFilterQueryOptionsAsnLabel": {},
   "documentFilterQueryOptionsExtendedLabel": "Extended",
@@ -272,6 +260,64 @@
   "@errorMessageUnsupportedFileFormat": {},
   "errorReportLabel": "REPORT",
   "@errorReportLabel": {},
+  "extendedDateRangePickerAfterLabel": "After",
+  "@extendedDateRangePickerAfterLabel": {},
+  "extendedDateRangePickerBeforeLabel": "Before",
+  "@extendedDateRangePickerBeforeLabel": {},
+  "extendedDateRangePickerDayText": "{count, plural, zero{} one{day} other{days}}",
+  "@extendedDateRangePickerDayText": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "extendedDateRangePickerFromLabel": "From",
+  "@extendedDateRangePickerFromLabel": {},
+  "extendedDateRangePickerLastDaysLabel": "{count, plural, zero{} one{Yesterday} other{Last {count} days}}",
+  "@extendedDateRangePickerLastDaysLabel": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "extendedDateRangePickerLastMonthsLabel": "{count, plural, zero{} one{Last month} other{Last {count} months}}",
+  "@extendedDateRangePickerLastMonthsLabel": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "extendedDateRangePickerLastText": "Last",
+  "@extendedDateRangePickerLastText": {},
+  "extendedDateRangePickerLastWeeksLabel": "{count, plural, zero{} one{Last week} other{Last {count} weeks}}",
+  "@extendedDateRangePickerLastWeeksLabel": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "extendedDateRangePickerLastYearsLabel": "{count, plural, zero{} one{Last year} other{Last {count} years}}",
+  "@extendedDateRangePickerLastYearsLabel": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "extendedDateRangePickerMonthText": "{count, plural, zero{} one{month} other{months}}",
+  "@extendedDateRangePickerMonthText": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "extendedDateRangePickerToLabel": "To",
+  "@extendedDateRangePickerToLabel": {},
+  "extendedDateRangePickerWeekText": "{count, plural, zero{} one{week} other{weeks}}",
+  "@extendedDateRangePickerWeekText": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "extendedDateRangePickerYearText": "{count, plural, zero{} one{year} other{years}}",
+  "@extendedDateRangePickerYearText": {
+    "placeholders": {
+      "count": {}
+    }
+  },
   "genericActionCancelLabel": "Cancel",
   "@genericActionCancelLabel": {},
   "genericActionCreateLabel": "Create",

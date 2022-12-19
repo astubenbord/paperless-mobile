@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-abstract class IdQueryParameter extends Equatable {
+class IdQueryParameter extends Equatable {
   final int? _assignmentStatus;
   final int? _id;
 
@@ -28,16 +28,14 @@ abstract class IdQueryParameter extends Equatable {
 
   int? get id => _id;
 
-  String get queryParameterKey;
-
-  Map<String, String> toQueryParameter() {
+  Map<String, String> toQueryParameter(String field) {
     final Map<String, String> params = {};
     if (onlyNotAssigned || onlyAssigned) {
       params.putIfAbsent(
-          '${queryParameterKey}__isnull', () => _assignmentStatus!.toString());
+          '${field}__isnull', () => _assignmentStatus!.toString());
     }
     if (isSet) {
-      params.putIfAbsent("${queryParameterKey}__id", () => id!.toString());
+      params.putIfAbsent("${field}__id", () => id!.toString());
     }
     return params;
   }

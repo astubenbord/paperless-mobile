@@ -126,7 +126,7 @@ class _LabelsPageState extends State<LabelsPage>
                   ),
                   child: LabelTabView<Correspondent>(
                     filterBuilder: (label) => DocumentFilter(
-                      correspondent: CorrespondentQuery.fromId(label.id),
+                      correspondent: IdQueryParameter.fromId(label.id),
                       pageSize: label.documentCount ?? 0,
                     ),
                     onEdit: _openEditCorrespondentPage,
@@ -146,7 +146,7 @@ class _LabelsPageState extends State<LabelsPage>
                   ),
                   child: LabelTabView<DocumentType>(
                     filterBuilder: (label) => DocumentFilter(
-                      documentType: DocumentTypeQuery.fromId(label.id),
+                      documentType: IdQueryParameter.fromId(label.id),
                       pageSize: label.documentCount ?? 0,
                     ),
                     onEdit: _openEditDocumentTypePage,
@@ -194,7 +194,7 @@ class _LabelsPageState extends State<LabelsPage>
                   child: LabelTabView<StoragePath>(
                     onEdit: _openEditStoragePathPage,
                     filterBuilder: (label) => DocumentFilter(
-                      storagePath: StoragePathQuery.fromId(label.id),
+                      storagePath: IdQueryParameter.fromId(label.id),
                       pageSize: label.documentCount ?? 0,
                     ),
                     contentBuilder: (path) => Text(path.path ?? ""),

@@ -1,14 +1,5 @@
-import 'package:paperless_api/src/models/document_filter.dart';
-import 'package:paperless_api/src/models/filter_rule_model.dart';
-import 'package:paperless_api/src/models/query_parameters/correspondent_query.dart';
-import 'package:paperless_api/src/models/query_parameters/document_type_query.dart';
-import 'package:paperless_api/src/models/query_parameters/query_type.dart';
-import 'package:paperless_api/src/models/query_parameters/sort_field.dart';
-import 'package:paperless_api/src/models/query_parameters/sort_order.dart';
-import 'package:paperless_api/src/models/query_parameters/storage_path_query.dart';
-import 'package:paperless_api/src/models/query_parameters/tags_query.dart';
-import 'package:paperless_api/src/models/saved_view_model.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:paperless_api/paperless_api.dart';
 
 void main() {
   group('Validate parsing logic from [SavedView] to [DocumentFilter]:', () {
@@ -74,10 +65,10 @@ void main() {
         }).toDocumentFilter(),
         equals(
           DocumentFilter.initial.copyWith(
-            correspondent: const CorrespondentQuery.fromId(42),
-            documentType: const DocumentTypeQuery.fromId(69),
-            storagePath: const StoragePathQuery.fromId(14),
-            tags: IdsTagsQuery(
+            correspondent: const IdQueryParameter.fromId(42),
+            documentType: const IdQueryParameter.fromId(69),
+            storagePath: const IdQueryParameter.fromId(14),
+            tags: const IdsTagsQuery(
               [
                 IncludeTagIdQuery(1),
                 IncludeTagIdQuery(2),
@@ -85,10 +76,14 @@ void main() {
                 ExcludeTagIdQuery(4),
               ],
             ),
-            createdDateBefore: DateTime.parse("2022-10-27"),
-            createdDateAfter: DateTime.parse("2022-09-27"),
-            addedDateBefore: DateTime.parse("2022-09-26"),
-            addedDateAfter: DateTime.parse("2000-01-01"),
+            created: AbsoluteDateRangeQuery(
+              before: DateTime.parse("2022-10-27"),
+              after: DateTime.parse("2022-09-27"),
+            ),
+            added: AbsoluteDateRangeQuery(
+              before: DateTime.parse("2022-09-26"),
+              after: DateTime.parse("2000-01-01"),
+            ),
             sortField: SortField.created,
             sortOrder: SortOrder.descending,
             queryText: "Never gonna give you up",
@@ -114,39 +109,41 @@ void main() {
     });
 
     test('Values are correctly parsed if not assigned.', () {
+      final actual = SavedView.fromJson({
+        "id": 1,
+        "name": "test_name",
+        "show_on_dashboard": false,
+        "show_in_sidebar": false,
+        "sort_field": SortField.created.name,
+        "sort_reverse": true,
+        "filter_rules": [
+          {
+            'rule_type': FilterRule.correspondentRule,
+            'value': null,
+          },
+          {
+            'rule_type': FilterRule.documentTypeRule,
+            'value': null,
+          },
+          {
+            'rule_type': FilterRule.hasAnyTag,
+            'value': false.toString(),
+          },
+          {
+            'rule_type': FilterRule.storagePathRule,
+            'value': null,
+          },
+        ],
+      }).toDocumentFilter();
+      final expected = DocumentFilter.initial.copyWith(
+        correspondent: const IdQueryParameter.notAssigned(),
+        documentType: const IdQueryParameter.notAssigned(),
+        storagePath: const IdQueryParameter.notAssigned(),
+        tags: const OnlyNotAssignedTagsQuery(),
+      );
       expect(
-        SavedView.fromJson({
-          "id": 1,
-          "name": "test_name",
-          "show_on_dashboard": false,
-          "show_in_sidebar": false,
-          "sort_field": SortField.created.name,
-          "sort_reverse": true,
-          "filter_rules": [
-            {
-              'rule_type': FilterRule.correspondentRule,
-              'value': null,
-            },
-            {
-              'rule_type': FilterRule.documentTypeRule,
-              'value': null,
-            },
-            {
-              'rule_type': FilterRule.hasAnyTag,
-              'value': false.toString(),
-            },
-            {
-              'rule_type': FilterRule.storagePathRule,
-              'value': null,
-            },
-          ],
-        }).toDocumentFilter(),
-        equals(DocumentFilter.initial.copyWith(
-          correspondent: const CorrespondentQuery.notAssigned(),
-          documentType: const DocumentTypeQuery.notAssigned(),
-          storagePath: const StoragePathQuery.notAssigned(),
-          tags: const OnlyNotAssignedTagsQuery(),
-        )),
+        actual,
+        equals(expected),
       );
     });
   });
@@ -156,10 +153,10 @@ void main() {
       expect(
         SavedView.fromDocumentFilter(
           DocumentFilter(
-            correspondent: const CorrespondentQuery.fromId(1),
-            documentType: const DocumentTypeQuery.fromId(2),
-            storagePath: const StoragePathQuery.fromId(3),
-            tags: IdsTagsQuery([
+            correspondent: const IdQueryParameter.fromId(1),
+            documentType: const IdQueryParameter.fromId(2),
+            storagePath: const IdQueryParameter.fromId(3),
+            tags: const IdsTagsQuery([
               IncludeTagIdQuery(4),
               IncludeTagIdQuery(5),
               ExcludeTagIdQuery(6),
@@ -168,10 +165,14 @@ void main() {
             ]),
             sortField: SortField.added,
             sortOrder: SortOrder.ascending,
-            addedDateAfter: DateTime.parse("2020-01-01"),
-            addedDateBefore: DateTime.parse("2020-03-01"),
-            createdDateAfter: DateTime.parse("2020-02-01"),
-            createdDateBefore: DateTime.parse("2020-04-01"),
+            created: AbsoluteDateRangeQuery(
+              before: DateTime.parse("2020-04-01"),
+              after: DateTime.parse("2020-02-01"),
+            ),
+            added: AbsoluteDateRangeQuery(
+              before: DateTime.parse("2020-03-01"),
+              after: DateTime.parse("2020-01-01"),
+            ),
             queryText: "Never gonna let you down",
             queryType: QueryType.title,
           ),
@@ -210,16 +211,14 @@ void main() {
       expect(
         SavedView.fromDocumentFilter(
           const DocumentFilter(
-            correspondent: CorrespondentQuery.unset(),
-            documentType: DocumentTypeQuery.unset(),
-            storagePath: StoragePathQuery.unset(),
+            correspondent: IdQueryParameter.unset(),
+            documentType: IdQueryParameter.unset(),
+            storagePath: IdQueryParameter.unset(),
             tags: IdsTagsQuery(),
             sortField: SortField.created,
             sortOrder: SortOrder.descending,
-            addedDateAfter: null,
-            addedDateBefore: null,
-            createdDateAfter: null,
-            createdDateBefore: null,
+            added: UnsetDateRangeQuery(),
+            created: UnsetDateRangeQuery(),
             queryText: null,
           ),
           name: "test_name",
@@ -243,9 +242,9 @@ void main() {
       expect(
         SavedView.fromDocumentFilter(
           const DocumentFilter(
-            correspondent: CorrespondentQuery.notAssigned(),
-            documentType: DocumentTypeQuery.notAssigned(),
-            storagePath: StoragePathQuery.notAssigned(),
+            correspondent: IdQueryParameter.notAssigned(),
+            documentType: IdQueryParameter.notAssigned(),
+            storagePath: IdQueryParameter.notAssigned(),
             tags: OnlyNotAssignedTagsQuery(),
             sortField: SortField.created,
             sortOrder: SortOrder.ascending,

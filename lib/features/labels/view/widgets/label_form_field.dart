@@ -9,31 +9,26 @@ import 'package:paperless_mobile/generated/l10n.dart';
 /// Form field allowing to select labels (i.e. correspondent, documentType)
 /// [T] is the label type (e.g. [DocumentType], [Correspondent], ...), [R] is the return type (e.g. [CorrespondentQuery], ...).
 ///
-class LabelFormField<T extends Label, R extends IdQueryParameter>
-    extends StatefulWidget {
+class LabelFormField<T extends Label> extends StatefulWidget {
   final Widget prefixIcon;
-  final Map<int, T> state;
+  final Map<int, T> labelOptions;
   final FormBuilderState? formBuilderState;
   final IdQueryParameter? initialValue;
   final String name;
-  final String label;
+  final String textFieldLabel;
   final FormFieldValidator? validator;
-  final Widget Function(String)? labelCreationWidgetBuilder;
-  final R Function() queryParameterNotAssignedBuilder;
-  final R Function(int? id) queryParameterIdBuilder;
+  final Widget Function(String initialName)? labelCreationWidgetBuilder;
   final bool notAssignedSelectable;
-  final void Function(R?)? onChanged;
+  final void Function(IdQueryParameter?)? onChanged;
 
   const LabelFormField({
     Key? key,
     required this.name,
-    required this.state,
+    required this.labelOptions,
     this.validator,
     this.initialValue,
-    required this.label,
+    required this.textFieldLabel,
     this.labelCreationWidgetBuilder,
-    required this.queryParameterNotAssignedBuilder,
-    required this.queryParameterIdBuilder,
     required this.formBuilderState,
     required this.prefixIcon,
     this.notAssignedSelectable = true,
@@ -41,11 +36,10 @@ class LabelFormField<T extends Label, R extends IdQueryParameter>
   }) : super(key: key);
 
   @override
-  State<LabelFormField<T, R>> createState() => _LabelFormFieldState<T, R>();
+  State<LabelFormField<T>> createState() => _LabelFormFieldState<T>();
 }
 
-class _LabelFormFieldState<T extends Label, R extends IdQueryParameter>
-    extends State<LabelFormField<T, R>> {
+class _LabelFormFieldState<T extends Label> extends State<LabelFormField<T>> {
   bool _showCreationSuffixIcon = false;
   late bool _showClearSuffixIcon;
 
@@ -54,12 +48,13 @@ class _LabelFormFieldState<T extends Label, R extends IdQueryParameter>
   @override
   void initState() {
     super.initState();
-    _showClearSuffixIcon = widget.state.containsKey(widget.initialValue?.id);
+    _showClearSuffixIcon =
+        widget.labelOptions.containsKey(widget.initialValue?.id);
     _textEditingController = TextEditingController(
-      text: widget.state[widget.initialValue?.id]?.name ?? '',
+      text: widget.labelOptions[widget.initialValue?.id]?.name ?? '',
     )..addListener(() {
         setState(() {
-          _showCreationSuffixIcon = widget.state.values
+          _showCreationSuffixIcon = widget.labelOptions.values
               .where(
                 (item) => item.name.toLowerCase().startsWith(
                       _textEditingController.text.toLowerCase(),
@@ -74,7 +69,7 @@ class _LabelFormFieldState<T extends Label, R extends IdQueryParameter>
 
   @override
   Widget build(BuildContext context) {
-    final isEnabled = widget.state.values.fold<bool>(
+    final isEnabled = widget.labelOptions.values.fold<bool>(
             false,
             (previousValue, element) =>
                 previousValue || (element.documentCount ?? 0) > 0) ||
@@ -90,7 +85,7 @@ class _LabelFormFieldState<T extends Label, R extends IdQueryParameter>
               TextStyle(color: Theme.of(context).disabledColor, fontSize: 18.0),
         ),
       ),
-      initialValue: widget.initialValue ?? widget.queryParameterIdBuilder(null),
+      initialValue: widget.initialValue ?? const IdQueryParameter.unset(),
       name: widget.name,
       suggestionsBoxDecoration: SuggestionsBoxDecoration(
         shape: RoundedRectangleBorder(
@@ -103,7 +98,7 @@ class _LabelFormFieldState<T extends Label, R extends IdQueryParameter>
       ),
       itemBuilder: (context, suggestion) => ListTile(
         title: Text(
-          widget.state[suggestion.id]?.name ??
+          widget.labelOptions[suggestion.id]?.name ??
               S.of(context).labelNotAssignedText,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -112,10 +107,10 @@ class _LabelFormFieldState<T extends Label, R extends IdQueryParameter>
         style: ListTileStyle.list,
       ),
       suggestionsCallback: (pattern) {
-        final List<IdQueryParameter> suggestions = widget.state.entries
+        final List<IdQueryParameter> suggestions = widget.labelOptions.entries
             .where(
               (entry) =>
-                  widget.state[entry.key]!.name
+                  widget.labelOptions[entry.key]!.name
                       .toLowerCase()
                       .contains(pattern.toLowerCase()) ||
                   pattern.isEmpty,
@@ -125,34 +120,33 @@ class _LabelFormFieldState<T extends Label, R extends IdQueryParameter>
                   widget.labelCreationWidgetBuilder != null ||
                   (entry.value.documentCount ?? 0) > 0,
             )
-            .map((entry) => widget.queryParameterIdBuilder(entry.key))
+            .map((entry) => IdQueryParameter.fromId(entry.key))
             .toList();
         if (widget.notAssignedSelectable) {
-          suggestions.insert(0, widget.queryParameterNotAssignedBuilder());
+          suggestions.insert(0, const IdQueryParameter.notAssigned());
         }
         return suggestions;
       },
       onChanged: (value) {
         setState(() => _showClearSuffixIcon = value?.isSet ?? false);
-        widget.onChanged?.call(value as R);
+        widget.onChanged?.call(value);
       },
       controller: _textEditingController,
       decoration: InputDecoration(
         prefixIcon: widget.prefixIcon,
-        label: Text(widget.label),
+        label: Text(widget.textFieldLabel),
         hintText: _getLocalizedHint(context),
         suffixIcon: _buildSuffixIcon(context),
       ),
       selectionToTextTransformer: (suggestion) {
-        if (suggestion == widget.queryParameterNotAssignedBuilder()) {
+        if (suggestion == const IdQueryParameter.notAssigned()) {
           return S.of(context).labelNotAssignedText;
         }
-        return widget.state[suggestion.id]?.name ?? "";
+        return widget.labelOptions[suggestion.id]?.name ?? "";
       },
       direction: AxisDirection.up,
-      onSuggestionSelected: (suggestion) => widget
-          .formBuilderState?.fields[widget.name]
-          ?.didChange(suggestion as R),
+      onSuggestionSelected: (suggestion) =>
+          widget.formBuilderState?.fields[widget.name]?.didChange(suggestion),
     );
   }
 
@@ -161,7 +155,7 @@ class _LabelFormFieldState<T extends Label, R extends IdQueryParameter>
       return IconButton(
         onPressed: () async {
           FocusScope.of(context).unfocus();
-          final createdLabel = await showDialog(
+          final createdLabel = await showDialog<T>(
             context: context,
             builder: (context) => widget.labelCreationWidgetBuilder!(
               _textEditingController.text,
@@ -170,7 +164,7 @@ class _LabelFormFieldState<T extends Label, R extends IdQueryParameter>
           if (createdLabel != null) {
             // If new label has been created, set form field value and text of this form field and unfocus keyboard (we assume user is done).
             widget.formBuilderState?.fields[widget.name]
-                ?.didChange(widget.queryParameterIdBuilder(createdLabel.id));
+                ?.didChange(IdQueryParameter.fromId(createdLabel.id));
             _textEditingController.text = createdLabel.name;
           } else {
             _reset();
@@ -192,7 +186,7 @@ class _LabelFormFieldState<T extends Label, R extends IdQueryParameter>
 
   void _reset() {
     widget.formBuilderState?.fields[widget.name]?.didChange(
-      widget.queryParameterIdBuilder(null), // equivalnt to IdQueryParam.unset()
+      const IdQueryParameter.unset(),
     );
     _textEditingController.clear();
   }

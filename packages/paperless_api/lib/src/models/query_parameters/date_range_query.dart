@@ -3,7 +3,7 @@ import 'package:paperless_api/src/constants.dart';
 
 abstract class DateRangeQuery extends Equatable {
   const DateRangeQuery();
-  Map<String, String> toQueryParameter();
+  Map<String, String> toQueryParameter(DateRangeQueryField field);
 }
 
 class UnsetDateRangeQuery extends DateRangeQuery {
@@ -12,86 +12,73 @@ class UnsetDateRangeQuery extends DateRangeQuery {
   List<Object?> get props => [];
 
   @override
-  Map<String, String> toQueryParameter() => const {};
+  Map<String, String> toQueryParameter(DateRangeQueryField field) => const {};
 }
 
-class FixedDateRangeQuery extends DateRangeQuery {
-  final String _querySuffix;
-
+class AbsoluteDateRangeQuery extends DateRangeQuery {
   final DateTime? after;
   final DateTime? before;
 
-  const FixedDateRangeQuery._(this._querySuffix, {this.after, this.before})
-      : assert(after != null || before != null);
-
-  const FixedDateRangeQuery.created({DateTime? after, DateTime? before})
-      : this._('created', after: after, before: before);
-
-  const FixedDateRangeQuery.added({DateTime? after, DateTime? before})
-      : this._('added', after: after, before: before);
-
-  const FixedDateRangeQuery.modified({DateTime? after, DateTime? before})
-      : this._('modified', after: after, before: before);
+  const AbsoluteDateRangeQuery({this.after, this.before});
 
   @override
-  List<Object?> get props => [_querySuffix, after, before];
+  List<Object?> get props => [after, before];
 
   @override
-  Map<String, String> toQueryParameter() {
+  Map<String, String> toQueryParameter(DateRangeQueryField field) {
     final Map<String, String> params = {};
 
     // Add/subtract one day in the following because paperless uses gt/lt not gte/lte
     if (after != null) {
-      params.putIfAbsent('${_querySuffix}__date__gt',
+      params.putIfAbsent('${field.name}__date__gt',
           () => apiDateFormat.format(after!.subtract(const Duration(days: 1))));
     }
 
     if (before != null) {
-      params.putIfAbsent('${_querySuffix}__date__lt',
+      params.putIfAbsent('${field.name}__date__lt',
           () => apiDateFormat.format(before!.add(const Duration(days: 1))));
     }
     return params;
   }
 
-  FixedDateRangeQuery copyWith({
+  AbsoluteDateRangeQuery copyWith({
     DateTime? before,
     DateTime? after,
   }) {
-    return FixedDateRangeQuery._(
-      _querySuffix,
+    return AbsoluteDateRangeQuery(
       before: before ?? this.before,
       after: after ?? this.after,
     );
   }
 }
 
-class LastNDateRangeQuery extends DateRangeQuery {
+class RelativeDateRangeQuery extends DateRangeQuery {
+  final int offset;
   final DateRangeUnit unit;
-  final int n;
-  final String _field;
 
-  const LastNDateRangeQuery._(
-    this._field, {
-    required this.n,
-    required this.unit,
-  });
-
-  const LastNDateRangeQuery.created(int n, DateRangeUnit unit)
-      : this._('created', unit: unit, n: n);
-  const LastNDateRangeQuery.added(int n, DateRangeUnit unit)
-      : this._('added', unit: unit, n: n);
-  const LastNDateRangeQuery.modified(int n, DateRangeUnit unit)
-      : this._('modified', unit: unit, n: n);
+  const RelativeDateRangeQuery(
+    this.offset,
+    this.unit,
+  );
 
   @override
-  // TODO: implement props
-  List<Object?> get props => [_field, n, unit];
+  List<Object?> get props => [offset, unit];
 
   @override
-  Map<String, String> toQueryParameter() {
+  Map<String, String> toQueryParameter(DateRangeQueryField field) {
     return {
-      'query': '[$_field:$n ${unit.name} to now]',
+      'query': '[${field.name}:$offset ${unit.name} to now]',
     };
+  }
+
+  RelativeDateRangeQuery copyWith({
+    int? offset,
+    DateRangeUnit? unit,
+  }) {
+    return RelativeDateRangeQuery(
+      offset ?? this.offset,
+      unit ?? this.unit,
+    );
   }
 }
 
@@ -100,4 +87,10 @@ enum DateRangeUnit {
   week,
   month,
   year;
+}
+
+enum DateRangeQueryField {
+  created,
+  added,
+  modified;
 }

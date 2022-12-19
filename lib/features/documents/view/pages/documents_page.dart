@@ -121,6 +121,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
         expand: false,
         snap: true,
         initialChildSize: .9,
+        maxChildSize: .9,
         builder: (context, controller) => LabelsBlocProvider(
           child: DocumentFilterPanel(
             initialFilter: _documentsCubit.state.filter,

@@ -1,14 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:paperless_api/src/constants.dart';
-import 'package:paperless_api/src/models/query_parameters/asn_query.dart';
-import 'package:paperless_api/src/models/query_parameters/correspondent_query.dart';
-import 'package:paperless_api/src/models/query_parameters/date_range_query.dart';
-import 'package:paperless_api/src/models/query_parameters/document_type_query.dart';
-import 'package:paperless_api/src/models/query_parameters/query_type.dart';
-import 'package:paperless_api/src/models/query_parameters/sort_field.dart';
-import 'package:paperless_api/src/models/query_parameters/sort_order.dart';
-import 'package:paperless_api/src/models/query_parameters/storage_path_query.dart';
-import 'package:paperless_api/src/models/query_parameters/tags_query.dart';
+import 'package:paperless_api/paperless_api.dart';
 
 class DocumentFilter extends Equatable {
   static const _oneDay = Duration(days: 1);
@@ -23,23 +14,24 @@ class DocumentFilter extends Equatable {
 
   final int pageSize;
   final int page;
-  final DocumentTypeQuery documentType;
-  final CorrespondentQuery correspondent;
-  final StoragePathQuery storagePath;
-  final AsnQuery asnQuery;
+  final IdQueryParameter documentType;
+  final IdQueryParameter correspondent;
+  final IdQueryParameter storagePath;
+  final IdQueryParameter asnQuery;
   final TagsQuery tags;
   final SortField sortField;
   final SortOrder sortOrder;
-  final DateRangeQuery added;
   final DateRangeQuery created;
+  final DateRangeQuery added;
+  final DateRangeQuery modified;
   final QueryType queryType;
   final String? queryText;
 
   const DocumentFilter({
-    this.documentType = const DocumentTypeQuery.unset(),
-    this.correspondent = const CorrespondentQuery.unset(),
-    this.storagePath = const StoragePathQuery.unset(),
-    this.asnQuery = const AsnQuery.unset(),
+    this.documentType = const IdQueryParameter.unset(),
+    this.correspondent = const IdQueryParameter.unset(),
+    this.storagePath = const IdQueryParameter.unset(),
+    this.asnQuery = const IdQueryParameter.unset(),
     this.tags = const IdsTagsQuery(),
     this.sortField = SortField.created,
     this.sortOrder = SortOrder.descending,
@@ -49,6 +41,7 @@ class DocumentFilter extends Equatable {
     this.queryText,
     this.added = const UnsetDateRangeQuery(),
     this.created = const UnsetDateRangeQuery(),
+    this.modified = const UnsetDateRangeQuery(),
   });
 
   Map<String, String> toQueryParameters() {
@@ -57,13 +50,14 @@ class DocumentFilter extends Equatable {
       'page_size': pageSize.toString(),
     };
 
-    params.addAll(documentType.toQueryParameter());
-    params.addAll(correspondent.toQueryParameter());
+    params.addAll(documentType.toQueryParameter('document_type'));
+    params.addAll(correspondent.toQueryParameter('correspondent'));
+    params.addAll(storagePath.toQueryParameter('storage_path'));
+    params.addAll(asnQuery.toQueryParameter('archive_serial_number'));
     params.addAll(tags.toQueryParameter());
-    params.addAll(storagePath.toQueryParameter());
-    params.addAll(asnQuery.toQueryParameter());
-    params.addAll(added.toQueryParameter());
-    params.addAll(created.toQueryParameter());
+    params.addAll(added.toQueryParameter(DateRangeQueryField.added));
+    params.addAll(created.toQueryParameter(DateRangeQueryField.created));
+    params.addAll(modified.toQueryParameter(DateRangeQueryField.modified));
     //TODO: Rework when implementing extended queries.
     if (queryText?.isNotEmpty ?? false) {
       params.putIfAbsent(queryType.queryParam, () => queryText!);
@@ -84,15 +78,16 @@ class DocumentFilter extends Equatable {
     int? pageSize,
     int? page,
     bool? onlyNoDocumentType,
-    DocumentTypeQuery? documentType,
-    CorrespondentQuery? correspondent,
-    StoragePathQuery? storagePath,
-    AsnQuery? asnQuery,
+    IdQueryParameter? documentType,
+    IdQueryParameter? correspondent,
+    IdQueryParameter? storagePath,
+    IdQueryParameter? asnQuery,
     TagsQuery? tags,
     SortField? sortField,
     SortOrder? sortOrder,
     DateRangeQuery? added,
     DateRangeQuery? created,
+    DateRangeQuery? modified,
     QueryType? queryType,
     String? queryText,
   }) {
@@ -105,11 +100,12 @@ class DocumentFilter extends Equatable {
       tags: tags ?? this.tags,
       sortField: sortField ?? this.sortField,
       sortOrder: sortOrder ?? this.sortOrder,
-      added: added ?? this.added,
       queryType: queryType ?? this.queryType,
       queryText: queryText ?? this.queryText,
       asnQuery: asnQuery ?? this.asnQuery,
+      added: added ?? this.added,
       created: created ?? this.created,
+      modified: modified ?? this.modified,
     );
   }
 
@@ -139,8 +135,9 @@ class DocumentFilter extends Equatable {
         correspondent != initial.correspondent,
         storagePath != initial.storagePath,
         tags != initial.tags,
-        (added != initial.added),
-        (created != initial.created),
+        added != initial.added,
+        created != initial.created,
+        modified != initial.modified,
         asnQuery != initial.asnQuery,
         (queryType != initial.queryType || queryText != initial.queryText),
       ].fold(0, (previousValue, element) => previousValue += element ? 1 : 0);
@@ -158,6 +155,7 @@ class DocumentFilter extends Equatable {
         sortOrder,
         added,
         created,
+        modified,
         queryType,
         queryText,
       ];

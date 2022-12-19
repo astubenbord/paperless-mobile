@@ -162,7 +162,7 @@ class _DocumentUploadPreparationPageState
                         S.of(context).documentCreatedPropertyLabel + " *",
                   ),
                 ),
-                LabelFormField<DocumentType, DocumentTypeQuery>(
+                LabelFormField<DocumentType>(
                   notAssignedSelectable: false,
                   formBuilderState: _formKey.currentState,
                   labelCreationWidgetBuilder: (initialName) =>
@@ -172,15 +172,13 @@ class _DocumentUploadPreparationPageState
                     ),
                     child: AddDocumentTypePage(initialName: initialName),
                   ),
-                  label: S.of(context).documentDocumentTypePropertyLabel + " *",
+                  textFieldLabel:
+                      S.of(context).documentDocumentTypePropertyLabel + " *",
                   name: DocumentModel.documentTypeKey,
-                  state: state.documentTypes,
-                  queryParameterIdBuilder: DocumentTypeQuery.fromId,
-                  queryParameterNotAssignedBuilder:
-                      DocumentTypeQuery.notAssigned,
+                  labelOptions: state.documentTypes,
                   prefixIcon: const Icon(Icons.description_outlined),
                 ),
-                LabelFormField<Correspondent, CorrespondentQuery>(
+                LabelFormField<Correspondent>(
                   notAssignedSelectable: false,
                   formBuilderState: _formKey.currentState,
                   labelCreationWidgetBuilder: (initialName) =>
@@ -191,13 +189,10 @@ class _DocumentUploadPreparationPageState
                     ),
                     child: AddCorrespondentPage(initialName: initialName),
                   ),
-                  label:
+                  textFieldLabel:
                       S.of(context).documentCorrespondentPropertyLabel + " *",
                   name: DocumentModel.correspondentKey,
-                  state: state.correspondents,
-                  queryParameterIdBuilder: CorrespondentQuery.fromId,
-                  queryParameterNotAssignedBuilder:
-                      CorrespondentQuery.notAssigned,
+                  labelOptions: state.correspondents,
                   prefixIcon: const Icon(Icons.person_outline),
                 ),
                 TagFormField(

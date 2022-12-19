@@ -51,12 +51,12 @@ class DocumentTypeWidget extends StatelessWidget {
       if (cubit.state.filter.documentType.id == documentTypeId) {
         cubit.updateCurrentFilter(
           (filter) =>
-              filter.copyWith(documentType: const DocumentTypeQuery.unset()),
+              filter.copyWith(documentType: const IdQueryParameter.unset()),
         );
       } else {
         cubit.updateCurrentFilter(
           (filter) => filter.copyWith(
-              documentType: DocumentTypeQuery.fromId(documentTypeId)),
+              documentType: IdQueryParameter.fromId(documentTypeId)),
         );
       }
       afterSelected?.call();

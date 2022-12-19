@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:http/src/boundary_characters.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
+import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_api/src/constants.dart';
 import 'package:paperless_api/src/models/bulk_edit_model.dart';
 import 'package:paperless_api/src/models/document_filter.dart';
@@ -11,7 +12,6 @@ import 'package:paperless_api/src/models/document_meta_data_model.dart';
 import 'package:paperless_api/src/models/document_model.dart';
 import 'package:paperless_api/src/models/paged_search_result.dart';
 import 'package:paperless_api/src/models/paperless_server_exception.dart';
-import 'package:paperless_api/src/models/query_parameters/asn_query.dart';
 import 'package:paperless_api/src/models/query_parameters/sort_field.dart';
 import 'package:paperless_api/src/models/query_parameters/sort_order.dart';
 import 'package:paperless_api/src/models/similar_document_model.dart';
@@ -139,7 +139,7 @@ class PaperlessDocumentsApiImpl implements PaperlessDocumentsApi {
     final filterParams = filter.toQueryParameters();
     final response = await baseClient.get(
       Uri(
-        path: "/api/documents/?$filterParams",
+        path: "/api/documents/",
         queryParameters: filterParams,
       ),
     );
@@ -190,7 +190,7 @@ class PaperlessDocumentsApiImpl implements PaperlessDocumentsApi {
     const DocumentFilter asnQueryFilter = DocumentFilter(
       sortField: SortField.archiveSerialNumber,
       sortOrder: SortOrder.descending,
-      asnQuery: AsnQuery.anyAssigned(),
+      asnQuery: IdQueryParameter.anyAssigned(),
       page: 1,
       pageSize: 1,
     );

@@ -54,12 +54,12 @@ class StoragePathWidget extends StatelessWidget {
       if (cubit.state.filter.correspondent.id == pathId) {
         cubit.updateCurrentFilter(
           (filter) =>
-              filter.copyWith(storagePath: const StoragePathQuery.unset()),
+              filter.copyWith(storagePath: const IdQueryParameter.unset()),
         );
       } else {
         cubit.updateCurrentFilter(
           (filter) =>
-              filter.copyWith(storagePath: StoragePathQuery.fromId(pathId)),
+              filter.copyWith(storagePath: IdQueryParameter.fromId(pathId)),
         );
       }
       afterSelected?.call();

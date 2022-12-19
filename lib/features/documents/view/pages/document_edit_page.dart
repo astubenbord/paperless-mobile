@@ -96,26 +96,24 @@ class _DocumentEditPageState extends State<DocumentEditPage> {
 
   Widget _buildStoragePathFormField(
       int? initialId, Map<int, StoragePath> options) {
-    return LabelFormField<StoragePath, StoragePathQuery>(
+    return LabelFormField<StoragePath>(
       notAssignedSelectable: false,
       formBuilderState: _formKey.currentState,
       labelCreationWidgetBuilder: (initialValue) => RepositoryProvider.value(
         value: RepositoryProvider.of<LabelRepository<StoragePath>>(context),
         child: AddStoragePathPage(initalValue: initialValue),
       ),
-      label: S.of(context).documentStoragePathPropertyLabel,
-      state: options,
-      initialValue: StoragePathQuery.fromId(initialId),
+      textFieldLabel: S.of(context).documentStoragePathPropertyLabel,
+      labelOptions: options,
+      initialValue: IdQueryParameter.fromId(initialId),
       name: fkStoragePath,
-      queryParameterIdBuilder: StoragePathQuery.fromId,
-      queryParameterNotAssignedBuilder: StoragePathQuery.notAssigned,
       prefixIcon: const Icon(Icons.folder_outlined),
     );
   }
 
   Widget _buildCorrespondentFormField(
       int? initialId, Map<int, Correspondent> options) {
-    return LabelFormField<Correspondent, CorrespondentQuery>(
+    return LabelFormField<Correspondent>(
       notAssignedSelectable: false,
       formBuilderState: _formKey.currentState,
       labelCreationWidgetBuilder: (initialValue) => RepositoryProvider.value(
@@ -124,19 +122,17 @@ class _DocumentEditPageState extends State<DocumentEditPage> {
         ),
         child: AddCorrespondentPage(initialName: initialValue),
       ),
-      label: S.of(context).documentCorrespondentPropertyLabel,
-      state: options,
-      initialValue: CorrespondentQuery.fromId(initialId),
+      textFieldLabel: S.of(context).documentCorrespondentPropertyLabel,
+      labelOptions: options,
+      initialValue: IdQueryParameter.fromId(initialId),
       name: fkCorrespondent,
-      queryParameterIdBuilder: CorrespondentQuery.fromId,
-      queryParameterNotAssignedBuilder: CorrespondentQuery.notAssigned,
       prefixIcon: const Icon(Icons.person_outlined),
     );
   }
 
   Widget _buildDocumentTypeFormField(
       int? initialId, Map<int, DocumentType> options) {
-    return LabelFormField<DocumentType, DocumentTypeQuery>(
+    return LabelFormField<DocumentType>(
       notAssignedSelectable: false,
       formBuilderState: _formKey.currentState,
       labelCreationWidgetBuilder: (currentInput) => RepositoryProvider.value(
@@ -147,12 +143,10 @@ class _DocumentEditPageState extends State<DocumentEditPage> {
           initialName: currentInput,
         ),
       ),
-      label: S.of(context).documentDocumentTypePropertyLabel,
-      initialValue: DocumentTypeQuery.fromId(initialId),
-      state: options,
+      textFieldLabel: S.of(context).documentDocumentTypePropertyLabel,
+      initialValue: IdQueryParameter.fromId(initialId),
+      labelOptions: options,
       name: fkDocumentType,
-      queryParameterIdBuilder: DocumentTypeQuery.fromId,
-      queryParameterNotAssignedBuilder: DocumentTypeQuery.notAssigned,
       prefixIcon: const Icon(Icons.description_outlined),
     );
   }

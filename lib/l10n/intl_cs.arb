@@ -78,18 +78,6 @@
   "@documentFilterAdvancedLabel": {},
   "documentFilterApplyFilterLabel": "Použít",
   "@documentFilterApplyFilterLabel": {},
-  "documentFilterDateRangeFieldEndLabel": "Do",
-  "@documentFilterDateRangeFieldEndLabel": {},
-  "documentFilterDateRangeFieldStartLabel": "Od",
-  "@documentFilterDateRangeFieldStartLabel": {},
-  "documentFilterDateRangeLastMonthLabel": "Minulý měsíc",
-  "@documentFilterDateRangeLastMonthLabel": {},
-  "documentFilterDateRangeLastSevenDaysLabel": "Posledních 7 dní",
-  "@documentFilterDateRangeLastSevenDaysLabel": {},
-  "documentFilterDateRangeLastThreeMonthsLabel": "Poslední 3 měsíce",
-  "@documentFilterDateRangeLastThreeMonthsLabel": {},
-  "documentFilterDateRangeLastYearLabel": "Minulý rok",
-  "@documentFilterDateRangeLastYearLabel": {},
   "documentFilterQueryOptionsAsnLabel": "ASČ",
   "@documentFilterQueryOptionsAsnLabel": {},
   "documentFilterQueryOptionsExtendedLabel": "Prodloužené",
@@ -272,6 +260,64 @@
   "@errorMessageUnsupportedFileFormat": {},
   "errorReportLabel": "NAHLÁSIT",
   "@errorReportLabel": {},
+  "extendedDateRangePickerAfterLabel": "",
+  "@extendedDateRangePickerAfterLabel": {},
+  "extendedDateRangePickerBeforeLabel": "",
+  "@extendedDateRangePickerBeforeLabel": {},
+  "extendedDateRangePickerDayText": "{count, plural, other{}}",
+  "@extendedDateRangePickerDayText": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "extendedDateRangePickerFromLabel": "Od",
+  "@extendedDateRangePickerFromLabel": {},
+  "extendedDateRangePickerLastDaysLabel": "{count, plural, zero{} one{} few{} many{} other{Posledních 7 dní}}",
+  "@extendedDateRangePickerLastDaysLabel": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "extendedDateRangePickerLastMonthsLabel": "{count, plural, zero{} one{} few{} many{} other{Minulý měsíc}}",
+  "@extendedDateRangePickerLastMonthsLabel": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "extendedDateRangePickerLastText": "",
+  "@extendedDateRangePickerLastText": {},
+  "extendedDateRangePickerLastWeeksLabel": "{count, plural, other{}}",
+  "@extendedDateRangePickerLastWeeksLabel": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "extendedDateRangePickerLastYearsLabel": "{count, plural, zero{} one{} few{} many{} other{Minulý rok}}",
+  "@extendedDateRangePickerLastYearsLabel": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "extendedDateRangePickerMonthText": "{count, plural, other{}}",
+  "@extendedDateRangePickerMonthText": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "extendedDateRangePickerToLabel": "Do",
+  "@extendedDateRangePickerToLabel": {},
+  "extendedDateRangePickerWeekText": "{count, plural, other{}}",
+  "@extendedDateRangePickerWeekText": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "extendedDateRangePickerYearText": "{count, plural, other{}}",
+  "@extendedDateRangePickerYearText": {
+    "placeholders": {
+      "count": {}
+    }
+  },
   "genericActionCancelLabel": "Zrušit",
   "@genericActionCancelLabel": {},
   "genericActionCreateLabel": "Vytvořit",
@@ -408,7 +454,7 @@
   "@savedViewShowOnDashboardLabel": {},
   "savedViewsLabel": "Uložené náhledy",
   "@savedViewsLabel": {},
-  "scannerPageImagePreviewTitle": "",
+  "scannerPageImagePreviewTitle": "Sken",
   "@scannerPageImagePreviewTitle": {},
   "serverInformationPaperlessVersionText": "Verze Paperless serveru",
   "@serverInformationPaperlessVersionText": {},
