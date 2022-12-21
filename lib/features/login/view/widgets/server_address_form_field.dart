@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:paperless_mobile/core/service/connectivity_status.service.dart';
-import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:provider/provider.dart';
 
 class ServerAddressFormField extends StatefulWidget {
   static const String fkServerAddress = "serverAddress";
@@ -64,7 +64,8 @@ class _ServerAddressFormFieldState extends State<ServerAddressFormField> {
     //https://stackoverflow.com/questions/49648022/check-whether-there-is-an-internet-connection-available-on-flutter-app
     setState(() => _reachabilityStatus = ReachabilityStatus.testing);
     final isReachable =
-        await getIt<ConnectivityStatusService>().isServerReachable(address);
+        await Provider.of<ConnectivityStatusService>(context, listen: false)
+            .isServerReachable(address);
     if (isReachable) {
       setState(() => _reachabilityStatus = ReachabilityStatus.reachable);
     } else {

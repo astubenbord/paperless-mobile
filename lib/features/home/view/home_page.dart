@@ -5,7 +5,6 @@ import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
 import 'package:paperless_mobile/core/bloc/paperless_server_information_cubit.dart';
 import 'package:paperless_mobile/core/repository/label_repository.dart';
 import 'package:paperless_mobile/core/repository/saved_view_repository.dart';
-import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/documents/view/pages/documents_page.dart';
 import 'package:paperless_mobile/features/home/view/widget/bottom_navigation_bar.dart';
@@ -15,6 +14,7 @@ import 'package:paperless_mobile/features/saved_view/cubit/saved_view_cubit.dart
 import 'package:paperless_mobile/features/scan/bloc/document_scanner_cubit.dart';
 import 'package:paperless_mobile/features/scan/view/scanner_page.dart';
 import 'package:paperless_mobile/util.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -56,7 +56,8 @@ class _HomePageState extends State<HomePage> {
           MultiBlocProvider(
             providers: [
               BlocProvider.value(
-                value: DocumentsCubit(getIt<PaperlessDocumentsApi>()),
+                value:
+                    DocumentsCubit(Provider.of<PaperlessDocumentsApi>(context)),
               ),
               BlocProvider(
                 create: (context) => SavedViewCubit(
@@ -70,8 +71,10 @@ class _HomePageState extends State<HomePage> {
             value: _scannerCubit,
             child: const ScannerPage(),
           ),
-          BlocProvider.value(
-            value: DocumentsCubit(getIt<PaperlessDocumentsApi>()),
+          BlocProvider(
+            create: (context) => DocumentsCubit(
+              Provider.of<PaperlessDocumentsApi>(context),
+            ),
             child: const LabelsPage(),
           ),
         ][_currentIndex],
@@ -81,13 +84,12 @@ class _HomePageState extends State<HomePage> {
 
   void _initializeData(BuildContext context) {
     try {
-      RepositoryProvider.of<LabelRepository<Tag>>(context).findAll();
-      RepositoryProvider.of<LabelRepository<Correspondent>>(context).findAll();
-      RepositoryProvider.of<LabelRepository<DocumentType>>(context).findAll();
-      RepositoryProvider.of<LabelRepository<StoragePath>>(context).findAll();
-      RepositoryProvider.of<SavedViewRepository>(context).findAll();
-      BlocProvider.of<PaperlessServerInformationCubit>(context)
-          .updateInformtion();
+      context.read<LabelRepository<Tag>>().findAll();
+      context.read<LabelRepository<Correspondent>>().findAll();
+      context.read<LabelRepository<DocumentType>>().findAll();
+      context.read<LabelRepository<StoragePath>>().findAll();
+      context.read<SavedViewRepository>().findAll();
+      context.read<PaperlessServerInformationCubit>().updateInformtion();
     } on PaperlessServerException catch (error, stackTrace) {
       showErrorMessage(context, error, stackTrace);
     }

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_api/paperless_api.dart';
-import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/linked_documents_preview/bloc/linked_documents_cubit.dart';
 import 'package:paperless_mobile/features/linked_documents_preview/view/pages/linked_documents_page.dart';
+import 'package:provider/provider.dart';
 
 class LabelItem<T extends Label> extends StatelessWidget {
   final T label;
@@ -45,9 +45,9 @@ class LabelItem<T extends Label> extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => BlocProvider.value(
-                    value: LinkedDocumentsCubit(
-                      getIt<PaperlessDocumentsApi>(),
+                  builder: (context) => BlocProvider(
+                    create: (context) => LinkedDocumentsCubit(
+                      Provider.of<PaperlessDocumentsApi>(context),
                       filter,
                     ),
                     child: const LinkedDocumentsPage(),

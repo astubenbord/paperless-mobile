@@ -1,25 +1,26 @@
-import 'dart:convert';
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart';
 import 'package:paperless_api/src/models/paperless_server_exception.dart';
 
 Future<T> getSingleResult<T>(
   String url,
   T Function(Map<String, dynamic>) fromJson,
   ErrorCode errorCode, {
-  required BaseClient client,
+  required Dio client,
   int minRequiredApiVersion = 1,
 }) async {
   final response = await client.get(
-    Uri.parse(url),
-    headers: {'accept': 'application/json; version=$minRequiredApiVersion'},
+    url,
+    options: Options(
+      headers: {'accept': 'application/json; version=$minRequiredApiVersion'},
+    ),
   );
   if (response.statusCode == HttpStatus.ok) {
     return compute(
       fromJson,
-      jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>,
+      response.data as Map<String, dynamic>,
     );
   }
   throw PaperlessServerException(
@@ -32,16 +33,17 @@ Future<List<T>> getCollection<T>(
   String url,
   T Function(Map<String, dynamic>) fromJson,
   ErrorCode errorCode, {
-  required BaseClient client,
+  required Dio client,
   int minRequiredApiVersion = 1,
 }) async {
   final response = await client.get(
-    Uri.parse(url),
-    headers: {'accept': 'application/json; version=$minRequiredApiVersion'},
+    url,
+    options: Options(headers: {
+      'accept': 'application/json; version=$minRequiredApiVersion'
+    }),
   );
   if (response.statusCode == HttpStatus.ok) {
-    final Map<String, dynamic> body =
-        jsonDecode(utf8.decode(response.bodyBytes));
+    final Map<String, dynamic> body = response.data;
     if (body.containsKey('count')) {
       if (body['count'] == 0) {
         return <T>[];

@@ -1,17 +1,19 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:http/http.dart';
+import 'package:dio/dio.dart';
 import 'package:paperless_api/src/models/labels/correspondent_model.dart';
 import 'package:paperless_api/src/models/labels/document_type_model.dart';
 import 'package:paperless_api/src/models/labels/storage_path_model.dart';
 import 'package:paperless_api/src/models/labels/tag_model.dart';
 import 'package:paperless_api/src/models/paperless_server_exception.dart';
 import 'package:paperless_api/src/modules/labels_api/paperless_labels_api.dart';
-import 'package:paperless_api/src/utils.dart';
+import 'package:paperless_api/src/request_utils.dart';
 
+//Notes:
+// Removed content type json header
 class PaperlessLabelApiImpl implements PaperlessLabelsApi {
-  final BaseClient client;
+  final Dio client;
 
   PaperlessLabelApiImpl(this.client);
   @override
@@ -89,15 +91,11 @@ class PaperlessLabelApiImpl implements PaperlessLabelsApi {
   @override
   Future<Correspondent> saveCorrespondent(Correspondent correspondent) async {
     final response = await client.post(
-      Uri.parse('/api/correspondents/'),
-      body: jsonEncode(correspondent.toJson()),
-      headers: {"Content-Type": "application/json"},
-      encoding: Encoding.getByName("utf-8"),
+      '/api/correspondents/',
+      data: correspondent.toJson(),
     );
     if (response.statusCode == HttpStatus.created) {
-      return Correspondent.fromJson(
-        jsonDecode(utf8.decode(response.bodyBytes)),
-      );
+      return Correspondent.fromJson(response.data);
     }
     throw PaperlessServerException(
       ErrorCode.correspondentCreateFailed,
@@ -108,15 +106,11 @@ class PaperlessLabelApiImpl implements PaperlessLabelsApi {
   @override
   Future<DocumentType> saveDocumentType(DocumentType type) async {
     final response = await client.post(
-      Uri.parse('/api/document_types/'),
-      body: json.encode(type.toJson()),
-      headers: {"Content-Type": "application/json"},
-      encoding: Encoding.getByName("utf-8"),
+      '/api/document_types/',
+      data: type.toJson(),
     );
     if (response.statusCode == HttpStatus.created) {
-      return DocumentType.fromJson(
-        jsonDecode(utf8.decode(response.bodyBytes)),
-      );
+      return DocumentType.fromJson(response.data);
     }
     throw PaperlessServerException(
       ErrorCode.documentTypeCreateFailed,
@@ -126,18 +120,13 @@ class PaperlessLabelApiImpl implements PaperlessLabelsApi {
 
   @override
   Future<Tag> saveTag(Tag tag) async {
-    final body = json.encode(tag.toJson());
     final response = await client.post(
-      Uri.parse('/api/tags/'),
-      body: body,
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json; version=2",
-      },
-      encoding: Encoding.getByName("utf-8"),
+      '/api/tags/',
+      data: tag.toJson(),
+      options: Options(headers: {"Accept": "application/json; version=2"}),
     );
     if (response.statusCode == HttpStatus.created) {
-      return Tag.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+      return Tag.fromJson(response.data);
     }
     throw PaperlessServerException(
       ErrorCode.tagCreateFailed,
@@ -148,8 +137,8 @@ class PaperlessLabelApiImpl implements PaperlessLabelsApi {
   @override
   Future<int> deleteCorrespondent(Correspondent correspondent) async {
     assert(correspondent.id != null);
-    final response = await client
-        .delete(Uri.parse('/api/correspondents/${correspondent.id}/'));
+    final response =
+        await client.delete('/api/correspondents/${correspondent.id}/');
     if (response.statusCode == HttpStatus.noContent) {
       return correspondent.id!;
     }
@@ -162,8 +151,8 @@ class PaperlessLabelApiImpl implements PaperlessLabelsApi {
   @override
   Future<int> deleteDocumentType(DocumentType documentType) async {
     assert(documentType.id != null);
-    final response = await client
-        .delete(Uri.parse('/api/document_types/${documentType.id}/'));
+    final response =
+        await client.delete('/api/document_types/${documentType.id}/');
     if (response.statusCode == HttpStatus.noContent) {
       return documentType.id!;
     }
@@ -176,7 +165,7 @@ class PaperlessLabelApiImpl implements PaperlessLabelsApi {
   @override
   Future<int> deleteTag(Tag tag) async {
     assert(tag.id != null);
-    final response = await client.delete(Uri.parse('/api/tags/${tag.id}/'));
+    final response = await client.delete('/api/tags/${tag.id}/');
     if (response.statusCode == HttpStatus.noContent) {
       return tag.id!;
     }
@@ -190,17 +179,14 @@ class PaperlessLabelApiImpl implements PaperlessLabelsApi {
   Future<Correspondent> updateCorrespondent(Correspondent correspondent) async {
     assert(correspondent.id != null);
     final response = await client.put(
-      Uri.parse('/api/correspondents/${correspondent.id}/'),
-      headers: {"Content-Type": "application/json"},
-      body: json.encode(correspondent.toJson()),
-      encoding: Encoding.getByName("utf-8"),
+      '/api/correspondents/${correspondent.id}/',
+      data: json.encode(correspondent.toJson()),
     );
     if (response.statusCode == HttpStatus.ok) {
-      return Correspondent.fromJson(
-          jsonDecode(utf8.decode(response.bodyBytes)));
+      return Correspondent.fromJson(response.data);
     }
     throw PaperlessServerException(
-      ErrorCode.unknown,
+      ErrorCode.unknown, //TODO: Add correct error code mapping.
       httpStatusCode: response.statusCode,
     );
   }
@@ -209,13 +195,11 @@ class PaperlessLabelApiImpl implements PaperlessLabelsApi {
   Future<DocumentType> updateDocumentType(DocumentType documentType) async {
     assert(documentType.id != null);
     final response = await client.put(
-      Uri.parse('/api/document_types/${documentType.id}/'),
-      headers: {"Content-Type": "application/json"},
-      body: json.encode(documentType.toJson()),
-      encoding: Encoding.getByName("utf-8"),
+      '/api/document_types/${documentType.id}/',
+      data: documentType.toJson(),
     );
     if (response.statusCode == HttpStatus.ok) {
-      return DocumentType.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+      return DocumentType.fromJson(response.data);
     }
     throw PaperlessServerException(
       ErrorCode.unknown,
@@ -227,16 +211,12 @@ class PaperlessLabelApiImpl implements PaperlessLabelsApi {
   Future<Tag> updateTag(Tag tag) async {
     assert(tag.id != null);
     final response = await client.put(
-      Uri.parse('/api/tags/${tag.id}/'),
-      headers: {
-        "Accept": "application/json; version=2",
-        "Content-Type": "application/json",
-      },
-      body: json.encode(tag.toJson()),
-      encoding: Encoding.getByName("utf-8"),
+      '/api/tags/${tag.id}/',
+      options: Options(headers: {"Accept": "application/json; version=2"}),
+      data: tag.toJson(),
     );
     if (response.statusCode == HttpStatus.ok) {
-      return Tag.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+      return Tag.fromJson(response.data);
     }
     throw PaperlessServerException(
       ErrorCode.unknown,
@@ -247,8 +227,7 @@ class PaperlessLabelApiImpl implements PaperlessLabelsApi {
   @override
   Future<int> deleteStoragePath(StoragePath path) async {
     assert(path.id != null);
-    final response =
-        await client.delete(Uri.parse('/api/storage_paths/${path.id}/'));
+    final response = await client.delete('/api/storage_paths/${path.id}/');
     if (response.statusCode == HttpStatus.noContent) {
       return path.id!;
     }
@@ -285,12 +264,11 @@ class PaperlessLabelApiImpl implements PaperlessLabelsApi {
   @override
   Future<StoragePath> saveStoragePath(StoragePath path) async {
     final response = await client.post(
-      Uri.parse('/api/storage_paths/'),
-      body: json.encode(path.toJson()),
-      headers: {"Content-Type": "application/json"},
+      '/api/storage_paths/',
+      data: path.toJson(),
     );
     if (response.statusCode == HttpStatus.created) {
-      return StoragePath.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+      return StoragePath.fromJson(jsonDecode(response.data));
     }
     throw PaperlessServerException(ErrorCode.storagePathCreateFailed,
         httpStatusCode: response.statusCode);
@@ -300,12 +278,11 @@ class PaperlessLabelApiImpl implements PaperlessLabelsApi {
   Future<StoragePath> updateStoragePath(StoragePath path) async {
     assert(path.id != null);
     final response = await client.put(
-      Uri.parse('/api/storage_paths/${path.id}/'),
-      headers: {"Content-Type": "application/json"},
-      body: json.encode(path.toJson()),
+      '/api/storage_paths/${path.id}/',
+      data: path.toJson(),
     );
     if (response.statusCode == HttpStatus.ok) {
-      return StoragePath.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+      return StoragePath.fromJson(jsonDecode(response.data));
     }
     throw const PaperlessServerException(ErrorCode.unknown);
   }

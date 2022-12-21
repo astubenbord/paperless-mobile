@@ -1,24 +1,28 @@
 import 'dart:io';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:paperless_api/paperless_api.dart';
+import 'package:paperless_mobile/core/security/security_context_aware_dio_manager.dart';
 import 'package:paperless_mobile/core/store/local_vault.dart';
-import 'package:paperless_mobile/di_initializer.dart';
+import 'package:paperless_mobile/features/login/bloc/authentication_state.dart';
 import 'package:paperless_mobile/features/login/model/authentication_information.dart';
 import 'package:paperless_mobile/features/login/model/client_certificate.dart';
 import 'package:paperless_mobile/features/login/model/user_credentials.model.dart';
 import 'package:paperless_mobile/features/login/services/authentication_service.dart';
 import 'package:paperless_mobile/features/settings/model/application_settings_state.dart';
 
-class AuthenticationCubit extends Cubit<AuthenticationState> {
+class AuthenticationCubit extends HydratedCubit<AuthenticationState> {
   final LocalAuthenticationService _localAuthService;
-  PaperlessAuthenticationApi _authApi;
+  final PaperlessAuthenticationApi _authApi;
   final LocalVault _localVault;
+  final SecurityContextAwareDioManager _dioWrapper;
 
   AuthenticationCubit(
     this._localVault,
     this._localAuthService,
     this._authApi,
+    this._dioWrapper,
   ) : super(AuthenticationState.initial);
 
   Future<void> login({
@@ -28,22 +32,21 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
   }) async {
     assert(credentials.username != null && credentials.password != null);
     try {
-      await registerSecurityContext(clientCertificate);
-      //TODO: Workaround for new architecture, listen for security context changes in timeout_client, possibly persisted in hive.
-      _authApi = getIt<PaperlessAuthenticationApi>();
-      // Store information required to make requests
-      final currentAuth = AuthenticationInformation(
-        serverUrl: serverUrl,
+      _dioWrapper.updateSettings(
+        baseUrl: serverUrl,
         clientCertificate: clientCertificate,
       );
-      await _localVault.storeAuthenticationInformation(currentAuth);
 
       final token = await _authApi.login(
         username: credentials.username!,
         password: credentials.password!,
       );
 
-      final auth = currentAuth.copyWith(token: token);
+      final auth = AuthenticationInformation(
+        serverUrl: serverUrl,
+        clientCertificate: clientCertificate,
+        token: token,
+      );
 
       await _localVault.storeAuthenticationInformation(auth);
 
@@ -83,9 +86,9 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
         final localAuthSuccess = await _localAuthService
             .authenticateLocalUser("Authenticate to log back in");
         if (localAuthSuccess) {
-          await registerSecurityContext(storedAuth.clientCertificate);
-          //TODO: Workaround for new architecture, listen for security context changes in timeout_client, possibly persisted in hive.
-          _authApi = getIt<PaperlessAuthenticationApi>();
+          _dioWrapper.updateSettings(
+            clientCertificate: storedAuth.clientCertificate,
+          );
           return emit(
             AuthenticationState(
               isAuthenticated: true,
@@ -102,7 +105,9 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
           ));
         }
       } else {
-        await registerSecurityContext(storedAuth.clientCertificate);
+        _dioWrapper.updateSettings(
+          clientCertificate: storedAuth.clientCertificate,
+        );
         final authState = AuthenticationState(
           isAuthenticated: true,
           authentication: storedAuth,
@@ -115,40 +120,14 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
 
   Future<void> logout() async {
     await _localVault.clear();
+    await super.clear();
     emit(AuthenticationState.initial);
   }
-}
 
-class AuthenticationState {
-  final bool wasLoginStored;
-  final bool? wasLocalAuthenticationSuccessful;
-  final bool isAuthenticated;
-  final AuthenticationInformation? authentication;
+  @override
+  AuthenticationState? fromJson(Map<String, dynamic> json) =>
+      AuthenticationState.fromJson(json);
 
-  static final AuthenticationState initial = AuthenticationState(
-    wasLoginStored: false,
-    isAuthenticated: false,
-  );
-
-  AuthenticationState({
-    required this.isAuthenticated,
-    required this.wasLoginStored,
-    this.wasLocalAuthenticationSuccessful,
-    this.authentication,
-  });
-
-  AuthenticationState copyWith({
-    bool? wasLoginStored,
-    bool? isAuthenticated,
-    AuthenticationInformation? authentication,
-    bool? wasLocalAuthenticationSuccessful,
-  }) {
-    return AuthenticationState(
-      isAuthenticated: isAuthenticated ?? this.isAuthenticated,
-      wasLoginStored: wasLoginStored ?? this.wasLoginStored,
-      authentication: authentication ?? this.authentication,
-      wasLocalAuthenticationSuccessful: wasLocalAuthenticationSuccessful ??
-          this.wasLocalAuthenticationSuccessful,
-    );
-  }
+  @override
+  Map<String, dynamic>? toJson(AuthenticationState state) => state.toJson();
 }

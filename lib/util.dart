@@ -14,7 +14,6 @@ import 'package:paperless_mobile/generated/l10n.dart';
 
 final dateFormat = DateFormat("yyyy-MM-dd");
 final GlobalKey<ScaffoldState> rootScaffoldKey = GlobalKey<ScaffoldState>();
-late PackageInfo kPackageInfo;
 
 class SnackBarActionConfig {
   final String label;

@@ -1,12 +1,9 @@
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:http/http.dart';
+import 'package:dio/dio.dart';
 import 'package:paperless_api/src/models/paperless_server_exception.dart';
 import 'package:paperless_api/src/modules/authentication_api/authentication_api.dart';
 
 class PaperlessAuthenticationApiImpl implements PaperlessAuthenticationApi {
-  final BaseClient client;
+  final Dio client;
 
   PaperlessAuthenticationApiImpl(this.client);
 
@@ -18,8 +15,8 @@ class PaperlessAuthenticationApiImpl implements PaperlessAuthenticationApi {
     late Response response;
     try {
       response = await client.post(
-        Uri.parse("/api/token/"),
-        body: {
+        "/api/token/",
+        data: {
           "username": username,
           "password": password,
         },
@@ -34,11 +31,11 @@ class PaperlessAuthenticationApiImpl implements PaperlessAuthenticationApi {
         );
       }
     }
-    if (response.statusCode == HttpStatus.ok) {
-      final data = jsonDecode(utf8.decode(response.bodyBytes));
-      return data['token'];
-    } else if (response.statusCode == HttpStatus.badRequest &&
-        response.body
+    if (response.statusCode == 200) {
+      return response.data['token'];
+    } else if (response.statusCode == 400 &&
+        response
+            .data //TODO: Check if text is included in statusMessage instead of body
             .toLowerCase()
             .contains("no required certificate was sent")) {
       throw PaperlessServerException(

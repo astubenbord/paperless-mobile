@@ -16,7 +16,6 @@ import 'package:paperless_mobile/core/repository/provider/label_repositories_pro
 import 'package:paperless_mobile/core/service/file_service.dart';
 import 'package:paperless_mobile/core/store/local_vault.dart';
 import 'package:paperless_mobile/core/widgets/offline_banner.dart';
-import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/document_upload/cubit/document_upload_cubit.dart';
 import 'package:paperless_mobile/features/document_upload/view/document_upload_preparation_page.dart';
 import 'package:paperless_mobile/features/documents/view/pages/document_view.dart';
@@ -28,6 +27,7 @@ import 'package:paperless_mobile/util.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 
 class ScannerPage extends StatefulWidget {
   const ScannerPage({Key? key}) : super(key: key);
@@ -139,8 +139,8 @@ class _ScannerPageState extends State<ScannerPage>
             builder: (_) => LabelRepositoriesProvider(
               child: BlocProvider(
                 create: (context) => DocumentUploadCubit(
-                  localVault: getIt<LocalVault>(),
-                  documentApi: getIt<PaperlessDocumentsApi>(),
+                  localVault: Provider.of<LocalVault>(context),
+                  documentApi: Provider.of<PaperlessDocumentsApi>(context),
                   correspondentRepository:
                       RepositoryProvider.of<LabelRepository<Correspondent>>(
                     context,
@@ -274,8 +274,8 @@ class _ScannerPageState extends State<ScannerPage>
           builder: (_) => LabelRepositoriesProvider(
             child: BlocProvider(
               create: (context) => DocumentUploadCubit(
-                localVault: getIt<LocalVault>(),
-                documentApi: getIt<PaperlessDocumentsApi>(),
+                localVault: Provider.of<LocalVault>(context),
+                documentApi: Provider.of<PaperlessDocumentsApi>(context),
                 correspondentRepository:
                     RepositoryProvider.of<LabelRepository<Correspondent>>(
                   context,

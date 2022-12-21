@@ -3,13 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/widgets/documents_list_loading_widget.dart';
-import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/document_details/bloc/document_details_cubit.dart';
 import 'package:paperless_mobile/features/document_details/view/pages/document_details_page.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/list/document_list_item.dart';
 import 'package:paperless_mobile/features/linked_documents_preview/bloc/linked_documents_cubit.dart';
 import 'package:paperless_mobile/features/linked_documents_preview/bloc/state/linked_documents_state.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
+import 'package:provider/provider.dart';
 
 class LinkedDocumentsPage extends StatefulWidget {
   const LinkedDocumentsPage({super.key});
@@ -63,10 +63,10 @@ class _LinkedDocumentsPageState extends State<LinkedDocumentsPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      BlocProvider<DocumentDetailsCubit>.value(
-                                    value: DocumentDetailsCubit(
-                                      getIt<PaperlessDocumentsApi>(),
+                                  builder: (context) => BlocProvider(
+                                    create: (context) => DocumentDetailsCubit(
+                                      Provider.of<PaperlessDocumentsApi>(
+                                          context),
                                       document,
                                     ),
                                     child: const DocumentDetailsPage(

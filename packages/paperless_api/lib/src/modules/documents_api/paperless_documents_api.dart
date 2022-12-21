@@ -12,12 +12,10 @@ abstract class PaperlessDocumentsApi {
     Uint8List documentBytes, {
     required String filename,
     required String title,
-    required String authToken,
-    required String serverUrl,
+    DateTime? createdAt,
     int? documentType,
     int? correspondent,
     Iterable<int> tags = const [],
-    DateTime? createdAt,
   });
   Future<DocumentModel> update(DocumentModel doc);
   Future<int> findNextAsn();

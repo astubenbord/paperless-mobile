@@ -32,8 +32,6 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  get_it: ^7.2.0
-  injectable: ^2.1.0
   encrypted_shared_preferences: ^3.0.0
   permission_handler: ^9.2.0
   pdf: ^3.8.1
@@ -79,6 +77,11 @@ dependencies:
   rxdart: ^0.27.7
   badges: ^2.0.3
   flutter_colorpicker: ^1.0.3
+  provider: ^6.0.5
+  dio: ^4.0.6
+  hydrated_bloc: ^9.0.0
+  json_annotation: ^4.7.0
+
 
 dev_dependencies:
   integration_test:
@@ -92,6 +95,7 @@ dev_dependencies:
   dependency_validator: ^3.0.0
   intl_utils: ^2.7.0
   flutter_lints: ^1.0.0
+  json_serializable: ^6.5.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

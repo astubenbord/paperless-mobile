@@ -6,7 +6,6 @@ import 'package:paperless_mobile/core/type/types.dart';
 import 'package:paperless_mobile/features/login/model/authentication_information.dart';
 import 'package:paperless_mobile/features/login/model/client_certificate.dart';
 import 'package:paperless_mobile/features/settings/model/application_settings_state.dart';
-import 'package:injectable/injectable.dart';
 
 abstract class LocalVault {
   Future<void> storeAuthenticationInformation(AuthenticationInformation auth);
@@ -17,8 +16,6 @@ abstract class LocalVault {
   Future<void> clear();
 }
 
-@prod
-@Injectable(as: LocalVault)
 class LocalVaultImpl implements LocalVault {
   static const applicationSettingsKey = "applicationSettings";
   static const authenticationKey = "authentication";

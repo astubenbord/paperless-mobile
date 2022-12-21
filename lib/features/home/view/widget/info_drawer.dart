@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/bloc/paperless_server_information_cubit.dart';
 import 'package:paperless_mobile/core/bloc/paperless_server_information_state.dart';
@@ -7,7 +8,6 @@ import 'package:paperless_mobile/core/repository/label_repository.dart';
 import 'package:paperless_mobile/core/repository/provider/label_repositories_provider.dart';
 import 'package:paperless_mobile/core/repository/saved_view_repository.dart';
 import 'package:paperless_mobile/core/store/local_vault.dart';
-import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/inbox/bloc/inbox_cubit.dart';
 import 'package:paperless_mobile/features/inbox/view/pages/inbox_page.dart';
@@ -16,14 +16,29 @@ import 'package:paperless_mobile/features/settings/bloc/application_settings_cub
 import 'package:paperless_mobile/features/settings/view/settings_page.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:paperless_mobile/util.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/link.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:collection/collection.dart';
 
-class InfoDrawer extends StatelessWidget {
+class InfoDrawer extends StatefulWidget {
   final VoidCallback? afterInboxClosed;
 
   const InfoDrawer({Key? key, this.afterInboxClosed}) : super(key: key);
+
+  @override
+  State<InfoDrawer> createState() => _InfoDrawerState();
+}
+
+class _InfoDrawerState extends State<InfoDrawer> {
+  late final Future<PackageInfo> _packageInfo;
+
+  @override
+  void initState() {
+    super.initState();
+    _packageInfo = PackageInfo.fromPlatform();
+  }
+
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
@@ -140,8 +155,9 @@ class InfoDrawer extends StatelessWidget {
                 ),
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => BlocProvider.value(
-                      value: getIt<ApplicationSettingsCubit>(),
+                    builder: (context) => BlocProvider(
+                      create: (context) =>
+                          Provider.of<ApplicationSettingsCubit>(context),
                       child: const SettingsPage(),
                     ),
                   ),
@@ -155,44 +171,51 @@ class InfoDrawer extends StatelessWidget {
                       'https://github.com/astubenbord/paperless-mobile/issues/new');
                 },
               ),
-              AboutListTile(
-                icon: const Icon(Icons.info),
-                applicationIcon: const ImageIcon(
-                    AssetImage('assets/logos/paperless_logo_green.png')),
-                applicationName: 'Paperless Mobile',
-                applicationVersion:
-                    kPackageInfo.version + '+' + kPackageInfo.buildNumber,
-                aboutBoxChildren: [
-                  Text(
-                      '${S.of(context).aboutDialogDevelopedByText} Anton Stubenbord'),
-                  Link(
-                    uri: Uri.parse(
-                        'https://github.com/astubenbord/paperless-mobile'),
-                    builder: (context, followLink) => GestureDetector(
-                      onTap: followLink,
-                      child: Text(
-                        'https://github.com/astubenbord/paperless-mobile',
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.tertiary),
+              FutureBuilder<PackageInfo>(
+                  future: _packageInfo,
+                  builder: (context, snapshot) {
+                    return AboutListTile(
+                      icon: const Icon(Icons.info),
+                      applicationIcon: const ImageIcon(
+                        AssetImage('assets/logos/paperless_logo_green.png'),
                       ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Credits',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  _buildOnboardingImageCredits(),
-                ],
-                child: Text(S.of(context).appDrawerAboutLabel),
-              ),
+                      applicationName: 'Paperless Mobile',
+                      applicationVersion: (snapshot.data?.version ?? '') +
+                          '+' +
+                          (snapshot.data?.buildNumber ?? ''),
+                      aboutBoxChildren: [
+                        Text(
+                            '${S.of(context).aboutDialogDevelopedByText} Anton Stubenbord'),
+                        Link(
+                          uri: Uri.parse(
+                              'https://github.com/astubenbord/paperless-mobile'),
+                          builder: (context, followLink) => GestureDetector(
+                            onTap: followLink,
+                            child: Text(
+                              'https://github.com/astubenbord/paperless-mobile',
+                              style: TextStyle(
+                                  color:
+                                      Theme.of(context).colorScheme.tertiary),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Credits',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        _buildOnboardingImageCredits(),
+                      ],
+                      child: Text(S.of(context).appDrawerAboutLabel),
+                    );
+                  }),
               ListTile(
                 leading: const Icon(Icons.logout),
                 title: Text(S.of(context).appDrawerLogoutLabel),
                 onTap: () {
                   try {
                     BlocProvider.of<AuthenticationCubit>(context).logout();
-                    getIt<LocalVault>().clear();
+                    Provider.of<LocalVault>(context).clear();
                     BlocProvider.of<ApplicationSettingsCubit>(context).clear();
                     RepositoryProvider.of<LabelRepository<Tag>>(context)
                         .clear();
@@ -224,7 +247,7 @@ class InfoDrawer extends StatelessWidget {
           child: BlocProvider(
             create: (context) => InboxCubit(
               RepositoryProvider.of<LabelRepository<Tag>>(context),
-              getIt<PaperlessDocumentsApi>(),
+              Provider.of<PaperlessDocumentsApi>(context),
             )..loadInbox(),
             child: const InboxPage(),
           ),
@@ -232,7 +255,7 @@ class InfoDrawer extends StatelessWidget {
         maintainState: false,
       ),
     );
-    afterInboxClosed?.call();
+    widget.afterInboxClosed?.call();
   }
 
   Link _buildOnboardingImageCredits() {

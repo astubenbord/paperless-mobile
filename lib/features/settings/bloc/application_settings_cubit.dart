@@ -1,24 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:paperless_mobile/core/store/local_vault.dart';
+import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:paperless_mobile/features/settings/model/application_settings_state.dart';
-import 'package:injectable/injectable.dart';
 import 'package:paperless_mobile/features/settings/model/view_type.dart';
 
-@prod
-@test
-@lazySingleton
-class ApplicationSettingsCubit extends Cubit<ApplicationSettingsState> {
-  final LocalVault localVault;
-
-  ApplicationSettingsCubit(this.localVault)
-      : super(ApplicationSettingsState.defaultSettings);
-
-  Future<void> initialize() async {
-    final settings = (await localVault.loadApplicationSettings()) ??
-        ApplicationSettingsState.defaultSettings;
-    emit(settings);
-  }
+class ApplicationSettingsCubit extends HydratedCubit<ApplicationSettingsState> {
+  ApplicationSettingsCubit() : super(ApplicationSettingsState.defaultSettings);
 
   Future<void> setLocale(String? localeSubtag) async {
     final updatedSettings = state.copyWith(preferredLocaleSubtag: localeSubtag);
@@ -42,11 +28,20 @@ class ApplicationSettingsCubit extends Cubit<ApplicationSettingsState> {
   }
 
   Future<void> _updateSettings(ApplicationSettingsState settings) async {
-    await localVault.storeApplicationSettings(settings);
     emit(settings);
   }
 
-  void clear() {
+  @override
+  Future<void> clear() async {
+    await super.clear();
     emit(ApplicationSettingsState.defaultSettings);
   }
+
+  @override
+  ApplicationSettingsState? fromJson(Map<String, dynamic> json) =>
+      ApplicationSettingsState.fromJson(json);
+
+  @override
+  Map<String, dynamic>? toJson(ApplicationSettingsState state) =>
+      state.toJson();
 }

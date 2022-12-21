@@ -70,8 +70,6 @@ class DocumentUploadCubit extends Cubit<DocumentUploadState> {
       documentType: documentType,
       tags: tags,
       createdAt: createdAt,
-      authToken: auth.token!,
-      serverUrl: auth.serverUrl,
     );
     if (onConsumptionFinished != null) {
       _documentApi

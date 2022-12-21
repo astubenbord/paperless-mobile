@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:injectable/injectable.dart';
 
 abstract class ConnectivityStatusService {
   Future<bool> isConnectedToInternet();
@@ -9,8 +8,6 @@ abstract class ConnectivityStatusService {
   Stream<bool> connectivityChanges();
 }
 
-@prod
-@Injectable(as: ConnectivityStatusService)
 class ConnectivityStatusServiceImpl implements ConnectivityStatusService {
   final Connectivity connectivity;
 

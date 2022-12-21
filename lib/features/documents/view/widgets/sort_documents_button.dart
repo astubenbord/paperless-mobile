@@ -28,7 +28,7 @@ class SortDocumentsButton extends StatelessWidget {
           topRight: Radius.circular(16),
         ),
       ),
-      builder: (_) => BlocProvider.value(
+      builder: (_) => BlocProvider<DocumentsCubit>.value(
         value: BlocProvider.of<DocumentsCubit>(context),
         child: FractionallySizedBox(
           heightFactor: .6,

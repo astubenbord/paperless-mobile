@@ -17,7 +17,8 @@ dependencies:
   http: ^0.13.5
   json_annotation: ^4.7.0
   intl: ^0.17.0
-
+  dio: ^4.0.6
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter

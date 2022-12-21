@@ -4,7 +4,6 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
 import 'package:paperless_mobile/core/repository/provider/label_repositories_provider.dart';
-import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/features/document_details/bloc/document_details_cubit.dart';
 import 'package:paperless_mobile/features/document_details/view/pages/document_details_page.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
@@ -23,6 +22,7 @@ import 'package:paperless_mobile/features/settings/bloc/application_settings_cub
 import 'package:paperless_mobile/features/settings/model/application_settings_state.dart';
 import 'package:paperless_mobile/features/settings/model/view_type.dart';
 import 'package:paperless_mobile/util.dart';
+import 'package:provider/provider.dart';
 
 class DocumentsPage extends StatefulWidget {
   const DocumentsPage({Key? key}) : super(key: key);
@@ -42,8 +42,8 @@ class _DocumentsPageState extends State<DocumentsPage> {
   @override
   void initState() {
     super.initState();
-    _documentsCubit = BlocProvider.of<DocumentsCubit>(context);
-    _savedViewCubit = BlocProvider.of<SavedViewCubit>(context);
+    _documentsCubit = context.watch();
+    _savedViewCubit = context.watch();
     try {
       _documentsCubit.load();
     } on PaperlessServerException catch (error, stackTrace) {
@@ -249,8 +249,11 @@ class _DocumentsPageState extends State<DocumentsPage> {
   MaterialPageRoute<DocumentModel?> _buildDetailsPageRoute(
       DocumentModel document) {
     return MaterialPageRoute(
-      builder: (_) => BlocProvider.value(
-        value: DocumentDetailsCubit(getIt<PaperlessDocumentsApi>(), document),
+      builder: (_) => BlocProvider(
+        create: (context) => DocumentDetailsCubit(
+          context.watch(),
+          document,
+        ),
         child: const LabelRepositoriesProvider(
           child: DocumentDetailsPage(),
         ),

@@ -1,11 +1,10 @@
-import 'package:paperless_mobile/core/type/types.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:paperless_mobile/features/login/model/client_certificate.dart';
 
-class AuthenticationInformation {
-  static const tokenKey = 'token';
-  static const serverUrlKey = 'serverUrl';
-  static const clientCertificateKey = 'clientCertificate';
+part 'authentication_information.g.dart';
 
+@JsonSerializable()
+class AuthenticationInformation {
   final String? token;
   final String serverUrl;
   final ClientCertificate? clientCertificate;
@@ -15,21 +14,6 @@ class AuthenticationInformation {
     required this.serverUrl,
     this.clientCertificate,
   });
-
-  AuthenticationInformation.fromJson(JSON json)
-      : token = json[tokenKey],
-        serverUrl = json[serverUrlKey],
-        clientCertificate = json[clientCertificateKey] != null
-            ? ClientCertificate.fromJson(json[clientCertificateKey])
-            : null;
-
-  JSON toJson() {
-    return {
-      tokenKey: token,
-      serverUrlKey: serverUrl,
-      clientCertificateKey: clientCertificate?.toJson(),
-    };
-  }
 
   bool get isValid {
     return serverUrl.isNotEmpty && (token?.isNotEmpty ?? false);
@@ -48,4 +32,9 @@ class AuthenticationInformation {
           (removeClientCertificate ? null : this.clientCertificate),
     );
   }
+
+  factory AuthenticationInformation.fromJson(Map<String, dynamic> json) =>
+      _$AuthenticationInformationFromJson(json);
+
+  Map<String, dynamic> toJson() => _$AuthenticationInformationToJson(this);
 }

@@ -11,17 +11,21 @@ class LabelRepositoriesProvider extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
-        RepositoryProvider.value(
-          value: RepositoryProvider.of<LabelRepository<Correspondent>>(context),
+        RepositoryProvider(
+          create: (context) =>
+              RepositoryProvider.of<LabelRepository<Correspondent>>(context),
         ),
-        RepositoryProvider.value(
-          value: RepositoryProvider.of<LabelRepository<DocumentType>>(context),
+        RepositoryProvider(
+          create: (context) =>
+              RepositoryProvider.of<LabelRepository<DocumentType>>(context),
         ),
-        RepositoryProvider.value(
-          value: RepositoryProvider.of<LabelRepository<StoragePath>>(context),
+        RepositoryProvider(
+          create: (context) =>
+              RepositoryProvider.of<LabelRepository<StoragePath>>(context),
         ),
-        RepositoryProvider.value(
-          value: RepositoryProvider.of<LabelRepository<Tag>>(context),
+        RepositoryProvider(
+          create: (context) =>
+              RepositoryProvider.of<LabelRepository<Tag>>(context),
         ),
       ],
       child: child,

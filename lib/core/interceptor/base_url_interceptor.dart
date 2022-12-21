@@ -1,9 +1,6 @@
 import 'package:http_interceptor/http_interceptor.dart';
-import 'package:injectable/injectable.dart';
 import 'package:paperless_mobile/core/store/local_vault.dart';
 
-@prod
-@injectable
 class BaseUrlInterceptor implements InterceptorContract {
   final LocalVault _localVault;
 

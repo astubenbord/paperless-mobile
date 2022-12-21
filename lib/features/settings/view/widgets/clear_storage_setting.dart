@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart' as cm;
 import 'package:paperless_mobile/core/service/file_service.dart';
-import 'package:paperless_mobile/di_initializer.dart';
+import 'package:provider/provider.dart';
 
 class ClearStorageSetting extends StatelessWidget {
   const ClearStorageSetting({super.key});
@@ -12,12 +12,10 @@ class ClearStorageSetting extends StatelessWidget {
       title: Text("Clear data"),
       subtitle:
           Text("Remove downloaded files, scans and clear the cache's content"),
-      onTap: _clearCache,
+      onTap: () {
+        Provider.of<cm.CacheManager>(context).emptyCache();
+        FileService.clearUserData();
+      },
     );
-  }
-
-  void _clearCache() async {
-    getIt<cm.CacheManager>().emptyCache();
-    FileService.clearUserData();
   }
 }

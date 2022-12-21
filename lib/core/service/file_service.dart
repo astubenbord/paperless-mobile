@@ -82,8 +82,8 @@ class FileService {
   static Future<void> clearUserData() async {
     final scanDir = await scanDirectory;
     final tempDir = await temporaryDirectory;
-    scanDir?.delete(recursive: true);
-    tempDir.delete(recursive: true);
+    await scanDir?.delete(recursive: true);
+    await tempDir.delete(recursive: true);
   }
 }
 

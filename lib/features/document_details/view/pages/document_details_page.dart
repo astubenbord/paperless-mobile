@@ -10,7 +10,6 @@ import 'package:intl/intl.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/repository/label_repository.dart';
 import 'package:paperless_mobile/core/widgets/highlighted_text.dart';
-import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/document_details/bloc/document_details_cubit.dart';
 import 'package:paperless_mobile/features/document_details/view/widgets/document_download_button.dart';
@@ -26,6 +25,7 @@ import 'package:paperless_mobile/features/labels/tags/view/widgets/tags_widget.d
 import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:paperless_mobile/util.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 class DocumentDetailsPage extends StatefulWidget {
@@ -50,7 +50,7 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
     return WillPopScope(
       onWillPop: () async {
         Navigator.of(context)
-            .pop(BlocProvider.of<DocumentDetailsCubit>(context).state.document);
+            .pop(context.read<DocumentDetailsCubit>().state.document);
         return false;
       },
       child: DefaultTabController(
@@ -106,9 +106,7 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
                         .black, //TODO: check if there is a way to dynamically determine color...
                   ),
                   onPressed: () => Navigator.of(context).pop(
-                    BlocProvider.of<DocumentDetailsCubit>(context)
-                        .state
-                        .document,
+                    context.read<DocumentDetailsCubit>().state.document,
                   ),
                 ),
                 floating: true,
@@ -185,29 +183,18 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
 
   Future<void> _onEdit(DocumentModel document) async {
     {
-      final cubit = BlocProvider.of<DocumentDetailsCubit>(context);
+      final cubit = context.read<DocumentDetailsCubit>();
       Navigator.push<bool>(
         context,
         MaterialPageRoute(
           builder: (context) => BlocProvider(
             create: (context) => EditDocumentCubit(
               document,
-              documentsApi: getIt<PaperlessDocumentsApi>(),
-              correspondentRepository:
-                  RepositoryProvider.of<LabelRepository<Correspondent>>(
-                context,
-              ),
-              documentTypeRepository:
-                  RepositoryProvider.of<LabelRepository<DocumentType>>(
-                context,
-              ),
-              storagePathRepository:
-                  RepositoryProvider.of<LabelRepository<StoragePath>>(
-                context,
-              ),
-              tagRepository: RepositoryProvider.of<LabelRepository<Tag>>(
-                context,
-              ),
+              documentsApi: context.watch(),
+              correspondentRepository: context.watch(),
+              documentTypeRepository: context.watch(),
+              storagePathRepository: context.watch(),
+              tagRepository: context.watch(),
             ),
             child: BlocListener<EditDocumentCubit, EditDocumentState>(
               listenWhen: (previous, current) =>
@@ -226,7 +213,7 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
 
   Widget _buildDocumentMetaDataView(DocumentModel document) {
     return FutureBuilder<DocumentMetaData>(
-      future: getIt<PaperlessDocumentsApi>().getMetaData(document),
+      future: context.read<PaperlessDocumentsApi>().getMetaData(document),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return const Center(child: CircularProgressIndicator());
@@ -281,7 +268,7 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
 
   Future<void> _assignAsn(DocumentModel document) async {
     try {
-      await BlocProvider.of<DocumentDetailsCubit>(context).assignAsn(document);
+      await context.read<DocumentDetailsCubit>().assignAsn(document);
     } on PaperlessServerException catch (error, stackTrace) {
       showErrorMessage(context, error, stackTrace);
     }
@@ -393,7 +380,7 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
   ///
   Future<void> _onShare(DocumentModel document) async {
     Uint8List documentBytes =
-        await getIt<PaperlessDocumentsApi>().download(document);
+        await context.read<PaperlessDocumentsApi>().download(document);
     final dir = await getTemporaryDirectory();
     final String path = "${dir.path}/${document.originalFileName}";
     await File(path).writeAsBytes(documentBytes);
@@ -419,7 +406,7 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
         false;
     if (delete) {
       try {
-        await BlocProvider.of<DocumentDetailsCubit>(context).delete(document);
+        await context.read<DocumentDetailsCubit>().delete(document);
         showSnackBar(context, S.of(context).documentDeleteSuccessMessage);
       } on PaperlessServerException catch (error, stackTrace) {
         showErrorMessage(context, error, stackTrace);
@@ -434,7 +421,8 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => DocumentView(
-          documentBytes: getIt<PaperlessDocumentsApi>().getPreview(document.id),
+          documentBytes:
+              context.read<PaperlessDocumentsApi>().getPreview(document.id),
         ),
       ),
     );

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import 'package:http/http.dart';
 import 'package:paperless_api/src/models/paperless_server_exception.dart';
 import 'package:paperless_api/src/models/paperless_server_information_model.dart';
@@ -13,25 +14,24 @@ import 'paperless_server_stats_api.dart';
 /// inbox and total number of documents.
 ///
 class PaperlessServerStatsApiImpl implements PaperlessServerStatsApi {
-  final BaseClient client;
+  final Dio client;
 
   PaperlessServerStatsApiImpl(this.client);
 
   @override
   Future<PaperlessServerInformationModel> getServerInformation() async {
-    final response = await client.get(Uri.parse("/api/ui_settings/"));
-    final version =
-        response.headers[PaperlessServerInformationModel.versionHeader] ??
-            'unknown';
-    final apiVersion = int.tryParse(
-        response.headers[PaperlessServerInformationModel.apiVersionHeader] ??
-            '1');
-    final String username =
-        jsonDecode(utf8.decode(response.bodyBytes))['username'];
+    final response = await client.get("/api/ui_settings/");
+    final version = response
+            .headers[PaperlessServerInformationModel.versionHeader]?.first ??
+        'unknown';
+    final apiVersion = int.tryParse(response
+            .headers[PaperlessServerInformationModel.apiVersionHeader]?.first ??
+        '1');
+    final String username = response.data['username'];
     final String host = response
-            .headers[PaperlessServerInformationModel.hostHeader] ??
-        response.request?.headers[PaperlessServerInformationModel.hostHeader] ??
-        ('${response.request?.url.host}:${response.request?.url.port}');
+            .headers[PaperlessServerInformationModel.hostHeader]?.first ??
+        response.headers[PaperlessServerInformationModel.hostHeader]?.first ??
+        ('${response.requestOptions.uri.host}:${response.requestOptions.uri.port}');
     return PaperlessServerInformationModel(
       username: username,
       version: version,
@@ -42,11 +42,9 @@ class PaperlessServerStatsApiImpl implements PaperlessServerStatsApi {
 
   @override
   Future<PaperlessServerStatisticsModel> getServerStatistics() async {
-    final response = await client.get(Uri.parse('/api/statistics/'));
+    final response = await client.get('/api/statistics/');
     if (response.statusCode == 200) {
-      return PaperlessServerStatisticsModel.fromJson(
-        jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>,
-      );
+      return PaperlessServerStatisticsModel.fromJson(response.data);
     }
     throw const PaperlessServerException.unknown();
   }

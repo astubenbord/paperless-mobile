@@ -1,8 +1,6 @@
 import 'package:paperless_mobile/features/settings/bloc/application_settings_cubit.dart';
 import 'package:http_interceptor/http_interceptor.dart';
-import 'package:injectable/injectable.dart';
 
-@injectable
 class LanguageHeaderInterceptor implements InterceptorContract {
   final ApplicationSettingsCubit appSettingsCubit;
 

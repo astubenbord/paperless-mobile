@@ -166,10 +166,8 @@ class _DocumentUploadPreparationPageState
                   notAssignedSelectable: false,
                   formBuilderState: _formKey.currentState,
                   labelCreationWidgetBuilder: (initialName) =>
-                      RepositoryProvider.value(
-                    value: RepositoryProvider.of<LabelRepository<DocumentType>>(
-                      context,
-                    ),
+                      RepositoryProvider<LabelRepository<DocumentType>>(
+                    create: (context) => context.watch(),
                     child: AddDocumentTypePage(initialName: initialName),
                   ),
                   textFieldLabel:
@@ -182,11 +180,8 @@ class _DocumentUploadPreparationPageState
                   notAssignedSelectable: false,
                   formBuilderState: _formKey.currentState,
                   labelCreationWidgetBuilder: (initialName) =>
-                      RepositoryProvider.value(
-                    value:
-                        RepositoryProvider.of<LabelRepository<Correspondent>>(
-                      context,
-                    ),
+                      RepositoryProvider<LabelRepository<Correspondent>>(
+                    create: (context) => context.watch(),
                     child: AddCorrespondentPage(initialName: initialName),
                   ),
                   textFieldLabel:
@@ -220,7 +215,7 @@ class _DocumentUploadPreparationPageState
 
   void _onSubmit() async {
     if (_formKey.currentState?.saveAndValidate() ?? false) {
-      final cubit = BlocProvider.of<DocumentUploadCubit>(context);
+      final cubit = context.read<DocumentUploadCubit>();
       try {
         setState(() => _isUploadLoading = true);
 

@@ -3,10 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/service/file_service.dart';
-import 'package:paperless_mobile/di_initializer.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:paperless_mobile/util.dart';
+import 'package:provider/provider.dart';
 
 class DocumentDownloadButton extends StatefulWidget {
   final DocumentModel? document;
@@ -43,7 +43,8 @@ class _DocumentDownloadButtonState extends State<DocumentDownloadButton> {
     }
     setState(() => _isDownloadPending = true);
     try {
-      final bytes = await getIt<PaperlessDocumentsApi>().download(document);
+      final bytes =
+          await context.read<PaperlessDocumentsApi>().download(document);
       final Directory dir = await FileService.downloadsDirectory;
       String filePath = "${dir.path}/${document.originalFileName}";
       //TODO: Add replacement mechanism here (ask user if file should be replaced if exists)
