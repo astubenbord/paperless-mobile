@@ -125,7 +125,7 @@ class _InboxPageState extends State<InboxPage> {
               .toList();
 
           return RefreshIndicator(
-            onRefresh: () => BlocProvider.of<InboxCubit>(context).loadInbox(),
+            onRefresh: () => context.read<InboxCubit>().loadInbox(),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -205,14 +205,13 @@ class _InboxPageState extends State<InboxPage> {
         ) ??
         false;
     if (isActionConfirmed) {
-      await BlocProvider.of<InboxCubit>(context).clearInbox();
+      await context.read<InboxCubit>().clearInbox();
     }
   }
 
   Future<bool> _onItemDismissed(DocumentModel doc) async {
     try {
-      final removedTags =
-          await BlocProvider.of<InboxCubit>(context).remove(doc);
+      final removedTags = await context.read<InboxCubit>().remove(doc);
       showSnackBar(
         context,
         S.of(context).inboxPageDocumentRemovedMessageText,
@@ -239,8 +238,7 @@ class _InboxPageState extends State<InboxPage> {
     Iterable<int> removedTags,
   ) async {
     try {
-      await BlocProvider.of<InboxCubit>(context)
-          .undoRemove(document, removedTags);
+      await context.read<InboxCubit>().undoRemove(document, removedTags);
     } on PaperlessServerException catch (error, stackTrace) {
       showErrorMessage(context, error, stackTrace);
     }

@@ -44,9 +44,10 @@ class SettingsPage extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (ctxt) => BlocProvider.value(
-            value: BlocProvider.of<ApplicationSettingsCubit>(context),
-            child: page),
+        builder: (context) => BlocProvider.value(
+          value: context.read<ApplicationSettingsCubit>(),
+          child: page,
+        ),
         maintainState: true,
       ),
     );

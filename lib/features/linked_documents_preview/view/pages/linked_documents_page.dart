@@ -65,8 +65,7 @@ class _LinkedDocumentsPageState extends State<LinkedDocumentsPage> {
                                 MaterialPageRoute(
                                   builder: (context) => BlocProvider(
                                     create: (context) => DocumentDetailsCubit(
-                                      Provider.of<PaperlessDocumentsApi>(
-                                          context),
+                                      context.read<PaperlessDocumentsApi>(),
                                       document,
                                     ),
                                     child: const DocumentDetailsPage(

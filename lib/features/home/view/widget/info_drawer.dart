@@ -155,9 +155,8 @@ class _InfoDrawerState extends State<InfoDrawer> {
                 ),
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => BlocProvider(
-                      create: (context) =>
-                          Provider.of<ApplicationSettingsCubit>(context),
+                    builder: (context) => BlocProvider.value(
+                      value: context.read<ApplicationSettingsCubit>(),
                       child: const SettingsPage(),
                     ),
                   ),
@@ -214,20 +213,14 @@ class _InfoDrawerState extends State<InfoDrawer> {
                 title: Text(S.of(context).appDrawerLogoutLabel),
                 onTap: () {
                   try {
-                    BlocProvider.of<AuthenticationCubit>(context).logout();
-                    Provider.of<LocalVault>(context).clear();
-                    BlocProvider.of<ApplicationSettingsCubit>(context).clear();
-                    RepositoryProvider.of<LabelRepository<Tag>>(context)
-                        .clear();
-                    RepositoryProvider.of<LabelRepository<Correspondent>>(
-                            context)
-                        .clear();
-                    RepositoryProvider.of<LabelRepository<DocumentType>>(
-                            context)
-                        .clear();
-                    RepositoryProvider.of<LabelRepository<StoragePath>>(context)
-                        .clear();
-                    RepositoryProvider.of<SavedViewRepository>(context).clear();
+                    context.read<AuthenticationCubit>().logout();
+                    context.read<LocalVault>().clear();
+                    context.read<ApplicationSettingsCubit>().clear();
+                    context.read<LabelRepository<Tag>>().clear();
+                    context.read<LabelRepository<Correspondent>>().clear();
+                    context.read<LabelRepository<DocumentType>>().clear();
+                    context.read<LabelRepository<StoragePath>>().clear();
+                    context.read<SavedViewRepository>().clear();
                   } on PaperlessServerException catch (error, stackTrace) {
                     showErrorMessage(context, error, stackTrace);
                   }
@@ -246,8 +239,8 @@ class _InfoDrawerState extends State<InfoDrawer> {
         builder: (_) => LabelRepositoriesProvider(
           child: BlocProvider(
             create: (context) => InboxCubit(
-              RepositoryProvider.of<LabelRepository<Tag>>(context),
-              Provider.of<PaperlessDocumentsApi>(context),
+              context.read<LabelRepository<Tag>>(),
+              context.read<PaperlessDocumentsApi>(),
             )..loadInbox(),
             child: const InboxPage(),
           ),

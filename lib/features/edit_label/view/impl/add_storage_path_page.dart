@@ -15,7 +15,7 @@ class AddStoragePathPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => EditLabelCubit<StoragePath>(
-        RepositoryProvider.of<LabelRepository<StoragePath>>(context),
+        context.read<LabelRepository<StoragePath>>(),
       ),
       child: AddLabelPage<StoragePath>(
         pageTitle: Text(S.of(context).addStoragePathPageTitle),

@@ -18,7 +18,7 @@ class AddTagPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => EditLabelCubit<Tag>(
-        RepositoryProvider.of<LabelRepository<Tag>>(context),
+        context.read<LabelRepository<Tag>>(),
       ),
       child: AddLabelPage<Tag>(
         pageTitle: Text(S.of(context).addTagPageTitle),

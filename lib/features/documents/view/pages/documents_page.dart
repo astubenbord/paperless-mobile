@@ -32,9 +32,6 @@ class DocumentsPage extends StatefulWidget {
 }
 
 class _DocumentsPageState extends State<DocumentsPage> {
-  late final DocumentsCubit _documentsCubit;
-  late final SavedViewCubit _savedViewCubit;
-
   final _pagingController = PagingController<int, DocumentModel>(
     firstPageKey: 1,
   );
@@ -42,10 +39,8 @@ class _DocumentsPageState extends State<DocumentsPage> {
   @override
   void initState() {
     super.initState();
-    _documentsCubit = context.watch();
-    _savedViewCubit = context.watch();
     try {
-      _documentsCubit.load();
+      context.read<DocumentsCubit>().load();
     } on PaperlessServerException catch (error, stackTrace) {
       showErrorMessage(context, error, stackTrace);
     }
@@ -66,7 +61,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
           current == ConnectivityState.connected,
       listener: (context, state) {
         try {
-          _documentsCubit.load();
+          context.read<DocumentsCubit>().load();
         } on PaperlessServerException catch (error, stackTrace) {
           showErrorMessage(context, error, stackTrace);
         }
@@ -74,9 +69,9 @@ class _DocumentsPageState extends State<DocumentsPage> {
       builder: (context, connectivityState) {
         return Scaffold(
           drawer: BlocProvider.value(
-            value: BlocProvider.of<AuthenticationCubit>(context),
+            value: context.read<AuthenticationCubit>(),
             child: InfoDrawer(
-              afterInboxClosed: () => _documentsCubit.reload(),
+              afterInboxClosed: () => context.read<DocumentsCubit>().reload(),
             ),
           ),
           floatingActionButton: BlocBuilder<DocumentsCubit, DocumentsState>(
@@ -111,22 +106,25 @@ class _DocumentsPageState extends State<DocumentsPage> {
         ),
       ),
       isScrollControlled: true,
-      builder: (context) => DraggableScrollableSheet(
-        expand: false,
-        snap: true,
-        initialChildSize: .9,
-        maxChildSize: .9,
-        builder: (context, controller) => LabelsBlocProvider(
-          child: DocumentFilterPanel(
-            initialFilter: _documentsCubit.state.filter,
-            scrollController: controller,
+      builder: (_) => BlocProvider.value(
+        value: context.read<DocumentsCubit>(),
+        child: DraggableScrollableSheet(
+          expand: false,
+          snap: true,
+          initialChildSize: .9,
+          maxChildSize: .9,
+          builder: (context, controller) => LabelsBlocProvider(
+            child: DocumentFilterPanel(
+              initialFilter: context.read<DocumentsCubit>().state.filter,
+              scrollController: controller,
+            ),
           ),
         ),
       ),
     );
     if (filter != null) {
-      _documentsCubit.updateFilter(filter: filter);
-      _savedViewCubit.resetSelection();
+      context.read<DocumentsCubit>().updateFilter(filter: filter);
+      context.read<SavedViewCubit>().resetSelection();
     }
   }
 
@@ -177,8 +175,8 @@ class _DocumentsPageState extends State<DocumentsPage> {
                 child: DocumentsEmptyState(
                   state: state,
                   onReset: () {
-                    _documentsCubit.resetFilter();
-                    _savedViewCubit.resetSelection();
+                    context.read<DocumentsCubit>().resetFilter();
+                    context.read<SavedViewCubit>().resetSelection();
                   },
                 ),
               );
@@ -196,13 +194,15 @@ class _DocumentsPageState extends State<DocumentsPage> {
                     listener: (context, state) {
                       try {
                         if (state.selectedSavedViewId == null) {
-                          _documentsCubit.resetFilter();
+                          context.read<DocumentsCubit>().resetFilter();
                         } else {
                           final newFilter = state
                               .value[state.selectedSavedViewId]
                               ?.toDocumentFilter();
                           if (newFilter != null) {
-                            _documentsCubit.updateFilter(filter: newFilter);
+                            context
+                                .read<DocumentsCubit>()
+                                .updateFilter(filter: newFilter);
                           }
                         }
                       } on PaperlessServerException catch (error, stackTrace) {
@@ -220,11 +220,11 @@ class _DocumentsPageState extends State<DocumentsPage> {
                                 ? Icons.list
                                 : Icons.grid_view,
                           ),
-                          onPressed: () =>
-                              BlocProvider.of<ApplicationSettingsCubit>(context)
-                                  .setViewType(
-                            settings.preferredViewType.toggle(),
-                          ),
+                          onPressed: () => context
+                              .read<ApplicationSettingsCubit>()
+                              .setViewType(
+                                settings.preferredViewType.toggle(),
+                              ),
                         ),
                       ],
                     ),
@@ -243,7 +243,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
     await Navigator.of(context).push<DocumentModel?>(
       _buildDetailsPageRoute(document),
     );
-    _documentsCubit.reload();
+    context.read<DocumentsCubit>().reload();
   }
 
   MaterialPageRoute<DocumentModel?> _buildDetailsPageRoute(
@@ -251,7 +251,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
     return MaterialPageRoute(
       builder: (_) => BlocProvider(
         create: (context) => DocumentDetailsCubit(
-          context.watch(),
+          context.read<PaperlessDocumentsApi>(),
           document,
         ),
         child: const LabelRepositoriesProvider(
@@ -263,21 +263,22 @@ class _DocumentsPageState extends State<DocumentsPage> {
 
   void _addTagToFilter(int tagId) {
     try {
-      final tagsQuery = _documentsCubit.state.filter.tags is IdsTagsQuery
-          ? _documentsCubit.state.filter.tags as IdsTagsQuery
-          : const IdsTagsQuery();
+      final tagsQuery =
+          context.read<DocumentsCubit>().state.filter.tags is IdsTagsQuery
+              ? context.read<DocumentsCubit>().state.filter.tags as IdsTagsQuery
+              : const IdsTagsQuery();
       if (tagsQuery.includedIds.contains(tagId)) {
-        _documentsCubit.updateCurrentFilter(
-          (filter) => filter.copyWith(
-            tags: tagsQuery.withIdsRemoved([tagId]),
-          ),
-        );
+        context.read<DocumentsCubit>().updateCurrentFilter(
+              (filter) => filter.copyWith(
+                tags: tagsQuery.withIdsRemoved([tagId]),
+              ),
+            );
       } else {
-        _documentsCubit.updateCurrentFilter(
-          (filter) => filter.copyWith(
-            tags: tagsQuery.withIdQueriesAdded([IncludeTagIdQuery(tagId)]),
-          ),
-        );
+        context.read<DocumentsCubit>().updateCurrentFilter(
+              (filter) => filter.copyWith(
+                tags: tagsQuery.withIdQueriesAdded([IncludeTagIdQuery(tagId)]),
+              ),
+            );
       }
     } on PaperlessServerException catch (error, stackTrace) {
       showErrorMessage(context, error, stackTrace);
@@ -285,7 +286,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
   }
 
   void _addCorrespondentToFilter(int? correspondentId) {
-    final cubit = BlocProvider.of<DocumentsCubit>(context);
+    final cubit = context.read<DocumentsCubit>();
     try {
       if (cubit.state.filter.correspondent.id == correspondentId) {
         cubit.updateCurrentFilter(
@@ -304,7 +305,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
   }
 
   void _addDocumentTypeToFilter(int? documentTypeId) {
-    final cubit = BlocProvider.of<DocumentsCubit>(context);
+    final cubit = context.read<DocumentsCubit>();
     try {
       if (cubit.state.filter.documentType.id == documentTypeId) {
         cubit.updateCurrentFilter(
@@ -323,7 +324,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
   }
 
   void _addStoragePathToFilter(int? pathId) {
-    final cubit = BlocProvider.of<DocumentsCubit>(context);
+    final cubit = context.read<DocumentsCubit>();
     try {
       if (cubit.state.filter.correspondent.id == pathId) {
         cubit.updateCurrentFilter(
@@ -342,28 +343,29 @@ class _DocumentsPageState extends State<DocumentsPage> {
   }
 
   Future<void> _loadNewPage(int pageKey) async {
-    final pageCount = _documentsCubit.state
-        .inferPageCount(pageSize: _documentsCubit.state.filter.pageSize);
+    final documentsCubit = context.read<DocumentsCubit>();
+    final pageCount = documentsCubit.state
+        .inferPageCount(pageSize: documentsCubit.state.filter.pageSize);
     if (pageCount <= pageKey + 1) {
       _pagingController.nextPageKey = null;
     }
     try {
-      await _documentsCubit.loadMore();
+      await documentsCubit.loadMore();
     } on PaperlessServerException catch (error, stackTrace) {
       showErrorMessage(context, error, stackTrace);
     }
   }
 
   void _onSelected(DocumentModel model) {
-    _documentsCubit.toggleDocumentSelection(model);
+    context.read<DocumentsCubit>().toggleDocumentSelection(model);
   }
 
   Future<void> _onRefresh() async {
     try {
-      _documentsCubit.updateCurrentFilter(
-        (filter) => filter.copyWith(page: 1),
-      );
-      _savedViewCubit.reload();
+      context.read<DocumentsCubit>().updateCurrentFilter(
+            (filter) => filter.copyWith(page: 1),
+          );
+      context.read<SavedViewCubit>().reload();
     } on PaperlessServerException catch (error, stackTrace) {
       showErrorMessage(context, error, stackTrace);
     }

@@ -30,15 +30,14 @@ class DocumentPreview extends StatelessWidget {
         fit: fit,
         alignment: Alignment.topCenter,
         cacheKey: "thumb_$id",
-        imageUrl:
-            Provider.of<PaperlessDocumentsApi>(context).getThumbnailUrl(id),
+        imageUrl: context.read<PaperlessDocumentsApi>().getThumbnailUrl(id),
         errorWidget: (ctxt, msg, __) => Text(msg),
         placeholder: (context, value) => Shimmer.fromColors(
           baseColor: Colors.grey[300]!,
           highlightColor: Colors.grey[100]!,
           child: const SizedBox(height: 100, width: 100),
         ),
-        cacheManager: context.watch(),
+        cacheManager: context.watch<CacheManager>(),
       ),
       // ),
     );

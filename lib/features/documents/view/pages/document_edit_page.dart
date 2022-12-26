@@ -99,9 +99,8 @@ class _DocumentEditPageState extends State<DocumentEditPage> {
     return LabelFormField<StoragePath>(
       notAssignedSelectable: false,
       formBuilderState: _formKey.currentState,
-      labelCreationWidgetBuilder: (initialValue) =>
-          RepositoryProvider<LabelRepository<StoragePath>>(
-        create: (context) => context.watch(),
+      labelCreationWidgetBuilder: (initialValue) => RepositoryProvider(
+        create: (context) => context.read<LabelRepository<StoragePath>>(),
         child: AddStoragePathPage(initalValue: initialValue),
       ),
       textFieldLabel: S.of(context).documentStoragePathPropertyLabel,
@@ -117,9 +116,8 @@ class _DocumentEditPageState extends State<DocumentEditPage> {
     return LabelFormField<Correspondent>(
       notAssignedSelectable: false,
       formBuilderState: _formKey.currentState,
-      labelCreationWidgetBuilder: (initialValue) =>
-          RepositoryProvider<LabelRepository<Correspondent>>(
-        create: context.watch(),
+      labelCreationWidgetBuilder: (initialValue) => RepositoryProvider(
+        create: (context) => context.read<LabelRepository<Correspondent>>(),
         child: AddCorrespondentPage(initialName: initialValue),
       ),
       textFieldLabel: S.of(context).documentCorrespondentPropertyLabel,
@@ -135,9 +133,8 @@ class _DocumentEditPageState extends State<DocumentEditPage> {
     return LabelFormField<DocumentType>(
       notAssignedSelectable: false,
       formBuilderState: _formKey.currentState,
-      labelCreationWidgetBuilder: (currentInput) =>
-          RepositoryProvider<LabelRepository<DocumentType>>(
-        create: (context) => context.watch(),
+      labelCreationWidgetBuilder: (currentInput) => RepositoryProvider(
+        create: (context) => context.read<LabelRepository<DocumentType>>(),
         child: AddDocumentTypePage(
           initialName: currentInput,
         ),

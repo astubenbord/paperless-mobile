@@ -48,9 +48,9 @@ class InboxItem extends StatelessWidget {
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => BlocProvider(
+          builder: (context) => BlocProvider(
             create: (context) => DocumentDetailsCubit(
-              Provider.of<PaperlessDocumentsApi>(context),
+              context.read<PaperlessDocumentsApi>(),
               document,
             ),
             child: const LabelRepositoriesProvider(

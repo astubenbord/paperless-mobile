@@ -29,20 +29,19 @@ class SortDocumentsButton extends StatelessWidget {
         ),
       ),
       builder: (_) => BlocProvider<DocumentsCubit>.value(
-        value: BlocProvider.of<DocumentsCubit>(context),
+        value: context.read<DocumentsCubit>(),
         child: FractionallySizedBox(
           heightFactor: .6,
           child: MultiBlocProvider(
             providers: [
               BlocProvider(
                 create: (context) => LabelCubit<DocumentType>(
-                  RepositoryProvider.of<LabelRepository<DocumentType>>(context),
+                  context.read<LabelRepository<DocumentType>>(),
                 ),
               ),
               BlocProvider(
                 create: (context) => LabelCubit<Correspondent>(
-                  RepositoryProvider.of<LabelRepository<Correspondent>>(
-                      context),
+                  context.read<LabelRepository<Correspondent>>(),
                 ),
               ),
             ],
@@ -52,13 +51,12 @@ class SortDocumentsButton extends StatelessWidget {
                   initialSortField: state.filter.sortField,
                   initialSortOrder: state.filter.sortOrder,
                   onSubmit: (field, order) =>
-                      BlocProvider.of<DocumentsCubit>(context)
-                          .updateCurrentFilter(
-                    (filter) => filter.copyWith(
-                      sortField: field,
-                      sortOrder: order,
-                    ),
-                  ),
+                      context.read<DocumentsCubit>().updateCurrentFilter(
+                            (filter) => filter.copyWith(
+                              sortField: field,
+                              sortOrder: order,
+                            ),
+                          ),
                 );
               },
             ),

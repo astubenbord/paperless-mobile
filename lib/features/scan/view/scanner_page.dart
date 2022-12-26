@@ -126,12 +126,12 @@ class _ScannerPageState extends State<ScannerPage>
     if (kDebugMode) {
       dev.log('[ScannerPage] Wrote image to temporary file: ${file.path}');
     }
-    BlocProvider.of<DocumentScannerCubit>(context).addScan(file);
+    context.read<DocumentScannerCubit>().addScan(file);
   }
 
   void _onPrepareDocumentUpload(BuildContext context) async {
     final doc = _buildDocumentFromImageFiles(
-      BlocProvider.of<DocumentScannerCubit>(context).state,
+      context.read<DocumentScannerCubit>().state,
     );
     final bytes = await doc.save();
     final uploaded = await Navigator.of(context).push(
@@ -139,19 +139,13 @@ class _ScannerPageState extends State<ScannerPage>
             builder: (_) => LabelRepositoriesProvider(
               child: BlocProvider(
                 create: (context) => DocumentUploadCubit(
-                  localVault: Provider.of<LocalVault>(context),
-                  documentApi: Provider.of<PaperlessDocumentsApi>(context),
+                  localVault: context.read<LocalVault>(),
+                  documentApi: context.read<PaperlessDocumentsApi>(),
                   correspondentRepository:
-                      RepositoryProvider.of<LabelRepository<Correspondent>>(
-                    context,
-                  ),
+                      context.read<LabelRepository<Correspondent>>(),
                   documentTypeRepository:
-                      RepositoryProvider.of<LabelRepository<DocumentType>>(
-                    context,
-                  ),
-                  tagRepository: RepositoryProvider.of<LabelRepository<Tag>>(
-                    context,
-                  ),
+                      context.read<LabelRepository<DocumentType>>(),
+                  tagRepository: context.read<LabelRepository<Tag>>(),
                 ),
                 child: DocumentUploadPreparationPage(
                   fileBytes: bytes,
@@ -162,7 +156,7 @@ class _ScannerPageState extends State<ScannerPage>
         ) ??
         false;
     if (uploaded) {
-      BlocProvider.of<DocumentScannerCubit>(context).reset();
+      context.read<DocumentScannerCubit>().reset();
     }
   }
 
@@ -216,8 +210,7 @@ class _ScannerPageState extends State<ScannerPage>
             file: scans[index],
             onDelete: () async {
               try {
-                BlocProvider.of<DocumentScannerCubit>(context)
-                    .removeScan(index);
+                context.read<DocumentScannerCubit>().removeScan(index);
               } on PaperlessServerException catch (error, stackTrace) {
                 showErrorMessage(context, error, stackTrace);
               }
@@ -230,7 +223,7 @@ class _ScannerPageState extends State<ScannerPage>
 
   void _reset(BuildContext context) {
     try {
-      BlocProvider.of<DocumentScannerCubit>(context).reset();
+      context.read<DocumentScannerCubit>().reset();
     } on PaperlessServerException catch (error, stackTrace) {
       showErrorMessage(context, error, stackTrace);
     }
@@ -274,19 +267,13 @@ class _ScannerPageState extends State<ScannerPage>
           builder: (_) => LabelRepositoriesProvider(
             child: BlocProvider(
               create: (context) => DocumentUploadCubit(
-                localVault: Provider.of<LocalVault>(context),
-                documentApi: Provider.of<PaperlessDocumentsApi>(context),
+                localVault: context.read<LocalVault>(),
+                documentApi: context.read<PaperlessDocumentsApi>(),
                 correspondentRepository:
-                    RepositoryProvider.of<LabelRepository<Correspondent>>(
-                  context,
-                ),
+                    context.read<LabelRepository<Correspondent>>(),
                 documentTypeRepository:
-                    RepositoryProvider.of<LabelRepository<DocumentType>>(
-                  context,
-                ),
-                tagRepository: RepositoryProvider.of<LabelRepository<Tag>>(
-                  context,
-                ),
+                    context.read<LabelRepository<DocumentType>>(),
+                tagRepository: context.read<LabelRepository<Tag>>(),
               ),
               child: DocumentUploadPreparationPage(
                 fileBytes: fileBytes,

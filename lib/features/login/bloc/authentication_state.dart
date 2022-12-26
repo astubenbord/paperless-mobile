@@ -20,7 +20,7 @@ class AuthenticationState {
     required this.wasLoginStored,
     this.wasLocalAuthenticationSuccessful,
     this.authentication,
-  });
+  }) : assert(!isAuthenticated || authentication != null);
 
   AuthenticationState copyWith({
     bool? wasLoginStored,

@@ -166,8 +166,9 @@ class _DocumentUploadPreparationPageState
                   notAssignedSelectable: false,
                   formBuilderState: _formKey.currentState,
                   labelCreationWidgetBuilder: (initialName) =>
-                      RepositoryProvider<LabelRepository<DocumentType>>(
-                    create: (context) => context.watch(),
+                      RepositoryProvider(
+                    create: (context) =>
+                        context.read<LabelRepository<DocumentType>>(),
                     child: AddDocumentTypePage(initialName: initialName),
                   ),
                   textFieldLabel:
@@ -180,8 +181,9 @@ class _DocumentUploadPreparationPageState
                   notAssignedSelectable: false,
                   formBuilderState: _formKey.currentState,
                   labelCreationWidgetBuilder: (initialName) =>
-                      RepositoryProvider<LabelRepository<Correspondent>>(
-                    create: (context) => context.watch(),
+                      RepositoryProvider(
+                    create: (context) =>
+                        context.read<LabelRepository<Correspondent>>(),
                     child: AddCorrespondentPage(initialName: initialName),
                   ),
                   textFieldLabel:

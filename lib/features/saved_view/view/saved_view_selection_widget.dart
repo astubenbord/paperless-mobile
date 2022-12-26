@@ -129,7 +129,7 @@ class SavedViewSelectionWidget extends StatelessWidget {
     );
     if (newView != null) {
       try {
-        await BlocProvider.of<SavedViewCubit>(context).add(newView);
+        await context.read<SavedViewCubit>().add(newView);
       } on PaperlessServerException catch (error, stackTrace) {
         showErrorMessage(context, error, stackTrace);
       }
@@ -139,9 +139,9 @@ class SavedViewSelectionWidget extends StatelessWidget {
   void _onSelected(
       bool isSelected, BuildContext context, SavedView view) async {
     if (isSelected) {
-      BlocProvider.of<SavedViewCubit>(context).selectView(view);
+      context.read<SavedViewCubit>().selectView(view);
     } else {
-      BlocProvider.of<SavedViewCubit>(context).selectView(null);
+      context.read<SavedViewCubit>().selectView(null);
     }
   }
 
@@ -154,7 +154,7 @@ class SavedViewSelectionWidget extends StatelessWidget {
           false;
       if (delete) {
         try {
-          BlocProvider.of<SavedViewCubit>(context).remove(view);
+          context.read<SavedViewCubit>().remove(view);
         } on PaperlessServerException catch (error, stackTrace) {
           showErrorMessage(context, error, stackTrace);
         }

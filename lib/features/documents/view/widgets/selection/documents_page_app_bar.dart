@@ -48,8 +48,7 @@ class _DocumentsPageAppBarState extends State<DocumentsPageAppBar> {
             ),
             leading: IconButton(
               icon: const Icon(Icons.close),
-              onPressed: () =>
-                  BlocProvider.of<DocumentsCubit>(context).resetSelection(),
+              onPressed: () => context.read<DocumentsCubit>().resetSelection(),
             ),
             title: Text(
                 '${documentsState.selection.length} ${S.of(context).documentsSelectedText}'),
@@ -111,7 +110,8 @@ class _DocumentsPageAppBarState extends State<DocumentsPageAppBar> {
         false;
     if (shouldDelete) {
       try {
-        await BlocProvider.of<DocumentsCubit>(context)
+        await context
+            .read<DocumentsCubit>()
             .bulkRemove(documentsState.selection);
         showSnackBar(
           context,

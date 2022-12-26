@@ -10,19 +10,20 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:http/http.dart';
 import 'package:http/io_client.dart';
+import 'package:http_interceptor/http/intercepted_client.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl_standalone.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/bloc/bloc_changes_observer.dart';
 import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
 import 'package:paperless_mobile/core/bloc/paperless_server_information_cubit.dart';
 import 'package:paperless_mobile/core/global/constants.dart';
+import 'package:paperless_mobile/core/interceptor/authentication.interceptor.dart';
 import 'package:paperless_mobile/core/logic/error_code_localization_mapper.dart';
-import 'package:paperless_mobile/core/model/paperless_statistics_state.dart';
 import 'package:paperless_mobile/core/repository/impl/correspondent_repository_impl.dart';
 import 'package:paperless_mobile/core/repository/impl/document_type_repository_impl.dart';
 import 'package:paperless_mobile/core/repository/impl/saved_view_repository_impl.dart';
@@ -30,17 +31,19 @@ import 'package:paperless_mobile/core/repository/impl/storage_path_repository_im
 import 'package:paperless_mobile/core/repository/impl/tag_repository_impl.dart';
 import 'package:paperless_mobile/core/repository/label_repository.dart';
 import 'package:paperless_mobile/core/repository/saved_view_repository.dart';
-import 'package:paperless_mobile/core/security/security_context_aware_dio_manager.dart';
+import 'package:paperless_mobile/core/security/authentication_aware_dio_manager.dart';
 import 'package:paperless_mobile/core/service/connectivity_status.service.dart';
 import 'package:paperless_mobile/core/service/file_service.dart';
 import 'package:paperless_mobile/core/store/local_vault.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
+import 'package:paperless_mobile/extensions/security_context_extension.dart';
 import 'package:paperless_mobile/features/app_intro/application_intro_slideshow.dart';
 import 'package:paperless_mobile/features/document_upload/cubit/document_upload_cubit.dart';
 import 'package:paperless_mobile/features/document_upload/view/document_upload_preparation_page.dart';
 import 'package:paperless_mobile/features/home/view/home_page.dart';
 import 'package:paperless_mobile/features/login/bloc/authentication_cubit.dart';
 import 'package:paperless_mobile/features/login/bloc/authentication_state.dart';
+import 'package:paperless_mobile/features/login/model/authentication_information.dart';
 import 'package:paperless_mobile/features/login/services/authentication_service.dart';
 import 'package:paperless_mobile/features/login/view/login_page.dart';
 import 'package:paperless_mobile/features/settings/bloc/application_settings_cubit.dart';
@@ -62,18 +65,12 @@ void main() async {
   await findSystemLocale();
 
   // Required for self signed client certificates
-  final dioWrapper = SecurityContextAwareDioManager();
-  IOClient httpClient = IOClient();
+  final dioWrapper = AuthenticationAwareDioManager();
 
-  dioWrapper.securityContextChanges.listen(
-    (context) => httpClient = IOClient(HttpClient(context: context)),
-  );
   // Initialize External dependencies
   final connectivity = Connectivity();
   final encryptedSharedPreferences = EncryptedSharedPreferences();
   final localAuthentication = LocalAuthentication();
-  final cacheManager = cm.CacheManager(cm.Config('cacheKey',
-      fileService: cm.HttpFileService(httpClient: httpClient)));
 
   // Initialize Paperless APIs
   final authApi = PaperlessAuthenticationApiImpl(dioWrapper.client);
@@ -104,8 +101,35 @@ void main() async {
     authApi,
     dioWrapper,
   );
-  //TODO: Check if hydrated cubit restores state.
-  //await authCubit.restoreSessionState();
+
+  String? currentServerUrl;
+  String? currentAuthToken;
+
+  if (authCubit.state.isAuthenticated) {
+    final auth = authCubit.state.authentication!;
+    dioWrapper.updateSettings(
+      baseUrl: auth.serverUrl,
+      authToken: auth.token,
+      clientCertificate: auth.clientCertificate,
+    );
+    currentServerUrl = auth.serverUrl;
+    currentAuthToken = auth.token;
+  }
+
+  SecurityContext securityContext = SecurityContext();
+  authCubit.stream.asBroadcastStream().listen((event) {
+    if (event.isAuthenticated) {
+      final auth = event.authentication!;
+      securityContext =
+          SecurityContext().withClientCertificate(auth.clientCertificate);
+      currentServerUrl = auth.serverUrl;
+      currentAuthToken = auth.token;
+    } else {
+      securityContext = SecurityContext();
+      currentServerUrl = null;
+      currentAuthToken = null;
+    }
+  });
 
   // Create repositories
   final tagRepository = TagRepositoryImpl(labelsApi);
@@ -122,7 +146,47 @@ void main() async {
         Provider<PaperlessLabelsApi>.value(value: labelsApi),
         Provider<PaperlessServerStatsApi>.value(value: statsApi),
         Provider<PaperlessSavedViewsApi>.value(value: savedViewsApi),
-        Provider<cm.CacheManager>.value(value: cacheManager),
+        ProxyProvider<SecurityContext, cm.CacheManager>(
+          create: (context) => cm.CacheManager(
+            cm.Config(
+              'cacheKey',
+              fileService: cm.HttpFileService(
+                httpClient: InterceptedClient.build(
+                  interceptors: [
+                    AuthenticationInterceptor(
+                      serverUrl: currentServerUrl,
+                      token: currentAuthToken,
+                    ),
+                  ],
+                  client: IOClient(
+                    HttpClient(
+                      context: securityContext,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          update: (context, securityContext, previous) => cm.CacheManager(
+            cm.Config(
+              'cacheKey',
+              fileService: cm.HttpFileService(
+                  httpClient: InterceptedClient.build(
+                interceptors: [
+                  AuthenticationInterceptor(
+                    serverUrl: currentServerUrl,
+                    token: currentAuthToken,
+                  ),
+                ],
+                client: IOClient(
+                  HttpClient(
+                    context: securityContext,
+                  ),
+                ),
+              )),
+            ),
+          ),
+        ),
         Provider<LocalVault>.value(value: localVault),
         Provider<ConnectivityStatusService>.value(
           value: connectivityStatusService,
@@ -148,17 +212,8 @@ void main() async {
         ],
         child: MultiBlocProvider(
           providers: [
-            BlocProvider(
-              create: (context) => AuthenticationCubit(
-                localVault,
-                localAuthService,
-                authApi,
-                dioWrapper,
-              ),
-            ),
-            BlocProvider<ConnectivityCubit>.value(
-              value: connectivityCubit,
-            ),
+            BlocProvider<AuthenticationCubit>.value(value: authCubit),
+            BlocProvider<ConnectivityCubit>.value(value: connectivityCubit),
           ],
           child: const PaperlessMobileEntrypoint(),
         ),
@@ -225,10 +280,7 @@ class _PaperlessMobileEntrypointState extends State<PaperlessMobileEntrypoint> {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => ConnectivityCubit(context.watch()),
-        ),
-        BlocProvider(
-          create: (context) => PaperlessServerInformationCubit(context.watch()),
+          create: (context) => PaperlessServerInformationCubit(context.read()),
         ),
         BlocProvider(
           create: (context) => ApplicationSettingsCubit(),
@@ -313,13 +365,13 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
     final success = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => BlocProvider(
-          create: (BuildContext context) => DocumentUploadCubit(
-            localVault: context.watch(),
-            documentApi: context.watch(),
-            tagRepository: context.watch(),
-            correspondentRepository: context.watch(),
-            documentTypeRepository: context.watch(),
+        builder: (context) => BlocProvider.value(
+          value: DocumentUploadCubit(
+            localVault: context.read(),
+            documentApi: context.read(),
+            tagRepository: context.read(),
+            correspondentRepository: context.read(),
+            documentTypeRepository: context.read(),
           ),
           child: DocumentUploadPreparationPage(
             fileBytes: bytes,

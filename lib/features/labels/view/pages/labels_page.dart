@@ -14,6 +14,10 @@ import 'package:paperless_mobile/features/edit_label/view/impl/edit_storage_path
 import 'package:paperless_mobile/features/edit_label/view/impl/edit_tag_page.dart';
 import 'package:paperless_mobile/features/home/view/widget/info_drawer.dart';
 import 'package:paperless_mobile/features/labels/bloc/label_cubit.dart';
+import 'package:paperless_mobile/features/labels/bloc/providers/correspondent_bloc_provider.dart';
+import 'package:paperless_mobile/features/labels/bloc/providers/document_type_bloc_provider.dart';
+import 'package:paperless_mobile/features/labels/bloc/providers/storage_path_bloc_provider.dart';
+import 'package:paperless_mobile/features/labels/bloc/providers/tag_bloc_provider.dart';
 import 'package:paperless_mobile/features/labels/view/widgets/label_tab_view.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 
@@ -119,11 +123,7 @@ class _LabelsPageState extends State<LabelsPage>
             body: TabBarView(
               controller: _tabController,
               children: [
-                BlocProvider(
-                  create: (context) => LabelCubit(
-                    RepositoryProvider.of<LabelRepository<Correspondent>>(
-                        context),
-                  ),
+                CorrespondentBlocProvider(
                   child: LabelTabView<Correspondent>(
                     filterBuilder: (label) => DocumentFilter(
                       correspondent: IdQueryParameter.fromId(label.id),
@@ -139,11 +139,7 @@ class _LabelsPageState extends State<LabelsPage>
                     onAddNew: _openAddCorrespondentPage,
                   ),
                 ),
-                BlocProvider(
-                  create: (context) => LabelCubit(
-                    RepositoryProvider.of<LabelRepository<DocumentType>>(
-                        context),
-                  ),
+                DocumentTypeBlocProvider(
                   child: LabelTabView<DocumentType>(
                     filterBuilder: (label) => DocumentFilter(
                       documentType: IdQueryParameter.fromId(label.id),
@@ -159,10 +155,7 @@ class _LabelsPageState extends State<LabelsPage>
                     onAddNew: _openAddDocumentTypePage,
                   ),
                 ),
-                BlocProvider(
-                  create: (context) => LabelCubit<Tag>(
-                    RepositoryProvider.of<LabelRepository<Tag>>(context),
-                  ),
+                TagBlocProvider(
                   child: LabelTabView<Tag>(
                     filterBuilder: (label) => DocumentFilter(
                       tags: IdsTagsQuery.fromIds([label.id!]),
@@ -186,11 +179,7 @@ class _LabelsPageState extends State<LabelsPage>
                     onAddNew: _openAddTagPage,
                   ),
                 ),
-                BlocProvider(
-                  create: (context) => LabelCubit<StoragePath>(
-                    RepositoryProvider.of<LabelRepository<StoragePath>>(
-                        context),
-                  ),
+                StoragePathBlocProvider(
                   child: LabelTabView<StoragePath>(
                     onEdit: _openEditStoragePathPage,
                     filterBuilder: (label) => DocumentFilter(
@@ -219,8 +208,8 @@ class _LabelsPageState extends State<LabelsPage>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => RepositoryProvider.value(
-          value: RepositoryProvider.of<LabelRepository<Correspondent>>(context),
+        builder: (_) => RepositoryProvider(
+          create: (context) => context.read<LabelRepository<Correspondent>>(),
           child: EditCorrespondentPage(correspondent: correspondent),
         ),
       ),
@@ -231,8 +220,8 @@ class _LabelsPageState extends State<LabelsPage>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => RepositoryProvider.value(
-          value: RepositoryProvider.of<LabelRepository<DocumentType>>(context),
+        builder: (_) => RepositoryProvider(
+          create: (context) => context.read<LabelRepository<DocumentType>>(),
           child: EditDocumentTypePage(documentType: docType),
         ),
       ),
@@ -243,8 +232,8 @@ class _LabelsPageState extends State<LabelsPage>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => RepositoryProvider.value(
-          value: RepositoryProvider.of<LabelRepository<Tag>>(context),
+        builder: (_) => RepositoryProvider(
+          create: (context) => context.read<LabelRepository<Tag>>(),
           child: EditTagPage(tag: tag),
         ),
       ),
@@ -255,8 +244,8 @@ class _LabelsPageState extends State<LabelsPage>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => RepositoryProvider.value(
-          value: RepositoryProvider.of<LabelRepository<StoragePath>>(context),
+        builder: (_) => RepositoryProvider(
+          create: (context) => context.read<LabelRepository<StoragePath>>(),
           child: EditStoragePathPage(
             storagePath: path,
           ),
@@ -269,8 +258,8 @@ class _LabelsPageState extends State<LabelsPage>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => RepositoryProvider.value(
-          value: RepositoryProvider.of<LabelRepository<Correspondent>>(context),
+        builder: (_) => RepositoryProvider(
+          create: (context) => context.read<LabelRepository<Correspondent>>(),
           child: const AddCorrespondentPage(),
         ),
       ),
@@ -281,8 +270,8 @@ class _LabelsPageState extends State<LabelsPage>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => RepositoryProvider.value(
-          value: RepositoryProvider.of<LabelRepository<DocumentType>>(context),
+        builder: (_) => RepositoryProvider(
+          create: (context) => context.read<LabelRepository<DocumentType>>(),
           child: const AddDocumentTypePage(),
         ),
       ),
@@ -293,8 +282,8 @@ class _LabelsPageState extends State<LabelsPage>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => RepositoryProvider.value(
-          value: RepositoryProvider.of<LabelRepository<Tag>>(context),
+        builder: (_) => RepositoryProvider(
+          create: (context) => context.read<LabelRepository<Tag>>(),
           child: const AddTagPage(),
         ),
       ),
@@ -305,8 +294,8 @@ class _LabelsPageState extends State<LabelsPage>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => RepositoryProvider.value(
-          value: RepositoryProvider.of<LabelRepository<StoragePath>>(context),
+        builder: (_) => RepositoryProvider(
+          create: (context) => context.read<LabelRepository<StoragePath>>(),
           child: const AddStoragePathPage(),
         ),
       ),

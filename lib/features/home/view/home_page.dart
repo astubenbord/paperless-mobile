@@ -55,13 +55,14 @@ class _HomePageState extends State<HomePage> {
         body: [
           MultiBlocProvider(
             providers: [
-              BlocProvider.value(
-                value:
-                    DocumentsCubit(Provider.of<PaperlessDocumentsApi>(context)),
+              BlocProvider(
+                create: (context) => DocumentsCubit(
+                  context.read<PaperlessDocumentsApi>(),
+                ),
               ),
               BlocProvider(
                 create: (context) => SavedViewCubit(
-                  RepositoryProvider.of<SavedViewRepository>(context),
+                  context.read<SavedViewRepository>(),
                 ),
               ),
             ],
@@ -71,12 +72,7 @@ class _HomePageState extends State<HomePage> {
             value: _scannerCubit,
             child: const ScannerPage(),
           ),
-          BlocProvider(
-            create: (context) => DocumentsCubit(
-              Provider.of<PaperlessDocumentsApi>(context),
-            ),
-            child: const LabelsPage(),
-          ),
+          const LabelsPage(),
         ][_currentIndex],
       ),
     );

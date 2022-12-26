@@ -1,9 +1,8 @@
 import 'dart:io';
 
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:paperless_api/paperless_api.dart';
-import 'package:paperless_mobile/core/security/security_context_aware_dio_manager.dart';
+import 'package:paperless_mobile/core/security/authentication_aware_dio_manager.dart';
 import 'package:paperless_mobile/core/store/local_vault.dart';
 import 'package:paperless_mobile/features/login/bloc/authentication_state.dart';
 import 'package:paperless_mobile/features/login/model/authentication_information.dart';
@@ -16,7 +15,7 @@ class AuthenticationCubit extends HydratedCubit<AuthenticationState> {
   final LocalAuthenticationService _localAuthService;
   final PaperlessAuthenticationApi _authApi;
   final LocalVault _localVault;
-  final SecurityContextAwareDioManager _dioWrapper;
+  final AuthenticationAwareDioManager _dioWrapper;
 
   AuthenticationCubit(
     this._localVault,

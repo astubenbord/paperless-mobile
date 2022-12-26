@@ -12,7 +12,7 @@ class TagBlocProvider extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => LabelCubit<Tag>(
-        RepositoryProvider.of<LabelRepository<Tag>>(context),
+        context.read<LabelRepository<Tag>>(),
       ),
       child: child,
     );

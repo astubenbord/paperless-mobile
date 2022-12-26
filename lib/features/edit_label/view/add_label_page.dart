@@ -24,7 +24,7 @@ class AddLabelPage<T extends Label> extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => EditLabelCubit(
-        RepositoryProvider.of<LabelRepository<T>>(context),
+        context.read<LabelRepository<T>>(),
       ),
       child: AddLabelFormWidget(
         pageTitle: pageTitle,
@@ -62,7 +62,7 @@ class AddLabelFormWidget<T extends Label> extends StatelessWidget {
         submitButtonConfig: SubmitButtonConfig<T>(
           icon: const Icon(Icons.add),
           label: Text(S.of(context).genericActionCreateLabel),
-          onSubmit: BlocProvider.of<EditLabelCubit<T>>(context).create,
+          onSubmit: context.read<EditLabelCubit<T>>().create,
         ),
         additionalFields: additionalFields,
       ),

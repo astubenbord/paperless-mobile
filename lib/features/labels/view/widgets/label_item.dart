@@ -47,7 +47,7 @@ class LabelItem<T extends Label> extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (context) => BlocProvider(
                     create: (context) => LinkedDocumentsCubit(
-                      Provider.of<PaperlessDocumentsApi>(context),
+                      context.read<PaperlessDocumentsApi>(),
                       filter,
                     ),
                     child: const LinkedDocumentsPage(),

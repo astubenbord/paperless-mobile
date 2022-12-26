@@ -12,7 +12,7 @@ class CorrespondentBlocProvider extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => LabelCubit<Correspondent>(
-        RepositoryProvider.of<LabelRepository<Correspondent>>(context),
+        context.read<LabelRepository<Correspondent>>(),
       ),
       child: child,
     );

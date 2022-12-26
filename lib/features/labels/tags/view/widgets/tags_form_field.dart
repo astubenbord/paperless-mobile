@@ -218,8 +218,8 @@ class _TagFormFieldState extends State<TagFormField> {
   void _onAddTag(BuildContext context, FormFieldState<TagsQuery> field) async {
     final Tag? tag = await Navigator.of(context).push<Tag>(
       MaterialPageRoute(
-        builder: (_) => RepositoryProvider.value(
-          value: RepositoryProvider.of<LabelRepository<Tag>>(context),
+        builder: (_) => RepositoryProvider(
+          create: (context) => context.read<LabelRepository<Tag>>(),
           child: AddTagPage(initialValue: _textEditingController.text),
         ),
       ),

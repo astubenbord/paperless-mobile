@@ -187,14 +187,14 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
       Navigator.push<bool>(
         context,
         MaterialPageRoute(
-          builder: (context) => BlocProvider(
-            create: (context) => EditDocumentCubit(
+          builder: (context) => BlocProvider.value(
+            value: EditDocumentCubit(
               document,
-              documentsApi: context.watch(),
-              correspondentRepository: context.watch(),
-              documentTypeRepository: context.watch(),
-              storagePathRepository: context.watch(),
-              tagRepository: context.watch(),
+              documentsApi: context.read(),
+              correspondentRepository: context.read(),
+              documentTypeRepository: context.read(),
+              storagePathRepository: context.read(),
+              tagRepository: context.read(),
             ),
             child: BlocListener<EditDocumentCubit, EditDocumentState>(
               listenWhen: (previous, current) =>

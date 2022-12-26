@@ -13,7 +13,7 @@ class ClearStorageSetting extends StatelessWidget {
       subtitle:
           Text("Remove downloaded files, scans and clear the cache's content"),
       onTap: () {
-        Provider.of<cm.CacheManager>(context).emptyCache();
+        context.read<cm.CacheManager>().emptyCache();
         FileService.clearUserData();
       },
     );

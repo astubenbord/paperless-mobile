@@ -38,14 +38,14 @@ class ThemeModeSetting extends StatelessWidget {
                       S.of(context).settingsPageAppearanceSettingDarkThemeLabel,
                 )
               ],
-              initialValue: BlocProvider.of<ApplicationSettingsCubit>(context)
+              initialValue: context
+                  .read<ApplicationSettingsCubit>()
                   .state
                   .preferredThemeMode,
               title: Text(S.of(context).settingsPageAppearanceSettingTitle),
             ),
           ).then((value) {
-            return BlocProvider.of<ApplicationSettingsCubit>(context)
-                .setThemeMode(value);
+            return context.read<ApplicationSettingsCubit>().setThemeMode(value);
           }),
         );
       },

@@ -92,12 +92,12 @@ class _LoginPageState extends State<LoginPage> {
       setState(() => _isLoginLoading = true);
       final form = _formKey.currentState!.value;
       try {
-        await BlocProvider.of<AuthenticationCubit>(context).login(
-          credentials: form[UserCredentialsFormField.fkCredentials],
-          serverUrl: form[ServerAddressFormField.fkServerAddress],
-          clientCertificate:
-              form[ClientCertificateFormField.fkClientCertificate],
-        );
+        await context.read<AuthenticationCubit>().login(
+              credentials: form[UserCredentialsFormField.fkCredentials],
+              serverUrl: form[ServerAddressFormField.fkServerAddress],
+              clientCertificate:
+                  form[ClientCertificateFormField.fkClientCertificate],
+            );
       } on PaperlessServerException catch (error, stackTrace) {
         showErrorMessage(context, error, stackTrace);
       } on Map<String, dynamic> catch (error, stackTrace) {

@@ -22,7 +22,7 @@ class EditLabelPage<T extends Label> extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => EditLabelCubit(
-        RepositoryProvider.of<LabelRepository<T>>(context),
+        context.read<LabelRepository<T>>(),
       ),
       child: EditLabelForm(
         label: label,
@@ -63,7 +63,7 @@ class EditLabelForm<T extends Label> extends StatelessWidget {
         submitButtonConfig: SubmitButtonConfig<T>(
           icon: const Icon(Icons.update),
           label: Text(S.of(context).genericActionUpdateLabel),
-          onSubmit: BlocProvider.of<EditLabelCubit<T>>(context).update,
+          onSubmit: context.read<EditLabelCubit<T>>().update,
         ),
         additionalFields: additionalFields,
       ),
@@ -99,11 +99,11 @@ class EditLabelForm<T extends Label> extends StatelessWidget {
           ) ??
           false;
       if (shouldDelete) {
-        BlocProvider.of<EditLabelCubit<T>>(context).delete(label);
+        context.read<EditLabelCubit<T>>().delete(label);
         Navigator.pop(context);
       }
     } else {
-      BlocProvider.of<EditLabelCubit<T>>(context).delete(label);
+      context.read<EditLabelCubit<T>>().delete(label);
       Navigator.pop(context);
     }
   }

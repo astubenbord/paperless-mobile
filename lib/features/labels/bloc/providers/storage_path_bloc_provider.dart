@@ -12,7 +12,7 @@ class StoragePathBlocProvider extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => LabelCubit<StoragePath>(
-        RepositoryProvider.of<LabelRepository<StoragePath>>(context),
+        context.read<LabelRepository<StoragePath>>(),
       ),
       child: child,
     );

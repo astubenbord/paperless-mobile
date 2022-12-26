@@ -63,9 +63,9 @@ class _ServerAddressFormFieldState extends State<ServerAddressFormField> {
     }
     //https://stackoverflow.com/questions/49648022/check-whether-there-is-an-internet-connection-available-on-flutter-app
     setState(() => _reachabilityStatus = ReachabilityStatus.testing);
-    final isReachable =
-        await Provider.of<ConnectivityStatusService>(context, listen: false)
-            .isServerReachable(address);
+    final isReachable = await context
+        .read<ConnectivityStatusService>()
+        .isServerReachable(address);
     if (isReachable) {
       setState(() => _reachabilityStatus = ReachabilityStatus.reachable);
     } else {

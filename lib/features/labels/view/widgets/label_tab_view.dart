@@ -63,7 +63,7 @@ class LabelTabView<T extends Label> extends StatelessWidget {
               );
             }
             return RefreshIndicator(
-              onRefresh: BlocProvider.of<LabelCubit<T>>(context).reload,
+              onRefresh: context.read<LabelCubit<T>>().reload,
               child: ListView(
                 children: labels
                     .map(

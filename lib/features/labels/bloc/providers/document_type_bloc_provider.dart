@@ -12,7 +12,7 @@ class DocumentTypeBlocProvider extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => LabelCubit<DocumentType>(
-        RepositoryProvider.of<LabelRepository<DocumentType>>(context),
+        context.read<LabelRepository<DocumentType>>(),
       ),
       child: child,
     );

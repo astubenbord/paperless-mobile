@@ -4,6 +4,7 @@ import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/repository/label_repository.dart';
 import 'package:paperless_mobile/features/labels/bloc/label_cubit.dart';
 import 'package:paperless_mobile/features/labels/bloc/label_state.dart';
+import 'package:paperless_mobile/features/labels/bloc/providers/document_type_bloc_provider.dart';
 
 class DocumentTypeWidget extends StatelessWidget {
   final int? documentTypeId;
@@ -20,10 +21,7 @@ class DocumentTypeWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => LabelCubit<DocumentType>(
-        RepositoryProvider.of<LabelRepository<DocumentType>>(context),
-      ),
+    return DocumentTypeBlocProvider(
       child: AbsorbPointer(
         absorbing: !isClickable,
         child: GestureDetector(

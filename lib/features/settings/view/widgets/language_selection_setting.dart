@@ -44,12 +44,13 @@ class _LanguageSelectionSettingState extends State<LanguageSelectionSetting> {
                   label: _languageOptions['cs']!,
                 )
               ],
-              initialValue: BlocProvider.of<ApplicationSettingsCubit>(context)
+              initialValue: context
+                  .read<ApplicationSettingsCubit>()
                   .state
                   .preferredLocaleSubtag,
             ),
-          ).then((value) => BlocProvider.of<ApplicationSettingsCubit>(context)
-              .setLocale(value)),
+          ).then((value) =>
+              context.read<ApplicationSettingsCubit>().setLocale(value)),
         );
       },
     );

@@ -17,7 +17,7 @@ class AddDocumentTypePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => EditLabelCubit<DocumentType>(
-        RepositoryProvider.of<LabelRepository<DocumentType>>(context),
+        context.read<LabelRepository<DocumentType>>(),
       ),
       child: AddLabelPage<DocumentType>(
         pageTitle: Text(S.of(context).addDocumentTypePageTitle),

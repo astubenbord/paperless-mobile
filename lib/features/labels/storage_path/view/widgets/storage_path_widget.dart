@@ -4,6 +4,7 @@ import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/repository/label_repository.dart';
 import 'package:paperless_mobile/features/labels/bloc/label_cubit.dart';
 import 'package:paperless_mobile/features/labels/bloc/label_state.dart';
+import 'package:paperless_mobile/features/labels/bloc/providers/storage_path_bloc_provider.dart';
 
 class StoragePathWidget extends StatelessWidget {
   final int? pathId;
@@ -21,10 +22,7 @@ class StoragePathWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => LabelCubit<StoragePath>(
-        RepositoryProvider.of<LabelRepository<StoragePath>>(context),
-      ),
+    return StoragePathBlocProvider(
       child: AbsorbPointer(
         absorbing: !isClickable,
         child: BlocBuilder<LabelCubit<StoragePath>, LabelState<StoragePath>>(
