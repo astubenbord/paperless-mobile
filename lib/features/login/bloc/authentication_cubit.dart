@@ -31,6 +31,12 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
       await registerSecurityContext(clientCertificate);
       //TODO: Workaround for new architecture, listen for security context changes in timeout_client, possibly persisted in hive.
       _authApi = getIt<PaperlessAuthenticationApi>();
+
+      // Remove trailing slash from server address
+      if (serverUrl.endsWith('/')) {
+        serverUrl = serverUrl.substring(0, serverUrl.length - 1);
+      }
+
       // Store information required to make requests
       final currentAuth = AuthenticationInformation(
         serverUrl: serverUrl,
