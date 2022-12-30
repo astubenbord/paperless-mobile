@@ -15,12 +15,19 @@ class PaperlessDocumentsApiImpl implements PaperlessDocumentsApi {
     Uint8List documentBytes, {
     required String filename,
     required String title,
+    String contentType = 'application/octet-stream',
     DateTime? createdAt,
     int? documentType,
     int? correspondent,
     Iterable<int> tags = const [],
   }) async {
-    final formData = FormData();
+    final formData = FormData()
+      ..files.add(
+        MapEntry(
+          'document',
+          MultipartFile.fromBytes(documentBytes, filename: filename),
+        ),
+      );
 
     formData.fields.add(MapEntry('title', title));
     if (createdAt != null) {
@@ -35,6 +42,7 @@ class PaperlessDocumentsApiImpl implements PaperlessDocumentsApi {
     for (final tag in tags) {
       formData.fields.add(MapEntry('tags', tag.toString()));
     }
+
     final response =
         await client.post('/api/documents/post_document/', data: formData);
     if (response.statusCode != 200) {

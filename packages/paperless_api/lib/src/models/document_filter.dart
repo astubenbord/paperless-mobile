@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:paperless_api/paperless_api.dart';
 
+@JsonSerializable()
 class DocumentFilter extends Equatable {
   static const _oneDay = Duration(days: 1);
   static const DocumentFilter initial = DocumentFilter();

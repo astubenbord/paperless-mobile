@@ -58,10 +58,6 @@ class DocumentUploadCubit extends Cubit<DocumentUploadState> {
     Iterable<int> tags = const [],
     DateTime? createdAt,
   }) async {
-    final auth = await _localVault.loadAuthenticationInformation();
-    if (auth == null || !auth.isValid) {
-      throw const PaperlessServerException(ErrorCode.notAuthenticated);
-    }
     await _documentApi.create(
       bytes,
       filename: filename,

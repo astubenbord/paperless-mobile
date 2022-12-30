@@ -30,6 +30,7 @@ class InboxItem extends StatelessWidget {
           id: document.id,
           fit: BoxFit.cover,
           alignment: Alignment.topCenter,
+          enableHero: false,
         ),
       ),
       subtitle: Column(

@@ -4,6 +4,7 @@ import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
 
 import '../../utils.dart';
 @GenerateNiceMocks([MockSpec<PaperlessDocumentsApi>()])
@@ -23,6 +24,7 @@ void main() async {
     await loadCollection("test/fixtures/correspondents/correspondents.json",
         Correspondent.fromJson),
   );
+
   final List<DocumentType> documentTypes = List.unmodifiable(
     await loadCollection("test/fixtures/document_types/document_types.json",
         DocumentType.fromJson),

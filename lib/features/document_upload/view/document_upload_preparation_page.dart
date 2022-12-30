@@ -245,8 +245,8 @@ class _DocumentUploadPreparationPageState
         Navigator.pop(context, true);
       } on PaperlessServerException catch (error, stackTrace) {
         showErrorMessage(context, error, stackTrace);
-      } on PaperlessValidationErrors catch (PaperlessServerExceptions) {
-        setState(() => _errors = PaperlessServerExceptions);
+      } on PaperlessValidationErrors catch (errors) {
+        setState(() => _errors = errors);
       } catch (unknownError, stackTrace) {
         showErrorMessage(
             context, const PaperlessServerException.unknown(), stackTrace);

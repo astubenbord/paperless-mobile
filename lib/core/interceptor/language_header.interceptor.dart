@@ -1,32 +1,19 @@
+import 'package:dio/dio.dart';
 import 'package:paperless_mobile/features/settings/bloc/application_settings_cubit.dart';
-import 'package:http_interceptor/http_interceptor.dart';
 
-class LanguageHeaderInterceptor implements InterceptorContract {
-  final ApplicationSettingsCubit appSettingsCubit;
-
-  LanguageHeaderInterceptor(this.appSettingsCubit);
+class LanguageHeaderInterceptor extends Interceptor {
+  String preferredLocaleSubtag;
+  LanguageHeaderInterceptor(this.preferredLocaleSubtag);
 
   @override
-  Future<BaseRequest> interceptRequest({required BaseRequest request}) async {
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     late String languages;
-    if (appSettingsCubit.state.preferredLocaleSubtag == "en") {
+    if (preferredLocaleSubtag == "en") {
       languages = "en";
     } else {
-      languages = appSettingsCubit.state.preferredLocaleSubtag +
-          ",en;q=0.7,en-US;q=0.6";
+      languages = "$preferredLocaleSubtag,en;q=0.7,en-US;q=0.6";
     }
-    request.headers.addAll({"Accept-Language": languages});
-    return request;
+    options.headers.addAll({"Accept-Language": languages});
+    handler.next(options);
   }
-
-  @override
-  Future<BaseResponse> interceptResponse(
-          {required BaseResponse response}) async =>
-      response;
-
-  @override
-  Future<bool> shouldInterceptRequest() async => true;
-
-  @override
-  Future<bool> shouldInterceptResponse() async => true;
 }

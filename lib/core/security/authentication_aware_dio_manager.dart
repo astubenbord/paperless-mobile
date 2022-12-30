@@ -3,36 +3,26 @@ import 'dart:io';
 
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
-import 'package:paperless_mobile/core/interceptor/dio_http_error_interceptor.dart';
 import 'package:paperless_mobile/extensions/security_context_extension.dart';
 import 'package:paperless_mobile/features/login/model/client_certificate.dart';
 
-///
-/// Convenience http client handling timeouts.
-///
 class AuthenticationAwareDioManager {
-  final Dio _dio;
+  final Dio client;
+  final List<Interceptor> interceptors;
 
   /// Some dependencies require an [HttpClient], therefore this is also maintained here.
 
-  AuthenticationAwareDioManager() : _dio = _initDio();
+  AuthenticationAwareDioManager([this.interceptors = const []])
+      : client = _initDio(interceptors);
 
-  Dio get client => _dio;
-
-  Stream<SecurityContext> get securityContextChanges =>
-      _securityContextStreamController.stream.asBroadcastStream();
-
-  final StreamController<SecurityContext> _securityContextStreamController =
-      StreamController.broadcast();
-
-  static Dio _initDio() {
+  static Dio _initDio(List<Interceptor> interceptors) {
     //en- and decoded by utf8 by default
     final Dio dio = Dio(BaseOptions());
     dio.options.receiveTimeout = const Duration(seconds: 25).inMilliseconds;
     dio.options.responseType = ResponseType.json;
     (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
         (client) => client..badCertificateCallback = (cert, host, port) => true;
-    dio.interceptors.add(DioHttpErrorInterceptor());
+    dio.interceptors.addAll(interceptors);
     return dio;
   }
 
@@ -42,19 +32,39 @@ class AuthenticationAwareDioManager {
     ClientCertificate? clientCertificate,
   }) {
     if (clientCertificate != null) {
-      final context =
-          SecurityContext().withClientCertificate(clientCertificate);
-      (_dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
-          (client) => HttpClient(context: context)
-            ..badCertificateCallback =
-                (X509Certificate cert, String host, int port) => true;
-      _securityContextStreamController.add(context);
+      final context = SecurityContext()
+        ..usePrivateKeyBytes(
+          clientCertificate.bytes,
+          password: clientCertificate.passphrase,
+        )
+        ..useCertificateChainBytes(
+          clientCertificate.bytes,
+          password: clientCertificate.passphrase,
+        )
+        ..setTrustedCertificatesBytes(
+          clientCertificate.bytes,
+          password: clientCertificate.passphrase,
+        );
+      final adapter = DefaultHttpClientAdapter()
+        ..onHttpClientCreate = (client) => HttpClient(context: context)
+          ..badCertificateCallback =
+              (X509Certificate cert, String host, int port) => true;
+
+      client.httpClientAdapter = adapter;
     }
+
     if (baseUrl != null) {
-      _dio.options.baseUrl = baseUrl;
+      client.options.baseUrl = baseUrl;
     }
+
     if (authToken != null) {
-      _dio.options.headers.addAll({'Authorization': 'Token $authToken'});
+      client.options.headers.addAll({'Authorization': 'Token $authToken'});
     }
+  }
+
+  void resetSettings() {
+    client.httpClientAdapter = DefaultHttpClientAdapter();
+    client.options.baseUrl = '';
+    client.options.headers.remove('Authorization');
   }
 }

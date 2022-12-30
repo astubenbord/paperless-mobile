@@ -19,7 +19,6 @@ class BiometricAuthenticationSetting extends StatelessWidget {
           subtitle: Text(
               S.of(context).appSettingsBiometricAuthenticationDescriptionText),
           onChanged: (val) async {
-            final settingsBloc = context.read<ApplicationSettingsCubit>();
             final String localizedReason = val
                 ? S
                     .of(context)
@@ -27,12 +26,10 @@ class BiometricAuthenticationSetting extends StatelessWidget {
                 : S
                     .of(context)
                     .appSettingsDisableBiometricAuthenticationReasonText;
-            final changeValue = await context
-                .read<LocalAuthenticationService>()
-                .authenticateLocalUser(localizedReason);
-            if (changeValue) {
-              settingsBloc.setIsBiometricAuthenticationEnabled(val);
-            }
+            await context
+                .read<ApplicationSettingsCubit>()
+                .setIsBiometricAuthenticationEnabled(val,
+                    localizedReason: localizedReason);
           },
         );
       },

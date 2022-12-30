@@ -1,20 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:paperless_mobile/features/login/services/authentication_service.dart';
 import 'package:paperless_mobile/features/settings/model/application_settings_state.dart';
 import 'package:paperless_mobile/features/settings/model/view_type.dart';
 
 class ApplicationSettingsCubit extends HydratedCubit<ApplicationSettingsState> {
-  ApplicationSettingsCubit() : super(ApplicationSettingsState.defaultSettings);
+  final LocalAuthenticationService _localAuthenticationService;
+  ApplicationSettingsCubit(this._localAuthenticationService)
+      : super(ApplicationSettingsState.defaultSettings);
 
   Future<void> setLocale(String? localeSubtag) async {
     final updatedSettings = state.copyWith(preferredLocaleSubtag: localeSubtag);
     _updateSettings(updatedSettings);
   }
 
-  Future<void> setIsBiometricAuthenticationEnabled(bool isEnabled) async {
-    final updatedSettings =
-        state.copyWith(isLocalAuthenticationEnabled: isEnabled);
-    _updateSettings(updatedSettings);
+  Future<void> setIsBiometricAuthenticationEnabled(
+    bool isEnabled, {
+    required String localizedReason,
+  }) async {
+    final isActionAuthorized = await _localAuthenticationService
+        .authenticateLocalUser(localizedReason);
+    if (isActionAuthorized) {
+      final updatedSettings =
+          state.copyWith(isLocalAuthenticationEnabled: isEnabled);
+      _updateSettings(updatedSettings);
+    }
   }
 
   Future<void> setThemeMode(ThemeMode? selectedMode) async {

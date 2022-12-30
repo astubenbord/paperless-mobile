@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:paperless_mobile/core/service/connectivity_status.service.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
@@ -26,6 +27,10 @@ class _ServerAddressFormFieldState extends State<ServerAddressFormField> {
       validator: FormBuilderValidators.required(
         errorText: S.of(context).loginPageServerUrlValidatorMessageText,
       ),
+      inputFormatters: [
+        FilteringTextInputFormatter.deny(r".*/$"),
+        FilteringTextInputFormatter.deny(r"\s"),
+      ],
       decoration: InputDecoration(
         suffixIcon: _buildIsReachableIcon(),
         hintText: "http://192.168.1.50:8000",

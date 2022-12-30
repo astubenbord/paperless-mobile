@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
@@ -120,10 +121,10 @@ class _LabelFormState<T extends Label> extends State<LabelForm<T>> {
         final createdLabel = await widget.submitButtonConfig
             .onSubmit(widget.fromJsonT(mergedJson));
         Navigator.pop(context, createdLabel);
-      } on PaperlessValidationErrors catch (errorMessages) {
-        setState(() => _errors = errorMessages);
       } on PaperlessServerException catch (error, stackTrace) {
         showErrorMessage(context, error, stackTrace);
+      } on DioError catch (error) {
+        setState(() => _errors = error.error as PaperlessValidationErrors);
       }
     }
   }

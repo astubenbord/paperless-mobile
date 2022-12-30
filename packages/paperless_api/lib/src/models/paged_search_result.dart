@@ -1,8 +1,10 @@
 import 'package:equatable/equatable.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:paperless_api/src/models/document_model.dart';
 
 const pageRegex = r".*page=(\d+).*";
 
+//Todo: make this an interface and delegate serialization to implementations
 class PagedSearchResultJsonSerializer<T> {
   final Map<String, dynamic> json;
   final T Function(Map<String, dynamic>) fromJson;
@@ -10,6 +12,7 @@ class PagedSearchResultJsonSerializer<T> {
   PagedSearchResultJsonSerializer(this.json, this.fromJson);
 }
 
+@JsonSerializable()
 class PagedSearchResult<T> extends Equatable {
   /// Total number of available items
   final int count;

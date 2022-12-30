@@ -81,6 +81,7 @@ dependencies:
   dio: ^4.0.6
   hydrated_bloc: ^9.0.0
   json_annotation: ^4.7.0
+  pretty_dio_logger: ^1.2.0-beta-1
 
 
 dev_dependencies:

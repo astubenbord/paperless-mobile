@@ -12,6 +12,7 @@ class PaperlessAuthenticationApiImpl implements PaperlessAuthenticationApi {
     required String username,
     required String password,
   }) async {
+    print(client.hashCode);
     late Response response;
     try {
       response = await client.post(
@@ -21,27 +22,19 @@ class PaperlessAuthenticationApiImpl implements PaperlessAuthenticationApi {
           "password": password,
         },
       );
-    } on FormatException catch (e) {
-      final source = e.source;
-      if (source is String &&
-          source.contains("400 No required SSL certificate was sent")) {
+    } on DioError catch (error) {
+      if (error.error is ErrorCode) {
         throw PaperlessServerException(
-          ErrorCode.missingClientCertificate,
-          httpStatusCode: response.statusCode,
+          error.error,
+          httpStatusCode: error.response?.statusCode,
         );
+      } else {
+        throw error.error;
       }
     }
+
     if (response.statusCode == 200) {
       return response.data['token'];
-    } else if (response.statusCode == 400 &&
-        response
-            .data //TODO: Check if text is included in statusMessage instead of body
-            .toLowerCase()
-            .contains("no required certificate was sent")) {
-      throw PaperlessServerException(
-        ErrorCode.invalidClientCertificateConfiguration,
-        httpStatusCode: response.statusCode,
-      );
     } else {
       throw PaperlessServerException(
         ErrorCode.authenticationFailed,

@@ -1,8 +1,16 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
+import 'package:json_annotation/json_annotation.dart';
+import 'package:paperless_api/src/converters/id_query_parameter_json_converter.dart';
 
+@IdQueryParameterJsonConverter()
+@JsonSerializable()
 class IdQueryParameter extends Equatable {
   final int? _assignmentStatus;
   final int? _id;
+
+  @Deprecated("Use named constructors, this is only meant for code generation")
+  const IdQueryParameter(this._assignmentStatus, this._id);
 
   const IdQueryParameter.notAssigned()
       : _assignmentStatus = 1,
@@ -27,6 +35,9 @@ class IdQueryParameter extends Equatable {
   bool get onlyAssigned => _assignmentStatus == 0;
 
   int? get id => _id;
+
+  @visibleForTesting
+  int? get assignmentStatus => _assignmentStatus;
 
   Map<String, String> toQueryParameter(String field) {
     final Map<String, String> params = {};

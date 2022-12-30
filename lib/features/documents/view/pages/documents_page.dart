@@ -7,6 +7,7 @@ import 'package:paperless_mobile/core/repository/provider/label_repositories_pro
 import 'package:paperless_mobile/features/document_details/bloc/document_details_cubit.dart';
 import 'package:paperless_mobile/features/document_details/view/pages/document_details_page.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
+import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/documents_empty_state.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/grid/document_grid.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/list/document_list.dart';
@@ -82,6 +83,8 @@ class _DocumentsPageState extends State<DocumentsPage> {
                     -4), //TODO: Wait for stable version of m3, then use AlignmentDirectional.topEnd
                 isLabelVisible: appliedFiltersCount > 0,
                 count: state.filter.appliedFiltersCount,
+                backgroundColor: Theme.of(context).colorScheme.errorContainer,
+                textColor: Theme.of(context).colorScheme.onErrorContainer,
                 child: FloatingActionButton(
                   child: const Icon(Icons.filter_alt_outlined),
                   onPressed: _openDocumentFilter,

@@ -10,21 +10,30 @@ class DocumentPreview extends StatelessWidget {
   final BoxFit fit;
   final Alignment alignment;
   final double borderRadius;
+  final bool enableHero;
 
   const DocumentPreview({
-    Key? key,
+    super.key,
     required this.id,
     this.fit = BoxFit.cover,
     this.alignment = Alignment.center,
     this.borderRadius = 8.0,
-  }) : super(key: key);
+    this.enableHero = true,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return
-        // Hero(
-        // tag: "document_$id",child:
-        ClipRRect(
+    if (!enableHero) {
+      return _buildPreview(context);
+    }
+    return Hero(
+      tag: "thumb_$id",
+      child: _buildPreview(context),
+    );
+  }
+
+  ClipRRect _buildPreview(BuildContext context) {
+    return ClipRRect(
       borderRadius: BorderRadius.circular(borderRadius),
       child: CachedNetworkImage(
         fit: fit,
@@ -39,7 +48,6 @@ class DocumentPreview extends StatelessWidget {
         ),
         cacheManager: context.watch<CacheManager>(),
       ),
-      // ),
     );
   }
 }

@@ -3,6 +3,7 @@ import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/widgets/empty_state.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
+import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 
 class DocumentsEmptyState extends StatelessWidget {

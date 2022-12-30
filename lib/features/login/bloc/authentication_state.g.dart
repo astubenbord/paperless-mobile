@@ -8,10 +8,7 @@ part of 'authentication_state.dart';
 
 AuthenticationState _$AuthenticationStateFromJson(Map<String, dynamic> json) =>
     AuthenticationState(
-      isAuthenticated: json['isAuthenticated'] as bool,
       wasLoginStored: json['wasLoginStored'] as bool,
-      wasLocalAuthenticationSuccessful:
-          json['wasLocalAuthenticationSuccessful'] as bool?,
       authentication: json['authentication'] == null
           ? null
           : AuthenticationInformation.fromJson(
@@ -22,8 +19,5 @@ Map<String, dynamic> _$AuthenticationStateToJson(
         AuthenticationState instance) =>
     <String, dynamic>{
       'wasLoginStored': instance.wasLoginStored,
-      'wasLocalAuthenticationSuccessful':
-          instance.wasLocalAuthenticationSuccessful,
-      'isAuthenticated': instance.isAuthenticated,
       'authentication': instance.authentication,
     };

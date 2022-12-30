@@ -1,9 +1,14 @@
-part of 'documents_cubit.dart';
+import 'package:equatable/equatable.dart';
+import 'package:json_annotation/json_annotation.dart';
+import 'package:paperless_api/paperless_api.dart';
 
+@JsonSerializable()
 class DocumentsState extends Equatable {
   final bool isLoaded;
   final DocumentFilter filter;
   final List<PagedSearchResult> value;
+
+  @JsonKey(ignore: true)
   final List<DocumentModel> selection;
 
   const DocumentsState({

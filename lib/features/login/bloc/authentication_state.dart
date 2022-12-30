@@ -6,21 +6,20 @@ part 'authentication_state.g.dart';
 @JsonSerializable()
 class AuthenticationState {
   final bool wasLoginStored;
+  @JsonKey(ignore: true)
   final bool? wasLocalAuthenticationSuccessful;
-  final bool isAuthenticated;
   final AuthenticationInformation? authentication;
 
   static final AuthenticationState initial = AuthenticationState(
     wasLoginStored: false,
-    isAuthenticated: false,
   );
 
+  bool get isAuthenticated => authentication != null;
   AuthenticationState({
-    required this.isAuthenticated,
     required this.wasLoginStored,
     this.wasLocalAuthenticationSuccessful,
     this.authentication,
-  }) : assert(!isAuthenticated || authentication != null);
+  });
 
   AuthenticationState copyWith({
     bool? wasLoginStored,
@@ -29,7 +28,6 @@ class AuthenticationState {
     bool? wasLocalAuthenticationSuccessful,
   }) {
     return AuthenticationState(
-      isAuthenticated: isAuthenticated ?? this.isAuthenticated,
       wasLoginStored: wasLoginStored ?? this.wasLoginStored,
       authentication: authentication ?? this.authentication,
       wasLocalAuthenticationSuccessful: wasLocalAuthenticationSuccessful ??
