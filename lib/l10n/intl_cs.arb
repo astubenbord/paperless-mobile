@@ -260,11 +260,25 @@
   "@errorMessageUnsupportedFileFormat": {},
   "errorReportLabel": "NAHLÁSIT",
   "@errorReportLabel": {},
-  "extendedDateRangePickerAfterLabel": "",
+  "extendedDateRangeDialogAbsoluteLabel": "Absolute",
+  "@extendedDateRangeDialogAbsoluteLabel": {},
+  "extendedDateRangeDialogHintText": "Hint: Apart from concrete dates, you can also specify a time range relative to the current date.",
+  "@extendedDateRangeDialogHintText": {},
+  "extendedDateRangeDialogRelativeAmountLabel": "Amount",
+  "@extendedDateRangeDialogRelativeAmountLabel": {},
+  "extendedDateRangeDialogRelativeLabel": "Relative",
+  "@extendedDateRangeDialogRelativeLabel": {},
+  "extendedDateRangeDialogRelativeLastLabel": "Last",
+  "@extendedDateRangeDialogRelativeLastLabel": {},
+  "extendedDateRangeDialogRelativeTimeUnitLabel": "Time unit",
+  "@extendedDateRangeDialogRelativeTimeUnitLabel": {},
+  "extendedDateRangeDialogTitle": "Select date range",
+  "@extendedDateRangeDialogTitle": {},
+  "extendedDateRangePickerAfterLabel": "After",
   "@extendedDateRangePickerAfterLabel": {},
-  "extendedDateRangePickerBeforeLabel": "",
+  "extendedDateRangePickerBeforeLabel": "Before",
   "@extendedDateRangePickerBeforeLabel": {},
-  "extendedDateRangePickerDayText": "{count, plural, other{}}",
+  "extendedDateRangePickerDayText": "{count, plural, zero{} one{day} other{days}}",
   "@extendedDateRangePickerDayText": {
     "placeholders": {
       "count": {}
@@ -284,9 +298,9 @@
       "count": {}
     }
   },
-  "extendedDateRangePickerLastText": "",
+  "extendedDateRangePickerLastText": "Last",
   "@extendedDateRangePickerLastText": {},
-  "extendedDateRangePickerLastWeeksLabel": "{count, plural, other{}}",
+  "extendedDateRangePickerLastWeeksLabel": "{count, plural, zero{} one{Last week} other{Last {count} weeks}}",
   "@extendedDateRangePickerLastWeeksLabel": {
     "placeholders": {
       "count": {}
@@ -298,7 +312,7 @@
       "count": {}
     }
   },
-  "extendedDateRangePickerMonthText": "{count, plural, other{}}",
+  "extendedDateRangePickerMonthText": "{count, plural, zero{} one{month} other{months}}",
   "@extendedDateRangePickerMonthText": {
     "placeholders": {
       "count": {}
@@ -306,13 +320,13 @@
   },
   "extendedDateRangePickerToLabel": "Do",
   "@extendedDateRangePickerToLabel": {},
-  "extendedDateRangePickerWeekText": "{count, plural, other{}}",
+  "extendedDateRangePickerWeekText": "{count, plural, zero{} one{week} other{weeks}}",
   "@extendedDateRangePickerWeekText": {
     "placeholders": {
       "count": {}
     }
   },
-  "extendedDateRangePickerYearText": "{count, plural, other{}}",
+  "extendedDateRangePickerYearText": "{count, plural, zero{} one{year} other{years}}",
   "@extendedDateRangePickerYearText": {
     "placeholders": {
       "count": {}
@@ -424,8 +438,10 @@
   "@loginPagePasswordValidatorMessageText": {},
   "loginPageServerUrlFieldLabel": "'Adresa serveru",
   "@loginPageServerUrlFieldLabel": {},
-  "loginPageServerUrlValidatorMessageText": "Adresa serveru nesmí být prázdná.",
-  "@loginPageServerUrlValidatorMessageText": {},
+  "loginPageServerUrlValidatorMessageInvalidAddressText": "Invalid address.",
+  "@loginPageServerUrlValidatorMessageInvalidAddressText": {},
+  "loginPageServerUrlValidatorMessageRequiredText": "Adresa serveru nesmí být prázdná.",
+  "@loginPageServerUrlValidatorMessageRequiredText": {},
   "loginPageTitle": "Propojit s Paperless",
   "@loginPageTitle": {},
   "loginPageUsernameLabel": "Jméno uživatele",
@@ -499,5 +515,13 @@
   "tagInboxTagPropertyLabel": "Tag inboxu",
   "@tagInboxTagPropertyLabel": {},
   "uploadPageAutomaticallInferredFieldsHintText": "Pokud specifikuješ hodnoty pro tato pole, paperless instance nebude automaticky přiřazovat naučené hodnoty. Pokud mají být tato pole automaticky vyplňována, nevyplňujte zde nic.",
-  "@uploadPageAutomaticallInferredFieldsHintText": {}
+  "@uploadPageAutomaticallInferredFieldsHintText": {},
+  "verifyIdentityPageDescriptionText": "Use the configured biometric factor to authenticate and unlock your documents.",
+  "@verifyIdentityPageDescriptionText": {},
+  "verifyIdentityPageLogoutButtonLabel": "Disconnect",
+  "@verifyIdentityPageLogoutButtonLabel": {},
+  "verifyIdentityPageTitle": "Verify your identity",
+  "@verifyIdentityPageTitle": {},
+  "verifyIdentityPageVerifyIdentityButtonLabel": "Verify Identity",
+  "@verifyIdentityPageVerifyIdentityButtonLabel": {}
 }

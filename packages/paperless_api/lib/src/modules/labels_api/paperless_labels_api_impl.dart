@@ -268,7 +268,7 @@ class PaperlessLabelApiImpl implements PaperlessLabelsApi {
       data: path.toJson(),
     );
     if (response.statusCode == HttpStatus.created) {
-      return StoragePath.fromJson(jsonDecode(response.data));
+      return StoragePath.fromJson(response.data);
     }
     throw PaperlessServerException(ErrorCode.storagePathCreateFailed,
         httpStatusCode: response.statusCode);
@@ -282,7 +282,7 @@ class PaperlessLabelApiImpl implements PaperlessLabelsApi {
       data: path.toJson(),
     );
     if (response.statusCode == HttpStatus.ok) {
-      return StoragePath.fromJson(jsonDecode(response.data));
+      return StoragePath.fromJson(response.data);
     }
     throw const PaperlessServerException(ErrorCode.unknown);
   }

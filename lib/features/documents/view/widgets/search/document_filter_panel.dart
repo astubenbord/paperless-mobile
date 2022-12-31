@@ -70,61 +70,70 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
         resizeToAvoidBottomInset: true,
         body: FormBuilder(
           key: _formKey,
-          child: ListView(
-            controller: widget.scrollController,
-            children: [
-              Align(
-                alignment: Alignment.center,
-                child: Container(
-                  width: 32,
-                  height: 4,
-                  margin: const EdgeInsets.only(top: 16),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-              ),
-              Text(
-                S.of(context).documentFilterTitle,
-                style: Theme.of(context).textTheme.headlineSmall,
-              ).paddedOnly(
-                top: 16.0,
-                left: 16.0,
-                bottom: 24,
-              ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  S.of(context).documentFilterSearchLabel,
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ).paddedOnly(left: 8.0),
-              _buildQueryFormField().padded(),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  S.of(context).documentFilterAdvancedLabel,
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ).padded(),
-              FormBuilderExtendedDateRangePicker(
-                name: DocumentModel.createdKey,
-                initialValue: widget.initialFilter.created,
-                labelText: S.of(context).documentCreatedPropertyLabel,
-              ).padded(),
-              FormBuilderExtendedDateRangePicker(
-                name: DocumentModel.addedKey,
-                initialValue: widget.initialFilter.added,
-                labelText: S.of(context).documentAddedPropertyLabel,
-              ).padded(),
-              _buildCorrespondentFormField().padded(),
-              _buildDocumentTypeFormField().padded(),
-              _buildStoragePathFormField().padded(),
-              _buildTagsFormField().padded(),
-            ],
-          ).paddedOnly(bottom: 16),
+          child: _buildFormList(context),
         ),
+      ),
+    );
+  }
+
+  ListView _buildFormList(BuildContext context) {
+    return ListView(
+      controller: widget.scrollController,
+      children: [
+        Align(
+          alignment: Alignment.center,
+          child: _buildDragHandle(context),
+        ),
+        Text(
+          S.of(context).documentFilterTitle,
+          style: Theme.of(context).textTheme.headlineSmall,
+        ).paddedOnly(
+          top: 16.0,
+          left: 16.0,
+          bottom: 24,
+        ),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            S.of(context).documentFilterSearchLabel,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ).paddedOnly(left: 8.0),
+        _buildQueryFormField().padded(),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            S.of(context).documentFilterAdvancedLabel,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ).padded(),
+        FormBuilderExtendedDateRangePicker(
+          name: DocumentModel.createdKey,
+          initialValue: widget.initialFilter.created,
+          labelText: S.of(context).documentCreatedPropertyLabel,
+        ).padded(),
+        FormBuilderExtendedDateRangePicker(
+          name: DocumentModel.addedKey,
+          initialValue: widget.initialFilter.added,
+          labelText: S.of(context).documentAddedPropertyLabel,
+        ).padded(),
+        _buildCorrespondentFormField().padded(),
+        _buildDocumentTypeFormField().padded(),
+        _buildStoragePathFormField().padded(),
+        _buildTagsFormField().padded(),
+      ],
+    );
+  }
+
+  Container _buildDragHandle(BuildContext context) {
+    return Container(
+      // According to m3 spec
+      width: 32,
+      height: 4,
+      margin: const EdgeInsets.only(top: 16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.4),
+        borderRadius: BorderRadius.circular(16),
       ),
     );
   }

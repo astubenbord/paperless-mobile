@@ -46,7 +46,8 @@ class _ExtendedDateRangeDialogState extends State<ExtendedDateRangeDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text("Select date range"),
+      insetPadding: const EdgeInsets.all(24.0),
+      title: Text(S.of(context).extendedDateRangeDialogTitle),
       content: FormBuilder(
         key: _formKey,
         child: Column(
@@ -55,7 +56,7 @@ class _ExtendedDateRangeDialogState extends State<ExtendedDateRangeDialog> {
           children: [
             _buildDateRangeQueryTypeSelection(),
             Text(
-              "Hint: You can either specify absolute values by selecting concrete dates, or you can specify a time range relative to the current date.",
+              S.of(context).extendedDateRangeDialogHintText,
               style: Theme.of(context).textTheme.bodySmall,
             ).paddedOnly(top: 8, bottom: 16),
             Builder(
@@ -109,12 +110,12 @@ class _ExtendedDateRangeDialogState extends State<ExtendedDateRangeDialog> {
         ButtonSegment(
           value: DateRangeType.absolute,
           enabled: true,
-          label: Text("Absolute"),
+          label: Text(S.of(context).extendedDateRangeDialogAbsoluteLabel),
         ),
         ButtonSegment(
           value: DateRangeType.relative,
           enabled: true,
-          label: Text("Relative"),
+          label: Text(S.of(context).extendedDateRangeDialogRelativeLabel),
         ),
       ],
       selected: {_selectedDateRangeType},

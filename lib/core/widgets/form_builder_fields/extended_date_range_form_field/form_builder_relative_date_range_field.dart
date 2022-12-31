@@ -47,12 +47,14 @@ class _FormBuilderRelativeDateRangePickerState
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Last"),
+              Text(S.of(context).extendedDateRangeDialogRelativeLastLabel),
               SizedBox(
-                width: 70,
+                width: 80,
                 child: TextFormField(
                   decoration: InputDecoration(
-                    labelText: "Offset",
+                    labelText: S
+                        .of(context)
+                        .extendedDateRangeDialogRelativeAmountLabel,
                   ),
                   inputFormatters: [
                     FilteringTextInputFormatter.digitsOnly,
@@ -91,7 +93,9 @@ class _FormBuilderRelativeDateRangePickerState
                   onChanged: (value) =>
                       field.didChange(field.value!.copyWith(unit: value)),
                   decoration: InputDecoration(
-                    labelText: "Amount",
+                    labelText: S
+                        .of(context)
+                        .extendedDateRangeDialogRelativeTimeUnitLabel,
                   ),
                 ),
               ),

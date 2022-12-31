@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:paperless_api/src/models/paperless_server_exception.dart';
 import 'package:paperless_api/src/modules/authentication_api/authentication_api.dart';
@@ -12,7 +14,6 @@ class PaperlessAuthenticationApiImpl implements PaperlessAuthenticationApi {
     required String username,
     required String password,
   }) async {
-    print(client.hashCode);
     late Response response;
     try {
       response = await client.post(
@@ -29,7 +30,11 @@ class PaperlessAuthenticationApiImpl implements PaperlessAuthenticationApi {
           httpStatusCode: error.response?.statusCode,
         );
       } else {
-        throw error.error;
+        log(error.message);
+        throw PaperlessServerException(
+          ErrorCode.authenticationFailed,
+          details: error.message,
+        );
       }
     }
 

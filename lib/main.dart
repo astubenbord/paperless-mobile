@@ -42,6 +42,7 @@ import 'package:paperless_mobile/features/app_intro/application_intro_slideshow.
 import 'package:paperless_mobile/features/document_upload/cubit/document_upload_cubit.dart';
 import 'package:paperless_mobile/features/document_upload/view/document_upload_preparation_page.dart';
 import 'package:paperless_mobile/features/home/view/home_page.dart';
+import 'package:paperless_mobile/features/home/view/widget/verify_identity_page.dart';
 import 'package:paperless_mobile/features/login/bloc/authentication_cubit.dart';
 import 'package:paperless_mobile/features/login/bloc/authentication_state.dart';
 import 'package:paperless_mobile/features/login/services/authentication_service.dart';
@@ -349,6 +350,9 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
       ),
     );
     if (success) {
+      Fluttertoast.showToast(
+        msg: S.of(context).documentUploadSuccessText,
+      );
       SystemNavigator.pop();
     }
   }
@@ -397,58 +401,11 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
           } else {
             if (authentication.wasLoginStored &&
                 !(authentication.wasLocalAuthenticationSuccessful ?? false)) {
-              return const BiometricAuthenticationPage();
+              return const VerifyIdentityPage();
             }
             return const LoginPage();
           }
         },
-      ),
-    );
-  }
-}
-
-class BiometricAuthenticationPage extends StatelessWidget {
-  const BiometricAuthenticationPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            "The app is locked!",
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          Text(
-            "You can now either try to authenticate again or disconnect from the current server.",
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodySmall,
-          ).padded(),
-          const SizedBox(height: 48),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  context.read<AuthenticationCubit>().logout();
-                  context.read();
-                  HydratedBloc.storage.clear();
-                },
-                child: const Text("Log out"),
-              ),
-              ElevatedButton(
-                onPressed: () => context
-                    .read<AuthenticationCubit>()
-                    .restoreSessionState(context
-                        .read<ApplicationSettingsCubit>()
-                        .state
-                        .isLocalAuthenticationEnabled),
-                child: const Text("Authenticate"),
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }

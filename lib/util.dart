@@ -35,8 +35,24 @@ void showSnackBar(
     ..hideCurrentSnackBar()
     ..showSnackBar(
       SnackBar(
-        content: Text(
-          message + (details != null ? ' ($details)' : ''),
+        content: RichText(
+          maxLines: 5,
+          text: TextSpan(
+            text: message,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onInverseSurface,
+                ),
+            children: <TextSpan>[
+              if (details != null)
+                TextSpan(
+                  text: "\n$details",
+                  style: const TextStyle(
+                    fontStyle: FontStyle.italic,
+                    fontSize: 10,
+                  ),
+                ),
+            ],
+          ),
         ),
         action: action != null
             ? SnackBarAction(

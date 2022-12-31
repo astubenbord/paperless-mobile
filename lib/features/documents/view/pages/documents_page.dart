@@ -83,8 +83,8 @@ class _DocumentsPageState extends State<DocumentsPage> {
                     -4), //TODO: Wait for stable version of m3, then use AlignmentDirectional.topEnd
                 isLabelVisible: appliedFiltersCount > 0,
                 count: state.filter.appliedFiltersCount,
-                backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                textColor: Theme.of(context).colorScheme.onErrorContainer,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
                 child: FloatingActionButton(
                   child: const Icon(Icons.filter_alt_outlined),
                   onPressed: _openDocumentFilter,
@@ -115,7 +115,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
           expand: false,
           snap: true,
           initialChildSize: .9,
-          maxChildSize: .9,
+          snapSizes: const [.9, 1],
           builder: (context, controller) => LabelsBlocProvider(
             child: DocumentFilterPanel(
               initialFilter: context.read<DocumentsCubit>().state.filter,
