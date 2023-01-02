@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:paperless_api/paperless_api.dart';
+import 'package:paperless_api/src/models/query_parameters/text_query.dart';
 
 void main() {
   group('Validate parsing logic from [SavedView] to [DocumentFilter]:', () {
@@ -86,8 +87,7 @@ void main() {
             ),
             sortField: SortField.created,
             sortOrder: SortOrder.descending,
-            queryText: "Never gonna give you up",
-            queryType: QueryType.extended,
+            query: const TextQuery.extended("Never gonna give you up"),
           ),
         ),
       );
@@ -173,8 +173,7 @@ void main() {
               before: DateTime.parse("2020-03-01"),
               after: DateTime.parse("2020-01-01"),
             ),
-            queryText: "Never gonna let you down",
-            queryType: QueryType.title,
+            query: const TextQuery.title("Never gonna let you down"),
           ),
           name: "test_name",
           showInSidebar: false,
@@ -219,7 +218,7 @@ void main() {
             sortOrder: SortOrder.descending,
             added: UnsetDateRangeQuery(),
             created: UnsetDateRangeQuery(),
-            queryText: null,
+            query: TextQuery(),
           ),
           name: "test_name",
           showInSidebar: false,

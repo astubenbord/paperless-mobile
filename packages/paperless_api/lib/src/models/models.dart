@@ -10,6 +10,7 @@ export 'query_parameters/sort_field.dart';
 export 'query_parameters/sort_order.dart';
 export 'query_parameters/tags_query.dart';
 export 'query_parameters/date_range_query.dart';
+export 'query_parameters/text_query.dart';
 export 'bulk_edit_model.dart';
 export 'document_filter.dart';
 export 'document_meta_data_model.dart';

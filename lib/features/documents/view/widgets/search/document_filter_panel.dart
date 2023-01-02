@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:intl/intl.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/widgets/form_builder_fields/extended_date_range_form_field/form_builder_extended_date_range_picker.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
-import 'package:paperless_mobile/features/documents/view/widgets/search/query_type_form_field.dart';
+import 'package:paperless_mobile/features/documents/view/widgets/search/text_query_form_field.dart';
 import 'package:paperless_mobile/features/labels/bloc/label_cubit.dart';
 import 'package:paperless_mobile/features/labels/bloc/label_state.dart';
 import 'package:paperless_mobile/features/labels/tags/view/widgets/tags_form_field.dart';
@@ -37,6 +36,13 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
   static const fkAddedAt = DocumentModel.addedKey;
 
   final _formKey = GlobalKey<FormBuilderState>();
+  late bool _allowOnlyExtendedQuery;
+
+  @override
+  void initState() {
+    super.initState();
+    _allowOnlyExtendedQuery = widget.initialFilter.forceExtendedQuery;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -108,14 +114,20 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
           ),
         ).padded(),
         FormBuilderExtendedDateRangePicker(
-          name: DocumentModel.createdKey,
+          name: fkCreatedAt,
           initialValue: widget.initialFilter.created,
           labelText: S.of(context).documentCreatedPropertyLabel,
+          onChanged: (_) {
+            _checkQueryConstraints();
+          },
         ).padded(),
         FormBuilderExtendedDateRangePicker(
-          name: DocumentModel.addedKey,
+          name: fkAddedAt,
           initialValue: widget.initialFilter.added,
           labelText: S.of(context).documentAddedPropertyLabel,
+          onChanged: (_) {
+            _checkQueryConstraints();
+          },
         ).padded(),
         _buildCorrespondentFormField().padded(),
         _buildDocumentTypeFormField().padded(),
@@ -154,11 +166,12 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
   void _resetFilter() async {
     FocusScope.of(context).unfocus();
     Navigator.pop(
-        context,
-        DocumentFilter.initial.copyWith(
-          sortField: widget.initialFilter.sortField,
-          sortOrder: widget.initialFilter.sortOrder,
-        ));
+      context,
+      DocumentFilter.initial.copyWith(
+        sortField: widget.initialFilter.sortField,
+        sortOrder: widget.initialFilter.sortOrder,
+      ),
+    );
   }
 
   Widget _buildDocumentTypeFormField() {
@@ -207,52 +220,24 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
   }
 
   Widget _buildQueryFormField() {
-    final queryType =
-        _formKey.currentState?.getRawValue(QueryTypeFormField.fkQueryType) ??
-            QueryType.titleAndContent;
-    late String label;
-    switch (queryType) {
-      case QueryType.title:
-        label = S.of(context).documentFilterQueryOptionsTitleLabel;
-        break;
-      case QueryType.titleAndContent:
-        label = S.of(context).documentFilterQueryOptionsTitleAndContentLabel;
-        break;
-      case QueryType.extended:
-        label = S.of(context).documentFilterQueryOptionsExtendedLabel;
-        break;
-    }
-
-    return FormBuilderTextField(
+    return TextQueryFormField(
       name: fkQuery,
-      textInputAction: TextInputAction.done,
-      decoration: InputDecoration(
-        prefixIcon: const Icon(Icons.search_outlined),
-        labelText: label,
-        suffixIcon: QueryTypeFormField(
-          initialValue: widget.initialFilter.queryType,
-          afterSelected: (queryType) => setState(() {}),
-        ),
-      ),
-      initialValue: widget.initialFilter.queryText,
+      onlyExtendedQueryAllowed: _allowOnlyExtendedQuery,
+      initialValue: widget.initialFilter.query,
     );
   }
 
   void _onApplyFilter() async {
     _formKey.currentState?.save();
     if (_formKey.currentState?.validate() ?? false) {
-      final v = _formKey.currentState!.value;
       DocumentFilter newFilter = _assembleFilter();
-      try {
-        FocusScope.of(context).unfocus();
-        Navigator.pop(context, newFilter);
-      } on PaperlessServerException catch (error, stackTrace) {
-        showErrorMessage(context, error, stackTrace);
-      }
+      FocusScope.of(context).unfocus();
+      Navigator.pop(context, newFilter);
     }
   }
 
   DocumentFilter _assembleFilter() {
+    _formKey.currentState?.save();
     final v = _formKey.currentState!.value;
     return DocumentFilter(
       correspondent: v[fkCorrespondent] as IdQueryParameter? ??
@@ -263,10 +248,9 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
           DocumentFilter.initial.storagePath,
       tags:
           v[DocumentModel.tagsKey] as TagsQuery? ?? DocumentFilter.initial.tags,
-      queryText: v[fkQuery] as String?,
+      query: v[fkQuery] as TextQuery? ?? DocumentFilter.initial.query,
       created: (v[fkCreatedAt] as DateRangeQuery),
       added: (v[fkAddedAt] as DateRangeQuery),
-      queryType: v[QueryTypeFormField.fkQueryType] as QueryType,
       asnQuery: widget.initialFilter.asnQuery,
       page: 1,
       pageSize: widget.initialFilter.pageSize,
@@ -274,16 +258,18 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
       sortOrder: widget.initialFilter.sortOrder,
     );
   }
-}
 
-DateTimeRange? _dateTimeRangeOfNullable(DateTime? start, DateTime? end) {
-  if (start == null && end == null) {
-    return null;
+  void _checkQueryConstraints() {
+    final filter = _assembleFilter();
+    if (filter.forceExtendedQuery) {
+      setState(() => _allowOnlyExtendedQuery = true);
+      final queryField = _formKey.currentState?.fields[fkQuery];
+      queryField?.didChange(
+        (queryField.value as TextQuery?)
+            ?.copyWith(queryType: QueryType.extended),
+      );
+    } else {
+      setState(() => _allowOnlyExtendedQuery = false);
+    }
   }
-  if (start != null && end != null) {
-    return DateTimeRange(start: start, end: end);
-  }
-  assert(start != null || end != null);
-  final singleDate = (start ?? end)!;
-  return DateTimeRange(start: singleDate, end: singleDate);
 }

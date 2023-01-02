@@ -88,12 +88,10 @@ class _TagFormFieldState extends State<TagFormField> {
                 controller: _textEditingController,
               ),
               suggestionsBoxDecoration: SuggestionsBoxDecoration(
+                elevation: 4.0,
+                shadowColor: Theme.of(context).colorScheme.primary,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  side: BorderSide(
-                    color: Theme.of(context).colorScheme.primary,
-                    width: 2.0,
-                  ),
+                  borderRadius: BorderRadius.circular(8),
                 ),
               ),
               suggestionsCallback: (query) {

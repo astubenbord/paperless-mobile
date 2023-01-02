@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_api/src/constants.dart';
+import 'package:paperless_api/src/models/query_parameters/text_query.dart';
 
 class FilterRule with EquatableMixin {
   static const int titleRule = 0;
@@ -32,7 +33,7 @@ class FilterRule with EquatableMixin {
   static const int _asnLessThan = 24;
 
   static const String _lastNDateRangeQueryRegex =
-      r"(?<field>created|added|modified):\[(?<n>-?\d+) (?<unit>day|week|month|year) to now\]";
+      r"(?<field>created|added|modified):\[-?(?<n>\d+) (?<unit>day|week|month|year) to now\]";
 
   final int ruleType;
   final String? value;
@@ -54,7 +55,7 @@ class FilterRule with EquatableMixin {
     //TODO: Check in profiling mode if this is inefficient enough to cause stutters...
     switch (ruleType) {
       case titleRule:
-        return filter.copyWith(queryText: value, queryType: QueryType.title);
+        return filter.copyWith(query: TextQuery.title(value));
       case documentTypeRule:
         return filter.copyWith(
           documentType: value == null
@@ -158,60 +159,69 @@ class FilterRule with EquatableMixin {
           );
         }
       case titleAndContentRule:
-        return filter.copyWith(
-          queryText: value,
-          queryType: QueryType.titleAndContent,
-        );
+        return filter.copyWith(query: TextQuery.titleAndContent(value));
       case extendedRule:
-        _parseExtendedRule(filter);
-        return filter.copyWith(queryText: value, queryType: QueryType.extended);
+        return _parseExtendedRule(filter);
       default:
         return filter;
     }
   }
 
-  DocumentFilter _parseExtendedRule(final DocumentFilter filter) {
-    DocumentFilter newFilter = filter;
+  DocumentFilter _parseExtendedRule(DocumentFilter filter) {
     assert(value != null);
-    final dateRangeRegExp = RegExp(_lastNDateRangeQueryRegex);
-    if (dateRangeRegExp.hasMatch(value!)) {
-      final matches = dateRangeRegExp.allMatches(value!);
-      for (final match in matches) {
-        final field = match.namedGroup('field')!;
-        final n = int.parse(match.namedGroup('n')!);
-        final unit = match.namedGroup('unit')!;
-        switch (field) {
-          case 'created':
-            newFilter = newFilter.copyWith(
-              created: RelativeDateRangeQuery(
-                n,
-                DateRangeUnit.values.byName(unit),
-              ),
-            );
-            break;
-          case 'added':
-            newFilter = newFilter.copyWith(
-              added: RelativeDateRangeQuery(
-                n,
-                DateRangeUnit.values.byName(unit),
-              ),
-            );
-            break;
-          case 'modified':
-            newFilter = newFilter.copyWith(
-              modified: RelativeDateRangeQuery(
-                n,
-                DateRangeUnit.values.byName(unit),
-              ),
-            );
-            break;
-        }
+    final extendedQueryValues = value!.split(",").reversed;
+
+    for (final query in extendedQueryValues) {
+      if (RegExp(_lastNDateRangeQueryRegex).hasMatch(query)) {
+        filter = _parseRelativeDateRangeQuery(query, filter);
+      } else {
+        filter = filter.copyWith(query: TextQuery.extended(query));
       }
-      return newFilter;
-    } else {
-      // Match other extended query types... currently not supported!
-      return filter;
     }
+    return filter;
+  }
+
+  DocumentFilter _parseRelativeDateRangeQuery(
+    String query,
+    final DocumentFilter filter,
+  ) {
+    DocumentFilter newFilter = filter;
+    final matches = RegExp(_lastNDateRangeQueryRegex).allMatches(query);
+    for (final match in matches) {
+      final field = match.namedGroup('field')!;
+      final n = int.parse(match.namedGroup('n')!);
+      final unit = match.namedGroup('unit')!;
+      switch (field) {
+        case 'created':
+          newFilter = newFilter.copyWith(
+            created: RelativeDateRangeQuery(
+              n,
+              DateRangeUnit.values.byName(unit),
+            ),
+            query: newFilter.query.copyWith(queryType: QueryType.extended),
+          );
+          break;
+        case 'added':
+          newFilter = newFilter.copyWith(
+            added: RelativeDateRangeQuery(
+              n,
+              DateRangeUnit.values.byName(unit),
+            ),
+            query: newFilter.query.copyWith(queryType: QueryType.extended),
+          );
+          break;
+        case 'modified':
+          newFilter = newFilter.copyWith(
+            modified: RelativeDateRangeQuery(
+              n,
+              DateRangeUnit.values.byName(unit),
+            ),
+            query: newFilter.query.copyWith(queryType: QueryType.extended),
+          );
+          break;
+      }
+    }
+    return newFilter;
   }
 
   ///
@@ -254,20 +264,20 @@ class FilterRule with EquatableMixin {
           .excludedIds
           .map((id) => FilterRule(excludeTagsRule, id.toString())));
     }
-
-    if (filter.queryText != null) {
-      switch (filter.queryType) {
+    if (filter.query.queryText != null) {
+      switch (filter.query.queryType) {
         case QueryType.title:
-          filterRules.add(FilterRule(titleRule, filter.queryText!));
+          filterRules.add(FilterRule(titleRule, filter.query.queryText!));
           break;
         case QueryType.titleAndContent:
-          filterRules.add(FilterRule(titleAndContentRule, filter.queryText!));
+          filterRules
+              .add(FilterRule(titleAndContentRule, filter.query.queryText!));
           break;
         case QueryType.extended:
-          filterRules.add(FilterRule(extendedRule, filter.queryText!));
+          filterRules.add(FilterRule(extendedRule, filter.query.queryText!));
           break;
         case QueryType.asn:
-          filterRules.add(FilterRule(asnRule, filter.queryText!));
+          filterRules.add(FilterRule(asnRule, filter.query.queryText!));
           break;
       }
     }
@@ -337,7 +347,23 @@ class FilterRule with EquatableMixin {
       );
     }
 
+    //Join values of all extended filter rules
+    final FilterRule extendedFilterRule = filterRules
+        .where((r) => r.ruleType == extendedRule)
+        .reduce((previousValue, element) => previousValue.copyWith(
+              value: previousValue.value! + element.value!,
+            ));
+    filterRules
+      ..removeWhere((element) => element.ruleType == extendedRule)
+      ..add(extendedFilterRule);
     return filterRules;
+  }
+
+  FilterRule copyWith({int? ruleType, String? value}) {
+    return FilterRule(
+      ruleType ?? this.ruleType,
+      value ?? this.value,
+    );
   }
 
   @override

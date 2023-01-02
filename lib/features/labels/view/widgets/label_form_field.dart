@@ -90,9 +90,11 @@ class _LabelFormFieldState<T extends Label> extends State<LabelFormField<T>> {
       initialValue: widget.initialValue ?? const IdQueryParameter.unset(),
       name: widget.name,
       suggestionsBoxDecoration: SuggestionsBoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant,
+        elevation: 4.0,
+        shadowColor: Theme.of(context).colorScheme.primary,
+        // color: Theme.of(context).colorScheme.surfaceVariant,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(8),
           // side: BorderSide(
           //   color: Theme.of(context).colorScheme.primary,
           //   width: 2.0,
@@ -106,7 +108,7 @@ class _LabelFormFieldState<T extends Label> extends State<LabelFormField<T>> {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        tileColor: Theme.of(context).colorScheme.surfaceVariant,
+        // tileColor: Theme.of(context).colorScheme.surfaceVariant,
         dense: true,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),

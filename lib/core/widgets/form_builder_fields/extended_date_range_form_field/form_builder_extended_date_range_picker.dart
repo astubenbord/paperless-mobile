@@ -10,12 +10,13 @@ class FormBuilderExtendedDateRangePicker extends StatefulWidget {
   final String name;
   final String labelText;
   final DateRangeQuery initialValue;
-
+  final void Function(DateRangeQuery? query)? onChanged;
   const FormBuilderExtendedDateRangePicker({
     super.key,
     required this.name,
     required this.labelText,
     required this.initialValue,
+    this.onChanged,
   });
 
   @override
@@ -42,6 +43,7 @@ class _FormBuilderExtendedDateRangePickerState
       onChanged: (query) {
         _textEditingController.text =
             _dateRangeQueryToString(query ?? const UnsetDateRangeQuery());
+        widget.onChanged?.call(query);
       },
       builder: (field) {
         return Column(

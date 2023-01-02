@@ -1,10 +1,11 @@
 import 'package:equatable/equatable.dart';
+import 'package:paperless_api/src/models/query_parameters/text_query.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:paperless_api/paperless_api.dart';
+import 'package:collection/collection.dart';
 
 @JsonSerializable()
 class DocumentFilter extends Equatable {
-  static const _oneDay = Duration(days: 1);
   static const DocumentFilter initial = DocumentFilter();
 
   static const DocumentFilter latestDocument = DocumentFilter(
@@ -26,8 +27,7 @@ class DocumentFilter extends Equatable {
   final DateRangeQuery created;
   final DateRangeQuery added;
   final DateRangeQuery modified;
-  final QueryType queryType;
-  final String? queryText;
+  final TextQuery query;
 
   const DocumentFilter({
     this.documentType = const IdQueryParameter.unset(),
@@ -39,47 +39,52 @@ class DocumentFilter extends Equatable {
     this.sortOrder = SortOrder.descending,
     this.page = 1,
     this.pageSize = 25,
-    this.queryType = QueryType.titleAndContent,
-    this.queryText,
+    this.query = const TextQuery(),
     this.added = const UnsetDateRangeQuery(),
     this.created = const UnsetDateRangeQuery(),
     this.modified = const UnsetDateRangeQuery(),
   });
 
-  Map<String, String> toQueryParameters() {
-    Map<String, String> params = {
-      'page': page.toString(),
-      'page_size': pageSize.toString(),
-    };
+  bool get forceExtendedQuery {
+    return added is RelativeDateRangeQuery ||
+        created is RelativeDateRangeQuery ||
+        modified is RelativeDateRangeQuery;
+  }
 
-    params.addAll(documentType.toQueryParameter('document_type'));
-    params.addAll(correspondent.toQueryParameter('correspondent'));
-    params.addAll(storagePath.toQueryParameter('storage_path'));
-    params.addAll(asnQuery.toQueryParameter('archive_serial_number'));
-    params.addAll(tags.toQueryParameter());
-    params.addAll(added.toQueryParameter(DateRangeQueryField.added));
-    params.addAll(created.toQueryParameter(DateRangeQueryField.created));
-    params.addAll(modified.toQueryParameter(DateRangeQueryField.modified));
-    //TODO: Rework when implementing extended queries.
-    if (queryText?.isNotEmpty ?? false) {
-      params.putIfAbsent(queryType.queryParam, () => queryText!);
-    }
+  Map<String, dynamic> toQueryParameters() {
+    List<MapEntry<String, dynamic>> params = [
+      MapEntry('page', '$page'),
+      MapEntry('page_size', '$pageSize'),
+      MapEntry('ordering', '${sortOrder.queryString}${sortField.queryString}'),
+      ...documentType.toQueryParameter('document_type').entries,
+      ...correspondent.toQueryParameter('correspondent').entries,
+      ...storagePath.toQueryParameter('storage_path').entries,
+      ...asnQuery.toQueryParameter('archive_serial_number').entries,
+      ...tags.toQueryParameter().entries,
+      ...added.toQueryParameter(DateRangeQueryField.added).entries,
+      ...created.toQueryParameter(DateRangeQueryField.created).entries,
+      ...modified.toQueryParameter(DateRangeQueryField.modified).entries,
+      ...query.toQueryParameter().entries,
+    ];
     // Reverse ordering can also be encoded using &reverse=1
-    params.putIfAbsent(
-        'ordering', () => '${sortOrder.queryString}${sortField.queryString}');
-
-    return params;
+    // Merge query params
+    final queryParams = groupBy(params, (e) => e.key).map(
+      (key, entries) => MapEntry(
+        key,
+        entries.length == 1
+            ? entries.first.value
+            : entries.map((e) => e.value).toList(),
+      ),
+    );
+    return queryParams;
   }
 
   @override
-  String toString() {
-    return toQueryParameters().toString();
-  }
+  String toString() => toQueryParameters().toString();
 
   DocumentFilter copyWith({
     int? pageSize,
     int? page,
-    bool? onlyNoDocumentType,
     IdQueryParameter? documentType,
     IdQueryParameter? correspondent,
     IdQueryParameter? storagePath,
@@ -90,10 +95,9 @@ class DocumentFilter extends Equatable {
     DateRangeQuery? added,
     DateRangeQuery? created,
     DateRangeQuery? modified,
-    QueryType? queryType,
-    String? queryText,
+    TextQuery? query,
   }) {
-    return DocumentFilter(
+    final newFilter = DocumentFilter(
       pageSize: pageSize ?? this.pageSize,
       page: page ?? this.page,
       documentType: documentType ?? this.documentType,
@@ -102,34 +106,20 @@ class DocumentFilter extends Equatable {
       tags: tags ?? this.tags,
       sortField: sortField ?? this.sortField,
       sortOrder: sortOrder ?? this.sortOrder,
-      queryType: queryType ?? this.queryType,
-      queryText: queryText ?? this.queryText,
       asnQuery: asnQuery ?? this.asnQuery,
+      query: query ?? this.query,
       added: added ?? this.added,
       created: created ?? this.created,
       modified: modified ?? this.modified,
     );
-  }
-
-  String? get titleOnlyMatchString {
-    if (queryType == QueryType.title) {
-      return queryText?.isEmpty ?? true ? null : queryText;
+    if (query?.queryType != QueryType.extended &&
+        newFilter.forceExtendedQuery) {
+      //Prevents infinite recursion
+      return newFilter.copyWith(
+        query: newFilter.query.copyWith(queryType: QueryType.extended),
+      );
     }
-    return null;
-  }
-
-  String? get titleAndContentMatchString {
-    if (queryType == QueryType.titleAndContent) {
-      return queryText?.isEmpty ?? true ? null : queryText;
-    }
-    return null;
-  }
-
-  String? get extendedMatchString {
-    if (queryType == QueryType.extended) {
-      return queryText?.isEmpty ?? true ? null : queryText;
-    }
-    return null;
+    return newFilter;
   }
 
   int get appliedFiltersCount => [
@@ -141,7 +131,7 @@ class DocumentFilter extends Equatable {
         created != initial.created,
         modified != initial.modified,
         asnQuery != initial.asnQuery,
-        (queryType != initial.queryType || queryText != initial.queryText),
+        (query.queryText != initial.query.queryText),
       ].fold(0, (previousValue, element) => previousValue += element ? 1 : 0);
 
   @override
@@ -158,7 +148,6 @@ class DocumentFilter extends Equatable {
         added,
         created,
         modified,
-        queryType,
-        queryText,
+        query,
       ];
 }
