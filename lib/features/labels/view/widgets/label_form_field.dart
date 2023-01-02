@@ -92,13 +92,8 @@ class _LabelFormFieldState<T extends Label> extends State<LabelFormField<T>> {
       suggestionsBoxDecoration: SuggestionsBoxDecoration(
         elevation: 4.0,
         shadowColor: Theme.of(context).colorScheme.primary,
-        // color: Theme.of(context).colorScheme.surfaceVariant,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
-          // side: BorderSide(
-          //   color: Theme.of(context).colorScheme.primary,
-          //   width: 2.0,
-          // ),
         ),
       ),
       itemBuilder: (context, suggestion) => ListTile(
