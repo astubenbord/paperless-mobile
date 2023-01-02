@@ -1,3 +1,7 @@
+import 'dart:developer' as dev;
+import 'dart:math';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -17,10 +21,12 @@ enum DateRangeSelection { before, after }
 class DocumentFilterPanel extends StatefulWidget {
   final DocumentFilter initialFilter;
   final ScrollController scrollController;
+  final DraggableScrollableController draggableSheetController;
   const DocumentFilterPanel({
     Key? key,
     required this.initialFilter,
     required this.scrollController,
+    required this.draggableSheetController,
   }) : super(key: key);
 
   @override
@@ -38,21 +44,49 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
   final _formKey = GlobalKey<FormBuilderState>();
   late bool _allowOnlyExtendedQuery;
 
+  double _heightAnimationValue = 0;
+
   @override
   void initState() {
     super.initState();
     _allowOnlyExtendedQuery = widget.initialFilter.forceExtendedQuery;
+    widget.draggableSheetController.addListener(animateTitleByDrag);
+  }
+
+  void animateTitleByDrag() {
+    setState(
+      () {
+        _heightAnimationValue = dp(
+            ((max(0.9, widget.draggableSheetController.size) - 0.9) / 0.1), 5);
+      },
+    );
+  }
+
+  bool get isDockedToTop => _heightAnimationValue == 1;
+
+  @override
+  void dispose() {
+    widget.draggableSheetController.removeListener(animateTitleByDrag);
+    super.dispose();
+  }
+
+  /// Rounds double to [places] decimal places.
+  double dp(double val, int places) {
+    num mod = pow(10.0, places);
+    return ((val * mod).round().toDouble() / mod);
   }
 
   @override
   Widget build(BuildContext context) {
+    final double radius = (1 - max(0, (_heightAnimationValue) - 0.5) * 2) * 16;
     return ClipRRect(
-      borderRadius: const BorderRadius.only(
-        topLeft: Radius.circular(16),
-        topRight: Radius.circular(16),
+      borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(radius),
+        topRight: Radius.circular(radius),
       ),
       child: Scaffold(
         floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         floatingActionButton: Visibility(
           visible: MediaQuery.of(context).viewInsets.bottom == 0,
           child: FloatingActionButton.extended(
@@ -69,7 +103,7 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
                 onPressed: _resetFilter,
                 icon: const Icon(Icons.refresh),
                 label: Text(S.of(context).documentFilterResetLabel),
-              )
+              ),
             ],
           ),
         ),
@@ -82,67 +116,97 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
     );
   }
 
-  ListView _buildFormList(BuildContext context) {
-    return ListView(
+  Widget _buildFormList(BuildContext context) {
+    return CustomScrollView(
       controller: widget.scrollController,
-      children: [
-        Align(
-          alignment: Alignment.center,
-          child: _buildDragHandle(context),
-        ),
-        Text(
-          S.of(context).documentFilterTitle,
-          style: Theme.of(context).textTheme.headlineSmall,
-        ).paddedOnly(
-          top: 16.0,
-          left: 16.0,
-          bottom: 24,
-        ),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Text(
-            S.of(context).documentFilterSearchLabel,
-            style: Theme.of(context).textTheme.bodySmall,
+      slivers: [
+        SliverAppBar(
+          pinned: true,
+          automaticallyImplyLeading: false,
+          toolbarHeight: kToolbarHeight + 22,
+          title: SizedBox(
+            width: MediaQuery.of(context).size.width,
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Opacity(
+                  opacity: 1 - _heightAnimationValue,
+                  child: Padding(
+                    padding: EdgeInsets.only(bottom: 11),
+                    child: _buildDragHandle(),
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Stack(
+                    alignment: Alignment.centerLeft,
+                    children: [
+                      Opacity(
+                        opacity: max(0, (_heightAnimationValue - 0.5) * 2),
+                        child: GestureDetector(
+                          onTap: () => Navigator.of(context).pop(),
+                          child: const Icon(Icons.expand_more_rounded),
+                        ),
+                      ),
+                      Padding(
+                        padding:
+                            EdgeInsets.only(left: _heightAnimationValue * 48),
+                        child: Text(S.of(context).documentFilterTitle),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
-        ).paddedOnly(left: 8.0),
-        _buildQueryFormField().padded(),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Text(
-            S.of(context).documentFilterAdvancedLabel,
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
-        ).padded(),
-        FormBuilderExtendedDateRangePicker(
-          name: fkCreatedAt,
-          initialValue: widget.initialFilter.created,
-          labelText: S.of(context).documentCreatedPropertyLabel,
-          onChanged: (_) {
-            _checkQueryConstraints();
-          },
-        ).padded(),
-        FormBuilderExtendedDateRangePicker(
-          name: fkAddedAt,
-          initialValue: widget.initialFilter.added,
-          labelText: S.of(context).documentAddedPropertyLabel,
-          onChanged: (_) {
-            _checkQueryConstraints();
-          },
-        ).padded(),
-        _buildCorrespondentFormField().padded(),
-        _buildDocumentTypeFormField().padded(),
-        _buildStoragePathFormField().padded(),
-        _buildTagsFormField().padded(),
+        ),
+        ..._buildFormFieldList(),
       ],
     );
   }
 
-  Container _buildDragHandle(BuildContext context) {
+  List<Widget> _buildFormFieldList() {
+    return [
+      _buildQueryFormField().paddedSymmetrically(vertical: 8, horizontal: 16),
+      Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          S.of(context).documentFilterAdvancedLabel,
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+      ).paddedSymmetrically(vertical: 8, horizontal: 16),
+      FormBuilderExtendedDateRangePicker(
+        name: fkCreatedAt,
+        initialValue: widget.initialFilter.created,
+        labelText: S.of(context).documentCreatedPropertyLabel,
+        onChanged: (_) {
+          _checkQueryConstraints();
+        },
+      ).paddedSymmetrically(vertical: 8, horizontal: 16),
+      FormBuilderExtendedDateRangePicker(
+        name: fkAddedAt,
+        initialValue: widget.initialFilter.added,
+        labelText: S.of(context).documentAddedPropertyLabel,
+        onChanged: (_) {
+          _checkQueryConstraints();
+        },
+      ).paddedSymmetrically(vertical: 8, horizontal: 16),
+      _buildCorrespondentFormField()
+          .paddedSymmetrically(vertical: 8, horizontal: 16),
+      _buildDocumentTypeFormField()
+          .paddedSymmetrically(vertical: 8, horizontal: 16),
+      _buildStoragePathFormField()
+          .paddedSymmetrically(vertical: 8, horizontal: 16),
+      _buildTagsFormField().padded(16),
+    ].map((w) => SliverToBoxAdapter(child: w)).toList();
+  }
+
+  Container _buildDragHandle() {
     return Container(
-      // According to m3 spec
+      // According to m3 spec https://m3.material.io/components/bottom-sheets/specs
       width: 32,
       height: 4,
-      margin: const EdgeInsets.only(top: 16),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.4),
         borderRadius: BorderRadius.circular(16),

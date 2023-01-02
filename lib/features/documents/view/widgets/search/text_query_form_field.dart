@@ -28,24 +28,26 @@ class TextQueryFormField extends StatelessWidget {
             prefixIcon: const Icon(Icons.search_outlined),
             labelText: _buildLabelText(context, field.value!.queryType),
             suffixIcon: PopupMenuButton<QueryType>(
+              enabled: !onlyExtendedQueryAllowed,
+              color: onlyExtendedQueryAllowed
+                  ? Theme.of(context).disabledColor
+                  : null,
               itemBuilder: (context) => [
-                if (!onlyExtendedQueryAllowed) ...[
-                  PopupMenuItem(
-                    child: ListTile(
-                      title: Text(S
-                          .of(context)
-                          .documentFilterQueryOptionsTitleAndContentLabel),
-                    ),
-                    value: QueryType.titleAndContent,
+                PopupMenuItem(
+                  child: ListTile(
+                    title: Text(S
+                        .of(context)
+                        .documentFilterQueryOptionsTitleAndContentLabel),
                   ),
-                  PopupMenuItem(
-                    child: ListTile(
-                      title: Text(
-                          S.of(context).documentFilterQueryOptionsTitleLabel),
-                    ),
-                    value: QueryType.title,
+                  value: QueryType.titleAndContent,
+                ),
+                PopupMenuItem(
+                  child: ListTile(
+                    title: Text(
+                        S.of(context).documentFilterQueryOptionsTitleLabel),
                   ),
-                ],
+                  value: QueryType.title,
+                ),
                 PopupMenuItem(
                   child: ListTile(
                     title: Text(

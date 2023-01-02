@@ -23,7 +23,6 @@ import 'package:paperless_mobile/features/settings/bloc/application_settings_cub
 import 'package:paperless_mobile/features/settings/model/application_settings_state.dart';
 import 'package:paperless_mobile/features/settings/model/view_type.dart';
 import 'package:paperless_mobile/util.dart';
-import 'package:provider/provider.dart';
 
 class DocumentsPage extends StatefulWidget {
   const DocumentsPage({Key? key}) : super(key: key);
@@ -100,7 +99,9 @@ class _DocumentsPageState extends State<DocumentsPage> {
   }
 
   void _openDocumentFilter() async {
+    final draggableSheetController = DraggableScrollableController();
     final filter = await showModalBottomSheet<DocumentFilter>(
+      useSafeArea: true,
       context: context,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
@@ -112,14 +113,17 @@ class _DocumentsPageState extends State<DocumentsPage> {
       builder: (_) => BlocProvider.value(
         value: context.read<DocumentsCubit>(),
         child: DraggableScrollableSheet(
+          controller: draggableSheetController,
           expand: false,
           snap: true,
+          snapSizes: const [0.9, 1],
           initialChildSize: .9,
-          snapSizes: const [.9, 1],
+          maxChildSize: 1,
           builder: (context, controller) => LabelsBlocProvider(
             child: DocumentFilterPanel(
               initialFilter: context.read<DocumentsCubit>().state.filter,
               scrollController: controller,
+              draggableSheetController: draggableSheetController,
             ),
           ),
         ),

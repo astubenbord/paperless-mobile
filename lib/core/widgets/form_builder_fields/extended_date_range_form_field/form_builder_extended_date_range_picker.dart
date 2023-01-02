@@ -11,6 +11,7 @@ class FormBuilderExtendedDateRangePicker extends StatefulWidget {
   final String labelText;
   final DateRangeQuery initialValue;
   final void Function(DateRangeQuery? query)? onChanged;
+
   const FormBuilderExtendedDateRangePicker({
     super.key,
     required this.name,
@@ -65,7 +66,12 @@ class _FormBuilderExtendedDateRangePickerState
                     : null,
               ),
             ),
-            RelativeDateRangePickerHelper(field: field),
+            MediaQuery.removePadding(
+              context: context,
+              removeLeft: true,
+              removeRight: true,
+              child: RelativeDateRangePickerHelper(field: field),
+            ),
           ],
         );
       },
