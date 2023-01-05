@@ -10,7 +10,12 @@ import 'package:paperless_mobile/generated/l10n.dart';
 
 class ClientCertificateFormField extends StatefulWidget {
   static const fkClientCertificate = 'clientCertificate';
-  const ClientCertificateFormField({Key? key}) : super(key: key);
+
+  final void Function(ClientCertificate? cert) onChanged;
+  const ClientCertificateFormField({
+    Key? key,
+    required this.onChanged,
+  }) : super(key: key);
 
   @override
   State<ClientCertificateFormField> createState() =>
@@ -19,11 +24,13 @@ class ClientCertificateFormField extends StatefulWidget {
 
 class _ClientCertificateFormFieldState
     extends State<ClientCertificateFormField> {
+  RestorableString? _selectedFilePath;
   File? _selectedFile;
   @override
   Widget build(BuildContext context) {
     return FormBuilderField<ClientCertificate?>(
       key: const ValueKey('login-client-cert'),
+      onChanged: widget.onChanged,
       initialValue: null,
       validator: (value) {
         if (value == null) {
@@ -38,54 +45,59 @@ class _ClientCertificateFormFieldState
         return null;
       },
       builder: (field) {
-        return ExpansionTile(
-          title: Text(S.of(context).loginPageClientCertificateSettingLabel),
-          subtitle: Text(
-              S.of(context).loginPageClientCertificateSettingDescriptionText),
-          children: [
-            InputDecorator(
-              decoration: InputDecoration(
-                errorText: field.errorText,
-                border: InputBorder.none,
-              ),
-              child: Column(
-                children: [
-                  ListTile(
-                    leading: ElevatedButton(
-                      onPressed: () => _onSelectFile(field),
-                      child: Text(S.of(context).genericActionSelectText),
-                    ),
-                    title: _buildSelectedFileText(field),
-                    trailing: AbsorbPointer(
-                      absorbing: field.value == null,
-                      child: _selectedFile != null
-                          ? IconButton(
-                              icon: const Icon(Icons.close),
-                              onPressed: () => setState(() {
-                                _selectedFile = null;
-                                field.didChange(null);
-                              }),
-                            )
-                          : null,
-                    ),
-                  ),
-                  if (_selectedFile != null) ...[
-                    ObscuredInputTextFormField(
-                      key: const ValueKey('login-client-cert-passphrase'),
-                      initialValue: field.value?.passphrase,
-                      onChanged: (value) => field.didChange(
-                        field.value?.copyWith(passphrase: value),
+        final theme =
+            Theme.of(context).copyWith(dividerColor: Colors.transparent); //new
+        return Theme(
+          data: theme,
+          child: ExpansionTile(
+            title: Text(S.of(context).loginPageClientCertificateSettingLabel),
+            subtitle: Text(
+                S.of(context).loginPageClientCertificateSettingDescriptionText),
+            children: [
+              InputDecorator(
+                decoration: InputDecoration(
+                  errorText: field.errorText,
+                  border: InputBorder.none,
+                ),
+                child: Column(
+                  children: [
+                    ListTile(
+                      leading: ElevatedButton(
+                        onPressed: () => _onSelectFile(field),
+                        child: Text(S.of(context).genericActionSelectText),
                       ),
-                      label: S
-                          .of(context)
-                          .loginPageClientCertificatePassphraseLabel,
-                    ).padded(),
-                  ] else
-                    ...[]
-                ],
+                      title: _buildSelectedFileText(field),
+                      trailing: AbsorbPointer(
+                        absorbing: field.value == null,
+                        child: _selectedFile != null
+                            ? IconButton(
+                                icon: const Icon(Icons.close),
+                                onPressed: () => setState(() {
+                                  _selectedFile = null;
+                                  field.didChange(null);
+                                }),
+                              )
+                            : null,
+                      ),
+                    ),
+                    if (_selectedFile != null) ...[
+                      ObscuredInputTextFormField(
+                        key: const ValueKey('login-client-cert-passphrase'),
+                        initialValue: field.value?.passphrase,
+                        onChanged: (value) => field.didChange(
+                          field.value?.copyWith(passphrase: value),
+                        ),
+                        label: S
+                            .of(context)
+                            .loginPageClientCertificatePassphraseLabel,
+                      ).padded(),
+                    ] else
+                      ...[]
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         );
       },
       name: ClientCertificateFormField.fkClientCertificate,

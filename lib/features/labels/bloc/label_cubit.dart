@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/repository/label_repository.dart';
@@ -13,11 +12,17 @@ class LabelCubit<T extends Label> extends Cubit<LabelState<T>> {
 
   LabelCubit(LabelRepository<T> repository)
       : _repository = repository,
-        super(LabelState(labels: repository.current, isLoaded: true)) {
-    _subscription = _repository.labels.listen(
-      (update) => emit(
-        LabelState(isLoaded: true, labels: update),
-      ),
+        super(LabelState(
+          isLoaded: repository.isInitialized,
+          labels: repository.current ?? {},
+        )) {
+    _subscription = _repository.values.listen(
+      (update) {
+        if (update == null) {
+          emit(LabelState());
+        }
+        emit(LabelState(isLoaded: true, labels: update!));
+      },
     );
   }
 

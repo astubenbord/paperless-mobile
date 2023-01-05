@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -42,58 +43,74 @@ class PaperlessDocumentsApiImpl implements PaperlessDocumentsApi {
     for (final tag in tags) {
       formData.fields.add(MapEntry('tags', tag.toString()));
     }
+    try {
+      final response =
+          await client.post('/api/documents/post_document/', data: formData);
 
-    final response =
-        await client.post('/api/documents/post_document/', data: formData);
-    if (response.statusCode != 200) {
-      throw PaperlessServerException(
-        ErrorCode.documentUploadFailed,
-        httpStatusCode: response.statusCode,
-      );
+      if (response.statusCode != 200) {
+        throw PaperlessServerException(
+          ErrorCode.documentUploadFailed,
+          httpStatusCode: response.statusCode,
+        );
+      }
+    } on DioError catch (err) {
+      throw err.error;
     }
   }
 
   @override
   Future<DocumentModel> update(DocumentModel doc) async {
-    final response = await client.put(
-      "/api/documents/${doc.id}/",
-      data: doc.toJson(),
-    );
-    if (response.statusCode == 200) {
-      return DocumentModel.fromJson(response.data);
-    } else {
-      throw const PaperlessServerException(ErrorCode.documentUpdateFailed);
+    try {
+      final response = await client.put(
+        "/api/documents/${doc.id}/",
+        data: doc.toJson(),
+      );
+      if (response.statusCode == 200) {
+        return DocumentModel.fromJson(response.data);
+      } else {
+        throw const PaperlessServerException(ErrorCode.documentUpdateFailed);
+      }
+    } on DioError catch (err) {
+      throw err.error;
     }
   }
 
   @override
   Future<PagedSearchResult<DocumentModel>> find(DocumentFilter filter) async {
     final filterParams = filter.toQueryParameters();
-    final response = await client.get(
-      "/api/documents/",
-      queryParameters: filterParams,
-    );
-    if (response.statusCode == 200) {
-      return compute(
-        PagedSearchResult.fromJson,
-        PagedSearchResultJsonSerializer<DocumentModel>(
-          response.data,
-          DocumentModel.fromJson,
-        ),
+    try {
+      final response = await client.get(
+        "/api/documents/",
+        queryParameters: filterParams,
       );
-    } else {
-      throw const PaperlessServerException(ErrorCode.documentLoadFailed);
+      if (response.statusCode == 200) {
+        return compute(
+          PagedSearchResult.fromJson,
+          PagedSearchResultJsonSerializer<DocumentModel>(
+            response.data,
+            DocumentModel.fromJson,
+          ),
+        );
+      } else {
+        throw const PaperlessServerException(ErrorCode.documentLoadFailed);
+      }
+    } on DioError catch (err) {
+      throw err.error;
     }
   }
 
   @override
   Future<int> delete(DocumentModel doc) async {
-    final response = await client.delete("/api/documents/${doc.id}/");
+    try {
+      final response = await client.delete("/api/documents/${doc.id}/");
 
-    if (response.statusCode == 204) {
-      return Future.value(doc.id);
+      if (response.statusCode == 204) {
+        return Future.value(doc.id);
+      }
+      throw const PaperlessServerException(ErrorCode.documentDeleteFailed);
+    } on DioError catch (err) {
+      throw err.error;
     }
-    throw const PaperlessServerException(ErrorCode.documentDeleteFailed);
   }
 
   @override
@@ -107,16 +124,20 @@ class PaperlessDocumentsApiImpl implements PaperlessDocumentsApi {
 
   @override
   Future<Uint8List> getPreview(int documentId) async {
-    final response = await client.get(
-      getPreviewUrl(documentId),
-      options: Options(
-          responseType:
-              ResponseType.bytes), //TODO: Check if bytes or stream is required
-    );
-    if (response.statusCode == 200) {
-      return response.data;
+    try {
+      final response = await client.get(
+        getPreviewUrl(documentId),
+        options: Options(
+            responseType: ResponseType
+                .bytes), //TODO: Check if bytes or stream is required
+      );
+      if (response.statusCode == 200) {
+        return response.data;
+      }
+      throw const PaperlessServerException(ErrorCode.documentPreviewFailed);
+    } on DioError catch (err) {
+      throw err.error;
     }
-    throw const PaperlessServerException(ErrorCode.documentPreviewFailed);
   }
 
   @override
@@ -134,21 +155,29 @@ class PaperlessDocumentsApiImpl implements PaperlessDocumentsApi {
               .map((e) => e.archiveSerialNumber)
               .firstWhere((asn) => asn != null, orElse: () => 0)! +
           1;
-    } on PaperlessServerException catch (_) {
+    } on PaperlessServerException {
       throw const PaperlessServerException(ErrorCode.documentAsnQueryFailed);
+    } on DioError catch (err) {
+      throw err.error;
     }
   }
 
   @override
   Future<Iterable<int>> bulkAction(BulkAction action) async {
-    final response = await client.post(
-      "/api/documents/bulk_edit/",
-      data: action.toJson(),
-    );
-    if (response.statusCode == 200) {
-      return action.documentIds;
-    } else {
-      throw const PaperlessServerException(ErrorCode.documentBulkActionFailed);
+    try {
+      final response = await client.post(
+        "/api/documents/bulk_edit/",
+        data: action.toJson(),
+      );
+      if (response.statusCode == 200) {
+        return action.documentIds;
+      } else {
+        throw const PaperlessServerException(
+          ErrorCode.documentBulkActionFailed,
+        );
+      }
+    } on DioError catch (err) {
+      throw err.error;
     }
   }
 
@@ -174,53 +203,68 @@ class PaperlessDocumentsApiImpl implements PaperlessDocumentsApi {
 
   @override
   Future<Uint8List> download(DocumentModel document) async {
-    //TODO: Add missing error handling
-    final response = await client.get(
-      "/api/documents/${document.id}/download/",
-      options: Options(responseType: ResponseType.bytes),
-    );
-    return response.data;
+    try {
+      final response = await client.get(
+        "/api/documents/${document.id}/download/",
+        options: Options(responseType: ResponseType.bytes),
+      );
+      return response.data;
+    } on DioError catch (err) {
+      throw err.error;
+    }
   }
 
   @override
   Future<DocumentMetaData> getMetaData(DocumentModel document) async {
-    final response =
-        await client.get("/api/documents/${document.id}/metadata/");
-    return compute(
-      DocumentMetaData.fromJson,
-      response.data as Map<String, dynamic>,
-    );
+    try {
+      final response =
+          await client.get("/api/documents/${document.id}/metadata/");
+      return compute(
+        DocumentMetaData.fromJson,
+        response.data as Map<String, dynamic>,
+      );
+    } on DioError catch (err) {
+      throw err.error;
+    }
   }
 
   @override
   Future<List<String>> autocomplete(String query, [int limit = 10]) async {
-    final response = await client.get(
-      '/api/search/autocomplete/',
-      queryParameters: {
-        'query': query,
-        'limit': limit,
-      },
-    );
-    if (response.statusCode == 200) {
-      return response.data as List<String>;
+    try {
+      final response = await client.get(
+        '/api/search/autocomplete/',
+        queryParameters: {
+          'query': query,
+          'limit': limit,
+        },
+      );
+      if (response.statusCode == 200) {
+        return response.data as List<String>;
+      }
+      throw const PaperlessServerException(ErrorCode.autocompleteQueryError);
+    } on DioError catch (err) {
+      throw err.error;
     }
-    throw const PaperlessServerException(ErrorCode.autocompleteQueryError);
   }
 
   @override
   Future<List<SimilarDocumentModel>> findSimilar(int docId) async {
-    final response =
-        await client.get("/api/documents/?more_like=$docId&pageSize=10");
-    if (response.statusCode == 200) {
-      return (await compute(
-        PagedSearchResult<SimilarDocumentModel>.fromJson,
-        PagedSearchResultJsonSerializer(
-          response.data,
-          SimilarDocumentModel.fromJson,
-        ),
-      ))
-          .results;
+    try {
+      final response =
+          await client.get("/api/documents/?more_like=$docId&pageSize=10");
+      if (response.statusCode == 200) {
+        return (await compute(
+          PagedSearchResult<SimilarDocumentModel>.fromJson,
+          PagedSearchResultJsonSerializer(
+            response.data,
+            SimilarDocumentModel.fromJson,
+          ),
+        ))
+            .results;
+      }
+      throw const PaperlessServerException(ErrorCode.similarQueryError);
+    } on DioError catch (err) {
+      throw err.error;
     }
-    throw const PaperlessServerException(ErrorCode.similarQueryError);
   }
 }

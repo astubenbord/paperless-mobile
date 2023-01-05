@@ -8,13 +8,14 @@ import 'package:paperless_mobile/features/edit_label/cubit/edit_label_state.dart
 class EditLabelCubit<T extends Label> extends Cubit<EditLabelState<T>> {
   final LabelRepository<T> _repository;
 
-  StreamSubscription<Map<int, T>>? _subscription;
+  StreamSubscription<Map<int, T>?>? _subscription;
 
   EditLabelCubit(LabelRepository<T> repository)
       : _repository = repository,
         super(const EditLabelInitial()) {
-    _subscription = _repository.labels
-        .listen((labels) => emit(EditLabelState(labels: labels)));
+    _subscription = repository.values.listen(
+      (update) => emit(EditLabelState(labels: update ?? {})),
+    );
   }
 
   Future<T> create(T label) => _repository.create(label);

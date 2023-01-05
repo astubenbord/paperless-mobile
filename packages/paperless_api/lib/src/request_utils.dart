@@ -11,22 +11,26 @@ Future<T> getSingleResult<T>(
   required Dio client,
   int minRequiredApiVersion = 1,
 }) async {
-  final response = await client.get(
-    url,
-    options: Options(
-      headers: {'accept': 'application/json; version=$minRequiredApiVersion'},
-    ),
-  );
-  if (response.statusCode == HttpStatus.ok) {
-    return compute(
-      fromJson,
-      response.data as Map<String, dynamic>,
+  try {
+    final response = await client.get(
+      url,
+      options: Options(
+        headers: {'accept': 'application/json; version=$minRequiredApiVersion'},
+      ),
     );
+    if (response.statusCode == HttpStatus.ok) {
+      return compute(
+        fromJson,
+        response.data as Map<String, dynamic>,
+      );
+    }
+    throw PaperlessServerException(
+      errorCode,
+      httpStatusCode: response.statusCode,
+    );
+  } on DioError catch (err) {
+    throw err.error;
   }
-  throw PaperlessServerException(
-    errorCode,
-    httpStatusCode: response.statusCode,
-  );
 }
 
 Future<List<T>> getCollection<T>(
@@ -36,30 +40,34 @@ Future<List<T>> getCollection<T>(
   required Dio client,
   int minRequiredApiVersion = 1,
 }) async {
-  final response = await client.get(
-    url,
-    options: Options(headers: {
-      'accept': 'application/json; version=$minRequiredApiVersion'
-    }),
-  );
-  if (response.statusCode == HttpStatus.ok) {
-    final Map<String, dynamic> body = response.data;
-    if (body.containsKey('count')) {
-      if (body['count'] == 0) {
-        return <T>[];
-      } else {
-        return compute(
-          _collectionFromJson,
-          _CollectionFromJsonSerializationParams(
-              fromJson, (body['results'] as List).cast<Map<String, dynamic>>()),
-        );
+  try {
+    final response = await client.get(
+      url,
+      options: Options(headers: {
+        'accept': 'application/json; version=$minRequiredApiVersion'
+      }),
+    );
+    if (response.statusCode == HttpStatus.ok) {
+      final Map<String, dynamic> body = response.data;
+      if (body.containsKey('count')) {
+        if (body['count'] == 0) {
+          return <T>[];
+        } else {
+          return compute(
+            _collectionFromJson,
+            _CollectionFromJsonSerializationParams(fromJson,
+                (body['results'] as List).cast<Map<String, dynamic>>()),
+          );
+        }
       }
     }
+    throw PaperlessServerException(
+      errorCode,
+      httpStatusCode: response.statusCode,
+    );
+  } on DioError catch (err) {
+    throw err.error;
   }
-  throw PaperlessServerException(
-    errorCode,
-    httpStatusCode: response.statusCode,
-  );
 }
 
 List<T> _collectionFromJson<T>(

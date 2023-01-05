@@ -34,26 +34,26 @@ class EditDocumentCubit extends Cubit<EditDocumentState> {
         super(
           EditDocumentState(
             document: document,
-            correspondents: correspondentRepository.current,
-            documentTypes: documentTypeRepository.current,
-            storagePaths: storagePathRepository.current,
-            tags: tagRepository.current,
+            correspondents: correspondentRepository.current ?? {},
+            documentTypes: documentTypeRepository.current ?? {},
+            storagePaths: storagePathRepository.current ?? {},
+            tags: tagRepository.current ?? {},
           ),
         ) {
     _subscriptions.add(
-      _correspondentRepository.labels
+      _correspondentRepository.values
           .listen((v) => emit(state.copyWith(correspondents: v))),
     );
     _subscriptions.add(
-      _documentTypeRepository.labels
+      _documentTypeRepository.values
           .listen((v) => emit(state.copyWith(documentTypes: v))),
     );
     _subscriptions.add(
-      _storagePathRepository.labels
+      _storagePathRepository.values
           .listen((v) => emit(state.copyWith(storagePaths: v))),
     );
     _subscriptions.add(
-      _tagRepository.labels.listen(
+      _tagRepository.values.listen(
         (v) => emit(state.copyWith(tags: v)),
       ),
     );

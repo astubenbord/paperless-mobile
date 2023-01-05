@@ -10,7 +10,7 @@ class SavedViewCubit extends Cubit<SavedViewState> {
   StreamSubscription? _subscription;
 
   SavedViewCubit(this._repository) : super(SavedViewState(value: {})) {
-    _subscription = _repository.savedViews.listen(
+    _subscription = _repository.values.listen(
       (savedViews) {
         if (savedViews == null) {
           emit(state.copyWith(isLoaded: false));

@@ -449,7 +449,7 @@ class _DetailsItem extends StatelessWidget {
         children: [
           Text(
             label,
-            style: Theme.of(context).textTheme.caption,
+            style: Theme.of(context).textTheme.bodySmall,
           ),
           content,
         ],

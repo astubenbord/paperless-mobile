@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_api/paperless_api.dart';
@@ -5,6 +6,7 @@ import 'package:paperless_mobile/core/repository/label_repository.dart';
 import 'package:paperless_mobile/features/edit_label/cubit/edit_label_cubit.dart';
 import 'package:paperless_mobile/features/edit_label/view/label_form.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
+import 'package:paperless_mobile/util.dart';
 
 class EditLabelPage<T extends Label> extends StatelessWidget {
   final T label;
@@ -91,7 +93,8 @@ class EditLabelForm<T extends Label> extends StatelessWidget {
                   },
                   child: Text(
                     S.of(context).genericActionDeleteLabel,
-                    style: TextStyle(color: Theme.of(context).errorColor),
+                    style:
+                        TextStyle(color: Theme.of(context).colorScheme.error),
                   ),
                 ),
               ],
@@ -99,7 +102,13 @@ class EditLabelForm<T extends Label> extends StatelessWidget {
           ) ??
           false;
       if (shouldDelete) {
-        context.read<EditLabelCubit<T>>().delete(label);
+        try {
+          context.read<EditLabelCubit<T>>().delete(label);
+        } on PaperlessServerException catch (error) {
+          showErrorMessage(context, error);
+        } catch (error) {
+          print(error);
+        }
         Navigator.pop(context);
       }
     } else {

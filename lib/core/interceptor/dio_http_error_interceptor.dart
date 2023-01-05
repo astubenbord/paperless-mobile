@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/type/types.dart';
@@ -9,12 +11,22 @@ class DioHttpErrorInterceptor extends Interceptor {
       // try to parse contained error message, otherwise return response
       final dynamic data = err.response?.data;
       if (data is Map<String, dynamic>) {
-        return _handlePaperlessValidationError(data, handler, err);
+        _handlePaperlessValidationError(data, handler, err);
       } else if (data is String) {
-        return _handlePlainError(data, handler, err);
+        _handlePlainError(data, handler, err);
       }
+    } else if (err.error is SocketException) {
+      // Offline
+      handler.reject(
+        DioError(
+          error: const PaperlessServerException(ErrorCode.deviceOffline),
+          requestOptions: err.requestOptions,
+          type: DioErrorType.connectTimeout,
+        ),
+      );
+    } else {
+      handler.reject(err);
     }
-    handler.reject(err);
   }
 
   void _handlePaperlessValidationError(
@@ -54,7 +66,8 @@ class DioHttpErrorInterceptor extends Interceptor {
         DioError(
           requestOptions: err.requestOptions,
           type: DioErrorType.response,
-          error: ErrorCode.missingClientCertificate,
+          error: const PaperlessServerException(
+              ErrorCode.missingClientCertificate),
         ),
       );
     }

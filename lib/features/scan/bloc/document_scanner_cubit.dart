@@ -4,9 +4,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:injectable/injectable.dart';
 import 'package:paperless_api/paperless_api.dart';
-import 'package:paperless_mobile/features/login/bloc/authentication_cubit.dart';
 
 class DocumentScannerCubit extends Cubit<List<File>> {
   DocumentScannerCubit() : super(const []);

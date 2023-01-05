@@ -24,11 +24,8 @@ class PaperlessAuthenticationApiImpl implements PaperlessAuthenticationApi {
         },
       );
     } on DioError catch (error) {
-      if (error.error is ErrorCode) {
-        throw PaperlessServerException(
-          error.error,
-          httpStatusCode: error.response?.statusCode,
-        );
+      if (error.error is PaperlessServerException) {
+        throw error.error;
       } else {
         log(error.message);
         throw PaperlessServerException(

@@ -7,10 +7,10 @@ class SavedViewRepositoryImpl implements SavedViewRepository {
 
   SavedViewRepositoryImpl(this._api);
 
-  final BehaviorSubject<Map<int, SavedView>?> _subject = BehaviorSubject();
+  final _subject = BehaviorSubject<Map<int, SavedView>?>();
 
   @override
-  Stream<Map<int, SavedView>?> get savedViews =>
+  Stream<Map<int, SavedView>?> get values =>
       _subject.stream.asBroadcastStream();
 
   @override
@@ -53,5 +53,16 @@ class SavedViewRepositoryImpl implements SavedViewRepository {
     };
     _subject.add(updatedState);
     return found;
+  }
+
+  @override
+  Map<int, SavedView>? get current => _subject.valueOrNull;
+
+  @override
+  bool get isInitialized => _subject.hasValue;
+
+  @override
+  Future<SavedView> update(SavedView object) {
+    throw UnimplementedError("Saved view update is not yet implemented");
   }
 }

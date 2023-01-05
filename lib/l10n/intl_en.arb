@@ -212,7 +212,7 @@
   "@errorMessageCreateSavedViewError": {},
   "errorMessageDeleteSavedViewError": "Could not delete saved view, please try again",
   "@errorMessageDeleteSavedViewError": {},
-  "errorMessageDeviceOffline": "Could not fetch data: You are not connected to the internet.",
+  "errorMessageDeviceOffline": "You are currently offline. Please make sure you are connected to the internet.",
   "@errorMessageDeviceOffline": {},
   "errorMessageDocumentAsnQueryFailed": "Could not assign archive serial number.",
   "@errorMessageDocumentAsnQueryFailed": {},

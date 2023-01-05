@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/security/authentication_aware_dio_manager.dart';
@@ -27,45 +25,32 @@ class AuthenticationCubit extends Cubit<AuthenticationState>
     ClientCertificate? clientCertificate,
   }) async {
     assert(credentials.username != null && credentials.password != null);
-    try {
-      print(_dioWrapper.client.hashCode);
-      _dioWrapper.updateSettings(
-        baseUrl: serverUrl,
-        clientCertificate: clientCertificate,
-      );
 
-      final token = await _authApi.login(
-        username: credentials.username!,
-        password: credentials.password!,
-      );
+    _dioWrapper.updateSettings(
+      baseUrl: serverUrl,
+      clientCertificate: clientCertificate,
+    );
+    final token = await _authApi.login(
+      username: credentials.username!,
+      password: credentials.password!,
+    );
 
-      _dioWrapper.updateSettings(
-        baseUrl: serverUrl,
-        clientCertificate: clientCertificate,
-        authToken: token,
-      );
+    _dioWrapper.updateSettings(
+      baseUrl: serverUrl,
+      clientCertificate: clientCertificate,
+      authToken: token,
+    );
 
-      emit(
-        AuthenticationState(
-          wasLoginStored: false,
-          authentication: AuthenticationInformation(
-            serverUrl: serverUrl,
-            clientCertificate: clientCertificate,
-            token: token,
-          ),
+    emit(
+      AuthenticationState(
+        wasLoginStored: false,
+        authentication: AuthenticationInformation(
+          serverUrl: serverUrl,
+          clientCertificate: clientCertificate,
+          token: token,
         ),
-      );
-    } on TlsException catch (_) {
-      const error = PaperlessServerException(
-          ErrorCode.invalidClientCertificateConfiguration);
-      throw error;
-    } on SocketException catch (err) {
-      if (err.message.contains("connection timed out")) {
-        throw const PaperlessServerException(ErrorCode.requestTimedOut);
-      } else {
-        throw const PaperlessServerException.unknown();
-      }
-    }
+      ),
+    );
   }
 
   ///

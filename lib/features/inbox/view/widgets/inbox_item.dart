@@ -7,7 +7,6 @@ import 'package:paperless_mobile/features/document_details/bloc/document_details
 import 'package:paperless_mobile/features/document_details/view/pages/document_details_page.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/document_preview.dart';
 import 'package:paperless_mobile/features/labels/tags/view/widgets/tags_widget.dart';
-import 'package:provider/provider.dart';
 
 class InboxItem extends StatelessWidget {
   static const _a4AspectRatio = 1 / 1.4142;

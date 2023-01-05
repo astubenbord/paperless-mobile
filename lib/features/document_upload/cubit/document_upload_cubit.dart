@@ -10,7 +10,6 @@ import 'package:paperless_mobile/core/store/local_vault.dart';
 part 'document_upload_state.dart';
 
 class DocumentUploadCubit extends Cubit<DocumentUploadState> {
-  final LocalVault _localVault;
   final PaperlessDocumentsApi _documentApi;
 
   final LabelRepository<Tag> _tagRepository;
@@ -29,7 +28,6 @@ class DocumentUploadCubit extends Cubit<DocumentUploadState> {
         _tagRepository = tagRepository,
         _correspondentRepository = correspondentRepository,
         _documentTypeRepository = documentTypeRepository,
-        _localVault = localVault,
         super(
           const DocumentUploadState(
             tags: {},
@@ -37,13 +35,13 @@ class DocumentUploadCubit extends Cubit<DocumentUploadState> {
             documentTypes: {},
           ),
         ) {
-    _subs.add(_tagRepository.labels.listen(
+    _subs.add(_tagRepository.values.listen(
       (tags) => emit(state.copyWith(tags: tags)),
     ));
-    _subs.add(_correspondentRepository.labels.listen(
+    _subs.add(_correspondentRepository.values.listen(
       (correspondents) => emit(state.copyWith(correspondents: correspondents)),
     ));
-    _subs.add(_documentTypeRepository.labels.listen(
+    _subs.add(_documentTypeRepository.values.listen(
       (documentTypes) => emit(state.copyWith(documentTypes: documentTypes)),
     ));
   }

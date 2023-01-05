@@ -9,7 +9,6 @@ import 'package:paperless_mobile/features/documents/view/widgets/list/document_l
 import 'package:paperless_mobile/features/linked_documents_preview/bloc/linked_documents_cubit.dart';
 import 'package:paperless_mobile/features/linked_documents_preview/bloc/state/linked_documents_state.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
-import 'package:provider/provider.dart';
 
 class LinkedDocumentsPage extends StatefulWidget {
   const LinkedDocumentsPage({super.key});

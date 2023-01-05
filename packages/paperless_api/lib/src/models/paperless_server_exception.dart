@@ -15,7 +15,7 @@ class PaperlessServerException implements Exception {
 
   @override
   String toString() {
-    return "ErrorMessage(code: $code${stackTrace != null ? ', stackTrace: ${stackTrace.toString()}' : ''}${httpStatusCode != null ? ', httpStatusCode: $httpStatusCode' : ''})";
+    return "PaperlessServerException(code: $code${stackTrace != null ? ', stackTrace: ${stackTrace.toString()}' : ''}${httpStatusCode != null ? ', httpStatusCode: $httpStatusCode' : ''})";
   }
 }
 

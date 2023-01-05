@@ -13,7 +13,7 @@ class OfflineBanner extends StatelessWidget with PreferredSizeWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8.0),
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Icon(
               Icons.cloud_off,
               size: 24,

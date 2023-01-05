@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:paperless_mobile/features/settings/bloc/application_settings_cubit.dart';
 
 class LanguageHeaderInterceptor extends Interceptor {
   String preferredLocaleSubtag;

@@ -136,7 +136,7 @@ class _InboxPageState extends State<InboxPage> {
                         child: Text(
                           S.of(context).inboxPageUsageHintText,
                           textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.caption,
+                          style: Theme.of(context).textTheme.bodySmall,
                         ).padded(),
                       ),
                       ...slivers

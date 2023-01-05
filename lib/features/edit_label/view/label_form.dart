@@ -123,8 +123,6 @@ class _LabelFormState<T extends Label> extends State<LabelForm<T>> {
         Navigator.pop(context, createdLabel);
       } on PaperlessServerException catch (error, stackTrace) {
         showErrorMessage(context, error, stackTrace);
-      } on DioError catch (error) {
-        setState(() => _errors = error.error as PaperlessValidationErrors);
       }
     }
   }

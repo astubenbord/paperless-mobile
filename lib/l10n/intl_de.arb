@@ -212,7 +212,7 @@
   "@errorMessageCreateSavedViewError": {},
   "errorMessageDeleteSavedViewError": "Gespeicherte Ansicht konnte nicht geklöscht werden, bitte versuche es erneut.",
   "@errorMessageDeleteSavedViewError": {},
-  "errorMessageDeviceOffline": "Daten konnten nicht geladen werden: Eine Verbindung zum Internet konnte nicht hergestellt werden.",
+  "errorMessageDeviceOffline": "Du bist offline. Bitte stelle sicher, dass du mit dem Internet verbunden bist.",
   "@errorMessageDeviceOffline": {},
   "errorMessageDocumentAsnQueryFailed": "Archiv-Seriennummer konnte nicht zugewiesen werden.",
   "@errorMessageDocumentAsnQueryFailed": {},

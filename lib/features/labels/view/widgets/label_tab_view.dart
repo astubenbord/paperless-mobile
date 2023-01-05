@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
-import 'package:paperless_mobile/core/repository/label_repository.dart';
 import 'package:paperless_mobile/features/labels/bloc/label_cubit.dart';
 import 'package:paperless_mobile/core/widgets/offline_widget.dart';
 import 'package:paperless_mobile/features/labels/bloc/label_state.dart';
@@ -38,12 +37,12 @@ class LabelTabView<T extends Label> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ConnectivityCubit, ConnectivityState>(
-      builder: (context, state) {
-        if (state == ConnectivityState.notConnected) {
-          return const OfflineWidget();
-        }
+      builder: (context, connectivityState) {
         return BlocBuilder<LabelCubit<T>, LabelState<T>>(
           builder: (context, state) {
+            if (!state.isLoaded && !connectivityState.isConnected) {
+              return const OfflineWidget();
+            }
             final labels = state.labels.values.toList()..sort();
             if (labels.isEmpty) {
               return Center(
@@ -57,13 +56,15 @@ class LabelTabView<T extends Label> extends StatelessWidget {
                     TextButton(
                       onPressed: onAddNew,
                       child: Text(emptyStateActionButtonLabel),
-                    )
+                    ),
                   ].padded(),
                 ),
               );
             }
             return RefreshIndicator(
               onRefresh: context.read<LabelCubit<T>>().reload,
+              notificationPredicate: (notification) =>
+                  connectivityState.isConnected,
               child: ListView(
                 children: labels
                     .map(

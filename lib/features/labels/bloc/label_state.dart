@@ -6,8 +6,8 @@ class LabelState<T extends Label> {
   final Map<int, T> labels;
 
   LabelState({
-    required this.isLoaded,
-    required this.labels,
+    this.isLoaded = false,
+    this.labels = const {},
   });
 
   T? getLabel(int? key) {

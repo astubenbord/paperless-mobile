@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -9,9 +8,9 @@ import 'package:paperless_api/src/request_utils.dart';
 import 'paperless_saved_views_api.dart';
 
 class PaperlessSavedViewsApiImpl implements PaperlessSavedViewsApi {
-  final Dio client;
+  final Dio _client;
 
-  PaperlessSavedViewsApiImpl(this.client);
+  PaperlessSavedViewsApiImpl(this._client);
 
   @override
   Future<Iterable<SavedView>> findAll([Iterable<int>? ids]) async {
@@ -19,7 +18,7 @@ class PaperlessSavedViewsApiImpl implements PaperlessSavedViewsApi {
       "/api/saved_views/",
       SavedView.fromJson,
       ErrorCode.loadSavedViewsError,
-      client: client,
+      client: _client,
     );
 
     return result.where((view) => ids?.contains(view.id!) ?? true);
@@ -27,29 +26,37 @@ class PaperlessSavedViewsApiImpl implements PaperlessSavedViewsApi {
 
   @override
   Future<SavedView> save(SavedView view) async {
-    final response = await client.post(
-      "/api/saved_views/",
-      data: view.toJson(),
-    );
-    if (response.statusCode == HttpStatus.created) {
-      return SavedView.fromJson(response.data);
+    try {
+      final response = await _client.post(
+        "/api/saved_views/",
+        data: view.toJson(),
+      );
+      if (response.statusCode == HttpStatus.created) {
+        return SavedView.fromJson(response.data);
+      }
+      throw PaperlessServerException(
+        ErrorCode.createSavedViewError,
+        httpStatusCode: response.statusCode,
+      );
+    } on DioError catch (err) {
+      throw err.error;
     }
-    throw PaperlessServerException(
-      ErrorCode.createSavedViewError,
-      httpStatusCode: response.statusCode,
-    );
   }
 
   @override
   Future<int> delete(SavedView view) async {
-    final response = await client.delete("/api/saved_views/${view.id}/");
-    if (response.statusCode == HttpStatus.noContent) {
-      return view.id!;
+    try {
+      final response = await _client.delete("/api/saved_views/${view.id}/");
+      if (response.statusCode == HttpStatus.noContent) {
+        return view.id!;
+      }
+      throw PaperlessServerException(
+        ErrorCode.deleteSavedViewError,
+        httpStatusCode: response.statusCode,
+      );
+    } on DioError catch (err) {
+      throw err.error;
     }
-    throw PaperlessServerException(
-      ErrorCode.deleteSavedViewError,
-      httpStatusCode: response.statusCode,
-    );
   }
 
   @override
@@ -58,7 +65,7 @@ class PaperlessSavedViewsApiImpl implements PaperlessSavedViewsApi {
       "/api/saved_views/$id/",
       SavedView.fromJson,
       ErrorCode.loadSavedViewsError,
-      client: client,
+      client: _client,
     );
   }
 }
