@@ -1,49 +1,43 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:paperless_api/src/converters/id_query_parameter_json_converter.dart';
+part 'id_query_parameter.g.dart';
 
-@IdQueryParameterJsonConverter()
 @JsonSerializable()
 class IdQueryParameter extends Equatable {
-  final int? _assignmentStatus;
-  final int? _id;
+  final int? assignmentStatus;
+  final int? id;
 
   @Deprecated("Use named constructors, this is only meant for code generation")
-  const IdQueryParameter(this._assignmentStatus, this._id);
+  const IdQueryParameter(this.assignmentStatus, this.id);
 
   const IdQueryParameter.notAssigned()
-      : _assignmentStatus = 1,
-        _id = null;
+      : assignmentStatus = 1,
+        id = null;
 
   const IdQueryParameter.anyAssigned()
-      : _assignmentStatus = 0,
-        _id = null;
+      : assignmentStatus = 0,
+        id = null;
 
   const IdQueryParameter.fromId(int? id)
-      : _assignmentStatus = null,
-        _id = id;
+      : assignmentStatus = null,
+        id = id;
 
   const IdQueryParameter.unset() : this.fromId(null);
 
-  bool get isUnset => _id == null && _assignmentStatus == null;
+  bool get isUnset => id == null && assignmentStatus == null;
 
-  bool get isSet => _id != null && _assignmentStatus == null;
+  bool get isSet => id != null && assignmentStatus == null;
 
-  bool get onlyNotAssigned => _assignmentStatus == 1;
+  bool get onlyNotAssigned => assignmentStatus == 1;
 
-  bool get onlyAssigned => _assignmentStatus == 0;
-
-  int? get id => _id;
-
-  @visibleForTesting
-  int? get assignmentStatus => _assignmentStatus;
+  bool get onlyAssigned => assignmentStatus == 0;
 
   Map<String, String> toQueryParameter(String field) {
     final Map<String, String> params = {};
     if (onlyNotAssigned || onlyAssigned) {
       params.putIfAbsent(
-          '${field}__isnull', () => _assignmentStatus!.toString());
+          '${field}__isnull', () => assignmentStatus!.toString());
     }
     if (isSet) {
       params.putIfAbsent("${field}__id", () => id!.toString());
@@ -52,5 +46,10 @@ class IdQueryParameter extends Equatable {
   }
 
   @override
-  List<Object?> get props => [_assignmentStatus, _id];
+  List<Object?> get props => [assignmentStatus, id];
+
+  Map<String, dynamic> toJson() => _$IdQueryParameterToJson(this);
+
+  factory IdQueryParameter.fromJson(Map<String, dynamic> json) =>
+      _$IdQueryParameterFromJson(json);
 }

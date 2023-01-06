@@ -1,5 +1,10 @@
+import 'package:json_annotation/json_annotation.dart';
+
 import 'query_type.dart';
 
+part 'text_query.g.dart';
+
+@JsonSerializable()
 class TextQuery {
   final QueryType queryType;
   final String? queryText;
@@ -51,4 +56,9 @@ class TextQuery {
     }
     return null;
   }
+
+  Map<String, dynamic> toJson() => _$TextQueryToJson(this);
+
+  factory TextQuery.fromJson(Map<String, dynamic> json) =>
+      _$TextQueryFromJson(json);
 }

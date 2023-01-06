@@ -1,8 +1,17 @@
 import 'package:equatable/equatable.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_api/src/constants.dart';
-import 'package:paperless_api/src/models/query_parameters/text_query.dart';
 
+import 'query_parameters/tags_query/any_assigned_tags_query.dart';
+import 'query_parameters/tags_query/exclude_tag_id_query.dart';
+import 'query_parameters/tags_query/ids_tags_query.dart';
+import 'query_parameters/tags_query/include_tag_id_query.dart';
+import 'query_parameters/tags_query/only_not_assigned_tags_query.dart';
+
+part 'filter_rule_model.g.dart';
+
+@JsonSerializable()
 class FilterRule with EquatableMixin {
   static const int titleRule = 0;
   static const int asnRule = 2;
@@ -35,21 +44,11 @@ class FilterRule with EquatableMixin {
   static const String _lastNDateRangeQueryRegex =
       r"(?<field>created|added|modified):\[-?(?<n>\d+) (?<unit>day|week|month|year) to now\]";
 
+  @JsonKey(name: 'rule_type')
   final int ruleType;
   final String? value;
 
   FilterRule(this.ruleType, this.value);
-
-  FilterRule.fromJson(Map<String, dynamic> json)
-      : ruleType = json['rule_type'],
-        value = json['value'];
-
-  Map<String, dynamic> toJson() {
-    return {
-      'rule_type': ruleType,
-      'value': value,
-    };
-  }
 
   DocumentFilter applyToFilter(final DocumentFilter filter) {
     //TODO: Check in profiling mode if this is inefficient enough to cause stutters...
@@ -368,4 +367,9 @@ class FilterRule with EquatableMixin {
 
   @override
   List<Object?> get props => [ruleType, value];
+
+  Map<String, dynamic> toJson() => _$FilterRuleToJson(this);
+
+  factory FilterRule.fromJson(Map<String, dynamic> json) =>
+      _$FilterRuleFromJson(json);
 }

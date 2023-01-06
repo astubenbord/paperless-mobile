@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_api/paperless_api.dart';
@@ -36,8 +38,15 @@ class _DocumentsPageAppBarState extends State<DocumentsPageAppBar> {
     return BlocBuilder<DocumentsCubit, DocumentsState>(
       builder: (context, documentsState) {
         final hasSelection = documentsState.selection.isNotEmpty;
+        // final PreferredSize? loadingWidget = documentsState.isLoading
+        //     ? const PreferredSize(
+        //         child: LinearProgressIndicator(),
+        //         preferredSize: Size.fromHeight(4.0),
+        //       )
+        //     : null;
         if (hasSelection) {
           return SliverAppBar(
+            // bottom: loadingWidget,
             expandedHeight: kToolbarHeight + flexibleAreaHeight,
             snap: true,
             floating: true,
@@ -62,6 +71,7 @@ class _DocumentsPageAppBarState extends State<DocumentsPageAppBar> {
           );
         } else {
           return SliverAppBar(
+            // bottom: loadingWidget,
             expandedHeight: kToolbarHeight + flexibleAreaHeight,
             snap: true,
             floating: true,

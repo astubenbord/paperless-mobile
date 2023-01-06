@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:dio/dio.dart';
 import 'package:paperless_api/src/models/paperless_server_exception.dart';
 import 'package:paperless_api/src/modules/authentication_api/authentication_api.dart';
@@ -24,10 +22,10 @@ class PaperlessAuthenticationApiImpl implements PaperlessAuthenticationApi {
         },
       );
     } on DioError catch (error) {
-      if (error.error is PaperlessServerException) {
+      if (error.error is PaperlessServerException ||
+          error.error is Map<String, String>) {
         throw error.error;
       } else {
-        log(error.message);
         throw PaperlessServerException(
           ErrorCode.authenticationFailed,
           details: error.message,

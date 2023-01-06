@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:paperless_api/paperless_api.dart';
+import 'package:paperless_api/src/models/query_parameters/tags_query/include_tag_id_query.dart';
 import 'package:paperless_api/src/models/query_parameters/text_query.dart';
 
 void main() {

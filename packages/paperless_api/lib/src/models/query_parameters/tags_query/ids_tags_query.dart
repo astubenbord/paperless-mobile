@@ -1,40 +1,13 @@
-import 'package:equatable/equatable.dart';
+import 'package:json_annotation/json_annotation.dart';
 
-abstract class TagsQuery extends Equatable {
-  const TagsQuery();
-  Map<String, String> toQueryParameter();
-}
+import 'exclude_tag_id_query.dart';
+import 'include_tag_id_query.dart';
+import 'tag_id_query.dart';
+import 'tags_query.dart';
 
-class OnlyNotAssignedTagsQuery extends TagsQuery {
-  const OnlyNotAssignedTagsQuery();
-  @override
-  Map<String, String> toQueryParameter() {
-    return {'is_tagged': '0'};
-  }
+part 'ids_tags_query.g.dart';
 
-  @override
-  List<Object?> get props => [];
-}
-
-class AnyAssignedTagsQuery extends TagsQuery {
-  final Iterable<int> tagIds;
-
-  const AnyAssignedTagsQuery({
-    this.tagIds = const [],
-  });
-
-  @override
-  Map<String, String> toQueryParameter() {
-    if (tagIds.isEmpty) {
-      return {'is_tagged': '1'};
-    }
-    return {'tags__id__in': tagIds.join(',')};
-  }
-
-  @override
-  List<Object?> get props => [tagIds];
-}
-
+@JsonSerializable(explicitToJson: true)
 class IdsTagsQuery extends TagsQuery {
   final Iterable<TagIdQuery> _idQueries;
 
@@ -102,41 +75,10 @@ class IdsTagsQuery extends TagsQuery {
 
   @override
   List<Object?> get props => [_idQueries];
-}
-
-abstract class TagIdQuery extends Equatable {
-  final int id;
-
-  const TagIdQuery(this.id);
-
-  String get methodName;
 
   @override
-  List<Object?> get props => [id, methodName];
+  Map<String, dynamic> toJson() => _$IdsTagsQueryToJson(this);
 
-  TagIdQuery toggle();
-}
-
-class IncludeTagIdQuery extends TagIdQuery {
-  const IncludeTagIdQuery(super.id);
-
-  @override
-  String get methodName => 'include';
-
-  @override
-  TagIdQuery toggle() {
-    return ExcludeTagIdQuery(id);
-  }
-}
-
-class ExcludeTagIdQuery extends TagIdQuery {
-  const ExcludeTagIdQuery(super.id);
-
-  @override
-  String get methodName => 'exclude';
-
-  @override
-  TagIdQuery toggle() {
-    return IncludeTagIdQuery(id);
-  }
+  factory IdsTagsQuery.fromJson(Map<String, dynamic> json) =>
+      _$IdsTagsQueryFromJson(json);
 }

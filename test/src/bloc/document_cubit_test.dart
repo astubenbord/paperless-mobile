@@ -35,7 +35,7 @@ void main() async {
 
   group("Test DocumentsCubit reloadDocuments", () {
     test("Assert correct initial state", () {
-      expect(DocumentsCubit(documentRepository).state, DocumentsState.initial);
+      expect(DocumentsCubit(documentRepository).state, const DocumentsState());
     });
 
     blocTest<DocumentsCubit, DocumentsState>(
@@ -49,11 +49,11 @@ void main() async {
         ),
       ),
       build: () => DocumentsCubit(documentRepository),
-      seed: () => DocumentsState.initial,
+      seed: () => const DocumentsState(),
       act: (bloc) => bloc.load(),
       expect: () => [
         DocumentsState(
-            isLoaded: true,
+            hasLoaded: true,
             value: [
               PagedSearchResult(
                 count: 10,
@@ -78,11 +78,11 @@ void main() async {
         ),
       ),
       build: () => DocumentsCubit(documentRepository),
-      seed: () => DocumentsState.initial,
+      seed: () => const DocumentsState(),
       act: (bloc) => bloc.load(),
       expect: () => [
         DocumentsState(
-            isLoaded: true,
+            hasLoaded: true,
             value: [
               PagedSearchResult(
                 count: 10,

@@ -1,10 +1,14 @@
+import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
-import 'package:paperless_api/src/models/query_parameters/text_query.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:paperless_api/paperless_api.dart';
-import 'package:collection/collection.dart';
+import 'package:paperless_api/src/converters/tags_query_json_converter.dart';
 
-@JsonSerializable()
+part 'document_filter.g.dart';
+
+@TagsQueryJsonConverter()
+@DateRangeQueryJsonConverter()
+@JsonSerializable(explicitToJson: true)
 class DocumentFilter extends Equatable {
   static const DocumentFilter initial = DocumentFilter();
 
@@ -73,7 +77,7 @@ class DocumentFilter extends Equatable {
         key,
         entries.length == 1
             ? entries.first.value
-            : entries.map((e) => e.value).toList(),
+            : entries.map((e) => e.value).join(","),
       ),
     );
     return queryParams;
@@ -150,4 +154,9 @@ class DocumentFilter extends Equatable {
         modified,
         query,
       ];
+
+  factory DocumentFilter.fromJson(Map<String, dynamic> json) =>
+      _$DocumentFilterFromJson(json);
+
+  Map<String, dynamic> toJson() => _$DocumentFilterToJson(this);
 }

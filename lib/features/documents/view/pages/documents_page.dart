@@ -35,6 +35,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
   final _pagingController = PagingController<int, DocumentModel>(
     firstPageKey: 1,
   );
+  final _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
 
   @override
   void initState() {
@@ -78,8 +79,8 @@ class _DocumentsPageState extends State<DocumentsPage> {
             builder: (context, state) {
               final appliedFiltersCount = state.filter.appliedFiltersCount;
               return Badge.count(
-                alignment: const AlignmentDirectional(44,
-                    -4), //TODO: Wait for stable version of m3, then use AlignmentDirectional.topEnd
+                //TODO: Wait for stable version of m3, then use AlignmentDirectional.topEnd
+                alignment: const AlignmentDirectional(44, -4),
                 isLabelVisible: appliedFiltersCount > 0,
                 count: state.filter.appliedFiltersCount,
                 backgroundColor: Colors.red,
@@ -177,7 +178,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
                 break;
             }
 
-            if (state.isLoaded && state.documents.isEmpty) {
+            if (state.hasLoaded && state.documents.isEmpty) {
               child = SliverToBoxAdapter(
                 child: DocumentsEmptyState(
                   state: state,
@@ -190,6 +191,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
             }
 
             return RefreshIndicator(
+              key: _refreshIndicatorKey,
               onRefresh: _onRefresh,
               notificationPredicate: (_) => isConnected,
               child: CustomScrollView(
@@ -369,10 +371,10 @@ class _DocumentsPageState extends State<DocumentsPage> {
 
   Future<void> _onRefresh() async {
     try {
-      context.read<DocumentsCubit>().updateCurrentFilter(
+      await context.read<DocumentsCubit>().updateCurrentFilter(
             (filter) => filter.copyWith(page: 1),
           );
-      context.read<SavedViewCubit>().reload();
+      await context.read<SavedViewCubit>().reload();
     } on PaperlessServerException catch (error, stackTrace) {
       showErrorMessage(context, error, stackTrace);
     }

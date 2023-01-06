@@ -1,10 +1,11 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_api/src/constants.dart';
+import 'package:paperless_api/src/converters/document_model_json_converter.dart';
+import 'package:paperless_api/src/converters/similar_document_model_json_converter.dart';
 
 class PaperlessDocumentsApiImpl implements PaperlessDocumentsApi {
   final Dio client;
@@ -28,9 +29,8 @@ class PaperlessDocumentsApiImpl implements PaperlessDocumentsApi {
           'document',
           MultipartFile.fromBytes(documentBytes, filename: filename),
         ),
-      );
-
-    formData.fields.add(MapEntry('title', title));
+      )
+      ..fields.add(MapEntry('title', title));
     if (createdAt != null) {
       formData.fields.add(MapEntry('created', apiDateFormat.format(createdAt)));
     }
@@ -85,10 +85,10 @@ class PaperlessDocumentsApiImpl implements PaperlessDocumentsApi {
       );
       if (response.statusCode == 200) {
         return compute(
-          PagedSearchResult.fromJson,
+          PagedSearchResult.fromJsonSingleParam,
           PagedSearchResultJsonSerializer<DocumentModel>(
             response.data,
-            DocumentModel.fromJson,
+            DocumentModelJsonConverter(),
           ),
         );
       } else {
@@ -254,10 +254,10 @@ class PaperlessDocumentsApiImpl implements PaperlessDocumentsApi {
           await client.get("/api/documents/?more_like=$docId&pageSize=10");
       if (response.statusCode == 200) {
         return (await compute(
-          PagedSearchResult<SimilarDocumentModel>.fromJson,
+          PagedSearchResult<SimilarDocumentModel>.fromJsonSingleParam,
           PagedSearchResultJsonSerializer(
             response.data,
-            SimilarDocumentModel.fromJson,
+            SimilarDocumentModelJsonConverter(),
           ),
         ))
             .results;

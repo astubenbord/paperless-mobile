@@ -5,8 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/login/model/client_certificate.dart';
-import 'package:paperless_mobile/features/login/view/widgets/password_text_field.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
+import 'package:paperless_mobile/util.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+import 'obscured_input_text_form_field.dart';
 
 class ClientCertificateFormField extends StatefulWidget {
   static const fkClientCertificate = 'clientCertificate';
@@ -24,7 +27,6 @@ class ClientCertificateFormField extends StatefulWidget {
 
 class _ClientCertificateFormFieldState
     extends State<ClientCertificateFormField> {
-  RestorableString? _selectedFilePath;
   File? _selectedFile;
   @override
   Widget build(BuildContext context) {
@@ -105,7 +107,9 @@ class _ClientCertificateFormFieldState
   }
 
   Future<void> _onSelectFile(FormFieldState<ClientCertificate?> field) async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      allowMultiple: false,
+    );
     if (result != null && result.files.single.path != null) {
       File file = File(result.files.single.path!);
       setState(() {

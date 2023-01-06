@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/security/authentication_aware_dio_manager.dart';
@@ -34,7 +35,6 @@ class AuthenticationCubit extends Cubit<AuthenticationState>
       username: credentials.username!,
       password: credentials.password!,
     );
-
     _dioWrapper.updateSettings(
       baseUrl: serverUrl,
       clientCertificate: clientCertificate,

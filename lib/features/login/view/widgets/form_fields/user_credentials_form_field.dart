@@ -3,7 +3,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/login/model/user_credentials.model.dart';
-import 'package:paperless_mobile/features/login/view/widgets/password_text_field.dart';
+import 'package:paperless_mobile/features/login/view/widgets/form_fields/obscured_input_text_form_field.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 
 class UserCredentialsFormField extends StatefulWidget {

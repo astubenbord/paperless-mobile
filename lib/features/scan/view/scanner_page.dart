@@ -26,8 +26,8 @@ import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:paperless_mobile/util.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:path/path.dart' as p;
 import 'package:permission_handler/permission_handler.dart';
-import 'package:provider/provider.dart';
 
 class ScannerPage extends StatefulWidget {
   const ScannerPage({Key? key}) : super(key: key);
@@ -70,8 +70,10 @@ class _ScannerPageState extends State<ScannerPage>
                   ? () => Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (context) => DocumentView(
-                            documentBytes:
-                                _buildDocumentFromImageFiles(state).save(),
+                            documentBytes: _assembleFileBytes(
+                              state,
+                              forcePdf: true,
+                            ).then((file) => file.bytes),
                           ),
                         ),
                       )
@@ -106,7 +108,10 @@ class _ScannerPageState extends State<ScannerPage>
   }
 
   void _openDocumentScanner(BuildContext context) async {
-    await _requestCameraPermissions();
+    final isGranted = await askForPermission(Permission.camera);
+    if (!isGranted) {
+      return;
+    }
     final file = await FileService.allocateTemporaryFile(
       PaperlessDirectoryType.scans,
       extension: 'jpeg',
@@ -130,10 +135,9 @@ class _ScannerPageState extends State<ScannerPage>
   }
 
   void _onPrepareDocumentUpload(BuildContext context) async {
-    final doc = _buildDocumentFromImageFiles(
+    final file = await _assembleFileBytes(
       context.read<DocumentScannerCubit>().state,
     );
-    final bytes = await doc.save();
     final uploaded = await Navigator.of(context).push(
           MaterialPageRoute(
             builder: (_) => LabelRepositoriesProvider(
@@ -148,7 +152,8 @@ class _ScannerPageState extends State<ScannerPage>
                   tagRepository: context.read<LabelRepository<Tag>>(),
                 ),
                 child: DocumentUploadPreparationPage(
-                  fileBytes: bytes,
+                  fileBytes: file.bytes,
+                  fileExtension: file.extension,
                 ),
               ),
             ),
@@ -229,24 +234,17 @@ class _ScannerPageState extends State<ScannerPage>
     }
   }
 
-  Future<void> _requestCameraPermissions() async {
-    final hasPermission = await Permission.camera.isGranted;
-    if (!hasPermission) {
-      await Permission.camera.request();
-    }
-  }
-
   void _onUploadFromFilesystem() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: supportedFileExtensions,
       withData: true,
+      allowMultiple: false,
     );
     if (result?.files.single.path != null) {
       File file = File(result!.files.single.path!);
-      if (!supportedFileExtensions.contains(
-        file.path.split('.').last.toLowerCase(),
-      )) {
+      if (!supportedFileExtensions
+          .contains(file.path.split('.').last.toLowerCase())) {
         showErrorMessage(
           context,
           const PaperlessServerException(ErrorCode.unsupportedFileFormat),
@@ -254,14 +252,7 @@ class _ScannerPageState extends State<ScannerPage>
         return;
       }
       final filename = extractFilenameFromPath(file.path);
-      final mimeType = lookupMimeType(file.path) ?? '';
-      late Uint8List fileBytes;
-      if (mimeType.startsWith('image')) {
-        fileBytes = await _buildDocumentFromImageFiles([file]).save();
-      } else {
-        // pdf
-        fileBytes = file.readAsBytesSync();
-      }
+      final extension = p.extension(file.path);
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (_) => LabelRepositoriesProvider(
@@ -276,8 +267,9 @@ class _ScannerPageState extends State<ScannerPage>
                 tagRepository: context.read<LabelRepository<Tag>>(),
               ),
               child: DocumentUploadPreparationPage(
-                fileBytes: fileBytes,
+                fileBytes: file.readAsBytesSync(),
                 filename: filename,
+                fileExtension: extension,
               ),
             ),
           ),
@@ -286,18 +278,38 @@ class _ScannerPageState extends State<ScannerPage>
     }
   }
 
-  pw.Document _buildDocumentFromImageFiles(List<File> files) {
+  ///
+  /// Returns the file bytes of either a single file or multiple images concatenated into a single pdf.
+  ///
+  Future<AssembledFile> _assembleFileBytes(
+    final List<File> files, {
+    bool forcePdf = false,
+  }) async {
+    assert(files.isNotEmpty);
+    if (files.length == 1 && !forcePdf) {
+      final ext = p.extension(files.first.path);
+      return AssembledFile(ext, files.first.readAsBytesSync());
+    }
     final doc = pw.Document();
     for (final file in files) {
       final img = pw.MemoryImage(file.readAsBytesSync());
       doc.addPage(
         pw.Page(
-          pageFormat:
-              PdfPageFormat(img.width!.toDouble(), img.height!.toDouble()),
+          pageFormat: PdfPageFormat(
+            img.width!.toDouble(),
+            img.height!.toDouble(),
+          ),
           build: (context) => pw.Image(img),
         ),
       );
     }
-    return doc;
+    return AssembledFile('.pdf', await doc.save());
   }
+}
+
+class AssembledFile {
+  final String extension;
+  final Uint8List bytes;
+
+  AssembledFile(this.extension, this.bytes);
 }

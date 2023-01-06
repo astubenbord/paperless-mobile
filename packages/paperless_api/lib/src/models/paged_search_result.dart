@@ -4,15 +4,13 @@ import 'package:paperless_api/src/models/document_model.dart';
 
 const pageRegex = r".*page=(\d+).*";
 
-//Todo: make this an interface and delegate serialization to implementations
 class PagedSearchResultJsonSerializer<T> {
   final Map<String, dynamic> json;
-  final T Function(Map<String, dynamic>) fromJson;
+  JsonConverter<T, Map<String, dynamic>> converter;
 
-  PagedSearchResultJsonSerializer(this.json, this.fromJson);
+  PagedSearchResultJsonSerializer(this.json, this.converter);
 }
 
-@JsonSerializable()
 class PagedSearchResult<T> extends Equatable {
   /// Total number of available items
   final int count;
@@ -54,16 +52,32 @@ class PagedSearchResult<T> extends Equatable {
     required this.results,
   });
 
-  factory PagedSearchResult.fromJson(
-      PagedSearchResultJsonSerializer<T> serializer) {
+  factory PagedSearchResult.fromJson(Map<String, dynamic> json,
+      JsonConverter<T, Map<String, dynamic>> converter) {
     return PagedSearchResult(
-      count: serializer.json['count'],
-      next: serializer.json['next'],
-      previous: serializer.json['previous'],
-      results: List<Map<String, dynamic>>.from(serializer.json['results'])
-          .map<T>(serializer.fromJson)
+      count: json['count'],
+      next: json['next'],
+      previous: json['previous'],
+      results: List<Map<String, dynamic>>.from(json['results'])
+          .map<T>(converter.fromJson)
           .toList(),
     );
+  }
+
+  Map<String, dynamic> toJson(
+      JsonConverter<T, Map<String, dynamic>> converter) {
+    return {
+      'count': count,
+      'next': next,
+      'previous': previous,
+      'results': results.map((e) => converter.toJson(e)).toList()
+    };
+  }
+
+  factory PagedSearchResult.fromJsonSingleParam(
+    PagedSearchResultJsonSerializer<T> serializer,
+  ) {
+    return PagedSearchResult.fromJson(serializer.json, serializer.converter);
   }
 
   PagedSearchResult copyWith({

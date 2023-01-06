@@ -28,10 +28,13 @@ class TextQueryFormField extends StatelessWidget {
             prefixIcon: const Icon(Icons.search_outlined),
             labelText: _buildLabelText(context, field.value!.queryType),
             suffixIcon: PopupMenuButton<QueryType>(
-              enabled: !onlyExtendedQueryAllowed,
-              color: onlyExtendedQueryAllowed
-                  ? Theme.of(context).disabledColor
+              icon: onlyExtendedQueryAllowed
+                  ? Icon(
+                      Icons.more_vert,
+                      color: Theme.of(context).disabledColor,
+                    )
                   : null,
+              enabled: !onlyExtendedQueryAllowed,
               itemBuilder: (context) => [
                 PopupMenuItem(
                   child: ListTile(
@@ -59,7 +62,6 @@ class TextQueryFormField extends StatelessWidget {
               onSelected: (selection) {
                 field.didChange(field.value?.copyWith(queryType: selection));
               },
-              child: const Icon(Icons.more_vert),
             ),
           ),
           onChanged: (value) {

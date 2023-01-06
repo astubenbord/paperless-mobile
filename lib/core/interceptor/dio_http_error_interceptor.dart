@@ -47,7 +47,7 @@ class DioHttpErrorInterceptor extends Interceptor {
         errorMessages.putIfAbsent(entry.key, () => entry.value.toString());
       }
     }
-    return handler.reject(
+    handler.reject(
       DioError(
         error: errorMessages,
         requestOptions: err.requestOptions,

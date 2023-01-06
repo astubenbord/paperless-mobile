@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:paperless_mobile/util.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 typedef OnImageScannedCallback = void Function(File);
@@ -23,14 +24,13 @@ class _ScannerWidgetState extends State<ScannerWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Scan document")),
-      body: FutureBuilder<PermissionStatus>(
-          future: Permission.camera.request(),
-          builder:
-              (BuildContext context, AsyncSnapshot<PermissionStatus> snapshot) {
+      body: FutureBuilder<bool>(
+          future: askForPermission(Permission.camera),
+          builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
             if (!snapshot.hasData) {
               return const Center(child: CircularProgressIndicator());
             }
-            if (snapshot.data!.isGranted) {
+            if (snapshot.data!) {
               return Container();
             }
             return const Center(

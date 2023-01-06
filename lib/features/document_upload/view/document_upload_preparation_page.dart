@@ -22,6 +22,7 @@ class DocumentUploadPreparationPage extends StatefulWidget {
   final Uint8List fileBytes;
   final String? title;
   final String? filename;
+  final String? fileExtension;
   final void Function(DocumentModel)? onSuccessfullyConsumed;
 
   const DocumentUploadPreparationPage({
@@ -30,6 +31,7 @@ class DocumentUploadPreparationPage extends StatefulWidget {
     this.title,
     this.filename,
     this.onSuccessfullyConsumed,
+    this.fileExtension,
   }) : super(key: key);
 
   @override
@@ -119,7 +121,7 @@ class _DocumentUploadPreparationPageState
                   name: fkFileName,
                   decoration: InputDecoration(
                     labelText: S.of(context).documentUploadFileNameLabel,
-                    suffixText: ".pdf",
+                    suffixText: widget.fileExtension,
                     suffixIcon: IconButton(
                       icon: const Icon(Icons.clear),
                       onPressed: () => _formKey.currentState?.fields[fkFileName]

@@ -22,8 +22,7 @@ class InboxPage extends StatefulWidget {
 }
 
 class _InboxPageState extends State<InboxPage> {
-  final GlobalKey<RefreshIndicatorState> _emptyStateRefreshIndicatorKey =
-      GlobalKey();
+  final _emptyStateRefreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
 
   @override
   void initState() {

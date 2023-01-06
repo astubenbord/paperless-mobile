@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:io';
 import 'dart:ui';
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,6 +13,7 @@ import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/logic/error_code_localization_mapper.dart';
 import 'package:paperless_mobile/core/service/github_issue_service.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 final dateFormat = DateFormat("yyyy-MM-dd");
 final GlobalKey<ScaffoldState> rootScaffoldKey = GlobalKey<ScaffoldState>();
@@ -90,6 +93,15 @@ void showGenericError(
   );
 }
 
+void showLocalizedError(
+  BuildContext context,
+  String localizedMessage, [
+  StackTrace? stackTrace,
+]) {
+  showSnackBar(context, localizedMessage);
+  log(localizedMessage, stackTrace: stackTrace);
+}
+
 void showErrorMessage(
   BuildContext context,
   PaperlessServerException error, [
@@ -155,4 +167,15 @@ Future<void> loadImage(ImageProvider provider) {
 
   stream.addListener(listener);
   return completer.future;
+}
+
+Future<bool> askForPermission(Permission permission) async {
+  final status = await permission.request();
+  log("Permission requested, new status is $status");
+  // If user has permanently declined permission, open settings.
+  if (status == PermissionStatus.permanentlyDenied) {
+    await openAppSettings();
+  }
+
+  return status == PermissionStatus.granted;
 }
