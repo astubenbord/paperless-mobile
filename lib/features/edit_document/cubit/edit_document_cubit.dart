@@ -5,6 +5,10 @@ import 'package:equatable/equatable.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/repository/label_repository.dart';
 import 'package:collection/collection.dart';
+import 'package:paperless_mobile/core/repository/state/impl/correspondent_repository_state.dart';
+import 'package:paperless_mobile/core/repository/state/impl/document_type_repository_state.dart';
+import 'package:paperless_mobile/core/repository/state/impl/storage_path_repository_state.dart';
+import 'package:paperless_mobile/core/repository/state/impl/tag_repository_state.dart';
 
 part 'edit_document_state.dart';
 
@@ -12,19 +16,25 @@ class EditDocumentCubit extends Cubit<EditDocumentState> {
   final DocumentModel _initialDocument;
   final PaperlessDocumentsApi _docsApi;
 
-  final LabelRepository<Correspondent> _correspondentRepository;
-  final LabelRepository<DocumentType> _documentTypeRepository;
-  final LabelRepository<StoragePath> _storagePathRepository;
-  final LabelRepository<Tag> _tagRepository;
+  final LabelRepository<Correspondent, CorrespondentRepositoryState>
+      _correspondentRepository;
+  final LabelRepository<DocumentType, DocumentTypeRepositoryState>
+      _documentTypeRepository;
+  final LabelRepository<StoragePath, StoragePathRepositoryState>
+      _storagePathRepository;
+  final LabelRepository<Tag, TagRepositoryState> _tagRepository;
 
   final List<StreamSubscription> _subscriptions = [];
   EditDocumentCubit(
     DocumentModel document, {
     required PaperlessDocumentsApi documentsApi,
-    required LabelRepository<Correspondent> correspondentRepository,
-    required LabelRepository<DocumentType> documentTypeRepository,
-    required LabelRepository<StoragePath> storagePathRepository,
-    required LabelRepository<Tag> tagRepository,
+    required LabelRepository<Correspondent, CorrespondentRepositoryState>
+        correspondentRepository,
+    required LabelRepository<DocumentType, DocumentTypeRepositoryState>
+        documentTypeRepository,
+    required LabelRepository<StoragePath, StoragePathRepositoryState>
+        storagePathRepository,
+    required LabelRepository<Tag, TagRepositoryState> tagRepository,
   })  : _initialDocument = document,
         _docsApi = documentsApi,
         _correspondentRepository = correspondentRepository,
@@ -34,27 +44,27 @@ class EditDocumentCubit extends Cubit<EditDocumentState> {
         super(
           EditDocumentState(
             document: document,
-            correspondents: correspondentRepository.current ?? {},
-            documentTypes: documentTypeRepository.current ?? {},
-            storagePaths: storagePathRepository.current ?? {},
-            tags: tagRepository.current ?? {},
+            correspondents: correspondentRepository.current?.values ?? {},
+            documentTypes: documentTypeRepository.current?.values ?? {},
+            storagePaths: storagePathRepository.current?.values ?? {},
+            tags: tagRepository.current?.values ?? {},
           ),
         ) {
     _subscriptions.add(
       _correspondentRepository.values
-          .listen((v) => emit(state.copyWith(correspondents: v))),
+          .listen((v) => emit(state.copyWith(correspondents: v?.values))),
     );
     _subscriptions.add(
       _documentTypeRepository.values
-          .listen((v) => emit(state.copyWith(documentTypes: v))),
+          .listen((v) => emit(state.copyWith(documentTypes: v?.values))),
     );
     _subscriptions.add(
       _storagePathRepository.values
-          .listen((v) => emit(state.copyWith(storagePaths: v))),
+          .listen((v) => emit(state.copyWith(storagePaths: v?.values))),
     );
     _subscriptions.add(
       _tagRepository.values.listen(
-        (v) => emit(state.copyWith(tags: v)),
+        (v) => emit(state.copyWith(tags: v?.values)),
       ),
     );
   }

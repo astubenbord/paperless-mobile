@@ -7,6 +7,10 @@ import 'package:paperless_mobile/core/bloc/paperless_server_information_state.da
 import 'package:paperless_mobile/core/repository/label_repository.dart';
 import 'package:paperless_mobile/core/repository/provider/label_repositories_provider.dart';
 import 'package:paperless_mobile/core/repository/saved_view_repository.dart';
+import 'package:paperless_mobile/core/repository/state/impl/correspondent_repository_state.dart';
+import 'package:paperless_mobile/core/repository/state/impl/document_type_repository_state.dart';
+import 'package:paperless_mobile/core/repository/state/impl/storage_path_repository_state.dart';
+import 'package:paperless_mobile/core/repository/state/impl/tag_repository_state.dart';
 import 'package:paperless_mobile/core/store/local_vault.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/inbox/bloc/inbox_cubit.dart';
@@ -102,154 +106,161 @@ class _InfoDrawerState extends State<InfoDrawer> {
     //     }
     //   },
     // );
-    return ClipRRect(
-      borderRadius: const BorderRadius.only(
-        topRight: Radius.circular(16.0),
-        bottomRight: Radius.circular(16.0),
-      ),
-      child: Drawer(
-        shape: const RoundedRectangleBorder(
-          borderRadius: const BorderRadius.only(
-            topRight: Radius.circular(16.0),
-            bottomRight: Radius.circular(16.0),
-          ),
+    return SafeArea(
+      top: true,
+      child: ClipRRect(
+        borderRadius: const BorderRadius.only(
+          topRight: Radius.circular(16.0),
+          bottomRight: Radius.circular(16.0),
         ),
-        child: ListView(
-          children: [
-            DrawerHeader(
-              padding: const EdgeInsets.only(
-                top: 8,
-                left: 8,
-                bottom: 0,
-                right: 8,
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Image.asset(
-                        'assets/logos/paperless_logo_white.png',
-                        height: 32,
-                        width: 32,
-                        color: Theme.of(context).colorScheme.onPrimaryContainer,
-                      ).paddedOnly(right: 8.0),
-                      Text(
-                        S.of(context).appTitleText,
-                        style:
-                            Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onPrimaryContainer,
-                                ),
-                      ),
-                    ],
-                  ),
-                  Align(
-                    alignment: Alignment.bottomRight,
-                    child: BlocBuilder<PaperlessServerInformationCubit,
-                        PaperlessServerInformationState>(
-                      builder: (context, state) {
-                        if (!state.isLoaded) {
-                          return Container();
-                        }
-                        final info = state.information!;
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            ListTile(
-                              contentPadding: EdgeInsets.zero,
-                              dense: true,
-                              title: Text(
-                                S.of(context).appDrawerHeaderLoggedInAsText +
-                                    (info.username ?? '?'),
-                                style: Theme.of(context).textTheme.bodyMedium,
-                                overflow: TextOverflow.ellipsis,
-                                textAlign: TextAlign.end,
-                                maxLines: 1,
-                              ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    state.information!.host ?? '',
-                                    style:
-                                        Theme.of(context).textTheme.bodyMedium,
-                                    overflow: TextOverflow.ellipsis,
-                                    textAlign: TextAlign.end,
-                                    maxLines: 1,
-                                  ),
-                                  Text(
-                                    '${S.of(context).serverInformationPaperlessVersionText} ${info.version} (API v${info.apiVersion})',
-                                    style:
-                                        Theme.of(context).textTheme.bodySmall,
-                                    overflow: TextOverflow.ellipsis,
-                                    textAlign: TextAlign.end,
-                                    maxLines: 1,
-                                  ),
-                                ],
-                              ),
-                              isThreeLine: true,
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
-              ),
+        child: Drawer(
+          shape: const RoundedRectangleBorder(
+            borderRadius: const BorderRadius.only(
+              topRight: Radius.circular(16.0),
+              bottomRight: Radius.circular(16.0),
             ),
-            ...[
-              ListTile(
-                title: Text(S.of(context).bottomNavInboxPageLabel),
-                leading: const Icon(Icons.inbox),
-                onTap: () => _onOpenInbox(),
-                shape: listtTileShape,
-              ),
-              ListTile(
-                leading: const Icon(Icons.settings),
-                shape: listtTileShape,
-                title: Text(
-                  S.of(context).appDrawerSettingsLabel,
+          ),
+          child: ListView(
+            children: [
+              DrawerHeader(
+                padding: const EdgeInsets.only(
+                  top: 8,
+                  left: 8,
+                  bottom: 0,
+                  right: 8,
                 ),
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => BlocProvider.value(
-                      value: context.read<ApplicationSettingsCubit>(),
-                      child: const SettingsPage(),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Image.asset(
+                          'assets/logos/paperless_logo_white.png',
+                          height: 32,
+                          width: 32,
+                          color:
+                              Theme.of(context).colorScheme.onPrimaryContainer,
+                        ).paddedOnly(right: 8.0),
+                        Text(
+                          S.of(context).appTitleText,
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineSmall
+                              ?.copyWith(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onPrimaryContainer,
+                              ),
+                        ),
+                      ],
+                    ),
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: BlocBuilder<PaperlessServerInformationCubit,
+                          PaperlessServerInformationState>(
+                        builder: (context, state) {
+                          if (!state.isLoaded) {
+                            return Container();
+                          }
+                          final info = state.information!;
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              ListTile(
+                                contentPadding: EdgeInsets.zero,
+                                dense: true,
+                                title: Text(
+                                  S.of(context).appDrawerHeaderLoggedInAsText +
+                                      (info.username ?? '?'),
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.end,
+                                  maxLines: 1,
+                                ),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      state.information!.host ?? '',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium,
+                                      overflow: TextOverflow.ellipsis,
+                                      textAlign: TextAlign.end,
+                                      maxLines: 1,
+                                    ),
+                                    Text(
+                                      '${S.of(context).serverInformationPaperlessVersionText} ${info.version} (API v${info.apiVersion})',
+                                      style:
+                                          Theme.of(context).textTheme.bodySmall,
+                                      overflow: TextOverflow.ellipsis,
+                                      textAlign: TextAlign.end,
+                                      maxLines: 1,
+                                    ),
+                                  ],
+                                ),
+                                isThreeLine: true,
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                ),
+              ),
+              ...[
+                ListTile(
+                  title: Text(S.of(context).bottomNavInboxPageLabel),
+                  leading: const Icon(Icons.inbox),
+                  onTap: () => _onOpenInbox(),
+                  shape: listtTileShape,
+                ),
+                ListTile(
+                  leading: const Icon(Icons.settings),
+                  shape: listtTileShape,
+                  title: Text(
+                    S.of(context).appDrawerSettingsLabel,
+                  ),
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => BlocProvider.value(
+                        value: context.read<ApplicationSettingsCubit>(),
+                        child: const SettingsPage(),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              ListTile(
-                leading: const Icon(Icons.bug_report),
-                title: Text(S.of(context).appDrawerReportBugLabel),
-                onTap: () {
-                  launchUrlString(
-                      'https://github.com/astubenbord/paperless-mobile/issues/new');
-                },
-                shape: listtTileShape,
-              ),
-              ListTile(
-                title: Text(S.of(context).appDrawerAboutLabel),
-                leading: Icon(Icons.info_outline_rounded),
-                onTap: _onShowAboutDialog,
-                shape: listtTileShape,
-              ),
-              ListTile(
-                leading: const Icon(Icons.logout),
-                title: Text(S.of(context).appDrawerLogoutLabel),
-                shape: listtTileShape,
-                onTap: () {
-                  _onLogout();
-                },
-              )
+                ListTile(
+                  leading: const Icon(Icons.bug_report),
+                  title: Text(S.of(context).appDrawerReportBugLabel),
+                  onTap: () {
+                    launchUrlString(
+                        'https://github.com/astubenbord/paperless-mobile/issues/new');
+                  },
+                  shape: listtTileShape,
+                ),
+                ListTile(
+                  title: Text(S.of(context).appDrawerAboutLabel),
+                  leading: Icon(Icons.info_outline_rounded),
+                  onTap: _onShowAboutDialog,
+                  shape: listtTileShape,
+                ),
+                ListTile(
+                  leading: const Icon(Icons.logout),
+                  title: Text(S.of(context).appDrawerLogoutLabel),
+                  shape: listtTileShape,
+                  onTap: () {
+                    _onLogout();
+                  },
+                )
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
@@ -260,10 +271,16 @@ class _InfoDrawerState extends State<InfoDrawer> {
       context.read<AuthenticationCubit>().logout();
       context.read<LocalVault>().clear();
       context.read<ApplicationSettingsCubit>().clear();
-      context.read<LabelRepository<Tag>>().clear();
-      context.read<LabelRepository<Correspondent>>().clear();
-      context.read<LabelRepository<DocumentType>>().clear();
-      context.read<LabelRepository<StoragePath>>().clear();
+      context.read<LabelRepository<Tag, TagRepositoryState>>().clear();
+      context
+          .read<LabelRepository<Correspondent, CorrespondentRepositoryState>>()
+          .clear();
+      context
+          .read<LabelRepository<DocumentType, DocumentTypeRepositoryState>>()
+          .clear();
+      context
+          .read<LabelRepository<StoragePath, StoragePathRepositoryState>>()
+          .clear();
       context.read<SavedViewRepository>().clear();
     } on PaperlessServerException catch (error, stackTrace) {
       showErrorMessage(context, error, stackTrace);
@@ -276,7 +293,7 @@ class _InfoDrawerState extends State<InfoDrawer> {
         builder: (_) => LabelRepositoriesProvider(
           child: BlocProvider(
             create: (context) => InboxCubit(
-              context.read<LabelRepository<Tag>>(),
+              context.read<LabelRepository<Tag, TagRepositoryState>>(),
               context.read<PaperlessDocumentsApi>(),
             )..loadInbox(),
             child: const InboxPage(),

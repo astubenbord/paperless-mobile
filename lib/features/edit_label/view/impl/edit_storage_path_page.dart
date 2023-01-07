@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/repository/label_repository.dart';
+import 'package:paperless_mobile/core/repository/state/impl/storage_path_repository_state.dart';
 import 'package:paperless_mobile/features/edit_label/cubit/edit_label_cubit.dart';
 import 'package:paperless_mobile/features/edit_label/view/edit_label_page.dart';
 import 'package:paperless_mobile/features/labels/storage_path/view/widgets/storage_path_autofill_form_builder_field.dart';
@@ -14,7 +15,8 @@ class EditStoragePathPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => EditLabelCubit<StoragePath>(
-        context.read<LabelRepository<StoragePath>>(),
+        context
+            .read<LabelRepository<StoragePath, StoragePathRepositoryState>>(),
       ),
       child: EditLabelPage<StoragePath>(
         label: storagePath,

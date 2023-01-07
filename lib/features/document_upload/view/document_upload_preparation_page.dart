@@ -8,6 +8,8 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/repository/label_repository.dart';
+import 'package:paperless_mobile/core/repository/state/impl/correspondent_repository_state.dart';
+import 'package:paperless_mobile/core/repository/state/impl/document_type_repository_state.dart';
 import 'package:paperless_mobile/core/type/types.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/document_upload/cubit/document_upload_cubit.dart';
@@ -169,8 +171,9 @@ class _DocumentUploadPreparationPageState
                   formBuilderState: _formKey.currentState,
                   labelCreationWidgetBuilder: (initialName) =>
                       RepositoryProvider(
-                    create: (context) =>
-                        context.read<LabelRepository<DocumentType>>(),
+                    create: (context) => context.read<
+                        LabelRepository<DocumentType,
+                            DocumentTypeRepositoryState>>(),
                     child: AddDocumentTypePage(initialName: initialName),
                   ),
                   textFieldLabel:
@@ -184,8 +187,9 @@ class _DocumentUploadPreparationPageState
                   formBuilderState: _formKey.currentState,
                   labelCreationWidgetBuilder: (initialName) =>
                       RepositoryProvider(
-                    create: (context) =>
-                        context.read<LabelRepository<Correspondent>>(),
+                    create: (context) => context.read<
+                        LabelRepository<Correspondent,
+                            CorrespondentRepositoryState>>(),
                     child: AddCorrespondentPage(initialName: initialName),
                   ),
                   textFieldLabel:

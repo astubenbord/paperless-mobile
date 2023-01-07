@@ -10,7 +10,12 @@ import 'package:provider/provider.dart';
 
 class DocumentDownloadButton extends StatefulWidget {
   final DocumentModel? document;
-  const DocumentDownloadButton({super.key, required this.document});
+  final bool enabled;
+  const DocumentDownloadButton({
+    super.key,
+    required this.document,
+    this.enabled = true,
+  });
 
   @override
   State<DocumentDownloadButton> createState() => _DocumentDownloadButtonState();
@@ -29,7 +34,7 @@ class _DocumentDownloadButtonState extends State<DocumentDownloadButton> {
               width: 16,
             )
           : const Icon(Icons.download),
-      onPressed: Platform.isAndroid && widget.document != null
+      onPressed: Platform.isAndroid && widget.document != null && widget.enabled
           ? () => _onDownload(widget.document!)
           : null,
     ).paddedOnly(right: 4);

@@ -4,6 +4,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/repository/label_repository.dart';
+import 'package:paperless_mobile/core/repository/state/impl/tag_repository_state.dart';
 import 'package:paperless_mobile/features/edit_label/view/impl/add_tag_page.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 
@@ -217,7 +218,8 @@ class _TagFormFieldState extends State<TagFormField> {
     final Tag? tag = await Navigator.of(context).push<Tag>(
       MaterialPageRoute(
         builder: (_) => RepositoryProvider(
-          create: (context) => context.read<LabelRepository<Tag>>(),
+          create: (context) =>
+              context.read<LabelRepository<Tag, TagRepositoryState>>(),
           child: AddTagPage(initialValue: _textEditingController.text),
         ),
       ),

@@ -3,6 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
 import 'package:paperless_mobile/core/repository/label_repository.dart';
+import 'package:paperless_mobile/core/repository/state/impl/correspondent_repository_state.dart';
+import 'package:paperless_mobile/core/repository/state/impl/document_type_repository_state.dart';
+import 'package:paperless_mobile/core/repository/state/impl/storage_path_repository_state.dart';
+import 'package:paperless_mobile/core/repository/state/impl/tag_repository_state.dart';
 import 'package:paperless_mobile/core/widgets/offline_banner.dart';
 import 'package:paperless_mobile/features/edit_label/view/impl/add_correspondent_page.dart';
 import 'package:paperless_mobile/features/edit_label/view/impl/add_document_type_page.dart';
@@ -208,7 +212,8 @@ class _LabelsPageState extends State<LabelsPage>
       context,
       MaterialPageRoute(
         builder: (_) => RepositoryProvider(
-          create: (context) => context.read<LabelRepository<Correspondent>>(),
+          create: (context) => context.read<
+              LabelRepository<Correspondent, CorrespondentRepositoryState>>(),
           child: EditCorrespondentPage(correspondent: correspondent),
         ),
       ),
@@ -220,7 +225,8 @@ class _LabelsPageState extends State<LabelsPage>
       context,
       MaterialPageRoute(
         builder: (_) => RepositoryProvider(
-          create: (context) => context.read<LabelRepository<DocumentType>>(),
+          create: (context) => context.read<
+              LabelRepository<DocumentType, DocumentTypeRepositoryState>>(),
           child: EditDocumentTypePage(documentType: docType),
         ),
       ),
@@ -232,7 +238,8 @@ class _LabelsPageState extends State<LabelsPage>
       context,
       MaterialPageRoute(
         builder: (_) => RepositoryProvider(
-          create: (context) => context.read<LabelRepository<Tag>>(),
+          create: (context) =>
+              context.read<LabelRepository<Tag, TagRepositoryState>>(),
           child: EditTagPage(tag: tag),
         ),
       ),
@@ -244,7 +251,8 @@ class _LabelsPageState extends State<LabelsPage>
       context,
       MaterialPageRoute(
         builder: (_) => RepositoryProvider(
-          create: (context) => context.read<LabelRepository<StoragePath>>(),
+          create: (context) => context
+              .read<LabelRepository<StoragePath, StoragePathRepositoryState>>(),
           child: EditStoragePathPage(
             storagePath: path,
           ),
@@ -258,7 +266,8 @@ class _LabelsPageState extends State<LabelsPage>
       context,
       MaterialPageRoute(
         builder: (_) => RepositoryProvider(
-          create: (context) => context.read<LabelRepository<Correspondent>>(),
+          create: (context) => context.read<
+              LabelRepository<Correspondent, CorrespondentRepositoryState>>(),
           child: const AddCorrespondentPage(),
         ),
       ),
@@ -270,7 +279,8 @@ class _LabelsPageState extends State<LabelsPage>
       context,
       MaterialPageRoute(
         builder: (_) => RepositoryProvider(
-          create: (context) => context.read<LabelRepository<DocumentType>>(),
+          create: (context) => context.read<
+              LabelRepository<DocumentType, DocumentTypeRepositoryState>>(),
           child: const AddDocumentTypePage(),
         ),
       ),
@@ -282,7 +292,8 @@ class _LabelsPageState extends State<LabelsPage>
       context,
       MaterialPageRoute(
         builder: (_) => RepositoryProvider(
-          create: (context) => context.read<LabelRepository<Tag>>(),
+          create: (context) =>
+              context.read<LabelRepository<Tag, TagRepositoryState>>(),
           child: const AddTagPage(),
         ),
       ),
@@ -294,7 +305,8 @@ class _LabelsPageState extends State<LabelsPage>
       context,
       MaterialPageRoute(
         builder: (_) => RepositoryProvider(
-          create: (context) => context.read<LabelRepository<StoragePath>>(),
+          create: (context) => context
+              .read<LabelRepository<StoragePath, StoragePathRepositoryState>>(),
           child: const AddStoragePathPage(),
         ),
       ),

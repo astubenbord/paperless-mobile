@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -12,6 +11,10 @@ import 'package:paperless_mobile/core/global/constants.dart';
 import 'package:paperless_mobile/core/logic/error_code_localization_mapper.dart';
 import 'package:paperless_mobile/core/repository/label_repository.dart';
 import 'package:paperless_mobile/core/repository/saved_view_repository.dart';
+import 'package:paperless_mobile/core/repository/state/impl/correspondent_repository_state.dart';
+import 'package:paperless_mobile/core/repository/state/impl/document_type_repository_state.dart';
+import 'package:paperless_mobile/core/repository/state/impl/storage_path_repository_state.dart';
+import 'package:paperless_mobile/core/repository/state/impl/tag_repository_state.dart';
 import 'package:paperless_mobile/features/document_upload/cubit/document_upload_cubit.dart';
 import 'package:paperless_mobile/features/document_upload/view/document_upload_preparation_page.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
@@ -25,9 +28,8 @@ import 'package:paperless_mobile/features/scan/view/scanner_page.dart';
 import 'package:paperless_mobile/features/sharing/share_intent_queue.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:paperless_mobile/util.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:provider/provider.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
+import 'package:path/path.dart' as p;
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -51,17 +53,13 @@ class _HomePageState extends State<HomePage> {
 
   void _listenForReceivedFiles() async {
     if (ShareIntentQueue.instance.hasUnhandledFiles) {
-      Fluttertoast.showToast(msg: "Sync: Has unhandled files!");
       await _handleReceivedFile(ShareIntentQueue.instance.pop()!);
-      Fluttertoast.showToast(msg: "Sync: File handled!");
     }
     ShareIntentQueue.instance.addListener(() async {
       final queue = ShareIntentQueue.instance;
       while (queue.hasUnhandledFiles) {
-        Fluttertoast.showToast(msg: "Async: Has unhandled files!");
         final file = queue.pop()!;
         await _handleReceivedFile(file);
-        Fluttertoast.showToast(msg: "Async: File handled!");
       }
     });
   }
@@ -73,28 +71,29 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _handleReceivedFile(SharedMediaFile file) async {
-    final isGranted = await askForPermission(Permission.storage);
+    // final isGranted = await askForPermission(Permission.storage);
 
-    if (!isGranted) {
-      return;
-    }
-    showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-              title: Text("Received File."),
-              content: Column(
-                children: [
-                  Text("Path: ${file.path}"),
-                  Text("Type: ${file.type.name}"),
-                  Text("Exists: ${File(file.path).existsSync()}"),
-                  FutureBuilder<bool>(
-                    future: Permission.storage.isGranted,
-                    builder: (context, snapshot) =>
-                        Text("Has storage permission: ${snapshot.data}"),
-                  )
-                ],
-              ),
-            ));
+    // if (!isGranted) {
+    //   return;
+    // }
+    // showDialog(
+    //   context: context,
+    //   builder: (context) => AlertDialog(
+    //     title: Text("Received File."),
+    //     content: Column(
+    //       children: [
+    //         Text("Path: ${file.path}"),
+    //         Text("Type: ${file.type.name}"),
+    //         Text("Exists: ${File(file.path).existsSync()}"),
+    //         FutureBuilder<bool>(
+    //           future: Permission.storage.isGranted,
+    //           builder: (context, snapshot) =>
+    //               Text("Has storage permission: ${snapshot.data}"),
+    //         )
+    //       ],
+    //     ),
+    //   ),
+    // );
     SharedMediaFile mediaFile;
     if (Platform.isIOS) {
       // Workaround for file not found on iOS: https://stackoverflow.com/a/72813212
@@ -119,7 +118,7 @@ class _HomePageState extends State<HomePage> {
       return;
     }
     final filename = extractFilenameFromPath(mediaFile.path);
-
+    final extension = p.extension(mediaFile.path);
     try {
       if (File(mediaFile.path).existsSync()) {
         final bytes = File(mediaFile.path).readAsBytesSync();
@@ -137,6 +136,8 @@ class _HomePageState extends State<HomePage> {
                   child: DocumentUploadPreparationPage(
                     fileBytes: bytes,
                     filename: filename,
+                    title: filename,
+                    fileExtension: extension,
                   ),
                 ),
               ),
@@ -148,20 +149,16 @@ class _HomePageState extends State<HomePage> {
           );
           SystemNavigator.pop();
         }
+      } else {
+        Fluttertoast.showToast(
+          msg: S.of(context).receiveSharedFilePermissionDeniedMessage,
+          toastLength: Toast.LENGTH_LONG,
+        );
       }
     } catch (e, stackTrace) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          content: Column(
-            children: [
-              Text(
-                e.toString(),
-              ),
-              Text(stackTrace.toString()),
-            ],
-          ),
-        ),
+      Fluttertoast.showToast(
+        msg: S.of(context).receiveSharedFilePermissionDeniedMessage,
+        toastLength: Toast.LENGTH_LONG,
       );
     }
   }
@@ -191,6 +188,7 @@ class _HomePageState extends State<HomePage> {
               BlocProvider(
                 create: (context) => DocumentsCubit(
                   context.read<PaperlessDocumentsApi>(),
+                  context.read<SavedViewRepository>(),
                 ),
               ),
               BlocProvider(
@@ -213,10 +211,16 @@ class _HomePageState extends State<HomePage> {
 
   void _initializeData(BuildContext context) {
     try {
-      context.read<LabelRepository<Tag>>().findAll();
-      context.read<LabelRepository<Correspondent>>().findAll();
-      context.read<LabelRepository<DocumentType>>().findAll();
-      context.read<LabelRepository<StoragePath>>().findAll();
+      context.read<LabelRepository<Tag, TagRepositoryState>>().findAll();
+      context
+          .read<LabelRepository<Correspondent, CorrespondentRepositoryState>>()
+          .findAll();
+      context
+          .read<LabelRepository<DocumentType, DocumentTypeRepositoryState>>()
+          .findAll();
+      context
+          .read<LabelRepository<StoragePath, StoragePathRepositoryState>>()
+          .findAll();
       context.read<SavedViewRepository>().findAll();
       context.read<PaperlessServerInformationCubit>().updateInformtion();
     } on PaperlessServerException catch (error, stackTrace) {

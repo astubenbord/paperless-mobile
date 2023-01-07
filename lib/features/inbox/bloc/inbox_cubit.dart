@@ -2,10 +2,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/repository/label_repository.dart';
+import 'package:paperless_mobile/core/repository/state/impl/tag_repository_state.dart';
 import 'package:paperless_mobile/features/inbox/bloc/state/inbox_state.dart';
 
 class InboxCubit extends Cubit<InboxState> {
-  final LabelRepository<Tag> _tagsRepository;
+  final LabelRepository<Tag, TagRepositoryState> _tagsRepository;
   final PaperlessDocumentsApi _documentsApi;
 
   InboxCubit(this._tagsRepository, this._documentsApi)

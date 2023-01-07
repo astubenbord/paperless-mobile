@@ -23,6 +23,10 @@ import 'package:paperless_mobile/core/repository/impl/storage_path_repository_im
 import 'package:paperless_mobile/core/repository/impl/tag_repository_impl.dart';
 import 'package:paperless_mobile/core/repository/label_repository.dart';
 import 'package:paperless_mobile/core/repository/saved_view_repository.dart';
+import 'package:paperless_mobile/core/repository/state/impl/correspondent_repository_state.dart';
+import 'package:paperless_mobile/core/repository/state/impl/document_type_repository_state.dart';
+import 'package:paperless_mobile/core/repository/state/impl/storage_path_repository_state.dart';
+import 'package:paperless_mobile/core/repository/state/impl/tag_repository_state.dart';
 import 'package:paperless_mobile/core/security/authentication_aware_dio_manager.dart';
 import 'package:paperless_mobile/core/service/connectivity_status_service.dart';
 import 'package:paperless_mobile/core/service/dio_file_service.dart';
@@ -151,16 +155,20 @@ void main() async {
       ],
       child: MultiRepositoryProvider(
         providers: [
-          RepositoryProvider<LabelRepository<Tag>>.value(
+          RepositoryProvider<LabelRepository<Tag, TagRepositoryState>>.value(
             value: tagRepository,
           ),
-          RepositoryProvider<LabelRepository<Correspondent>>.value(
+          RepositoryProvider<
+              LabelRepository<Correspondent,
+                  CorrespondentRepositoryState>>.value(
             value: correspondentRepository,
           ),
-          RepositoryProvider<LabelRepository<DocumentType>>.value(
+          RepositoryProvider<
+              LabelRepository<DocumentType, DocumentTypeRepositoryState>>.value(
             value: documentTypeRepository,
           ),
-          RepositoryProvider<LabelRepository<StoragePath>>.value(
+          RepositoryProvider<
+              LabelRepository<StoragePath, StoragePathRepositoryState>>.value(
             value: storagePathRepository,
           ),
           RepositoryProvider<SavedViewRepository>.value(
@@ -303,35 +311,32 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      top: true,
-      child: BlocConsumer<AuthenticationCubit, AuthenticationState>(
-        listener: (context, authState) {
-          final bool showIntroSlider =
-              authState.isAuthenticated && !authState.wasLoginStored;
-          if (showIntroSlider) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const ApplicationIntroSlideshow(),
-                fullscreenDialog: true,
-              ),
-            );
+    return BlocConsumer<AuthenticationCubit, AuthenticationState>(
+      listener: (context, authState) {
+        final bool showIntroSlider =
+            authState.isAuthenticated && !authState.wasLoginStored;
+        if (showIntroSlider) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const ApplicationIntroSlideshow(),
+              fullscreenDialog: true,
+            ),
+          );
+        }
+      },
+      builder: (context, authentication) {
+        if (authentication.isAuthenticated &&
+            (authentication.wasLocalAuthenticationSuccessful ?? true)) {
+          return const HomePage();
+        } else {
+          if (authentication.wasLoginStored &&
+              !(authentication.wasLocalAuthenticationSuccessful ?? false)) {
+            return const VerifyIdentityPage();
           }
-        },
-        builder: (context, authentication) {
-          if (authentication.isAuthenticated &&
-              (authentication.wasLocalAuthenticationSuccessful ?? true)) {
-            return const HomePage();
-          } else {
-            if (authentication.wasLoginStored &&
-                !(authentication.wasLocalAuthenticationSuccessful ?? false)) {
-              return const VerifyIdentityPage();
-            }
-            return const LoginPage();
-          }
-        },
-      ),
+          return const LoginPage();
+        }
+      },
     );
   }
 }

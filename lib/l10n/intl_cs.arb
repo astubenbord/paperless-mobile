@@ -476,6 +476,8 @@
   "@onboardingDoneButtonLabel": {},
   "onboardingNextButtonLabel": "Další",
   "@onboardingNextButtonLabel": {},
+  "receiveSharedFilePermissionDeniedMessage": "Could not access the received file. Please try to open the app before sharing.",
+  "@receiveSharedFilePermissionDeniedMessage": {},
   "referencedDocumentsReadOnlyHintText": "Tento náhled nelze upravovat! Nelze upravovat nebo odstraňovat dokumenty. Bude načteno maximálně 100 odkazovaných dokumentů.",
   "@referencedDocumentsReadOnlyHintText": {},
   "savedViewCreateNewLabel": "Nový náhled",

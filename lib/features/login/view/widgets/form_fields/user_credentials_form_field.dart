@@ -8,7 +8,10 @@ import 'package:paperless_mobile/generated/l10n.dart';
 
 class UserCredentialsFormField extends StatefulWidget {
   static const fkCredentials = 'credentials';
-  const UserCredentialsFormField({Key? key}) : super(key: key);
+
+  const UserCredentialsFormField({
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<UserCredentialsFormField> createState() =>

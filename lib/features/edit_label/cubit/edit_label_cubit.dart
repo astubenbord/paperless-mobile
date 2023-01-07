@@ -3,18 +3,19 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/repository/label_repository.dart';
+import 'package:paperless_mobile/core/repository/state/repository_state.dart';
 import 'package:paperless_mobile/features/edit_label/cubit/edit_label_state.dart';
 
 class EditLabelCubit<T extends Label> extends Cubit<EditLabelState<T>> {
-  final LabelRepository<T> _repository;
+  final LabelRepository<T, RepositoryState<Map<int, T>>> _repository;
 
-  StreamSubscription<Map<int, T>?>? _subscription;
+  StreamSubscription? _subscription;
 
-  EditLabelCubit(LabelRepository<T> repository)
+  EditLabelCubit(LabelRepository<T, RepositoryState<Map<int, T>>> repository)
       : _repository = repository,
         super(const EditLabelInitial()) {
     _subscription = repository.values.listen(
-      (update) => emit(EditLabelState(labels: update ?? {})),
+      (event) => emit(EditLabelState(labels: event?.values ?? {})),
     );
   }
 

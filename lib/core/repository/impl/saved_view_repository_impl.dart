@@ -1,46 +1,35 @@
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/repository/saved_view_repository.dart';
-import 'package:rxdart/rxdart.dart';
+import 'package:paperless_mobile/core/repository/state/impl/saved_view_repository_state.dart';
 
-class SavedViewRepositoryImpl implements SavedViewRepository {
+class SavedViewRepositoryImpl extends SavedViewRepository {
   final PaperlessSavedViewsApi _api;
 
-  SavedViewRepositoryImpl(this._api);
-
-  final _subject = BehaviorSubject<Map<int, SavedView>?>();
-
-  @override
-  Stream<Map<int, SavedView>?> get values =>
-      _subject.stream.asBroadcastStream();
-
-  @override
-  void clear() {
-    _subject.add(const {});
-  }
+  SavedViewRepositoryImpl(this._api) : super(const SavedViewRepositoryState());
 
   @override
   Future<SavedView> create(SavedView view) async {
     final created = await _api.save(view);
-    final updatedState = {..._subject.valueOrNull ?? {}}
+    final updatedState = {...state.values}
       ..putIfAbsent(created.id!, () => created);
-    _subject.add(updatedState);
+    emit(SavedViewRepositoryState(values: updatedState, hasLoaded: true));
     return created;
   }
 
   @override
   Future<int> delete(SavedView view) async {
     await _api.delete(view);
-    final updatedState = {..._subject.valueOrNull ?? {}}..remove(view.id);
-    _subject.add(updatedState);
+    final updatedState = {...state.values}..remove(view.id);
+    emit(SavedViewRepositoryState(values: updatedState, hasLoaded: true));
     return view.id!;
   }
 
   @override
   Future<SavedView?> find(int id) async {
     final found = await _api.find(id);
-    final updatedState = {..._subject.valueOrNull ?? {}}
+    final updatedState = {...state.values}
       ..update(id, (_) => found, ifAbsent: () => found);
-    _subject.add(updatedState);
+    emit(SavedViewRepositoryState(values: updatedState, hasLoaded: true));
     return found;
   }
 
@@ -48,21 +37,26 @@ class SavedViewRepositoryImpl implements SavedViewRepository {
   Future<Iterable<SavedView>> findAll([Iterable<int>? ids]) async {
     final found = await _api.findAll(ids);
     final updatedState = {
-      ..._subject.valueOrNull ?? {},
+      ...state.values,
       ...{for (final view in found) view.id!: view},
     };
-    _subject.add(updatedState);
+    emit(SavedViewRepositoryState(values: updatedState, hasLoaded: true));
     return found;
   }
 
   @override
-  Map<int, SavedView>? get current => _subject.valueOrNull;
-
-  @override
-  bool get isInitialized => _subject.hasValue;
-
-  @override
   Future<SavedView> update(SavedView object) {
-    throw UnimplementedError("Saved view update is not yet implemented");
+    throw UnimplementedError(
+        "Saved view update is not yet implemented as it is not supported by the API.");
+  }
+
+  @override
+  SavedViewRepositoryState fromJson(Map<String, dynamic> json) {
+    return SavedViewRepositoryState.fromJson(json);
+  }
+
+  @override
+  Map<String, dynamic> toJson(SavedViewRepositoryState state) {
+    return state.toJson();
   }
 }

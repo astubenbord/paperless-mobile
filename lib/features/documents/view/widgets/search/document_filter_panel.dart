@@ -6,6 +6,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/widgets/form_builder_fields/extended_date_range_form_field/form_builder_extended_date_range_picker.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
+import 'package:paperless_mobile/features/documents/view/pages/documents_page.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/search/text_query_form_field.dart';
 import 'package:paperless_mobile/features/labels/bloc/label_cubit.dart';
 import 'package:paperless_mobile/features/labels/bloc/label_state.dart';
@@ -228,10 +229,7 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
     FocusScope.of(context).unfocus();
     Navigator.pop(
       context,
-      DocumentFilter.initial.copyWith(
-        sortField: widget.initialFilter.sortField,
-        sortOrder: widget.initialFilter.sortOrder,
-      ),
+      DocumentFilterIntent(shouldReset: true),
     );
   }
 
@@ -293,7 +291,7 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
     if (_formKey.currentState?.validate() ?? false) {
       DocumentFilter newFilter = _assembleFilter();
       FocusScope.of(context).unfocus();
-      Navigator.pop(context, newFilter);
+      Navigator.pop(context, DocumentFilterIntent(filter: newFilter));
     }
   }
 

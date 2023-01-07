@@ -1,18 +1,34 @@
+import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:paperless_mobile/core/repository/state/repository_state.dart';
+import 'package:rxdart/subjects.dart';
+
 ///
 /// Base repository class which all repositories should implement
 ///
-abstract class BaseRepository<State, Object> {
-  Stream<State?> get values;
+abstract class BaseRepository<State extends RepositoryState, Type>
+    extends Cubit<State> with HydratedMixin {
+  final State _initialState;
 
-  State? get current;
+  BaseRepository(this._initialState) : super(_initialState) {
+    hydrate();
+  }
 
-  bool get isInitialized;
+  Stream<State?> get values =>
+      BehaviorSubject.seeded(state)..addStream(super.stream);
 
-  Future<Object> create(Object object);
-  Future<Object?> find(int id);
-  Future<Iterable<Object>> findAll([Iterable<int>? ids]);
-  Future<Object> update(Object object);
-  Future<int> delete(Object object);
+  State? get current => state;
 
-  void clear();
+  bool get isInitialized => state.hasLoaded;
+
+  Future<Type> create(Type object);
+  Future<Type?> find(int id);
+  Future<Iterable<Type>> findAll([Iterable<int>? ids]);
+  Future<Type> update(Type object);
+  Future<int> delete(Type object);
+
+  @override
+  Future<void> clear() async {
+    await super.clear();
+    emit(_initialState);
+  }
 }

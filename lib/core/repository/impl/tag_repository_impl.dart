@@ -1,34 +1,28 @@
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/repository/label_repository.dart';
-import 'package:rxdart/rxdart.dart' show BehaviorSubject;
+import 'package:paperless_mobile/core/repository/state/impl/correspondent_repository_state.dart';
+import 'package:paperless_mobile/core/repository/state/impl/tag_repository_state.dart';
+import 'package:paperless_mobile/core/repository/state/repository_state.dart';
 
-class TagRepositoryImpl implements LabelRepository<Tag> {
+class TagRepositoryImpl extends LabelRepository<Tag, TagRepositoryState> {
   final PaperlessLabelsApi _api;
 
-  final _subject = BehaviorSubject<Map<int, Tag>?>();
-
-  TagRepositoryImpl(this._api);
+  TagRepositoryImpl(this._api) : super(const TagRepositoryState());
 
   @override
-  Stream<Map<int, Tag>?> get values => _subject.stream.asBroadcastStream();
-
-  Map<int, Tag> get _currentValueOrEmpty => _subject.valueOrNull ?? {};
-
-  @override
-  Future<Tag> create(Tag tag) async {
-    final created = await _api.saveTag(tag);
-    final updatedState = {..._currentValueOrEmpty}
+  Future<Tag> create(Tag object) async {
+    final created = await _api.saveTag(object);
+    final updatedState = {...state.values}
       ..putIfAbsent(created.id!, () => created);
-    _subject.add(updatedState);
+    emit(TagRepositoryState(values: updatedState, hasLoaded: true));
     return created;
   }
 
   @override
   Future<int> delete(Tag tag) async {
     await _api.deleteTag(tag);
-    final updatedState = {..._currentValueOrEmpty}
-      ..removeWhere((k, v) => k == tag.id);
-    _subject.add(updatedState);
+    final updatedState = {...state.values}..removeWhere((k, v) => k == tag.id);
+    emit(TagRepositoryState(values: updatedState, hasLoaded: true));
     return tag.id!;
   }
 
@@ -36,8 +30,8 @@ class TagRepositoryImpl implements LabelRepository<Tag> {
   Future<Tag?> find(int id) async {
     final tag = await _api.getTag(id);
     if (tag != null) {
-      final updatedState = {..._currentValueOrEmpty}..[id] = tag;
-      _subject.add(updatedState);
+      final updatedState = {...state.values}..[id] = tag;
+      emit(TagRepositoryState(values: updatedState, hasLoaded: true));
       return tag;
     }
     return null;
@@ -46,29 +40,27 @@ class TagRepositoryImpl implements LabelRepository<Tag> {
   @override
   Future<Iterable<Tag>> findAll([Iterable<int>? ids]) async {
     final tags = await _api.getTags(ids);
-    final updatedState = {..._currentValueOrEmpty}
+    final updatedState = {...state.values}
       ..addEntries(tags.map((e) => MapEntry(e.id!, e)));
-    _subject.add(updatedState);
+    emit(TagRepositoryState(values: updatedState, hasLoaded: true));
     return tags;
   }
 
   @override
   Future<Tag> update(Tag tag) async {
     final updated = await _api.updateTag(tag);
-    final updatedState = {..._currentValueOrEmpty}
-      ..update(updated.id!, (_) => updated);
-    _subject.add(updatedState);
+    final updatedState = {...state.values}..update(updated.id!, (_) => updated);
+    emit(TagRepositoryState(values: updatedState, hasLoaded: true));
     return updated;
   }
 
   @override
-  void clear() {
-    _subject.add(null);
+  TagRepositoryState? fromJson(Map<String, dynamic> json) {
+    return TagRepositoryState.fromJson(json);
   }
 
   @override
-  Map<int, Tag>? get current => _subject.valueOrNull;
-
-  @override
-  bool get isInitialized => _subject.valueOrNull != null;
+  Map<String, dynamic>? toJson(TagRepositoryState state) {
+    return state.toJson();
+  }
 }

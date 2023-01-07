@@ -30,7 +30,7 @@ class TextQuery {
 
   Map<String, String> toQueryParameter() {
     final params = <String, String>{};
-    if (queryText != null) {
+    if (queryText != null && queryText!.isNotEmpty) {
       params.addAll({queryType.queryParam: queryText!});
     }
     return params;

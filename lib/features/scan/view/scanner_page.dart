@@ -7,12 +7,14 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mime/mime.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
 import 'package:paperless_mobile/core/global/constants.dart';
 import 'package:paperless_mobile/core/repository/label_repository.dart';
 import 'package:paperless_mobile/core/repository/provider/label_repositories_provider.dart';
+import 'package:paperless_mobile/core/repository/state/impl/correspondent_repository_state.dart';
+import 'package:paperless_mobile/core/repository/state/impl/document_type_repository_state.dart';
+import 'package:paperless_mobile/core/repository/state/impl/tag_repository_state.dart';
 import 'package:paperless_mobile/core/service/file_service.dart';
 import 'package:paperless_mobile/core/store/local_vault.dart';
 import 'package:paperless_mobile/core/widgets/offline_banner.dart';
@@ -24,9 +26,9 @@ import 'package:paperless_mobile/features/scan/bloc/document_scanner_cubit.dart'
 import 'package:paperless_mobile/features/scan/view/widgets/grid_image_item_widget.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:paperless_mobile/util.dart';
+import 'package:path/path.dart' as p;
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:path/path.dart' as p;
 import 'package:permission_handler/permission_handler.dart';
 
 class ScannerPage extends StatefulWidget {
@@ -145,11 +147,14 @@ class _ScannerPageState extends State<ScannerPage>
                 create: (context) => DocumentUploadCubit(
                   localVault: context.read<LocalVault>(),
                   documentApi: context.read<PaperlessDocumentsApi>(),
-                  correspondentRepository:
-                      context.read<LabelRepository<Correspondent>>(),
-                  documentTypeRepository:
-                      context.read<LabelRepository<DocumentType>>(),
-                  tagRepository: context.read<LabelRepository<Tag>>(),
+                  correspondentRepository: context.read<
+                      LabelRepository<Correspondent,
+                          CorrespondentRepositoryState>>(),
+                  documentTypeRepository: context.read<
+                      LabelRepository<DocumentType,
+                          DocumentTypeRepositoryState>>(),
+                  tagRepository:
+                      context.read<LabelRepository<Tag, TagRepositoryState>>(),
                 ),
                 child: DocumentUploadPreparationPage(
                   fileBytes: file.bytes,
@@ -260,16 +265,20 @@ class _ScannerPageState extends State<ScannerPage>
               create: (context) => DocumentUploadCubit(
                 localVault: context.read<LocalVault>(),
                 documentApi: context.read<PaperlessDocumentsApi>(),
-                correspondentRepository:
-                    context.read<LabelRepository<Correspondent>>(),
-                documentTypeRepository:
-                    context.read<LabelRepository<DocumentType>>(),
-                tagRepository: context.read<LabelRepository<Tag>>(),
+                correspondentRepository: context.read<
+                    LabelRepository<Correspondent,
+                        CorrespondentRepositoryState>>(),
+                documentTypeRepository: context.read<
+                    LabelRepository<DocumentType,
+                        DocumentTypeRepositoryState>>(),
+                tagRepository:
+                    context.read<LabelRepository<Tag, TagRepositoryState>>(),
               ),
               child: DocumentUploadPreparationPage(
                 fileBytes: file.readAsBytesSync(),
                 filename: filename,
                 fileExtension: extension,
+                title: filename,
               ),
             ),
           ),

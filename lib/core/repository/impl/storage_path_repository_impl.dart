@@ -1,35 +1,30 @@
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/repository/label_repository.dart';
+import 'package:paperless_mobile/core/repository/state/impl/storage_path_repository_state.dart';
 import 'package:rxdart/rxdart.dart' show BehaviorSubject;
 
-class StoragePathRepositoryImpl implements LabelRepository<StoragePath> {
+class StoragePathRepositoryImpl
+    extends LabelRepository<StoragePath, StoragePathRepositoryState> {
   final PaperlessLabelsApi _api;
 
-  final _subject = BehaviorSubject<Map<int, StoragePath>?>();
-
-  StoragePathRepositoryImpl(this._api);
-
-  @override
-  Stream<Map<int, StoragePath>?> get values =>
-      _subject.stream.asBroadcastStream();
-
-  Map<int, StoragePath> get _currentValueOrEmpty => _subject.valueOrNull ?? {};
+  StoragePathRepositoryImpl(this._api)
+      : super(const StoragePathRepositoryState());
 
   @override
   Future<StoragePath> create(StoragePath storagePath) async {
     final created = await _api.saveStoragePath(storagePath);
-    final updatedState = {..._currentValueOrEmpty}
+    final updatedState = {...state.values}
       ..putIfAbsent(created.id!, () => created);
-    _subject.add(updatedState);
+    emit(StoragePathRepositoryState(values: updatedState, hasLoaded: true));
     return created;
   }
 
   @override
   Future<int> delete(StoragePath storagePath) async {
     await _api.deleteStoragePath(storagePath);
-    final updatedState = {..._currentValueOrEmpty}
+    final updatedState = {...state.values}
       ..removeWhere((k, v) => k == storagePath.id);
-    _subject.add(updatedState);
+    emit(StoragePathRepositoryState(values: updatedState, hasLoaded: true));
     return storagePath.id!;
   }
 
@@ -37,8 +32,8 @@ class StoragePathRepositoryImpl implements LabelRepository<StoragePath> {
   Future<StoragePath?> find(int id) async {
     final storagePath = await _api.getStoragePath(id);
     if (storagePath != null) {
-      final updatedState = {..._currentValueOrEmpty}..[id] = storagePath;
-      _subject.add(updatedState);
+      final updatedState = {...state.values}..[id] = storagePath;
+      emit(StoragePathRepositoryState(values: updatedState, hasLoaded: true));
       return storagePath;
     }
     return null;
@@ -47,29 +42,27 @@ class StoragePathRepositoryImpl implements LabelRepository<StoragePath> {
   @override
   Future<Iterable<StoragePath>> findAll([Iterable<int>? ids]) async {
     final storagePaths = await _api.getStoragePaths(ids);
-    final updatedState = {..._currentValueOrEmpty}
+    final updatedState = {...state.values}
       ..addEntries(storagePaths.map((e) => MapEntry(e.id!, e)));
-    _subject.add(updatedState);
+    emit(StoragePathRepositoryState(values: updatedState, hasLoaded: true));
     return storagePaths;
   }
 
   @override
   Future<StoragePath> update(StoragePath storagePath) async {
     final updated = await _api.updateStoragePath(storagePath);
-    final updatedState = {..._currentValueOrEmpty}
-      ..update(updated.id!, (_) => updated);
-    _subject.add(updatedState);
+    final updatedState = {...state.values}..update(updated.id!, (_) => updated);
+    emit(StoragePathRepositoryState(values: updatedState, hasLoaded: true));
     return updated;
   }
 
   @override
-  void clear() {
-    _subject.add(const {});
+  StoragePathRepositoryState fromJson(Map<String, dynamic> json) {
+    return StoragePathRepositoryState.fromJson(json);
   }
 
   @override
-  Map<int, StoragePath>? get current => _subject.valueOrNull;
-
-  @override
-  bool get isInitialized => _subject.valueOrNull != null;
+  Map<String, dynamic> toJson(StoragePathRepositoryState state) {
+    return state.toJson();
+  }
 }

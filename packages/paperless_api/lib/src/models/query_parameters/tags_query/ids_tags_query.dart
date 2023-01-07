@@ -5,9 +5,6 @@ import 'include_tag_id_query.dart';
 import 'tag_id_query.dart';
 import 'tags_query.dart';
 
-part 'ids_tags_query.g.dart';
-
-@JsonSerializable(explicitToJson: true)
 class IdsTagsQuery extends TagsQuery {
   final Iterable<TagIdQuery> _idQueries;
 
@@ -77,8 +74,15 @@ class IdsTagsQuery extends TagsQuery {
   List<Object?> get props => [_idQueries];
 
   @override
-  Map<String, dynamic> toJson() => _$IdsTagsQueryToJson(this);
+  Map<String, dynamic> toJson() {
+    return {
+      'queries': _idQueries.map((e) => e.toJson()).toList(),
+    };
+  }
 
-  factory IdsTagsQuery.fromJson(Map<String, dynamic> json) =>
-      _$IdsTagsQueryFromJson(json);
+  factory IdsTagsQuery.fromJson(Map<String, dynamic> json) {
+    return IdsTagsQuery(
+      (json['queries'] as List).map((e) => TagIdQuery.fromJson(e)),
+    );
+  }
 }

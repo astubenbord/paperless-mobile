@@ -52,7 +52,7 @@ class PagedSearchResult<T> extends Equatable {
     required this.results,
   });
 
-  factory PagedSearchResult.fromJson(Map<String, dynamic> json,
+  factory PagedSearchResult.fromJsonT(Map<String, dynamic> json,
       JsonConverter<T, Map<String, dynamic>> converter) {
     return PagedSearchResult(
       count: json['count'],
@@ -77,7 +77,7 @@ class PagedSearchResult<T> extends Equatable {
   factory PagedSearchResult.fromJsonSingleParam(
     PagedSearchResultJsonSerializer<T> serializer,
   ) {
-    return PagedSearchResult.fromJson(serializer.json, serializer.converter);
+    return PagedSearchResult.fromJsonT(serializer.json, serializer.converter);
   }
 
   PagedSearchResult copyWith({

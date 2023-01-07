@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/repository/label_repository.dart';
+import 'package:paperless_mobile/core/repository/state/impl/storage_path_repository_state.dart';
 import 'package:paperless_mobile/features/labels/bloc/label_cubit.dart';
 
 class StoragePathBlocProvider extends StatelessWidget {
@@ -12,7 +13,8 @@ class StoragePathBlocProvider extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => LabelCubit<StoragePath>(
-        context.read<LabelRepository<StoragePath>>(),
+        context
+            .read<LabelRepository<StoragePath, StoragePathRepositoryState>>(),
       ),
       child: child,
     );

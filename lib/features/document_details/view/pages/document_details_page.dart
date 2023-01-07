@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:paperless_api/paperless_api.dart';
+import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
 import 'package:paperless_mobile/core/widgets/highlighted_text.dart';
+import 'package:paperless_mobile/core/widgets/offline_widget.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/document_details/bloc/document_details_cubit.dart';
 import 'package:paperless_mobile/features/document_details/view/widgets/document_download_button.dart';
@@ -56,9 +58,16 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
           floatingActionButton: widget.allowEdit
               ? BlocBuilder<DocumentDetailsCubit, DocumentDetailsState>(
                   builder: (context, state) {
-                    return FloatingActionButton(
-                      child: const Icon(Icons.edit),
-                      onPressed: () => _onEdit(state.document),
+                    return BlocBuilder<ConnectivityCubit, ConnectivityState>(
+                      builder: (context, connectivityState) {
+                        if (!connectivityState.isConnected) {
+                          return Container();
+                        }
+                        return FloatingActionButton(
+                          child: const Icon(Icons.edit),
+                          onPressed: () => _onEdit(state.document),
+                        );
+                      },
                     );
                   },
                 )
@@ -67,27 +76,37 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
               BlocBuilder<DocumentDetailsCubit, DocumentDetailsState>(
             builder: (context, state) {
               return BottomAppBar(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: widget.allowEdit
-                          ? () => _onDelete(state.document)
-                          : null,
-                    ).paddedSymmetrically(horizontal: 4),
-                    DocumentDownloadButton(
-                      document: state.document,
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.open_in_new),
-                      onPressed: () => _onOpen(state.document),
-                    ).paddedOnly(right: 4.0),
-                    IconButton(
-                      icon: const Icon(Icons.share),
-                      onPressed: () => _onShare(state.document),
-                    ),
-                  ],
+                child: BlocBuilder<ConnectivityCubit, ConnectivityState>(
+                  builder: (context, connectivityState) {
+                    final isConnected = connectivityState.isConnected;
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.delete),
+                          onPressed: widget.allowEdit && isConnected
+                              ? () => _onDelete(state.document)
+                              : null,
+                        ).paddedSymmetrically(horizontal: 4),
+                        DocumentDownloadButton(
+                          document: state.document,
+                          enabled: isConnected,
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.open_in_new),
+                          onPressed: isConnected
+                              ? () => _onOpen(state.document)
+                              : null,
+                        ).paddedOnly(right: 4.0),
+                        IconButton(
+                          icon: const Icon(Icons.share),
+                          onPressed: isConnected
+                              ? () => _onShare(state.document)
+                              : null,
+                        ),
+                      ],
+                    );
+                  },
                 ),
               );
             },
@@ -208,55 +227,69 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
   }
 
   Widget _buildDocumentMetaDataView(DocumentModel document) {
-    return FutureBuilder<DocumentMetaData>(
-      future: context.read<PaperlessDocumentsApi>().getMetaData(document),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const Center(child: CircularProgressIndicator());
+    return BlocBuilder<ConnectivityCubit, ConnectivityState>(
+      builder: (context, state) {
+        if (!state.isConnected) {
+          return const Center(
+            child: OfflineWidget(),
+          );
         }
-        final meta = snapshot.data!;
-        return ListView(
-          children: [
-            _DetailsItem.text(DateFormat().format(document.modified),
-                    label: S.of(context).documentModifiedPropertyLabel,
-                    context: context)
-                .paddedOnly(bottom: 16),
-            _DetailsItem.text(DateFormat().format(document.added),
-                    label: S.of(context).documentAddedPropertyLabel,
-                    context: context)
-                .paddedSymmetrically(vertical: 16),
-            _DetailsItem(
-              label: S.of(context).documentArchiveSerialNumberPropertyLongLabel,
-              content: document.archiveSerialNumber != null
-                  ? Text(document.archiveSerialNumber.toString())
-                  : OutlinedButton(
-                      child: Text(S
-                          .of(context)
-                          .documentDetailsPageAssignAsnButtonLabel),
-                      onPressed:
-                          widget.allowEdit ? () => _assignAsn(document) : null,
-                    ),
-            ).paddedSymmetrically(vertical: 16),
-            _DetailsItem.text(
-              meta.mediaFilename,
-              context: context,
-              label: S.of(context).documentMetaDataMediaFilenamePropertyLabel,
-            ).paddedSymmetrically(vertical: 16),
-            _DetailsItem.text(
-              meta.originalChecksum,
-              context: context,
-              label: S.of(context).documentMetaDataChecksumLabel,
-            ).paddedSymmetrically(vertical: 16),
-            _DetailsItem.text(formatBytes(meta.originalSize, 2),
-                    label: S.of(context).documentMetaDataOriginalFileSizeLabel,
-                    context: context)
-                .paddedSymmetrically(vertical: 16),
-            _DetailsItem.text(
-              meta.originalMimeType,
-              label: S.of(context).documentMetaDataOriginalMimeTypeLabel,
-              context: context,
-            ).paddedSymmetrically(vertical: 16),
-          ],
+        return FutureBuilder<DocumentMetaData>(
+          future: context.read<PaperlessDocumentsApi>().getMetaData(document),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            final meta = snapshot.data!;
+            return ListView(
+              children: [
+                _DetailsItem.text(DateFormat().format(document.modified),
+                        label: S.of(context).documentModifiedPropertyLabel,
+                        context: context)
+                    .paddedOnly(bottom: 16),
+                _DetailsItem.text(DateFormat().format(document.added),
+                        label: S.of(context).documentAddedPropertyLabel,
+                        context: context)
+                    .paddedSymmetrically(vertical: 16),
+                _DetailsItem(
+                  label: S
+                      .of(context)
+                      .documentArchiveSerialNumberPropertyLongLabel,
+                  content: document.archiveSerialNumber != null
+                      ? Text(document.archiveSerialNumber.toString())
+                      : OutlinedButton(
+                          child: Text(S
+                              .of(context)
+                              .documentDetailsPageAssignAsnButtonLabel),
+                          onPressed: widget.allowEdit
+                              ? () => _assignAsn(document)
+                              : null,
+                        ),
+                ).paddedSymmetrically(vertical: 16),
+                _DetailsItem.text(
+                  meta.mediaFilename,
+                  context: context,
+                  label:
+                      S.of(context).documentMetaDataMediaFilenamePropertyLabel,
+                ).paddedSymmetrically(vertical: 16),
+                _DetailsItem.text(
+                  meta.originalChecksum,
+                  context: context,
+                  label: S.of(context).documentMetaDataChecksumLabel,
+                ).paddedSymmetrically(vertical: 16),
+                _DetailsItem.text(formatBytes(meta.originalSize, 2),
+                        label:
+                            S.of(context).documentMetaDataOriginalFileSizeLabel,
+                        context: context)
+                    .paddedSymmetrically(vertical: 16),
+                _DetailsItem.text(
+                  meta.originalMimeType,
+                  label: S.of(context).documentMetaDataOriginalMimeTypeLabel,
+                  context: context,
+                ).paddedSymmetrically(vertical: 16),
+              ],
+            );
+          },
         );
       },
     );

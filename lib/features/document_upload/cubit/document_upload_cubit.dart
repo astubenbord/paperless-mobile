@@ -5,6 +5,9 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/repository/label_repository.dart';
+import 'package:paperless_mobile/core/repository/state/impl/correspondent_repository_state.dart';
+import 'package:paperless_mobile/core/repository/state/impl/document_type_repository_state.dart';
+import 'package:paperless_mobile/core/repository/state/impl/tag_repository_state.dart';
 import 'package:paperless_mobile/core/store/local_vault.dart';
 
 part 'document_upload_state.dart';
@@ -12,18 +15,22 @@ part 'document_upload_state.dart';
 class DocumentUploadCubit extends Cubit<DocumentUploadState> {
   final PaperlessDocumentsApi _documentApi;
 
-  final LabelRepository<Tag> _tagRepository;
-  final LabelRepository<Correspondent> _correspondentRepository;
-  final LabelRepository<DocumentType> _documentTypeRepository;
+  final LabelRepository<Tag, TagRepositoryState> _tagRepository;
+  final LabelRepository<Correspondent, CorrespondentRepositoryState>
+      _correspondentRepository;
+  final LabelRepository<DocumentType, DocumentTypeRepositoryState>
+      _documentTypeRepository;
 
   final List<StreamSubscription> _subs = [];
 
   DocumentUploadCubit({
     required LocalVault localVault,
     required PaperlessDocumentsApi documentApi,
-    required LabelRepository<Tag> tagRepository,
-    required LabelRepository<Correspondent> correspondentRepository,
-    required LabelRepository<DocumentType> documentTypeRepository,
+    required LabelRepository<Tag, TagRepositoryState> tagRepository,
+    required LabelRepository<Correspondent, CorrespondentRepositoryState>
+        correspondentRepository,
+    required LabelRepository<DocumentType, DocumentTypeRepositoryState>
+        documentTypeRepository,
   })  : _documentApi = documentApi,
         _tagRepository = tagRepository,
         _correspondentRepository = correspondentRepository,
@@ -36,13 +43,15 @@ class DocumentUploadCubit extends Cubit<DocumentUploadState> {
           ),
         ) {
     _subs.add(_tagRepository.values.listen(
-      (tags) => emit(state.copyWith(tags: tags)),
+      (tags) => emit(state.copyWith(tags: tags?.values)),
     ));
     _subs.add(_correspondentRepository.values.listen(
-      (correspondents) => emit(state.copyWith(correspondents: correspondents)),
+      (correspondents) =>
+          emit(state.copyWith(correspondents: correspondents?.values)),
     ));
     _subs.add(_documentTypeRepository.values.listen(
-      (documentTypes) => emit(state.copyWith(documentTypes: documentTypes)),
+      (documentTypes) =>
+          emit(state.copyWith(documentTypes: documentTypes?.values)),
     ));
   }
 

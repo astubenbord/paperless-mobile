@@ -9,23 +9,16 @@ class SavedViewCubit extends Cubit<SavedViewState> {
   final SavedViewRepository _repository;
   StreamSubscription? _subscription;
 
-  SavedViewCubit(this._repository) : super(SavedViewState(value: {})) {
+  SavedViewCubit(this._repository) : super(const SavedViewState()) {
     _subscription = _repository.values.listen(
       (savedViews) {
-        if (savedViews == null) {
-          emit(state.copyWith(isLoaded: false));
+        if (savedViews?.hasLoaded ?? false) {
+          emit(state.copyWith(value: savedViews?.values, hasLoaded: true));
         } else {
-          emit(state.copyWith(value: savedViews, isLoaded: true));
+          emit(state.copyWith(hasLoaded: false));
         }
       },
     );
-  }
-
-  void selectView(SavedView? view) {
-    emit(state.copyWith(
-      selectedSavedViewId: view?.id,
-      overwriteSelectedSavedViewId: true,
-    ));
   }
 
   Future<SavedView> add(SavedView view) async {
@@ -34,28 +27,17 @@ class SavedViewCubit extends Cubit<SavedViewState> {
     return savedView;
   }
 
-  Future<int> remove(SavedView view) async {
-    final id = await _repository.delete(view);
-    if (state.selectedSavedViewId == id) {
-      resetSelection();
-    }
-    return id;
+  Future<int> remove(SavedView view) {
+    return _repository.delete(view);
   }
 
   Future<void> initialize() async {
     final views = await _repository.findAll();
     final values = {for (var element in views) element.id!: element};
-    emit(SavedViewState(value: values, isLoaded: true));
+    emit(SavedViewState(value: values, hasLoaded: true));
   }
 
   Future<void> reload() => initialize();
-
-  void resetSelection() {
-    emit(SavedViewState(
-      value: state.value,
-      isLoaded: true,
-    ));
-  }
 
   @override
   Future<void> close() {

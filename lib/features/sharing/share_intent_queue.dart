@@ -1,10 +1,7 @@
 import 'dart:collection';
-import 'dart:developer';
 
 import 'package:flutter/widgets.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
-import 'package:rxdart/rxdart.dart';
 
 class ShareIntentQueue extends ChangeNotifier {
   final Queue<SharedMediaFile> _queue = Queue();

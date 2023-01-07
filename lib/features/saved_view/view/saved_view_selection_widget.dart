@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_api/paperless_api.dart';
+import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/selection/confirm_delete_saved_view_dialog.dart';
@@ -27,71 +28,86 @@ class SavedViewSelectionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.end,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        BlocBuilder<SavedViewCubit, SavedViewState>(
-          builder: (context, state) {
-            if (!state.isLoaded) {
-              return _buildLoadingWidget(context);
-            }
-            if (state.value.isEmpty) {
-              return Text(S.of(context).savedViewsEmptyStateText);
-            }
-            return SizedBox(
-              height: height,
-              child: ListView.separated(
-                itemCount: state.value.length,
-                scrollDirection: Axis.horizontal,
-                itemBuilder: (context, index) {
-                  final view = state.value.values.elementAt(index);
-                  return GestureDetector(
-                    onLongPress: () => _onDelete(context, view),
-                    child: FilterChip(
-                      label: Text(state.value.values.toList()[index].name),
-                      selected: view.id == state.selectedSavedViewId,
-                      onSelected: enabled
-                          ? (isSelected) =>
-                              _onSelected(isSelected, context, view)
-                          : null,
+    return BlocBuilder<ConnectivityCubit, ConnectivityState>(
+      builder: (context, connectivityState) {
+        final hasInternetConnection = connectivityState.isConnected;
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            BlocBuilder<SavedViewCubit, SavedViewState>(
+              builder: (context, state) {
+                if (!state.hasLoaded) {
+                  return _buildLoadingWidget(context);
+                }
+                if (state.value.isEmpty) {
+                  return Text(S.of(context).savedViewsEmptyStateText);
+                }
+                return SizedBox(
+                  height: height,
+                  child: ListView.separated(
+                    itemCount: state.value.length,
+                    scrollDirection: Axis.horizontal,
+                    itemBuilder: (context, index) {
+                      final view = state.value.values.elementAt(index);
+                      return GestureDetector(
+                        onLongPress: hasInternetConnection
+                            ? () => _onDelete(context, view)
+                            : null,
+                        child: BlocBuilder<DocumentsCubit, DocumentsState>(
+                          builder: (context, docState) {
+                            return FilterChip(
+                              label: Text(
+                                state.value.values.toList()[index].name,
+                              ),
+                              selected: view.id == docState.selectedSavedViewId,
+                              onSelected: enabled && hasInternetConnection
+                                  ? (isSelected) =>
+                                      _onSelected(isSelected, context, view)
+                                  : null,
+                            );
+                          },
+                        ),
+                      );
+                    },
+                    separatorBuilder: (context, index) => const SizedBox(
+                      width: 4.0,
                     ),
-                  );
-                },
-                separatorBuilder: (context, index) => const SizedBox(
-                  width: 8.0,
-                ),
-              ),
-            );
-          },
-        ),
-        BlocBuilder<SavedViewCubit, SavedViewState>(
-          builder: (context, state) {
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  S.of(context).savedViewsLabel,
-                  style: Theme.of(context).textTheme.titleSmall,
-                ),
-                BlocBuilder<DocumentsCubit, DocumentsState>(
-                  buildWhen: (previous, current) =>
-                      previous.filter != current.filter,
-                  builder: (context, docState) {
-                    return TextButton.icon(
-                      icon: const Icon(Icons.add),
-                      onPressed: (enabled && state.isLoaded)
-                          ? () => _onCreatePressed(context, docState.filter)
-                          : null,
-                      label: Text(S.of(context).savedViewCreateNewLabel),
-                    );
-                  },
-                ),
-              ],
-            );
-          },
-        ),
-      ],
+                  ),
+                );
+              },
+            ),
+            BlocBuilder<SavedViewCubit, SavedViewState>(
+              builder: (context, state) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      S.of(context).savedViewsLabel,
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
+                    BlocBuilder<DocumentsCubit, DocumentsState>(
+                      buildWhen: (previous, current) =>
+                          previous.filter != current.filter,
+                      builder: (context, docState) {
+                        return TextButton.icon(
+                          icon: const Icon(Icons.add),
+                          onPressed: (enabled &&
+                                  state.hasLoaded &&
+                                  hasInternetConnection)
+                              ? () => _onCreatePressed(context, docState.filter)
+                              : null,
+                          label: Text(S.of(context).savedViewCreateNewLabel),
+                        );
+                      },
+                    ),
+                  ],
+                );
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -114,7 +130,7 @@ class SavedViewSelectionWidget extends StatelessWidget {
           itemBuilder: (context, index) => FilterChip(
               label: SizedBox(width: r.nextInt((index * 20) + 50).toDouble()),
               onSelected: null),
-          separatorBuilder: (context, index) => SizedBox(width: 8.0),
+          separatorBuilder: (context, index) => const SizedBox(width: 4.0),
         ),
       ),
     );
@@ -138,11 +154,15 @@ class SavedViewSelectionWidget extends StatelessWidget {
   }
 
   void _onSelected(
-      bool isSelected, BuildContext context, SavedView view) async {
+    bool isSelected,
+    BuildContext context,
+    SavedView view,
+  ) async {
     if (isSelected) {
-      context.read<SavedViewCubit>().selectView(view);
+      context.read<DocumentsCubit>().selectView(view.id!);
     } else {
-      context.read<SavedViewCubit>().selectView(null);
+      context.read<DocumentsCubit>().resetFilter();
+      context.read<DocumentsCubit>().unselectView();
     }
   }
 
@@ -156,6 +176,10 @@ class SavedViewSelectionWidget extends StatelessWidget {
       if (delete) {
         try {
           context.read<SavedViewCubit>().remove(view);
+          if (context.read<DocumentsCubit>().state.selectedSavedViewId ==
+              view.id) {
+            await context.read<DocumentsCubit>().resetFilter();
+          }
         } on PaperlessServerException catch (error, stackTrace) {
           showErrorMessage(context, error, stackTrace);
         }

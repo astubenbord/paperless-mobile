@@ -7,6 +7,9 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:intl/intl.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/repository/label_repository.dart';
+import 'package:paperless_mobile/core/repository/state/impl/correspondent_repository_state.dart';
+import 'package:paperless_mobile/core/repository/state/impl/document_type_repository_state.dart';
+import 'package:paperless_mobile/core/repository/state/impl/storage_path_repository_state.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/edit_document/cubit/edit_document_cubit.dart';
 import 'package:paperless_mobile/features/edit_label/view/impl/add_correspondent_page.dart';
@@ -80,7 +83,8 @@ class _DocumentEditPageState extends State<DocumentEditPage> {
                           state.document.storagePath, state.storagePaths)
                       .padded(),
                   TagFormField(
-                    initialValue: IdsTagsQuery.included(state.document.tags),
+                    initialValue:
+                        IdsTagsQuery.included(state.document.tags.toList()),
                     notAssignedSelectable: false,
                     anyAssignedSelectable: false,
                     excludeAllowed: false,
@@ -100,7 +104,8 @@ class _DocumentEditPageState extends State<DocumentEditPage> {
       notAssignedSelectable: false,
       formBuilderState: _formKey.currentState,
       labelCreationWidgetBuilder: (initialValue) => RepositoryProvider(
-        create: (context) => context.read<LabelRepository<StoragePath>>(),
+        create: (context) => context
+            .read<LabelRepository<StoragePath, StoragePathRepositoryState>>(),
         child: AddStoragePathPage(initalValue: initialValue),
       ),
       textFieldLabel: S.of(context).documentStoragePathPropertyLabel,
@@ -117,7 +122,8 @@ class _DocumentEditPageState extends State<DocumentEditPage> {
       notAssignedSelectable: false,
       formBuilderState: _formKey.currentState,
       labelCreationWidgetBuilder: (initialValue) => RepositoryProvider(
-        create: (context) => context.read<LabelRepository<Correspondent>>(),
+        create: (context) => context.read<
+            LabelRepository<Correspondent, CorrespondentRepositoryState>>(),
         child: AddCorrespondentPage(initialName: initialValue),
       ),
       textFieldLabel: S.of(context).documentCorrespondentPropertyLabel,
@@ -134,7 +140,8 @@ class _DocumentEditPageState extends State<DocumentEditPage> {
       notAssignedSelectable: false,
       formBuilderState: _formKey.currentState,
       labelCreationWidgetBuilder: (currentInput) => RepositoryProvider(
-        create: (context) => context.read<LabelRepository<DocumentType>>(),
+        create: (context) => context
+            .read<LabelRepository<DocumentType, DocumentTypeRepositoryState>>(),
         child: AddDocumentTypePage(
           initialName: currentInput,
         ),

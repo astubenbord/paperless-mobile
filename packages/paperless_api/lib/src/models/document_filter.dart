@@ -100,6 +100,7 @@ class DocumentFilter extends Equatable {
     DateRangeQuery? created,
     DateRangeQuery? modified,
     TextQuery? query,
+    int? selectedViewId,
   }) {
     final newFilter = DocumentFilter(
       pageSize: pageSize ?? this.pageSize,
@@ -135,7 +136,7 @@ class DocumentFilter extends Equatable {
         created != initial.created,
         modified != initial.modified,
         asnQuery != initial.asnQuery,
-        (query.queryText != initial.query.queryText),
+        ((query.queryText ?? '') != (initial.query.queryText ?? '')),
       ].fold(0, (previousValue, element) => previousValue += element ? 1 : 0);
 
   @override

@@ -1,15 +1,22 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:paperless_api/paperless_api.dart';
+import 'package:paperless_mobile/core/repository/saved_view_repository.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
 
-class DocumentsCubit extends HydratedCubit<DocumentsState> {
+class DocumentsCubit extends Cubit<DocumentsState> with HydratedMixin {
   final PaperlessDocumentsApi _api;
+  final SavedViewRepository _savedViewRepository;
 
-  DocumentsCubit(this._api) : super(const DocumentsState());
+  DocumentsCubit(this._api, this._savedViewRepository)
+      : super(const DocumentsState()) {
+    hydrate();
+  }
 
   Future<void> bulkRemove(List<DocumentModel> documents) async {
+    log("[DocumentsCubit] bulkRemove");
     await _api.bulkAction(
       BulkDeleteAction(documents.map((doc) => doc.id)),
     );
@@ -21,6 +28,7 @@ class DocumentsCubit extends HydratedCubit<DocumentsState> {
     Iterable<int> addTags = const [],
     Iterable<int> removeTags = const [],
   }) async {
+    log("[DocumentsCubit] bulkEditTags");
     await _api.bulkAction(BulkModifyTagsAction(
       documents.map((doc) => doc.id),
       addTags: addTags,
@@ -33,6 +41,7 @@ class DocumentsCubit extends HydratedCubit<DocumentsState> {
     DocumentModel document, [
     bool updateRemote = true,
   ]) async {
+    log("[DocumentsCubit] update");
     if (updateRemote) {
       await _api.update(document);
     }
@@ -40,6 +49,7 @@ class DocumentsCubit extends HydratedCubit<DocumentsState> {
   }
 
   Future<void> load() async {
+    log("[DocumentsCubit] load");
     emit(state.copyWith(isLoading: true));
     try {
       final result = await _api.find(state.filter);
@@ -48,33 +58,23 @@ class DocumentsCubit extends HydratedCubit<DocumentsState> {
         hasLoaded: true,
         value: [...state.value, result],
       ));
-    } catch (err) {
+    } finally {
       emit(state.copyWith(isLoading: false));
-      rethrow;
     }
   }
 
   Future<void> reload() async {
+    log("[DocumentsCubit] reload");
     emit(state.copyWith(isLoading: true));
     try {
-      if (state.currentPageNumber >= 5) {
-        return _bulkReloadDocuments();
-      }
-      var newPages = <PagedSearchResult<DocumentModel>>[];
-      for (final page in state.value) {
-        final result =
-            await _api.find(state.filter.copyWith(page: page.pageKey));
-        newPages.add(result);
-      }
-      emit(DocumentsState(
+      final result = await _api.find(state.filter.copyWith(page: 1));
+      emit(state.copyWith(
         hasLoaded: true,
-        value: newPages,
-        filter: state.filter,
+        value: [result],
         isLoading: false,
       ));
-    } catch (err) {
+    } finally {
       emit(state.copyWith(isLoading: false));
-      rethrow;
     }
   }
 
@@ -93,13 +93,13 @@ class DocumentsCubit extends HydratedCubit<DocumentsState> {
         filter: state.filter,
         isLoading: false,
       ));
-    } catch (err) {
+    } finally {
       emit(state.copyWith(isLoading: false));
-      rethrow;
     }
   }
 
   Future<void> loadMore() async {
+    log("[DocumentsCubit] loadMore");
     if (state.isLastPageLoaded) {
       return;
     }
@@ -115,21 +115,22 @@ class DocumentsCubit extends HydratedCubit<DocumentsState> {
           isLoading: false,
         ),
       );
-    } catch (err) {
+    } finally {
       emit(state.copyWith(isLoading: false));
-      rethrow;
     }
   }
 
   ///
-  /// Update filter state and automatically reload documents. Always resets page to 1.
-  /// Use [DocumentsCubit.loadMore] to load more data.
+  /// Updates document filter and automatically reloads documents. Always resets page to 1.
+  /// Use [loadMore] to load more data.
   Future<void> updateFilter({
     final DocumentFilter filter = DocumentFilter.initial,
   }) async {
+    log("[DocumentsCubit] updateFilter");
     try {
       emit(state.copyWith(isLoading: true));
       final result = await _api.find(filter.copyWith(page: 1));
+
       emit(
         DocumentsState(
           filter: filter,
@@ -138,13 +139,13 @@ class DocumentsCubit extends HydratedCubit<DocumentsState> {
           isLoading: false,
         ),
       );
-    } catch (err) {
+    } finally {
       emit(state.copyWith(isLoading: false));
-      rethrow;
     }
   }
 
   Future<void> resetFilter() {
+    log("[DocumentsCubit] resetFilter");
     final filter = DocumentFilter.initial.copyWith(
       sortField: state.filter.sortField,
       sortOrder: state.filter.sortOrder,
@@ -161,6 +162,7 @@ class DocumentsCubit extends HydratedCubit<DocumentsState> {
       updateFilter(filter: transformFn(state.filter));
 
   void toggleDocumentSelection(DocumentModel model) {
+    log("[DocumentsCubit] toggleSelection");
     if (state.selection.contains(model)) {
       emit(
         state.copyWith(
@@ -177,16 +179,44 @@ class DocumentsCubit extends HydratedCubit<DocumentsState> {
   }
 
   void resetSelection() {
+    log("[DocumentsCubit] resetSelection");
     emit(state.copyWith(selection: []));
   }
 
   void reset() {
+    log("[DocumentsCubit] reset");
     emit(const DocumentsState());
+  }
+
+  Future<void> selectView(int id) async {
+    emit(state.copyWith(isLoading: true));
+    try {
+      final filter =
+          _savedViewRepository.current?.values[id]?.toDocumentFilter();
+      if (filter == null) {
+        return;
+      }
+      final results = await _api.find(filter.copyWith(page: 1));
+      emit(
+        DocumentsState(
+          filter: filter,
+          hasLoaded: true,
+          isLoading: false,
+          selectedSavedViewId: id,
+          value: [results],
+        ),
+      );
+    } finally {
+      emit(state.copyWith(isLoading: false));
+    }
+  }
+
+  void unselectView() {
+    emit(state.copyWith(selectedSavedViewId: null));
   }
 
   @override
   DocumentsState? fromJson(Map<String, dynamic> json) {
-    log(json['filter'].toString());
     return DocumentsState.fromJson(json);
   }
 

@@ -4,12 +4,12 @@ import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:paperless_api/paperless_api.dart';
 
-@JsonSerializable()
 class DocumentsState extends Equatable {
   final bool isLoading;
   final bool hasLoaded;
   final DocumentFilter filter;
   final List<PagedSearchResult<DocumentModel>> value;
+  final int? selectedSavedViewId;
 
   @JsonKey(ignore: true)
   final List<DocumentModel> selection;
@@ -20,6 +20,7 @@ class DocumentsState extends Equatable {
     this.value = const [],
     this.filter = const DocumentFilter(),
     this.selection = const [],
+    this.selectedSavedViewId,
   });
 
   int get currentPageNumber {
@@ -69,6 +70,7 @@ class DocumentsState extends Equatable {
     List<PagedSearchResult<DocumentModel>>? value,
     DocumentFilter? filter,
     List<DocumentModel>? selection,
+    int? selectedSavedViewId,
   }) {
     return DocumentsState(
       hasLoaded: hasLoaded ?? this.hasLoaded,
@@ -76,17 +78,26 @@ class DocumentsState extends Equatable {
       value: value ?? this.value,
       filter: filter ?? this.filter,
       selection: selection ?? this.selection,
+      selectedSavedViewId: selectedSavedViewId ?? this.selectedSavedViewId,
     );
   }
 
   @override
-  List<Object?> get props => [hasLoaded, filter, value, selection, isLoading];
+  List<Object?> get props => [
+        hasLoaded,
+        filter,
+        value,
+        selection,
+        isLoading,
+        selectedSavedViewId,
+      ];
 
   Map<String, dynamic> toJson() {
     final json = {
       'hasLoaded': hasLoaded,
       'isLoading': isLoading,
       'filter': filter.toJson(),
+      'selectedSavedViewId': selectedSavedViewId,
       'value':
           value.map((e) => e.toJson(DocumentModelJsonConverter())).toList(),
     };
@@ -97,9 +108,10 @@ class DocumentsState extends Equatable {
     return DocumentsState(
       hasLoaded: json['hasLoaded'],
       isLoading: json['isLoading'],
+      selectedSavedViewId: json['selectedSavedViewId'],
       value: (json['value'] as List<dynamic>)
           .map((e) =>
-              PagedSearchResult.fromJson(e, DocumentModelJsonConverter()))
+              PagedSearchResult.fromJsonT(e, DocumentModelJsonConverter()))
           .toList(),
       filter: DocumentFilter.fromJson(json['filter']),
     );
