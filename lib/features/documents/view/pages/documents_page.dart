@@ -1,11 +1,9 @@
-import 'dart:math';
-
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
-import 'package:paperless_mobile/core/repository/impl/correspondent_repository_impl.dart';
 import 'package:paperless_mobile/core/repository/provider/label_repositories_provider.dart';
 import 'package:paperless_mobile/features/document_details/bloc/document_details_cubit.dart';
 import 'package:paperless_mobile/features/document_details/view/pages/document_details_page.dart';
@@ -21,12 +19,10 @@ import 'package:paperless_mobile/features/home/view/widget/info_drawer.dart';
 import 'package:paperless_mobile/features/labels/bloc/providers/labels_bloc_provider.dart';
 import 'package:paperless_mobile/features/login/bloc/authentication_cubit.dart';
 import 'package:paperless_mobile/features/saved_view/cubit/saved_view_cubit.dart';
-import 'package:paperless_mobile/features/saved_view/cubit/saved_view_state.dart';
 import 'package:paperless_mobile/features/settings/bloc/application_settings_cubit.dart';
 import 'package:paperless_mobile/features/settings/model/application_settings_state.dart';
 import 'package:paperless_mobile/features/settings/model/view_type.dart';
 import 'package:paperless_mobile/util.dart';
-import 'package:collection/collection.dart';
 
 class DocumentFilterIntent {
   final DocumentFilter? filter;

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -6,6 +7,7 @@ import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_api/src/constants.dart';
 import 'package:paperless_api/src/converters/document_model_json_converter.dart';
 import 'package:paperless_api/src/converters/similar_document_model_json_converter.dart';
+import 'package:paperless_api/src/request_utils.dart';
 
 class PaperlessDocumentsApiImpl implements PaperlessDocumentsApi {
   final Dio client;
@@ -13,7 +15,7 @@ class PaperlessDocumentsApiImpl implements PaperlessDocumentsApi {
   PaperlessDocumentsApiImpl(this.client);
 
   @override
-  Future<void> create(
+  Future<String?> create(
     Uint8List documentBytes, {
     required String filename,
     required String title,
@@ -46,8 +48,12 @@ class PaperlessDocumentsApiImpl implements PaperlessDocumentsApi {
     try {
       final response =
           await client.post('/api/documents/post_document/', data: formData);
-
-      if (response.statusCode != 200) {
+      if (response.statusCode == 200) {
+        if (response.data is String && response.data != "OK") {
+          return response.data;
+        }
+        return null;
+      } else {
         throw PaperlessServerException(
           ErrorCode.documentUploadFailed,
           httpStatusCode: response.statusCode,

@@ -84,6 +84,7 @@ dependencies:
   pretty_dio_logger: ^1.2.0-beta-1
   collection: ^1.17.0
   device_info_plus: ^4.1.3
+  flutter_local_notifications: ^13.0.0
 
 dev_dependencies:
   integration_test:

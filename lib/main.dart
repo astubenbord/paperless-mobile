@@ -39,9 +39,11 @@ import 'package:paperless_mobile/features/login/bloc/authentication_cubit.dart';
 import 'package:paperless_mobile/features/login/bloc/authentication_state.dart';
 import 'package:paperless_mobile/features/login/services/authentication_service.dart';
 import 'package:paperless_mobile/features/login/view/login_page.dart';
+import 'package:paperless_mobile/features/notifications/services/local_notification_service.dart';
 import 'package:paperless_mobile/features/settings/bloc/application_settings_cubit.dart';
 import 'package:paperless_mobile/features/settings/model/application_settings_state.dart';
 import 'package:paperless_mobile/features/sharing/share_intent_queue.dart';
+import 'package:paperless_mobile/features/tasks/cubit/task_status_cubit.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
@@ -53,6 +55,7 @@ void main() async {
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
 
   await findSystemLocale();
+  await LocalNotificationService.instance.initialize();
 
   // Initialize External dependencies
   final connectivity = Connectivity();
@@ -95,6 +98,7 @@ void main() async {
   final labelsApi = PaperlessLabelApiImpl(dioWrapper.client);
   final statsApi = PaperlessServerStatsApiImpl(dioWrapper.client);
   final savedViewsApi = PaperlessSavedViewsApiImpl(dioWrapper.client);
+  final tasksApi = PaperlessTasksApiImpl(dioWrapper.client);
 
   // Initialize Blocs/Cubits
   final connectivityCubit = ConnectivityCubit(connectivityStatusService);
@@ -140,6 +144,7 @@ void main() async {
         Provider<PaperlessLabelsApi>.value(value: labelsApi),
         Provider<PaperlessServerStatsApi>.value(value: statsApi),
         Provider<PaperlessSavedViewsApi>.value(value: savedViewsApi),
+        Provider<PaperlessTasksApi>.value(value: tasksApi),
         Provider<cm.CacheManager>(
           create: (context) => cm.CacheManager(
             cm.Config(
@@ -328,7 +333,11 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
       builder: (context, authentication) {
         if (authentication.isAuthenticated &&
             (authentication.wasLocalAuthenticationSuccessful ?? true)) {
-          return const HomePage();
+          return BlocProvider(
+            create: (context) =>
+                TaskStatusCubit(context.read<PaperlessTasksApi>()),
+            child: const HomePage(),
+          );
         } else {
           if (authentication.wasLoginStored &&
               !(authentication.wasLocalAuthenticationSuccessful ?? false)) {

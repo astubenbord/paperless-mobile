@@ -1,0 +1,4 @@
+enum NotificationResponseAction {
+  openCreatedDocument,
+  acknowledgeCreatedDocument;
+}

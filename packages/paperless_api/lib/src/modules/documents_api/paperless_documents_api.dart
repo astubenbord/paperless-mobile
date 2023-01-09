@@ -8,7 +8,9 @@ import 'package:paperless_api/src/models/paged_search_result.dart';
 import 'package:paperless_api/src/models/similar_document_model.dart';
 
 abstract class PaperlessDocumentsApi {
-  Future<void> create(
+  /// Uploads a document using a form data request and from server version 1.11.3
+  /// returns the celery task id which can be used to track the status of the document.
+  Future<String?> create(
     Uint8List documentBytes, {
     required String filename,
     required String title,
@@ -27,7 +29,9 @@ abstract class PaperlessDocumentsApi {
   Future<Uint8List> getPreview(int docId);
   String getThumbnailUrl(int docId);
   Future<DocumentModel> waitForConsumptionFinished(
-      String filename, String title);
+    String filename,
+    String title,
+  );
   Future<Uint8List> download(DocumentModel document);
 
   Future<List<String>> autocomplete(String query, [int limit = 10]);

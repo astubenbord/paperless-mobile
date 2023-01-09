@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 import 'package:paperless_api/paperless_api.dart';
@@ -50,10 +51,8 @@ class WebSocketStatusService implements StatusService {
 }
 
 class LongPollingStatusService implements StatusService {
-  static const maxRetries = 60;
-
-  final BaseClient httpClient;
-  LongPollingStatusService(this.httpClient);
+  final Dio client;
+  const LongPollingStatusService(this.client);
 
   @override
   Future<void> startListeningBeforeDocumentUpload(

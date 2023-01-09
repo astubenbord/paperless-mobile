@@ -22,10 +22,12 @@ import 'package:paperless_mobile/features/documents/view/pages/documents_page.da
 import 'package:paperless_mobile/features/home/view/widget/bottom_navigation_bar.dart';
 import 'package:paperless_mobile/features/home/view/widget/info_drawer.dart';
 import 'package:paperless_mobile/features/labels/view/pages/labels_page.dart';
+import 'package:paperless_mobile/features/notifications/services/local_notification_service.dart';
 import 'package:paperless_mobile/features/saved_view/cubit/saved_view_cubit.dart';
 import 'package:paperless_mobile/features/scan/bloc/document_scanner_cubit.dart';
 import 'package:paperless_mobile/features/scan/view/scanner_page.dart';
 import 'package:paperless_mobile/features/sharing/share_intent_queue.dart';
+import 'package:paperless_mobile/features/tasks/cubit/task_status_cubit.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:paperless_mobile/util.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
@@ -45,6 +47,46 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    LocalNotificationService.instance.notifyTaskChanged(
+      Task(
+        id: 100,
+        dateCreated: DateTime.now(),
+        dateDone: DateTime.now(),
+        taskFileName: "test_file.pdf",
+        status: TaskStatus.started,
+        taskId: "abc-def-123-456",
+        type: "file",
+      ),
+    );
+    Future.delayed(const Duration(seconds: 5), () {
+      LocalNotificationService.instance.notifyTaskChanged(
+        Task(
+          id: 100,
+          dateCreated: DateTime.now(),
+          dateDone: DateTime.now(),
+          taskFileName: "test_file.pdf",
+          status: TaskStatus.pending,
+          taskId: "abc-def-123-456",
+          type: "file",
+        ),
+      );
+    });
+    Future.delayed(const Duration(seconds: 10), () {
+      LocalNotificationService.instance.notifyTaskChanged(
+        Task(
+          id: 100,
+          acknowledged: false,
+          dateCreated: DateTime.now(),
+          dateDone: DateTime.now(),
+          relatedDocumentId: 180,
+          result: "New document successfully created.",
+          status: TaskStatus.success,
+          taskFileName: "test_file.pdf",
+          taskId: "abc-def-123-456",
+          type: "file",
+        ),
+      );
+    });
     _initializeData(context);
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       _listenForReceivedFiles();
@@ -71,29 +113,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _handleReceivedFile(SharedMediaFile file) async {
-    // final isGranted = await askForPermission(Permission.storage);
-
-    // if (!isGranted) {
-    //   return;
-    // }
-    // showDialog(
-    //   context: context,
-    //   builder: (context) => AlertDialog(
-    //     title: Text("Received File."),
-    //     content: Column(
-    //       children: [
-    //         Text("Path: ${file.path}"),
-    //         Text("Type: ${file.type.name}"),
-    //         Text("Exists: ${File(file.path).existsSync()}"),
-    //         FutureBuilder<bool>(
-    //           future: Permission.storage.isGranted,
-    //           builder: (context, snapshot) =>
-    //               Text("Has storage permission: ${snapshot.data}"),
-    //         )
-    //       ],
-    //     ),
-    //   ),
-    // );
     SharedMediaFile mediaFile;
     if (Platform.isIOS) {
       // Workaround for file not found on iOS: https://stackoverflow.com/a/72813212
@@ -165,12 +184,20 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<ConnectivityCubit, ConnectivityState>(
-      //Only re-initialize data if the connectivity changed from not connected to connected
-      listenWhen: (previous, current) => current == ConnectivityState.connected,
-      listener: (context, state) {
-        _initializeData(context);
-      },
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<ConnectivityCubit, ConnectivityState>(
+          //Only re-initialize data if the connectivity changed from not connected to connected
+          listenWhen: (previous, current) =>
+              current == ConnectivityState.connected,
+          listener: (context, state) {
+            _initializeData(context);
+          },
+        ),
+        BlocListener<TaskStatusCubit, TaskStatusState>(
+          listener: (context, state) {},
+        ),
+      ],
       child: Scaffold(
         key: rootScaffoldKey,
         bottomNavigationBar: BottomNavBar(

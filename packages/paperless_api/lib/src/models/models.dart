@@ -22,3 +22,5 @@ export 'paperless_server_information_model.dart';
 export 'paperless_server_statistics_model.dart';
 export 'saved_view_model.dart';
 export 'similar_document_model.dart';
+export 'task/task.dart';
+export 'task/task_status.dart';

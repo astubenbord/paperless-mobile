@@ -35,6 +35,8 @@ android {
     compileSdkVersion 33
 
     compileOptions {
+        // Required for flutter_local_notifications
+        coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
@@ -54,6 +56,8 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        // Required for flutter_local_notifications
+        multiDexEnabled true
     }
 
    signingConfigs {
@@ -82,4 +86,6 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    // Required for flutter_local_notifications
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 }

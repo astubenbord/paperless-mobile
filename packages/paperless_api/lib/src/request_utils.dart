@@ -81,3 +81,14 @@ class _CollectionFromJsonSerializationParams<T> {
 
   _CollectionFromJsonSerializationParams(this.fromJson, this.list);
 }
+
+int getExtendedVersionNumber(String version) {
+  List versionCells = version.split('.');
+  versionCells = versionCells.map((i) => int.parse(i)).toList();
+  return versionCells[0] * 100000 + versionCells[1] * 1000 + versionCells[2];
+}
+
+int? tryParseNullable(String? source, {int? radix}) {
+  if (source == null) return null;
+  return int.tryParse(source, radix: radix);
+}
