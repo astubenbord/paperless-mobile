@@ -54,7 +54,7 @@ class _DocumentEditPageState extends State<DocumentEditPage> {
             floatingActionButton: FloatingActionButton.extended(
               onPressed: () => _onSubmit(state.document),
               icon: const Icon(Icons.save),
-              label: Text(S.of(context).genericActionSaveLabel),
+              label: Text(S.of(context).genericActionUpdateLabel),
             ),
             appBar: AppBar(
               title: Text(S.of(context).documentEditPageTitle),
@@ -75,31 +75,56 @@ class _DocumentEditPageState extends State<DocumentEditPage> {
               ),
               child: FormBuilder(
                 key: _formKey,
-                child: ListView(children: [
-                  _buildTitleFormField(state.document.title).padded(),
-                  _buildCreatedAtFormField(state.document.created).padded(),
-                  _buildDocumentTypeFormField(
-                    state.document.documentType,
-                    state.documentTypes,
-                  ).padded(),
-                  _buildCorrespondentFormField(
-                    state.document.correspondent,
-                    state.correspondents,
-                  ).padded(),
-                  _buildStoragePathFormField(
-                    state.document.storagePath,
-                    state.storagePaths,
-                  ).padded(),
-                  TagFormField(
-                    initialValue:
-                        IdsTagsQuery.included(state.document.tags.toList()),
-                    notAssignedSelectable: false,
-                    anyAssignedSelectable: false,
-                    excludeAllowed: false,
-                    name: fkTags,
-                    selectableOptions: state.tags,
-                  ).padded(),
-                ]),
+                child: ListView(
+                  children: [
+                    _buildTitleFormField(state.document.title).padded(),
+                    _buildCreatedAtFormField(state.document.created).padded(),
+                    _buildDocumentTypeFormField(
+                      state.document.documentType,
+                      state.documentTypes,
+                    ).padded(),
+                    _buildCorrespondentFormField(
+                      state.document.correspondent,
+                      state.correspondents,
+                    ).padded(),
+                    _buildStoragePathFormField(
+                      state.document.storagePath,
+                      state.storagePaths,
+                    ).padded(),
+                    TagFormField(
+                      initialValue:
+                          IdsTagsQuery.included(state.document.tags.toList()),
+                      notAssignedSelectable: false,
+                      anyAssignedSelectable: false,
+                      excludeAllowed: false,
+                      name: fkTags,
+                      selectableOptions: state.tags,
+                      suggestions: widget.suggestions.hasSuggestedTags
+                          ? _buildSuggestionsSkeleton<int>(
+                              suggestions: widget.suggestions.storagePaths,
+                              itemBuilder: (context, itemData) => ActionChip(
+                                label: Text(state.tags[itemData]!.name),
+                                onPressed: () {
+                                  final currentTags = _formKey.currentState
+                                      ?.fields[fkTags] as TagsQuery;
+                                  if (currentTags is IdsTagsQuery) {
+                                    _formKey.currentState?.fields[fkTags]
+                                        ?.didChange((IdsTagsQuery.fromIds(
+                                            [...currentTags.ids, itemData])));
+                                  } else {
+                                    _formKey.currentState?.fields[fkTags]
+                                        ?.didChange(
+                                            (IdsTagsQuery.fromIds([itemData])));
+                                  }
+                                },
+                              ),
+                            )
+                          : null,
+                    ).padded(),
+                    const SizedBox(
+                        height: 64), // Prevent tags from being hidden by fab
+                  ],
+                ),
               ),
             ));
       },
@@ -267,7 +292,7 @@ class _DocumentEditPageState extends State<DocumentEditPage> {
           _buildSuggestionsSkeleton<DateTime>(
             suggestions: widget.suggestions.dates,
             itemBuilder: (context, itemData) => ActionChip(
-              label: Text(DateFormat.yMd().format(itemData)),
+              label: Text(DateFormat.yMMMd().format(itemData)),
               onPressed: () => _formKey.currentState?.fields[fkCreatedDate]
                   ?.didChange(itemData),
             ),

@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
 import 'package:paperless_mobile/core/widgets/highlighted_text.dart';
+import 'package:paperless_mobile/core/widgets/hint_card.dart';
 import 'package:paperless_mobile/core/widgets/offline_widget.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/document_details/bloc/document_details_cubit.dart';
@@ -77,7 +78,7 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
                               color: Colors.white,
                             ),
                           ),
-                          badgeColor: Theme.of(context).colorScheme.error,
+                          badgeColor: Colors.red,
                           //TODO: Wait for stable version of m3, then use AlignmentDirectional.topEnd
                         );
                       },
@@ -190,18 +191,16 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
                   children: [
                     _buildDocumentOverview(
                       state.document,
-                      widget.titleAndContentQueryString,
                     ),
                     _buildDocumentContentView(
                       state.document,
-                      widget.titleAndContentQueryString,
                       state,
                     ),
                     _buildDocumentMetaDataView(
                       state.document,
                     ),
-                  ].padded(),
-                );
+                  ],
+                ).paddedSymmetrically(horizontal: 8);
               },
             ),
           ),
@@ -216,23 +215,34 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
       Navigator.push<bool>(
         context,
         MaterialPageRoute(
-          builder: (context) => BlocProvider.value(
-            value: EditDocumentCubit(
-              document,
-              documentsApi: context.read(),
-              correspondentRepository: context.read(),
-              documentTypeRepository: context.read(),
-              storagePathRepository: context.read(),
-              tagRepository: context.read(),
-            ),
+          builder: (_) => MultiBlocProvider(
+            providers: [
+              BlocProvider.value(
+                value: EditDocumentCubit(
+                  document,
+                  documentsApi: context.read(),
+                  correspondentRepository: context.read(),
+                  documentTypeRepository: context.read(),
+                  storagePathRepository: context.read(),
+                  tagRepository: context.read(),
+                ),
+              ),
+              BlocProvider<DocumentDetailsCubit>.value(
+                value: cubit,
+              ),
+            ],
             child: BlocListener<EditDocumentCubit, EditDocumentState>(
               listenWhen: (previous, current) =>
                   previous.document != current.document,
               listener: (context, state) {
                 cubit.replaceDocument(state.document);
               },
-              child: DocumentEditPage(
-                suggestions: cubit.state.suggestions,
+              child: BlocBuilder<DocumentDetailsCubit, DocumentDetailsState>(
+                builder: (context, state) {
+                  return DocumentEditPage(
+                    suggestions: state.suggestions,
+                  );
+                },
               ),
             ),
           ),
@@ -273,8 +283,9 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
                       .documentArchiveSerialNumberPropertyLongLabel,
                   content: document.archiveSerialNumber != null
                       ? Text(document.archiveSerialNumber.toString())
-                      : OutlinedButton(
-                          child: Text(S
+                      : TextButton.icon(
+                          icon: const Icon(Icons.archive),
+                          label: Text(S
                               .of(context)
                               .documentDetailsPageAssignAsnButtonLabel),
                           onPressed: widget.allowEdit
@@ -321,38 +332,46 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
 
   Widget _buildDocumentContentView(
     DocumentModel document,
-    String? match,
     DocumentDetailsState state,
   ) {
-    return ListView(
-      children: [
-        HighlightedText(
-          text: (state.isFullContentLoaded
-                  ? state.fullContent
-                  : document.content) ??
-              "",
-          highlights: match == null ? [] : match.split(" "),
-          style: Theme.of(context).textTheme.bodyMedium,
-          caseSensitive: false,
-        ),
-        if (!state.isFullContentLoaded && (document.content ?? '').isNotEmpty)
-          TextButton(
-            child: Text("Show full content ..."),
-            onPressed: () {
-              context.read<DocumentDetailsCubit>().loadFullContent();
-            },
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          HighlightedText(
+            text: (state.isFullContentLoaded
+                    ? state.fullContent
+                    : document.content) ??
+                "",
+            highlights: widget.titleAndContentQueryString != null
+                ? widget.titleAndContentQueryString!.split(" ")
+                : [],
+            style: Theme.of(context).textTheme.bodyMedium,
+            caseSensitive: false,
           ),
-      ],
-    ).paddedOnly(top: 8);
+          if (!state.isFullContentLoaded && (document.content ?? '').isNotEmpty)
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: TextButton(
+                child:
+                    Text(S.of(context).documentDetailsPageLoadFullContentLabel),
+                onPressed: () {
+                  context.read<DocumentDetailsCubit>().loadFullContent();
+                },
+              ),
+            ),
+        ],
+      ).padded(8).paddedOnly(top: 14),
+    );
   }
 
-  Widget _buildDocumentOverview(DocumentModel document, String? match) {
+  Widget _buildDocumentOverview(DocumentModel document) {
     return ListView(
       children: [
         _DetailsItem(
           content: HighlightedText(
             text: document.title,
-            highlights: match?.split(" ") ?? <String>[],
+            highlights: widget.titleAndContentQueryString?.split(" ") ?? [],
             style: Theme.of(context).textTheme.bodyLarge,
           ),
           label: S.of(context).documentTitlePropertyLabel,

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -5,6 +7,7 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/repository/label_repository.dart';
 import 'package:paperless_mobile/core/repository/state/impl/tag_repository_state.dart';
+import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/edit_label/view/impl/add_tag_page.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 
@@ -16,6 +19,7 @@ class TagFormField extends StatefulWidget {
   final bool anyAssignedSelectable;
   final bool excludeAllowed;
   final Map<int, Tag> selectableOptions;
+  final Widget? suggestions;
 
   const TagFormField({
     super.key,
@@ -26,6 +30,7 @@ class TagFormField extends StatefulWidget {
     this.anyAssignedSelectable = true,
     this.excludeAllowed = true,
     required this.selectableOptions,
+    this.suggestions,
   });
 
   @override
@@ -37,7 +42,7 @@ class _TagFormFieldState extends State<TagFormField> {
   static const _anyAssignedId = -2;
 
   late final TextEditingController _textEditingController;
-  bool _showCreationSuffixIcon = true;
+  bool _showCreationSuffixIcon = false;
   bool _showClearSuffixIcon = false;
 
   @override
@@ -46,14 +51,19 @@ class _TagFormFieldState extends State<TagFormField> {
     _textEditingController = TextEditingController()
       ..addListener(() {
         setState(() {
-          _showCreationSuffixIcon = widget.selectableOptions.values
-                  .where(
-                    (item) => item.name.toLowerCase().startsWith(
-                          _textEditingController.text.toLowerCase(),
-                        ),
+          _showCreationSuffixIcon = widget.selectableOptions.values.where(
+            (item) {
+              log(item.name
+                  .toLowerCase()
+                  .startsWith(
+                    _textEditingController.text.toLowerCase(),
                   )
-                  .isEmpty ||
-              _textEditingController.text.isEmpty;
+                  .toString());
+              return item.name.toLowerCase().startsWith(
+                    _textEditingController.text.toLowerCase(),
+                  );
+            },
+          ).isEmpty;
         });
         setState(
           () => _showClearSuffixIcon = _textEditingController.text.isNotEmpty,
@@ -124,23 +134,33 @@ class _TagFormFieldState extends State<TagFormField> {
               getImmediateSuggestions: true,
               animationStart: 1,
               itemBuilder: (context, data) {
-                if (data == _onlyNotAssignedId) {
-                  return ListTile(
-                    title: Text(S.of(context).labelNotAssignedText),
-                  );
-                } else if (data == _anyAssignedId) {
-                  return ListTile(
-                    title: Text(S.of(context).labelAnyAssignedText),
-                  );
+                late String? title;
+                switch (data) {
+                  case _onlyNotAssignedId:
+                    title = S.of(context).labelNotAssignedText;
+                    break;
+                  case _anyAssignedId:
+                    title = S.of(context).labelAnyAssignedText;
+                    break;
+                  default:
+                    title = widget.selectableOptions[data]?.name;
                 }
-                final tag = widget.selectableOptions[data]!;
+
+                final tag = widget.selectableOptions[data];
                 return ListTile(
-                  leading: Icon(
-                    Icons.circle,
-                    color: tag.color,
+                  dense: true,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
                   ),
+                  style: ListTileStyle.list,
+                  leading: data != _onlyNotAssignedId && data != _anyAssignedId
+                      ? Icon(
+                          Icons.circle,
+                          color: tag?.color,
+                        )
+                      : null,
                   title: Text(
-                    tag.name,
+                    title ?? '',
                     style: TextStyle(
                         color: Theme.of(context).colorScheme.onBackground),
                   ),
@@ -165,10 +185,11 @@ class _TagFormFieldState extends State<TagFormField> {
               direction: AxisDirection.up,
             ),
             if (field.value is OnlyNotAssignedTagsQuery) ...[
-              _buildNotAssignedTag(field)
+              _buildNotAssignedTag(field).padded()
             ] else if (field.value is AnyAssignedTagsQuery) ...[
-              _buildAnyAssignedTag(field)
+              _buildAnyAssignedTag(field).padded()
             ] else ...[
+              if (widget.suggestions != null) widget.suggestions!,
               // field.value is IdsTagsQuery
               Wrap(
                 alignment: WrapAlignment.start,
@@ -183,7 +204,7 @@ class _TagFormFieldState extends State<TagFormField> {
                       ),
                     )
                     .toList(),
-              ),
+              ).padded(),
             ]
           ],
         );
@@ -266,6 +287,7 @@ class _TagFormFieldState extends State<TagFormField> {
         tag.name,
         style: TextStyle(
           color: tag.textColor,
+          decorationColor: tag.textColor,
           decoration: !isIncludedTag ? TextDecoration.lineThrough : null,
           decorationThickness: 2.0,
         ),

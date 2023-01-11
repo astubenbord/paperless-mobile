@@ -25,9 +25,6 @@ class _LinkedDocumentsPageState extends State<LinkedDocumentsPage> {
       ),
       body: BlocBuilder<LinkedDocumentsCubit, LinkedDocumentsState>(
         builder: (context, state) {
-          if (!state.isLoaded) {
-            return const DocumentsListLoadingWidget();
-          }
           return Column(
             children: [
               Text(
@@ -35,37 +32,41 @@ class _LinkedDocumentsPageState extends State<LinkedDocumentsPage> {
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodySmall,
               ),
-              Expanded(
-                child: ListView.builder(
-                  itemBuilder: (context, index) {
-                    return DocumentListItem(
-                      isLabelClickable: false,
-                      document: state.documents!.results.elementAt(index),
-                      onTap: (doc) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => BlocProvider(
-                              create: (context) => DocumentDetailsCubit(
-                                context.read<PaperlessDocumentsApi>(),
-                                state.documents!.results.elementAt(index),
-                              ),
-                              child: const DocumentDetailsPage(
-                                isLabelClickable: false,
-                                allowEdit: false,
+              if (!state.isLoaded)
+                Expanded(child: const DocumentsListLoadingWidget())
+              else
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: state.documents?.results.length,
+                    itemBuilder: (context, index) {
+                      return DocumentListItem(
+                        isLabelClickable: false,
+                        document: state.documents!.results.elementAt(index),
+                        onTap: (doc) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => BlocProvider(
+                                create: (context) => DocumentDetailsCubit(
+                                  context.read<PaperlessDocumentsApi>(),
+                                  state.documents!.results.elementAt(index),
+                                ),
+                                child: const DocumentDetailsPage(
+                                  isLabelClickable: false,
+                                  allowEdit: false,
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      },
-                      isSelected: false,
-                      isAtLeastOneSelected: false,
-                      isTagSelectedPredicate: (_) => false,
-                      onTagSelected: (int tag) {},
-                    );
-                  },
+                          );
+                        },
+                        isSelected: false,
+                        isAtLeastOneSelected: false,
+                        isTagSelectedPredicate: (_) => false,
+                        onTagSelected: (int tag) {},
+                      );
+                    },
+                  ),
                 ),
-              ),
             ],
           );
         },

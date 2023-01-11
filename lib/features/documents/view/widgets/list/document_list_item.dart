@@ -38,7 +38,6 @@ class DocumentListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       child: ListTile(
-        trailing: Text("${document.id}"),
         dense: true,
         selected: isSelected,
         onTap: () => _onTap(),

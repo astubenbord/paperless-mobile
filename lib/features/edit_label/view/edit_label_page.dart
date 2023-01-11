@@ -65,7 +65,7 @@ class EditLabelForm<T extends Label> extends StatelessWidget {
         initialValue: label,
         fromJsonT: fromJsonT,
         submitButtonConfig: SubmitButtonConfig<T>(
-          icon: const Icon(Icons.done),
+          icon: const Icon(Icons.save),
           label: Text(S.of(context).genericActionUpdateLabel),
           onSubmit: context.read<EditLabelCubit<T>>().update,
         ),

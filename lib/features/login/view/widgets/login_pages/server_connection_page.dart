@@ -24,28 +24,38 @@ class ServerConnectionPage extends StatefulWidget {
 }
 
 class _ServerConnectionPageState extends State<ServerConnectionPage> {
+  bool _isCheckingConnection = false;
   ReachabilityStatus _reachabilityStatus = ReachabilityStatus.unknown;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: kToolbarHeight - 4,
         title: Text(S.of(context).loginPageTitle),
+        bottom: PreferredSize(
+          child: _isCheckingConnection
+              ? const LinearProgressIndicator()
+              : const SizedBox(height: 4.0),
+          preferredSize: const Size.fromHeight(4.0),
+        ),
       ),
       resizeToAvoidBottomInset: true,
-      body: Column(
-        children: [
-          ServerAddressFormField(
-            onDone: (address) {
-              _updateReachability();
-            },
-          ).padded(),
-          ClientCertificateFormField(
-            onChanged: (_) => _updateReachability(),
-          ).padded(),
-          _buildStatusIndicator(),
-        ],
-      ).padded(),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            ServerAddressFormField(
+              onDone: (address) {
+                _updateReachability(address);
+              },
+            ).padded(),
+            ClientCertificateFormField(
+              onChanged: (_) => _updateReachability(),
+            ).padded(),
+            _buildStatusIndicator(),
+          ],
+        ).padded(),
+      ),
       bottomNavigationBar: BottomAppBar(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
@@ -62,20 +72,30 @@ class _ServerConnectionPageState extends State<ServerConnectionPage> {
     );
   }
 
-  Future<void> _updateReachability() async {
+  Future<void> _updateReachability([String? address]) async {
+    setState(() {
+      _isCheckingConnection = true;
+    });
     final status = await context
         .read<ConnectivityStatusService>()
         .isPaperlessServerReachable(
-          widget.formBuilderKey.currentState!
-              .getRawValue(ServerAddressFormField.fkServerAddress),
+          address ??
+              widget.formBuilderKey.currentState!
+                  .getRawValue(ServerAddressFormField.fkServerAddress),
           widget.formBuilderKey.currentState?.getRawValue(
             ClientCertificateFormField.fkClientCertificate,
           ),
         );
-    setState(() => _reachabilityStatus = status);
+    setState(() {
+      _isCheckingConnection = false;
+      _reachabilityStatus = status;
+    });
   }
 
   Widget _buildStatusIndicator() {
+    if (_isCheckingConnection) {
+      return const ListTile();
+    }
     Color errorColor = Theme.of(context).colorScheme.error;
     switch (_reachabilityStatus) {
       case ReachabilityStatus.unknown:
@@ -110,6 +130,12 @@ class _ServerConnectionPageState extends State<ServerConnectionPage> {
           S
               .of(context)
               .loginPageReachabilityInvalidClientCertificateConfigurationText,
+          errorColor,
+        );
+      case ReachabilityStatus.connectionTimeout:
+        return _buildIconText(
+          Icons.close,
+          S.of(context).loginPageReachabilityConnectionTimeoutText,
           errorColor,
         );
     }

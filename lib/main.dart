@@ -14,6 +14,7 @@ import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/bloc/bloc_changes_observer.dart';
 import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
 import 'package:paperless_mobile/core/bloc/paperless_server_information_cubit.dart';
+import 'package:paperless_mobile/core/interceptor/dio_http_error_interceptor.dart';
 import 'package:paperless_mobile/core/interceptor/language_header.interceptor.dart';
 import 'package:paperless_mobile/core/repository/impl/correspondent_repository_impl.dart';
 import 'package:paperless_mobile/core/repository/impl/document_type_repository_impl.dart';
@@ -76,7 +77,10 @@ void main() async {
     appSettingsCubit.state.preferredLocaleSubtag,
   );
   // Manages security context, required for self signed client certificates
-  final sessionManager = SessionManager([languageHeaderInterceptor]);
+  final sessionManager = SessionManager([
+    DioHttpErrorInterceptor(),
+    languageHeaderInterceptor,
+  ]);
 
   // Initialize Paperless APIs
   final authApi = PaperlessAuthenticationApiImpl(sessionManager.client);
@@ -219,6 +223,9 @@ class _PaperlessMobileEntrypointState extends State<PaperlessMobileEntrypoint> {
     chipTheme: ChipThemeData(
       backgroundColor: Colors.lightGreen[50],
     ),
+    listTileTheme: const ListTileThemeData(
+      tileColor: Colors.transparent,
+    ),
   );
 
   final _darkTheme = ThemeData(
@@ -240,6 +247,9 @@ class _PaperlessMobileEntrypointState extends State<PaperlessMobileEntrypoint> {
     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     chipTheme: ChipThemeData(
       backgroundColor: Colors.green[900],
+    ),
+    listTileTheme: const ListTileThemeData(
+      tileColor: Colors.transparent,
     ),
   );
 

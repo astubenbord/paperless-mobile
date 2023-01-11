@@ -33,30 +33,32 @@ void showSnackBar(
   String message, {
   String? details,
   SnackBarActionConfig? action,
+  Duration duration = const Duration(seconds: 5),
 }) {
   ScaffoldMessenger.of(context)
     ..hideCurrentSnackBar()
     ..showSnackBar(
       SnackBar(
-        content: RichText(
-          maxLines: 5,
-          text: TextSpan(
-            text: message,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onInverseSurface,
+        content: (details != null)
+            ? RichText(
+                maxLines: 5,
+                text: TextSpan(
+                  text: message,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onInverseSurface,
+                      ),
+                  children: <TextSpan>[
+                    TextSpan(
+                      text: "\n$details",
+                      style: const TextStyle(
+                        fontStyle: FontStyle.italic,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ],
                 ),
-            children: <TextSpan>[
-              if (details != null)
-                TextSpan(
-                  text: "\n$details",
-                  style: const TextStyle(
-                    fontStyle: FontStyle.italic,
-                    fontSize: 10,
-                  ),
-                ),
-            ],
-          ),
-        ),
+              )
+            : Text(message),
         action: action != null
             ? SnackBarAction(
                 label: action.label,
@@ -64,7 +66,7 @@ void showSnackBar(
                 textColor: Theme.of(context).colorScheme.onInverseSurface,
               )
             : null,
-        duration: const Duration(seconds: 5),
+        duration: duration,
       ),
     );
 }

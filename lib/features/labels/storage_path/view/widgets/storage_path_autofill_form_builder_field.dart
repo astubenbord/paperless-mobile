@@ -63,7 +63,8 @@ class _StoragePathAutofillFormBuilderFieldState
           ),
           Wrap(
             alignment: WrapAlignment.start,
-            spacing: 8.0,
+            spacing: 4.0,
+            runSpacing: 4.0,
             children: [
               InputChip(
                 label: Text(

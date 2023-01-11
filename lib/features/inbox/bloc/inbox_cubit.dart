@@ -1,10 +1,11 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/repository/label_repository.dart';
 import 'package:paperless_mobile/core/repository/state/impl/tag_repository_state.dart';
 import 'package:paperless_mobile/features/inbox/bloc/state/inbox_state.dart';
 
-class InboxCubit extends Cubit<InboxState> {
+class InboxCubit extends HydratedCubit<InboxState> {
   final LabelRepository<Tag, TagRepositoryState> _tagsRepository;
   final PaperlessDocumentsApi _documentsApi;
 
@@ -14,17 +15,20 @@ class InboxCubit extends Cubit<InboxState> {
   ///
   /// Fetches inbox tag ids and loads the inbox items (documents).
   ///
-  Future<void> loadInbox() async {
+  Future<void> initializeInbox() async {
+    if (state.isLoaded) return;
     final inboxTags = await _tagsRepository.findAll().then(
           (tags) => tags.where((t) => t.isInboxTag ?? false).map((t) => t.id!),
         );
     if (inboxTags.isEmpty) {
       // no inbox tags = no inbox items.
-      return emit(const InboxState(
-        isLoaded: true,
-        inboxItems: [],
-        inboxTags: [],
-      ));
+      return emit(
+        state.copyWith(
+          isLoaded: true,
+          inboxItems: [],
+          inboxTags: [],
+        ),
+      );
     }
     final inboxDocuments = await _documentsApi
         .findAll(DocumentFilter(
@@ -32,7 +36,7 @@ class InboxCubit extends Cubit<InboxState> {
           sortField: SortField.added,
         ))
         .then((psr) => psr.results);
-    final newState = InboxState(
+    final newState = state.copyWith(
       isLoaded: true,
       inboxItems: inboxDocuments,
       inboxTags: inboxTags,
@@ -57,9 +61,8 @@ class InboxCubit extends Cubit<InboxState> {
       ),
     );
     emit(
-      InboxState(
+      state.copyWith(
         isLoaded: true,
-        inboxTags: state.inboxTags,
         inboxItems: state.inboxItems.where((doc) => doc.id != document.id),
       ),
     );
@@ -79,14 +82,11 @@ class InboxCubit extends Cubit<InboxState> {
       overwriteTags: true,
     );
     await _documentsApi.update(updatedDoc);
-    emit(
-      InboxState(
-        isLoaded: true,
-        inboxItems: [...state.inboxItems, updatedDoc]
-          ..sort((d1, d2) => d2.added.compareTo(d1.added)),
-        inboxTags: state.inboxTags,
-      ),
-    );
+    emit(state.copyWith(
+      isLoaded: true,
+      inboxItems: [...state.inboxItems, updatedDoc]
+        ..sort((d1, d2) => d2.added.compareTo(d1.added)),
+    ));
   }
 
   ///
@@ -99,12 +99,40 @@ class InboxCubit extends Cubit<InboxState> {
         state.inboxTags,
       ),
     );
-    emit(
-      InboxState(
-        isLoaded: true,
-        inboxTags: state.inboxTags,
-        inboxItems: [],
-      ),
-    );
+    emit(state.copyWith(
+      isLoaded: true,
+      inboxItems: [],
+    ));
+  }
+
+  void replaceUpdatedDocument(DocumentModel document) {
+    if (document.tags.any((id) => state.inboxTags.contains(id))) {
+      // If replaced document still has inbox tag assigned:
+      emit(state.copyWith(
+        inboxItems:
+            state.inboxItems.map((e) => e.id == document.id ? document : e),
+      ));
+    } else {
+      // Remove tag from inbox.
+      emit(
+        state.copyWith(
+            inboxItems:
+                state.inboxItems.where((element) => element.id != document.id)),
+      );
+    }
+  }
+
+  void acknowledgeHint() {
+    emit(state.copyWith(isHintAcknowledged: true));
+  }
+
+  @override
+  InboxState fromJson(Map<String, dynamic> json) {
+    return InboxState.fromJson(json);
+  }
+
+  @override
+  Map<String, dynamic> toJson(InboxState state) {
+    return state.toJson();
   }
 }

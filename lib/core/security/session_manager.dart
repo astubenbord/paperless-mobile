@@ -26,7 +26,6 @@ class SessionManager {
         (client) => client..badCertificateCallback = (cert, host, port) => true;
     dio.interceptors.addAll([
       ...interceptors,
-      DioHttpErrorInterceptor(),
       PrettyDioLogger(
         compact: true,
         responseBody: false,

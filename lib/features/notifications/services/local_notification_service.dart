@@ -91,15 +91,16 @@ class LocalNotificationService {
           progress: progress,
           actions: status == TaskStatus.success
               ? [
-                  AndroidNotificationAction(
-                    NotificationResponseAction.openCreatedDocument.name,
-                    "Open",
-                    showsUserInterface: true,
-                  ),
-                  AndroidNotificationAction(
-                    NotificationResponseAction.acknowledgeCreatedDocument.name,
-                    "Acknowledge",
-                  ),
+                  //TODO: Implement once moved to new routing
+                  // AndroidNotificationAction(
+                  //   NotificationResponseAction.openCreatedDocument.name,
+                  //   "Open",
+                  //   showsUserInterface: true,
+                  // ),
+                  // AndroidNotificationAction(
+                  //   NotificationResponseAction.acknowledgeCreatedDocument.name,
+                  //   "Acknowledge",
+                  // ),
                 ]
               : [],
         ),

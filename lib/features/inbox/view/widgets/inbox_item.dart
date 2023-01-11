@@ -6,16 +6,18 @@ import 'package:paperless_mobile/core/repository/provider/label_repositories_pro
 import 'package:paperless_mobile/features/document_details/bloc/document_details_cubit.dart';
 import 'package:paperless_mobile/features/document_details/view/pages/document_details_page.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/document_preview.dart';
+import 'package:paperless_mobile/features/inbox/bloc/inbox_cubit.dart';
 import 'package:paperless_mobile/features/labels/tags/view/widgets/tags_widget.dart';
 
 class InboxItem extends StatelessWidget {
   static const _a4AspectRatio = 1 / 1.4142;
-
+  final void Function(DocumentModel model) onDocumentUpdated;
   final DocumentModel document;
 
   const InboxItem({
     super.key,
     required this.document,
+    required this.onDocumentUpdated,
   });
 
   @override
@@ -45,23 +47,27 @@ class InboxItem extends StatelessWidget {
           ),
         ],
       ),
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => BlocProvider(
-            create: (context) => DocumentDetailsCubit(
-              context.read<PaperlessDocumentsApi>(),
-              document,
-            ),
-            child: const LabelRepositoriesProvider(
-              child: DocumentDetailsPage(
-                allowEdit: false,
-                isLabelClickable: false,
+      onTap: () async {
+        final returnedDocument = await Navigator.push<DocumentModel?>(
+          context,
+          MaterialPageRoute(
+            builder: (context) => BlocProvider(
+              create: (context) => DocumentDetailsCubit(
+                context.read<PaperlessDocumentsApi>(),
+                document,
+              ),
+              child: const LabelRepositoriesProvider(
+                child: DocumentDetailsPage(
+                  isLabelClickable: false,
+                ),
               ),
             ),
           ),
-        ),
-      ),
+        );
+        if (returnedDocument != null) {
+          onDocumentUpdated(returnedDocument);
+        }
+      },
     );
   }
 }

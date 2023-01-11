@@ -17,6 +17,20 @@ class ServerAddressFormField extends StatefulWidget {
 }
 
 class _ServerAddressFormFieldState extends State<ServerAddressFormField> {
+  bool _canClear = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _textEditingController.addListener(() {
+      if (_textEditingController.text.isNotEmpty) {
+        setState(() {
+          _canClear = true;
+        });
+      }
+    });
+  }
+
   final TextEditingController _textEditingController = TextEditingController();
 
   @override
@@ -25,12 +39,30 @@ class _ServerAddressFormFieldState extends State<ServerAddressFormField> {
       key: const ValueKey('login-server-address'),
       controller: _textEditingController,
       name: ServerAddressFormField.fkServerAddress,
-      validator: FormBuilderValidators.required(
-        errorText: S.of(context).loginPageServerUrlValidatorMessageRequiredText,
-      ),
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      validator: FormBuilderValidators.compose([
+        FormBuilderValidators.required(
+          errorText:
+              S.of(context).loginPageServerUrlValidatorMessageRequiredText,
+        ),
+        FormBuilderValidators.match(
+          r"https?://.*",
+          errorText:
+              S.of(context).loginPageServerUrlValidatorMessageMissingSchemeText,
+        )
+      ]),
       decoration: InputDecoration(
         hintText: "http://192.168.1.50:8000",
         labelText: S.of(context).loginPageServerUrlFieldLabel,
+        suffixIcon: _canClear
+            ? IconButton(
+                icon: Icon(Icons.clear),
+                color: Theme.of(context).iconTheme.color,
+                onPressed: () {
+                  _textEditingController.clear();
+                },
+              )
+            : null,
       ),
       onSubmitted: (value) {
         if (value == null) return;

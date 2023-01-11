@@ -11,22 +11,23 @@ class DioHttpErrorInterceptor extends Interceptor {
       // try to parse contained error message, otherwise return response
       final dynamic data = err.response?.data;
       if (data is Map<String, dynamic>) {
-        _handlePaperlessValidationError(data, handler, err);
+        return _handlePaperlessValidationError(data, handler, err);
       } else if (data is String) {
-        _handlePlainError(data, handler, err);
+        return _handlePlainError(data, handler, err);
       }
     } else if (err.error is SocketException) {
-      // Offline
-      handler.reject(
-        DioError(
-          error: const PaperlessServerException(ErrorCode.deviceOffline),
-          requestOptions: err.requestOptions,
-          type: DioErrorType.connectTimeout,
-        ),
-      );
-    } else {
-      handler.reject(err);
+      final ex = err.error as SocketException;
+      if (ex.osError?.errorCode == _OsErrorCodes.serverUnreachable.code) {
+        return handler.reject(
+          DioError(
+            error: const PaperlessServerException(ErrorCode.deviceOffline),
+            requestOptions: err.requestOptions,
+            type: DioErrorType.connectTimeout,
+          ),
+        );
+      }
     }
+    return handler.reject(err);
   }
 
   void _handlePaperlessValidationError(
@@ -72,4 +73,12 @@ class DioHttpErrorInterceptor extends Interceptor {
       );
     }
   }
+}
+
+enum _OsErrorCodes {
+  serverUnreachable(101),
+  hostNotFound(7);
+
+  const _OsErrorCodes(this.code);
+  final int code;
 }

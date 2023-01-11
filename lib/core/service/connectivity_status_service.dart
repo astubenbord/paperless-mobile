@@ -1,8 +1,12 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
+import 'package:paperless_mobile/core/global/os_error_codes.dart';
+import 'package:paperless_mobile/core/interceptor/server_reachability_error_interceptor.dart';
+import 'package:paperless_mobile/core/security/session_manager.dart';
 import 'package:paperless_mobile/features/login/model/client_certificate.dart';
 import 'package:paperless_mobile/features/login/model/reachability_status.dart';
 
@@ -63,51 +67,30 @@ class ConnectivityStatusServiceImpl implements ConnectivityStatusService {
     if (!RegExp(r"^https?://.*").hasMatch(serverAddress)) {
       return ReachabilityStatus.unknown;
     }
-    late SecurityContext context = SecurityContext();
     try {
-      if (clientCertificate != null) {
-        context
-          ..usePrivateKeyBytes(
-            clientCertificate.bytes,
-            password: clientCertificate.passphrase,
-          )
-          ..useCertificateChainBytes(
-            clientCertificate.bytes,
-            password: clientCertificate.passphrase,
-          )
-          ..setTrustedCertificatesBytes(
-            clientCertificate.bytes,
-            password: clientCertificate.passphrase,
-          );
-      }
+      SessionManager manager =
+          SessionManager([ServerReachabilityErrorInterceptor()])
+            ..updateSettings(clientCertificate: clientCertificate)
+            ..client.options.connectTimeout = 5000
+            ..client.options.receiveTimeout = 5000;
 
-      final adapter = DefaultHttpClientAdapter()
-        ..onHttpClientCreate = (client) => HttpClient(context: context)
-          ..badCertificateCallback =
-              (X509Certificate cert, String host, int port) => true;
-      final Dio dio = Dio()..httpClientAdapter = adapter;
-
-      final response = await dio.get('$serverAddress/api/');
+      final response = await manager.client.get('$serverAddress/api/');
       if (response.statusCode == 200) {
         return ReachabilityStatus.reachable;
       }
       return ReachabilityStatus.notReachable;
     } on DioError catch (error) {
-      if (error.error is String) {
-        if (error.response?.data is String) {
-          if ((error.response!.data as String)
-              .contains("No required SSL certificate was sent")) {
-            return ReachabilityStatus.missingClientCertificate;
-          }
-        }
+      if (error.type == DioErrorType.other &&
+          error.error is ReachabilityStatus) {
+        return error.error as ReachabilityStatus;
       }
-      return ReachabilityStatus.notReachable;
     } on TlsException catch (error) {
-      if (error.osError?.errorCode == 318767212) {
-        //INCORRECT_PASSWORD for certificate
+      final code = error.osError?.errorCode;
+      if (code == OsErrorCodes.invalidClientCertConfig.code) {
+        // Missing client cert passphrase
         return ReachabilityStatus.invalidClientCertificateConfiguration;
       }
-      return ReachabilityStatus.notReachable;
     }
+    return ReachabilityStatus.notReachable;
   }
 }

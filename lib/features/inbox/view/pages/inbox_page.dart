@@ -5,6 +5,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/widgets/documents_list_loading_widget.dart';
+import 'package:paperless_mobile/core/widgets/hint_card.dart';
 import 'package:paperless_mobile/extensions/dart_extensions.dart';
 import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/inbox/bloc/inbox_cubit.dart';
@@ -113,7 +114,6 @@ class _InboxPageState extends State<InboxPage> {
                     delegate: SliverChildBuilderDelegate(
                       childCount: entry.value.length,
                       (context, index) => _buildListItem(
-                        context,
                         entry.value[index],
                       ),
                     ),
@@ -124,7 +124,7 @@ class _InboxPageState extends State<InboxPage> {
               .toList();
 
           return RefreshIndicator(
-            onRefresh: () => context.read<InboxCubit>().loadInbox(),
+            onRefresh: () => context.read<InboxCubit>().initializeInbox(),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -132,11 +132,12 @@ class _InboxPageState extends State<InboxPage> {
                   child: CustomScrollView(
                     slivers: [
                       SliverToBoxAdapter(
-                        child: Text(
-                          S.of(context).inboxPageUsageHintText,
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ).padded(),
+                        child: HintCard(
+                          show: !state.isHintAcknowledged,
+                          hintText: S.of(context).inboxPageUsageHintText,
+                          onHintAcknowledged: () =>
+                              context.read<InboxCubit>().acknowledgeHint(),
+                        ),
                       ),
                       ...slivers
                     ],
@@ -150,7 +151,7 @@ class _InboxPageState extends State<InboxPage> {
     );
   }
 
-  Widget _buildListItem(BuildContext context, DocumentModel doc) {
+  Widget _buildListItem(DocumentModel doc) {
     return Dismissible(
       direction: DismissDirection.endToStart,
       background: Row(
@@ -170,7 +171,12 @@ class _InboxPageState extends State<InboxPage> {
       ).padded(),
       confirmDismiss: (_) => _onItemDismissed(doc),
       key: UniqueKey(),
-      child: InboxItem(document: doc),
+      child: InboxItem(
+        document: doc,
+        onDocumentUpdated: (document) {
+          context.read<InboxCubit>().replaceUpdatedDocument(document);
+        },
+      ),
     );
   }
 

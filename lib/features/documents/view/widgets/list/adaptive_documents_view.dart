@@ -42,6 +42,7 @@ class AdaptiveDocumentsView extends StatelessWidget {
   Widget build(BuildContext context) {
     return CustomScrollView(
       controller: scrollController,
+      physics: const AlwaysScrollableScrollPhysics(),
       slivers: [
         SliverToBoxAdapter(child: beforeItems),
         if (viewType == ViewType.list) _buildListView() else _buildGridView(),
