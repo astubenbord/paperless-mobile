@@ -1,5 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:injectable/injectable.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/repository/label_repository.dart';
 import 'package:paperless_mobile/core/repository/state/impl/tag_repository_state.dart';
@@ -28,7 +27,7 @@ class InboxCubit extends Cubit<InboxState> {
       ));
     }
     final inboxDocuments = await _documentsApi
-        .find(DocumentFilter(
+        .findAll(DocumentFilter(
           tags: AnyAssignedTagsQuery(tagIds: inboxTags),
           sortField: SortField.added,
         ))

@@ -2,15 +2,20 @@ import 'dart:io';
 
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
+import 'package:paperless_api/paperless_api.dart';
+import 'package:paperless_mobile/core/interceptor/dio_http_error_interceptor.dart';
 import 'package:paperless_mobile/core/interceptor/retry_on_connection_change_interceptor.dart';
 import 'package:paperless_mobile/features/login/model/client_certificate.dart';
+import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
-class AuthenticationAwareDioManager {
+class SessionManager {
   final Dio client;
   final List<Interceptor> interceptors;
+  PaperlessServerInformationModel serverInformation;
 
-  AuthenticationAwareDioManager([this.interceptors = const []])
-      : client = _initDio(interceptors);
+  SessionManager([this.interceptors = const []])
+      : client = _initDio(interceptors),
+        serverInformation = PaperlessServerInformationModel();
 
   static Dio _initDio(List<Interceptor> interceptors) {
     //en- and decoded by utf8 by default
@@ -19,8 +24,19 @@ class AuthenticationAwareDioManager {
     dio.options.responseType = ResponseType.json;
     (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
         (client) => client..badCertificateCallback = (cert, host, port) => true;
-    dio.interceptors.addAll(interceptors);
-    dio.interceptors.add(RetryOnConnectionChangeInterceptor(dio: dio));
+    dio.interceptors.addAll([
+      ...interceptors,
+      DioHttpErrorInterceptor(),
+      PrettyDioLogger(
+        compact: true,
+        responseBody: false,
+        responseHeader: false,
+        request: false,
+        requestBody: false,
+        requestHeader: false,
+      ),
+      RetryOnConnectionChangeInterceptor(dio: dio)
+    ]);
     return dio;
   }
 
@@ -28,6 +44,7 @@ class AuthenticationAwareDioManager {
     String? baseUrl,
     String? authToken,
     ClientCertificate? clientCertificate,
+    PaperlessServerInformationModel? serverInformation,
   }) {
     if (clientCertificate != null) {
       final context = SecurityContext()
@@ -58,11 +75,16 @@ class AuthenticationAwareDioManager {
     if (authToken != null) {
       client.options.headers.addAll({'Authorization': 'Token $authToken'});
     }
+
+    if (serverInformation != null) {
+      this.serverInformation = serverInformation;
+    }
   }
 
   void resetSettings() {
     client.httpClientAdapter = DefaultHttpClientAdapter();
     client.options.baseUrl = '';
     client.options.headers.remove('Authorization');
+    serverInformation = PaperlessServerInformationModel();
   }
 }

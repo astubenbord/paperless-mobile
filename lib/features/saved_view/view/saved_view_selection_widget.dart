@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
+import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/selection/confirm_delete_saved_view_dialog.dart';
@@ -31,91 +32,97 @@ class SavedViewSelectionWidget extends StatelessWidget {
     return BlocBuilder<ConnectivityCubit, ConnectivityState>(
       builder: (context, connectivityState) {
         final hasInternetConnection = connectivityState.isConnected;
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            BlocBuilder<SavedViewCubit, SavedViewState>(
-              builder: (context, state) {
-                if (!state.hasLoaded) {
-                  return _buildLoadingWidget(context);
-                }
-                if (state.value.isEmpty) {
-                  return Text(S.of(context).savedViewsEmptyStateText);
-                }
-                return SizedBox(
-                  height: height,
-                  child: ListView.separated(
-                    itemCount: state.value.length,
-                    scrollDirection: Axis.horizontal,
-                    itemBuilder: (context, index) {
-                      final view = state.value.values.elementAt(index);
-                      return GestureDetector(
-                        onLongPress: hasInternetConnection
-                            ? () => _onDelete(context, view)
-                            : null,
-                        child: BlocBuilder<DocumentsCubit, DocumentsState>(
-                          builder: (context, docState) {
-                            return FilterChip(
-                              label: Text(
-                                state.value.values.toList()[index].name,
-                              ),
-                              selected: view.id == docState.selectedSavedViewId,
-                              onSelected: enabled && hasInternetConnection
-                                  ? (isSelected) =>
-                                      _onSelected(isSelected, context, view)
-                                  : null,
-                            );
-                          },
-                        ),
-                      );
-                    },
-                    separatorBuilder: (context, index) => const SizedBox(
-                      width: 4.0,
-                    ),
-                  ),
-                );
-              },
-            ),
-            BlocBuilder<SavedViewCubit, SavedViewState>(
-              builder: (context, state) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      S.of(context).savedViewsLabel,
-                      style: Theme.of(context).textTheme.titleSmall,
-                    ),
-                    BlocBuilder<DocumentsCubit, DocumentsState>(
-                      buildWhen: (previous, current) =>
-                          previous.filter != current.filter,
-                      builder: (context, docState) {
-                        return TextButton.icon(
-                          icon: const Icon(Icons.add),
-                          onPressed: (enabled &&
-                                  state.hasLoaded &&
-                                  hasInternetConnection)
-                              ? () => _onCreatePressed(context, docState.filter)
+        return SizedBox(
+          height: height,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              BlocBuilder<SavedViewCubit, SavedViewState>(
+                builder: (context, state) {
+                  if (!state.hasLoaded) {
+                    return _buildLoadingWidget(context);
+                  }
+                  if (state.value.isEmpty) {
+                    return Text(S.of(context).savedViewsEmptyStateText);
+                  }
+                  return SizedBox(
+                    height: 38,
+                    child: ListView.separated(
+                      itemCount: state.value.length,
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (context, index) {
+                        final view = state.value.values.elementAt(index);
+                        return GestureDetector(
+                          onLongPress: hasInternetConnection
+                              ? () => _onDelete(context, view)
                               : null,
-                          label: Text(S.of(context).savedViewCreateNewLabel),
+                          child: BlocBuilder<DocumentsCubit, DocumentsState>(
+                            builder: (context, docState) {
+                              final view = state.value.values.toList()[index];
+                              return FilterChip(
+                                label: Text(
+                                  view.name,
+                                ),
+                                selected:
+                                    view.id == docState.selectedSavedViewId,
+                                onSelected: enabled && hasInternetConnection
+                                    ? (isSelected) =>
+                                        _onSelected(isSelected, context, view)
+                                    : null,
+                              );
+                            },
+                          ),
                         );
                       },
+                      separatorBuilder: (context, index) => const SizedBox(
+                        width: 4.0,
+                      ),
                     ),
-                  ],
-                );
-              },
-            ),
-          ],
+                  );
+                },
+              ),
+              BlocBuilder<SavedViewCubit, SavedViewState>(
+                builder: (context, state) {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        S.of(context).savedViewsLabel,
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
+                      BlocBuilder<DocumentsCubit, DocumentsState>(
+                        buildWhen: (previous, current) =>
+                            previous.filter != current.filter,
+                        builder: (context, docState) {
+                          return TextButton.icon(
+                            icon: const Icon(Icons.add),
+                            onPressed: (enabled &&
+                                    state.hasLoaded &&
+                                    hasInternetConnection)
+                                ? () =>
+                                    _onCreatePressed(context, docState.filter)
+                                : null,
+                            label: Text(S.of(context).savedViewCreateNewLabel),
+                          );
+                        },
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ],
+          ).padded(),
         );
       },
     );
   }
 
   Widget _buildLoadingWidget(BuildContext context) {
-    final r = Random(123456789);
     return SizedBox(
-      height: height,
-      width: double.infinity,
+      height: 38,
+      width: MediaQuery.of(context).size.width,
       child: Shimmer.fromColors(
         baseColor: Theme.of(context).brightness == Brightness.light
             ? Colors.grey[300]!
@@ -123,14 +130,35 @@ class SavedViewSelectionWidget extends StatelessWidget {
         highlightColor: Theme.of(context).brightness == Brightness.light
             ? Colors.grey[100]!
             : Colors.grey[600]!,
-        child: ListView.separated(
+        child: ListView(
           scrollDirection: Axis.horizontal,
           physics: const NeverScrollableScrollPhysics(),
-          itemCount: 10,
-          itemBuilder: (context, index) => FilterChip(
-              label: SizedBox(width: r.nextInt((index * 20) + 50).toDouble()),
-              onSelected: null),
-          separatorBuilder: (context, index) => const SizedBox(width: 4.0),
+          children: [
+            FilterChip(
+              label: const SizedBox(width: 32),
+              onSelected: (_) {},
+            ),
+            const SizedBox(width: 4.0),
+            FilterChip(
+              label: const SizedBox(width: 64),
+              onSelected: (_) {},
+            ),
+            const SizedBox(width: 4.0),
+            FilterChip(
+              label: const SizedBox(width: 100),
+              onSelected: (_) {},
+            ),
+            const SizedBox(width: 4.0),
+            FilterChip(
+              label: const SizedBox(width: 32),
+              onSelected: (_) {},
+            ),
+            const SizedBox(width: 4.0),
+            FilterChip(
+              label: const SizedBox(width: 48),
+              onSelected: (_) {},
+            ),
+          ],
         ),
       ),
     );

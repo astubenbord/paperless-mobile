@@ -52,7 +52,7 @@ class DocumentsCubit extends Cubit<DocumentsState> with HydratedMixin {
     log("[DocumentsCubit] load");
     emit(state.copyWith(isLoading: true));
     try {
-      final result = await _api.find(state.filter);
+      final result = await _api.findAll(state.filter);
       emit(state.copyWith(
         isLoading: false,
         hasLoaded: true,
@@ -67,11 +67,13 @@ class DocumentsCubit extends Cubit<DocumentsState> with HydratedMixin {
     log("[DocumentsCubit] reload");
     emit(state.copyWith(isLoading: true));
     try {
-      final result = await _api.find(state.filter.copyWith(page: 1));
+      final filter = state.filter.copyWith(page: 1);
+      final result = await _api.findAll(filter);
       emit(state.copyWith(
         hasLoaded: true,
         value: [result],
         isLoading: false,
+        filter: filter,
       ));
     } finally {
       emit(state.copyWith(isLoading: false));
@@ -81,7 +83,7 @@ class DocumentsCubit extends Cubit<DocumentsState> with HydratedMixin {
   Future<void> _bulkReloadDocuments() async {
     emit(state.copyWith(isLoading: true));
     try {
-      final result = await _api.find(
+      final result = await _api.findAll(
         state.filter.copyWith(
           page: 1,
           pageSize: state.documents.length,
@@ -106,7 +108,7 @@ class DocumentsCubit extends Cubit<DocumentsState> with HydratedMixin {
     emit(state.copyWith(isLoading: true));
     final newFilter = state.filter.copyWith(page: state.filter.page + 1);
     try {
-      final result = await _api.find(newFilter);
+      final result = await _api.findAll(newFilter);
       emit(
         DocumentsState(
           hasLoaded: true,
@@ -129,7 +131,7 @@ class DocumentsCubit extends Cubit<DocumentsState> with HydratedMixin {
     log("[DocumentsCubit] updateFilter");
     try {
       emit(state.copyWith(isLoading: true));
-      final result = await _api.find(filter.copyWith(page: 1));
+      final result = await _api.findAll(filter.copyWith(page: 1));
 
       emit(
         DocumentsState(
@@ -163,7 +165,7 @@ class DocumentsCubit extends Cubit<DocumentsState> with HydratedMixin {
 
   void toggleDocumentSelection(DocumentModel model) {
     log("[DocumentsCubit] toggleSelection");
-    if (state.selection.contains(model)) {
+    if (state.selectedIds.contains(model.id)) {
       emit(
         state.copyWith(
           selection: state.selection
@@ -183,6 +185,12 @@ class DocumentsCubit extends Cubit<DocumentsState> with HydratedMixin {
     emit(state.copyWith(selection: []));
   }
 
+  @override
+  void onChange(Change<DocumentsState> change) {
+    super.onChange(change);
+    log("[DocumentsCubit] state changed: ${change.currentState.selection.map((e) => e.id).join(",")} to ${change.nextState.selection.map((e) => e.id).join(",")}");
+  }
+
   void reset() {
     log("[DocumentsCubit] reset");
     emit(const DocumentsState());
@@ -196,7 +204,7 @@ class DocumentsCubit extends Cubit<DocumentsState> with HydratedMixin {
       if (filter == null) {
         return;
       }
-      final results = await _api.find(filter.copyWith(page: 1));
+      final results = await _api.findAll(filter.copyWith(page: 1));
       emit(
         DocumentsState(
           filter: filter,

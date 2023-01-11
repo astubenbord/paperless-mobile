@@ -11,9 +11,7 @@ class LocalNotificationService {
   final FlutterLocalNotificationsPlugin _plugin =
       FlutterLocalNotificationsPlugin();
 
-  LocalNotificationService._();
-
-  static final LocalNotificationService instance = LocalNotificationService._();
+  LocalNotificationService();
 
   Future<void> initialize() async {
     const AndroidInitializationSettings initializationSettingsAndroid =
@@ -71,7 +69,7 @@ class LocalNotificationService {
         body = task.taskFileName;
         timestampMillis = task.dateDone!.millisecondsSinceEpoch;
         payload = CreateDocumentSuccessNotificationResponsePayload(
-          task.relatedDocumentId!,
+          task.relatedDocument!,
         );
         break;
       default:

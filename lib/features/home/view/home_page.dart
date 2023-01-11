@@ -47,46 +47,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    LocalNotificationService.instance.notifyTaskChanged(
-      Task(
-        id: 100,
-        dateCreated: DateTime.now(),
-        dateDone: DateTime.now(),
-        taskFileName: "test_file.pdf",
-        status: TaskStatus.started,
-        taskId: "abc-def-123-456",
-        type: "file",
-      ),
-    );
-    Future.delayed(const Duration(seconds: 5), () {
-      LocalNotificationService.instance.notifyTaskChanged(
-        Task(
-          id: 100,
-          dateCreated: DateTime.now(),
-          dateDone: DateTime.now(),
-          taskFileName: "test_file.pdf",
-          status: TaskStatus.pending,
-          taskId: "abc-def-123-456",
-          type: "file",
-        ),
-      );
-    });
-    Future.delayed(const Duration(seconds: 10), () {
-      LocalNotificationService.instance.notifyTaskChanged(
-        Task(
-          id: 100,
-          acknowledged: false,
-          dateCreated: DateTime.now(),
-          dateDone: DateTime.now(),
-          relatedDocumentId: 180,
-          result: "New document successfully created.",
-          status: TaskStatus.success,
-          taskFileName: "test_file.pdf",
-          taskId: "abc-def-123-456",
-          type: "file",
-        ),
-      );
-    });
     _initializeData(context);
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       _listenForReceivedFiles();
@@ -195,7 +155,14 @@ class _HomePageState extends State<HomePage> {
           },
         ),
         BlocListener<TaskStatusCubit, TaskStatusState>(
-          listener: (context, state) {},
+          listener: (context, state) {
+            if (state.task != null) {
+              // Handle local notifications on task change (only when app is running for now).
+              context
+                  .read<LocalNotificationService>()
+                  .notifyTaskChanged(state.task!);
+            }
+          },
         ),
       ],
       child: Scaffold(

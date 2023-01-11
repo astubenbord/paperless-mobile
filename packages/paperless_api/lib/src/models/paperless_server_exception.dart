@@ -43,6 +43,7 @@ enum ErrorCode {
   deviceOffline,
   serverUnreachable,
   similarQueryError,
+  suggestionsQueryError,
   autocompleteQueryError,
   storagePathLoadFailed,
   storagePathCreateFailed,
@@ -51,5 +52,6 @@ enum ErrorCode {
   deleteSavedViewError,
   requestTimedOut,
   unsupportedFileFormat,
-  missingClientCertificate;
+  missingClientCertificate,
+  acknowledgeTasksError;
 }

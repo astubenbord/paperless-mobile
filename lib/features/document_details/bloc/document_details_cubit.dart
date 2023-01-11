@@ -8,10 +8,28 @@ class DocumentDetailsCubit extends Cubit<DocumentDetailsState> {
   final PaperlessDocumentsApi _api;
 
   DocumentDetailsCubit(this._api, DocumentModel initialDocument)
-      : super(DocumentDetailsState(document: initialDocument));
+      : super(DocumentDetailsState(document: initialDocument)) {
+    loadSuggestions();
+  }
 
   Future<void> delete(DocumentModel document) async {
     await _api.delete(document);
+  }
+
+  Future<void> loadSuggestions() async {
+    final suggestions = await _api.findSuggestions(state.document);
+    emit(state.copyWith(suggestions: suggestions));
+  }
+
+  Future<void> loadFullContent() async {
+    final doc = await _api.find(state.document.id);
+    if (doc == null) {
+      return;
+    }
+    emit(state.copyWith(
+      isFullContentLoaded: true,
+      fullContent: doc.content,
+    ));
   }
 
   Future<void> assignAsn(DocumentModel document) async {
@@ -19,11 +37,11 @@ class DocumentDetailsCubit extends Cubit<DocumentDetailsState> {
       final int asn = await _api.findNextAsn();
       final updatedDocument =
           await _api.update(document.copyWith(archiveSerialNumber: asn));
-      emit(DocumentDetailsState(document: updatedDocument));
+      emit(state.copyWith(document: updatedDocument));
     }
   }
 
   void replaceDocument(DocumentModel document) {
-    emit(DocumentDetailsState(document: document));
+    emit(state.copyWith(document: document));
   }
 }

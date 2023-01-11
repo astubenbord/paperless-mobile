@@ -25,14 +25,12 @@ class DocumentUploadPreparationPage extends StatefulWidget {
   final String? title;
   final String? filename;
   final String? fileExtension;
-  final void Function(DocumentModel)? onSuccessfullyConsumed;
 
   const DocumentUploadPreparationPage({
     Key? key,
     required this.fileBytes,
     this.title,
     this.filename,
-    this.onSuccessfullyConsumed,
     this.fileExtension,
   }) : super(key: key);
 
@@ -236,19 +234,18 @@ class _DocumentUploadPreparationPageState
         final correspondent =
             fv[DocumentModel.correspondentKey] as IdQueryParameter;
 
-        await cubit.upload(
+        final taskId = await cubit.upload(
           widget.fileBytes,
           filename:
               _padWithPdfExtension(_formKey.currentState?.value[fkFileName]),
           title: title,
-          onConsumptionFinished: widget.onSuccessfullyConsumed,
           documentType: docType.id,
           correspondent: correspondent.id,
           tags: tags.ids,
           createdAt: createdAt,
         );
         showSnackBar(context, S.of(context).documentUploadSuccessText);
-        Navigator.pop(context, true);
+        Navigator.pop(context, taskId);
       } on PaperlessServerException catch (error, stackTrace) {
         showErrorMessage(context, error, stackTrace);
       } on PaperlessValidationErrors catch (errors) {

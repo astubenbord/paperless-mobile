@@ -25,6 +25,7 @@ import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:paperless_mobile/util.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:badges/badges.dart' as b;
 
 class DocumentDetailsPage extends StatefulWidget {
   final bool allowEdit;
@@ -63,9 +64,21 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
                         if (!connectivityState.isConnected) {
                           return Container();
                         }
-                        return FloatingActionButton(
-                          child: const Icon(Icons.edit),
-                          onPressed: () => _onEdit(state.document),
+                        return b.Badge(
+                          position: b.BadgePosition.topEnd(top: -12, end: -6),
+                          showBadge: state.suggestions.hasSuggestions,
+                          child: FloatingActionButton(
+                            child: const Icon(Icons.edit),
+                            onPressed: () => _onEdit(state.document),
+                          ),
+                          badgeContent: Text(
+                            '${state.suggestions.suggestionsCount}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                            ),
+                          ),
+                          badgeColor: Theme.of(context).colorScheme.error,
+                          //TODO: Wait for stable version of m3, then use AlignmentDirectional.topEnd
                         );
                       },
                     );
@@ -182,6 +195,7 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
                     _buildDocumentContentView(
                       state.document,
                       widget.titleAndContentQueryString,
+                      state,
                     ),
                     _buildDocumentMetaDataView(
                       state.document,
@@ -217,7 +231,9 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
               listener: (context, state) {
                 cubit.replaceDocument(state.document);
               },
-              child: const DocumentEditPage(),
+              child: DocumentEditPage(
+                suggestions: cubit.state.suggestions,
+              ),
             ),
           ),
           maintainState: true,
@@ -303,14 +319,30 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
     }
   }
 
-  Widget _buildDocumentContentView(DocumentModel document, String? match) {
-    return SingleChildScrollView(
-      child: HighlightedText(
-        text: document.content ?? "",
-        highlights: match == null ? [] : match.split(" "),
-        style: Theme.of(context).textTheme.bodyMedium,
-        caseSensitive: false,
-      ),
+  Widget _buildDocumentContentView(
+    DocumentModel document,
+    String? match,
+    DocumentDetailsState state,
+  ) {
+    return ListView(
+      children: [
+        HighlightedText(
+          text: (state.isFullContentLoaded
+                  ? state.fullContent
+                  : document.content) ??
+              "",
+          highlights: match == null ? [] : match.split(" "),
+          style: Theme.of(context).textTheme.bodyMedium,
+          caseSensitive: false,
+        ),
+        if (!state.isFullContentLoaded && (document.content ?? '').isNotEmpty)
+          TextButton(
+            child: Text("Show full content ..."),
+            onPressed: () {
+              context.read<DocumentDetailsCubit>().loadFullContent();
+            },
+          ),
+      ],
     ).paddedOnly(top: 8);
   }
 

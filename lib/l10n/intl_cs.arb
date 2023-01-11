@@ -194,6 +194,8 @@
   "@editLabelPageConfirmDeletionDialogTitle": {},
   "editLabelPageDeletionDialogText": "Dokumenty mají přiřazen tento štítek. Odstraněním štítku bude označení odstraněno. Pokračovat?",
   "@editLabelPageDeletionDialogText": {},
+  "errorMessageAcknowledgeTasksError": "",
+  "@errorMessageAcknowledgeTasksError": {},
   "errorMessageAuthenticationFailed": "Přihlášení selhalo, zkuste to znovu.",
   "@errorMessageAuthenticationFailed": {},
   "errorMessageAutocompleteQueryError": "Při automatickém doplnění požadavku došlo k chybě.",
@@ -250,6 +252,8 @@
   "@errorMessageStoragePathCreateFailed": {},
   "errorMessageStoragePathLoadFailed": "Nelze načíst cestu k úložišti.",
   "@errorMessageStoragePathLoadFailed": {},
+  "errorMessageSuggestionsQueryError": "",
+  "@errorMessageSuggestionsQueryError": {},
   "errorMessageTagCreateFailed": "Nelze vytvořit tag, zkuste to znovu.",
   "@errorMessageTagCreateFailed": {},
   "errorMessageTagLoadFailed": "Nelze načíst tagy.",
@@ -260,25 +264,25 @@
   "@errorMessageUnsupportedFileFormat": {},
   "errorReportLabel": "NAHLÁSIT",
   "@errorReportLabel": {},
-  "extendedDateRangeDialogAbsoluteLabel": "Absolute",
+  "extendedDateRangeDialogAbsoluteLabel": "",
   "@extendedDateRangeDialogAbsoluteLabel": {},
-  "extendedDateRangeDialogHintText": "Hint: Apart from concrete dates, you can also specify a time range relative to the current date.",
+  "extendedDateRangeDialogHintText": "",
   "@extendedDateRangeDialogHintText": {},
-  "extendedDateRangeDialogRelativeAmountLabel": "Amount",
+  "extendedDateRangeDialogRelativeAmountLabel": "",
   "@extendedDateRangeDialogRelativeAmountLabel": {},
-  "extendedDateRangeDialogRelativeLabel": "Relative",
+  "extendedDateRangeDialogRelativeLabel": "",
   "@extendedDateRangeDialogRelativeLabel": {},
-  "extendedDateRangeDialogRelativeLastLabel": "Last",
+  "extendedDateRangeDialogRelativeLastLabel": "",
   "@extendedDateRangeDialogRelativeLastLabel": {},
-  "extendedDateRangeDialogRelativeTimeUnitLabel": "Time unit",
+  "extendedDateRangeDialogRelativeTimeUnitLabel": "",
   "@extendedDateRangeDialogRelativeTimeUnitLabel": {},
-  "extendedDateRangeDialogTitle": "Select date range",
+  "extendedDateRangeDialogTitle": "",
   "@extendedDateRangeDialogTitle": {},
-  "extendedDateRangePickerAfterLabel": "After",
+  "extendedDateRangePickerAfterLabel": "",
   "@extendedDateRangePickerAfterLabel": {},
-  "extendedDateRangePickerBeforeLabel": "Before",
+  "extendedDateRangePickerBeforeLabel": "",
   "@extendedDateRangePickerBeforeLabel": {},
-  "extendedDateRangePickerDayText": "{count, plural, zero{} one{day} other{days}}",
+  "extendedDateRangePickerDayText": "{count, plural, other{}}",
   "@extendedDateRangePickerDayText": {
     "placeholders": {
       "count": {}
@@ -298,9 +302,9 @@
       "count": {}
     }
   },
-  "extendedDateRangePickerLastText": "Last",
+  "extendedDateRangePickerLastText": "",
   "@extendedDateRangePickerLastText": {},
-  "extendedDateRangePickerLastWeeksLabel": "{count, plural, zero{} one{Last week} other{Last {count} weeks}}",
+  "extendedDateRangePickerLastWeeksLabel": "{count, plural, other{}}",
   "@extendedDateRangePickerLastWeeksLabel": {
     "placeholders": {
       "count": {}
@@ -312,7 +316,7 @@
       "count": {}
     }
   },
-  "extendedDateRangePickerMonthText": "{count, plural, zero{} one{month} other{months}}",
+  "extendedDateRangePickerMonthText": "{count, plural, other{}}",
   "@extendedDateRangePickerMonthText": {
     "placeholders": {
       "count": {}
@@ -320,13 +324,13 @@
   },
   "extendedDateRangePickerToLabel": "Do",
   "@extendedDateRangePickerToLabel": {},
-  "extendedDateRangePickerWeekText": "{count, plural, zero{} one{week} other{weeks}}",
+  "extendedDateRangePickerWeekText": "{count, plural, other{}}",
   "@extendedDateRangePickerWeekText": {
     "placeholders": {
       "count": {}
     }
   },
-  "extendedDateRangePickerYearText": "{count, plural, zero{} one{year} other{years}}",
+  "extendedDateRangePickerYearText": "{count, plural, other{}}",
   "@extendedDateRangePickerYearText": {
     "placeholders": {
       "count": {}
@@ -428,7 +432,7 @@
   "@loginPageClientCertificateSettingLabel": {},
   "loginPageClientCertificateSettingSelectFileText": "Vybrat soubor...",
   "@loginPageClientCertificateSettingSelectFileText": {},
-  "loginPageContinueLabel": "Continue",
+  "loginPageContinueLabel": "",
   "@loginPageContinueLabel": {},
   "loginPageIncorrectOrMissingCertificatePassphraseErrorMessageText": "Chybná nebo chybějící heslová fráze certifikátu.",
   "@loginPageIncorrectOrMissingCertificatePassphraseErrorMessageText": {},
@@ -438,27 +442,27 @@
   "@loginPagePasswordFieldLabel": {},
   "loginPagePasswordValidatorMessageText": "Heslo nesmí být prázdné.",
   "@loginPagePasswordValidatorMessageText": {},
-  "loginPageReachabilityInvalidClientCertificateConfigurationText": "Incorrect or missing client certificate passphrase.",
+  "loginPageReachabilityInvalidClientCertificateConfigurationText": "",
   "@loginPageReachabilityInvalidClientCertificateConfigurationText": {},
-  "loginPageReachabilityMissingClientCertificateText": "A client certificate was expected but not sent. Please provide a certificate.",
+  "loginPageReachabilityMissingClientCertificateText": "",
   "@loginPageReachabilityMissingClientCertificateText": {},
-  "loginPageReachabilityNotReachableText": "Could not establish a connection to the server.",
+  "loginPageReachabilityNotReachableText": "",
   "@loginPageReachabilityNotReachableText": {},
-  "loginPageReachabilitySuccessText": "Connection successfully established.",
+  "loginPageReachabilitySuccessText": "",
   "@loginPageReachabilitySuccessText": {},
-  "loginPageReachabilityUnresolvedHostText": "Host could not be resolved. Please check the server address.",
+  "loginPageReachabilityUnresolvedHostText": "",
   "@loginPageReachabilityUnresolvedHostText": {},
   "loginPageServerUrlFieldLabel": "'Adresa serveru",
   "@loginPageServerUrlFieldLabel": {},
-  "loginPageServerUrlValidatorMessageInvalidAddressText": "Invalid address.",
+  "loginPageServerUrlValidatorMessageInvalidAddressText": "",
   "@loginPageServerUrlValidatorMessageInvalidAddressText": {},
   "loginPageServerUrlValidatorMessageRequiredText": "Adresa serveru nesmí být prázdná.",
   "@loginPageServerUrlValidatorMessageRequiredText": {},
-  "loginPageSignInButtonLabel": "Sign In",
+  "loginPageSignInButtonLabel": "",
   "@loginPageSignInButtonLabel": {},
-  "loginPageSignInTitle": "Sign In",
+  "loginPageSignInTitle": "",
   "@loginPageSignInTitle": {},
-  "loginPageSignInToPrefixText": "Sign in to {serverAddress}",
+  "loginPageSignInToPrefixText": "",
   "@loginPageSignInToPrefixText": {
     "placeholders": {
       "serverAddress": {}
@@ -476,7 +480,7 @@
   "@onboardingDoneButtonLabel": {},
   "onboardingNextButtonLabel": "Další",
   "@onboardingNextButtonLabel": {},
-  "receiveSharedFilePermissionDeniedMessage": "Could not access the received file. Please try to open the app before sharing.",
+  "receiveSharedFilePermissionDeniedMessage": "",
   "@receiveSharedFilePermissionDeniedMessage": {},
   "referencedDocumentsReadOnlyHintText": "Tento náhled nelze upravovat! Nelze upravovat nebo odstraňovat dokumenty. Bude načteno maximálně 100 odkazovaných dokumentů.",
   "@referencedDocumentsReadOnlyHintText": {},
@@ -540,12 +544,12 @@
   "@tagInboxTagPropertyLabel": {},
   "uploadPageAutomaticallInferredFieldsHintText": "Pokud specifikuješ hodnoty pro tato pole, paperless instance nebude automaticky přiřazovat naučené hodnoty. Pokud mají být tato pole automaticky vyplňována, nevyplňujte zde nic.",
   "@uploadPageAutomaticallInferredFieldsHintText": {},
-  "verifyIdentityPageDescriptionText": "Use the configured biometric factor to authenticate and unlock your documents.",
+  "verifyIdentityPageDescriptionText": "",
   "@verifyIdentityPageDescriptionText": {},
-  "verifyIdentityPageLogoutButtonLabel": "Disconnect",
+  "verifyIdentityPageLogoutButtonLabel": "",
   "@verifyIdentityPageLogoutButtonLabel": {},
-  "verifyIdentityPageTitle": "Verify your identity",
+  "verifyIdentityPageTitle": "",
   "@verifyIdentityPageTitle": {},
-  "verifyIdentityPageVerifyIdentityButtonLabel": "Verify Identity",
+  "verifyIdentityPageVerifyIdentityButtonLabel": "",
   "@verifyIdentityPageVerifyIdentityButtonLabel": {}
 }

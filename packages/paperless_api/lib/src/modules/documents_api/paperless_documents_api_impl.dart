@@ -1,13 +1,9 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_api/src/constants.dart';
-import 'package:paperless_api/src/converters/document_model_json_converter.dart';
-import 'package:paperless_api/src/converters/similar_document_model_json_converter.dart';
-import 'package:paperless_api/src/request_utils.dart';
 
 class PaperlessDocumentsApiImpl implements PaperlessDocumentsApi {
   final Dio client;
@@ -82,8 +78,11 @@ class PaperlessDocumentsApiImpl implements PaperlessDocumentsApi {
   }
 
   @override
-  Future<PagedSearchResult<DocumentModel>> find(DocumentFilter filter) async {
-    final filterParams = filter.toQueryParameters();
+  Future<PagedSearchResult<DocumentModel>> findAll(
+    DocumentFilter filter,
+  ) async {
+    final filterParams = filter.toQueryParameters()
+      ..addAll({'truncate_content': "true"});
     try {
       final response = await client.get(
         "/api/documents/",
@@ -156,7 +155,7 @@ class PaperlessDocumentsApiImpl implements PaperlessDocumentsApi {
       pageSize: 1,
     );
     try {
-      final result = await find(asnQueryFilter);
+      final result = await findAll(asnQueryFilter);
       return result.results
               .map((e) => e.archiveSerialNumber)
               .firstWhere((asn) => asn != null, orElse: () => 0)! +
@@ -184,26 +183,6 @@ class PaperlessDocumentsApiImpl implements PaperlessDocumentsApi {
       }
     } on DioError catch (err) {
       throw err.error;
-    }
-  }
-
-  @override
-  Future<DocumentModel> waitForConsumptionFinished(
-      String fileName, String title) async {
-    PagedSearchResult<DocumentModel> results =
-        await find(DocumentFilter.latestDocument);
-
-    while ((results.results.isEmpty ||
-        (results.results[0].originalFileName != fileName &&
-            results.results[0].title != title))) {
-      //TODO: maybe implement more intelligent retry logic or find workaround for websocket authentication...
-      await Future.delayed(const Duration(seconds: 2));
-      results = await find(DocumentFilter.latestDocument);
-    }
-    try {
-      return results.results.first;
-    } on StateError {
-      throw const PaperlessServerException(ErrorCode.documentUploadFailed);
     }
   }
 
@@ -269,6 +248,34 @@ class PaperlessDocumentsApiImpl implements PaperlessDocumentsApi {
             .results;
       }
       throw const PaperlessServerException(ErrorCode.similarQueryError);
+    } on DioError catch (err) {
+      throw err.error;
+    }
+  }
+
+  @override
+  Future<FieldSuggestions> findSuggestions(DocumentModel document) async {
+    try {
+      final response =
+          await client.get("/api/documents/${document.id}/suggestions/");
+      if (response.statusCode == 200) {
+        return FieldSuggestions.fromJson(response.data);
+      }
+      throw const PaperlessServerException(ErrorCode.suggestionsQueryError);
+    } on DioError catch (err) {
+      throw err.error;
+    }
+  }
+
+  @override
+  Future<DocumentModel?> find(int id) async {
+    try {
+      final response = await client.get("/api/documents/$id/");
+      if (response.statusCode == 200) {
+        return DocumentModel.fromJson(response.data);
+      } else {
+        return null;
+      }
     } on DioError catch (err) {
       throw err.error;
     }

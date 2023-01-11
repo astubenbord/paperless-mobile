@@ -1,27 +1,30 @@
+import 'package:badges/badges.dart' as b;
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
 import 'package:paperless_mobile/core/repository/provider/label_repositories_provider.dart';
+import 'package:paperless_mobile/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/document_details/bloc/document_details_cubit.dart';
 import 'package:paperless_mobile/features/document_details/view/pages/document_details_page.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_cubit.dart';
 import 'package:paperless_mobile/features/documents/bloc/documents_state.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/documents_empty_state.dart';
-import 'package:paperless_mobile/features/documents/view/widgets/grid/document_grid.dart';
-import 'package:paperless_mobile/features/documents/view/widgets/list/document_list.dart';
+import 'package:paperless_mobile/features/documents/view/widgets/list/adaptive_documents_view.dart';
+import 'package:paperless_mobile/features/documents/view/widgets/new_items_loading_widget.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/search/document_filter_panel.dart';
-import 'package:paperless_mobile/features/documents/view/widgets/selection/documents_page_app_bar.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/sort_documents_button.dart';
 import 'package:paperless_mobile/features/home/view/widget/info_drawer.dart';
 import 'package:paperless_mobile/features/labels/bloc/providers/labels_bloc_provider.dart';
 import 'package:paperless_mobile/features/login/bloc/authentication_cubit.dart';
 import 'package:paperless_mobile/features/saved_view/cubit/saved_view_cubit.dart';
+import 'package:paperless_mobile/features/saved_view/view/saved_view_selection_widget.dart';
 import 'package:paperless_mobile/features/settings/bloc/application_settings_cubit.dart';
 import 'package:paperless_mobile/features/settings/model/application_settings_state.dart';
 import 'package:paperless_mobile/features/settings/model/view_type.dart';
+import 'package:paperless_mobile/features/tasks/cubit/task_status_cubit.dart';
+import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:paperless_mobile/util.dart';
 
 class DocumentFilterIntent {
@@ -42,9 +45,11 @@ class DocumentsPage extends StatefulWidget {
 }
 
 class _DocumentsPageState extends State<DocumentsPage> {
-  final _pagingController = PagingController<int, DocumentModel>(
-    firstPageKey: 1,
-  );
+  final ScrollController _scrollController = ScrollController();
+  double _offset = 0;
+  double _last = 0;
+
+  static const double _savedViewWidgetHeight = 78 + 16;
 
   @override
   void initState() {
@@ -55,12 +60,36 @@ class _DocumentsPageState extends State<DocumentsPage> {
     } on PaperlessServerException catch (error, stackTrace) {
       showErrorMessage(context, error, stackTrace);
     }
-    _pagingController.addPageRequestListener(_loadNewPage);
+    _scrollController
+      ..addListener(_listenForScrollChanges)
+      ..addListener(_listenForLoadDataTrigger);
+  }
+
+  void _listenForLoadDataTrigger() {
+    final currState = context.read<DocumentsCubit>().state;
+    if (_scrollController.offset >=
+            _scrollController.position.maxScrollExtent &&
+        !currState.isLoading &&
+        !currState.isLastPageLoaded) {
+      _loadNewPage();
+    }
+  }
+
+  void _listenForScrollChanges() {
+    final current = _scrollController.offset;
+    _offset += _last - current;
+
+    if (_offset <= -_savedViewWidgetHeight) _offset = -_savedViewWidgetHeight;
+    if (_offset >= 0) _offset = 0;
+    _last = current;
+    if (_offset <= 0 && _offset >= -_savedViewWidgetHeight) {
+      setState(() {});
+    }
   }
 
   @override
   void dispose() {
-    _pagingController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -78,6 +107,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
         }
       },
       builder: (context, connectivityState) {
+        const linearProgressIndicatorHeight = 4.0;
         return Scaffold(
           drawer: BlocProvider.value(
             value: context.read<AuthenticationCubit>(),
@@ -85,16 +115,65 @@ class _DocumentsPageState extends State<DocumentsPage> {
               afterInboxClosed: () => context.read<DocumentsCubit>().reload(),
             ),
           ),
+          appBar: PreferredSize(
+            preferredSize: const Size.fromHeight(
+              kToolbarHeight + linearProgressIndicatorHeight,
+            ),
+            child: BlocBuilder<DocumentsCubit, DocumentsState>(
+              builder: (context, state) {
+                return AppBar(
+                  title: Text(
+                    "${S.of(context).documentsPageTitle} (${_formatDocumentCount(state.count)})",
+                  ),
+                  actions: [
+                    const SortDocumentsButton(),
+                    BlocBuilder<ApplicationSettingsCubit,
+                        ApplicationSettingsState>(
+                      builder: (context, settingsState) => IconButton(
+                        icon: Icon(
+                          settingsState.preferredViewType == ViewType.grid
+                              ? Icons.list
+                              : Icons.grid_view_rounded,
+                        ),
+                        onPressed: () {
+                          // Reset saved view widget position as scroll offset will be reset anyway.
+                          setState(() {
+                            _offset = 0;
+                            _last = 0;
+                          });
+                          final cubit =
+                              context.read<ApplicationSettingsCubit>();
+                          cubit.setViewType(
+                              cubit.state.preferredViewType.toggle());
+                        },
+                      ),
+                    ),
+                  ],
+                  bottom: PreferredSize(
+                    preferredSize:
+                        const Size.fromHeight(linearProgressIndicatorHeight),
+                    child: state.isLoading
+                        ? const LinearProgressIndicator()
+                        : const SizedBox(height: 4.0),
+                  ),
+                );
+              },
+            ),
+          ),
           floatingActionButton: BlocBuilder<DocumentsCubit, DocumentsState>(
             builder: (context, state) {
               final appliedFiltersCount = state.filter.appliedFiltersCount;
-              return Badge.count(
-                //TODO: Wait for stable version of m3, then use AlignmentDirectional.topEnd
-                alignment: const AlignmentDirectional(44, -4),
-                isLabelVisible: appliedFiltersCount > 0,
-                count: state.filter.appliedFiltersCount,
-                backgroundColor: Colors.red,
-                textColor: Colors.white,
+              return b.Badge(
+                position: b.BadgePosition.topEnd(top: -12, end: -6),
+                showBadge: appliedFiltersCount > 0,
+                badgeContent: Text(
+                  '$appliedFiltersCount',
+                  style: const TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+                animationType: b.BadgeAnimationType.fade,
+                badgeColor: Theme.of(context).colorScheme.error,
                 child: FloatingActionButton(
                   child: const Icon(Icons.filter_alt_outlined),
                   onPressed: _openDocumentFilter,
@@ -103,9 +182,68 @@ class _DocumentsPageState extends State<DocumentsPage> {
             },
           ),
           resizeToAvoidBottomInset: true,
-          body: _buildBody(connectivityState),
+          body: WillPopScope(
+            onWillPop: () async {
+              if (context.read<DocumentsCubit>().state.selection.isNotEmpty) {
+                context.read<DocumentsCubit>().resetSelection();
+              }
+              return false;
+            },
+            child: RefreshIndicator(
+              onRefresh: _onRefresh,
+              notificationPredicate: (_) => connectivityState.isConnected,
+              child: BlocBuilder<TaskStatusCubit, TaskStatusState>(
+                builder: (context, taskState) {
+                  return Stack(
+                    children: [
+                      _buildBody(connectivityState),
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        top: _offset,
+                        child: BlocBuilder<DocumentsCubit, DocumentsState>(
+                          builder: (context, state) {
+                            return ColoredBox(
+                              color: Theme.of(context).colorScheme.background,
+                              child: SavedViewSelectionWidget(
+                                height: _savedViewWidgetHeight,
+                                currentFilter: state.filter,
+                                enabled: state.selection.isEmpty &&
+                                    connectivityState.isConnected,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      if (taskState.task != null &&
+                          taskState.isSuccess &&
+                          !taskState.task!.acknowledged)
+                        _buildNewDocumentAvailableButton(context),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ),
         );
       },
+    );
+  }
+
+  Align _buildNewDocumentAvailableButton(BuildContext context) {
+    return Align(
+      alignment: Alignment.bottomLeft,
+      child: FilledButton(
+        style: ButtonStyle(
+          backgroundColor:
+              MaterialStatePropertyAll(Theme.of(context).colorScheme.error),
+        ),
+        child: Text("New document available!"),
+        onPressed: () {
+          context.read<TaskStatusCubit>().acknowledgeCurrentTask();
+          context.read<DocumentsCubit>().reload();
+        },
+      ).paddedOnly(bottom: 24, left: 24),
     );
   }
 
@@ -160,88 +298,45 @@ class _DocumentsPageState extends State<DocumentsPage> {
     }
   }
 
+  String _formatDocumentCount(int count) {
+    return count > 99 ? "99+" : count.toString();
+  }
+
   Widget _buildBody(ConnectivityState connectivityState) {
     final isConnected = connectivityState == ConnectivityState.connected;
     return BlocBuilder<ApplicationSettingsCubit, ApplicationSettingsState>(
       builder: (context, settings) {
         return BlocBuilder<DocumentsCubit, DocumentsState>(
-          buildWhen: (previous, current) => !const ListEquality()
-              .equals(previous.documents, current.documents),
+          buildWhen: (previous, current) =>
+              !const ListEquality()
+                  .equals(previous.documents, current.documents) ||
+              previous.selectedIds != current.selectedIds,
           builder: (context, state) {
             // Some ugly tricks to make it work with bloc, update pageController
-            _pagingController.value = PagingState(
-              itemList: state.documents,
-              nextPageKey: state.nextPageNumber,
-            );
-
-            late Widget child;
-            switch (settings.preferredViewType) {
-              case ViewType.list:
-                child = DocumentListView(
-                  state: state,
-                  onTap: _openDetails,
-                  onSelected: _onSelected,
-                  pagingController: _pagingController,
-                  hasInternetConnection: isConnected,
-                  onTagSelected: _addTagToFilter,
-                  onCorrespondentSelected: _addCorrespondentToFilter,
-                  onDocumentTypeSelected: _addDocumentTypeToFilter,
-                  onStoragePathSelected: _addStoragePathToFilter,
-                );
-                break;
-              case ViewType.grid:
-                child = DocumentGridView(
-                  state: state,
-                  onTap: _openDetails,
-                  onSelected: _onSelected,
-                  pagingController: _pagingController,
-                  hasInternetConnection: isConnected,
-                  onTagSelected: _addTagToFilter,
-                  onCorrespondentSelected: _addCorrespondentToFilter,
-                  onDocumentTypeSelected: _addDocumentTypeToFilter,
-                  onStoragePathSelected: _addStoragePathToFilter,
-                );
-                break;
-            }
 
             if (state.hasLoaded && state.documents.isEmpty) {
-              child = SliverToBoxAdapter(
-                child: DocumentsEmptyState(
-                  state: state,
-                  onReset: () {
-                    context.read<DocumentsCubit>().resetFilter();
-                    context.read<DocumentsCubit>().unselectView();
-                  },
-                ),
+              return DocumentsEmptyState(
+                state: state,
+                onReset: () {
+                  context.read<DocumentsCubit>().resetFilter();
+                  context.read<DocumentsCubit>().unselectView();
+                },
               );
             }
 
-            return RefreshIndicator(
-              onRefresh: _onRefresh,
-              notificationPredicate: (_) => isConnected,
-              child: CustomScrollView(
-                slivers: [
-                  DocumentsPageAppBar(
-                    isOffline: connectivityState != ConnectivityState.connected,
-                    actions: [
-                      const SortDocumentsButton(),
-                      IconButton(
-                        icon: Icon(
-                          settings.preferredViewType == ViewType.grid
-                              ? Icons.list
-                              : Icons.grid_view,
-                        ),
-                        onPressed: () => context
-                            .read<ApplicationSettingsCubit>()
-                            .setViewType(
-                              settings.preferredViewType.toggle(),
-                            ),
-                      ),
-                    ],
-                  ),
-                  child,
-                ],
-              ),
+            return AdaptiveDocumentsView(
+              viewType: settings.preferredViewType,
+              state: state,
+              scrollController: _scrollController,
+              onTap: _openDetails,
+              onSelected: _onSelected,
+              hasInternetConnection: isConnected,
+              onTagSelected: _addTagToFilter,
+              onCorrespondentSelected: _addCorrespondentToFilter,
+              onDocumentTypeSelected: _addDocumentTypeToFilter,
+              onStoragePathSelected: _addStoragePathToFilter,
+              pageLoadingWidget: const NewItemsLoadingWidget(),
+              beforeItems: const SizedBox(height: _savedViewWidgetHeight),
             );
           },
         );
@@ -355,15 +450,9 @@ class _DocumentsPageState extends State<DocumentsPage> {
     }
   }
 
-  Future<void> _loadNewPage(int pageKey) async {
-    final documentsCubit = context.read<DocumentsCubit>();
-    final pageCount = documentsCubit.state
-        .inferPageCount(pageSize: documentsCubit.state.filter.pageSize);
-    if (pageCount <= pageKey + 1) {
-      _pagingController.nextPageKey = null;
-    }
+  Future<void> _loadNewPage() async {
     try {
-      await documentsCubit.loadMore();
+      await context.read<DocumentsCubit>().loadMore();
     } on PaperlessServerException catch (error, stackTrace) {
       showErrorMessage(context, error, stackTrace);
     }
@@ -376,8 +465,8 @@ class _DocumentsPageState extends State<DocumentsPage> {
   Future<void> _onRefresh() async {
     try {
       // We do not await here on purpose so we can show a linear progress indicator below the app bar.
-      await context.read<DocumentsCubit>().reload();
-      await context.read<SavedViewCubit>().reload();
+      context.read<DocumentsCubit>().reload();
+      context.read<SavedViewCubit>().reload();
     } on PaperlessServerException catch (error, stackTrace) {
       showErrorMessage(context, error, stackTrace);
     }

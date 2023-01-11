@@ -14,7 +14,6 @@ import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/bloc/bloc_changes_observer.dart';
 import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
 import 'package:paperless_mobile/core/bloc/paperless_server_information_cubit.dart';
-import 'package:paperless_mobile/core/interceptor/dio_http_error_interceptor.dart';
 import 'package:paperless_mobile/core/interceptor/language_header.interceptor.dart';
 import 'package:paperless_mobile/core/repository/impl/correspondent_repository_impl.dart';
 import 'package:paperless_mobile/core/repository/impl/document_type_repository_impl.dart';
@@ -27,7 +26,7 @@ import 'package:paperless_mobile/core/repository/state/impl/correspondent_reposi
 import 'package:paperless_mobile/core/repository/state/impl/document_type_repository_state.dart';
 import 'package:paperless_mobile/core/repository/state/impl/storage_path_repository_state.dart';
 import 'package:paperless_mobile/core/repository/state/impl/tag_repository_state.dart';
-import 'package:paperless_mobile/core/security/authentication_aware_dio_manager.dart';
+import 'package:paperless_mobile/core/security/session_manager.dart';
 import 'package:paperless_mobile/core/service/connectivity_status_service.dart';
 import 'package:paperless_mobile/core/service/dio_file_service.dart';
 import 'package:paperless_mobile/core/service/file_service.dart';
@@ -46,7 +45,6 @@ import 'package:paperless_mobile/features/sharing/share_intent_queue.dart';
 import 'package:paperless_mobile/features/tasks/cubit/task_status_cubit.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:provider/provider.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
@@ -55,7 +53,6 @@ void main() async {
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
 
   await findSystemLocale();
-  await LocalNotificationService.instance.initialize();
 
   // Initialize External dependencies
   final connectivity = Connectivity();
@@ -78,27 +75,18 @@ void main() async {
   final languageHeaderInterceptor = LanguageHeaderInterceptor(
     appSettingsCubit.state.preferredLocaleSubtag,
   );
-  // Required for self signed client certificates
-  final dioWrapper = AuthenticationAwareDioManager([
-    DioHttpErrorInterceptor(),
-    PrettyDioLogger(
-      compact: true,
-      responseBody: false,
-      responseHeader: false,
-      request: false,
-      requestBody: false,
-      requestHeader: false,
-    ),
-    languageHeaderInterceptor,
-  ]);
+  // Manages security context, required for self signed client certificates
+  final sessionManager = SessionManager([languageHeaderInterceptor]);
 
   // Initialize Paperless APIs
-  final authApi = PaperlessAuthenticationApiImpl(dioWrapper.client);
-  final documentsApi = PaperlessDocumentsApiImpl(dioWrapper.client);
-  final labelsApi = PaperlessLabelApiImpl(dioWrapper.client);
-  final statsApi = PaperlessServerStatsApiImpl(dioWrapper.client);
-  final savedViewsApi = PaperlessSavedViewsApiImpl(dioWrapper.client);
-  final tasksApi = PaperlessTasksApiImpl(dioWrapper.client);
+  final authApi = PaperlessAuthenticationApiImpl(sessionManager.client);
+  final documentsApi = PaperlessDocumentsApiImpl(sessionManager.client);
+  final labelsApi = PaperlessLabelApiImpl(sessionManager.client);
+  final statsApi = PaperlessServerStatsApiImpl(sessionManager.client);
+  final savedViewsApi = PaperlessSavedViewsApiImpl(sessionManager.client);
+  final tasksApi = PaperlessTasksApiImpl(
+    sessionManager.client,
+  );
 
   // Initialize Blocs/Cubits
   final connectivityCubit = ConnectivityCubit(connectivityStatusService);
@@ -119,19 +107,22 @@ void main() async {
   final authCubit = AuthenticationCubit(
     localAuthService,
     authApi,
-    dioWrapper,
+    sessionManager,
   );
   await authCubit
       .restoreSessionState(appSettingsCubit.state.isLocalAuthenticationEnabled);
 
   if (authCubit.state.isAuthenticated) {
     final auth = authCubit.state.authentication!;
-    dioWrapper.updateSettings(
+    sessionManager.updateSettings(
       baseUrl: auth.serverUrl,
       authToken: auth.token,
       clientCertificate: auth.clientCertificate,
     );
   }
+
+  final localNotificationService = LocalNotificationService();
+  await localNotificationService.initialize();
 
   //Update language header in interceptor on language change.
   appSettingsCubit.stream.listen((event) => languageHeaderInterceptor
@@ -149,13 +140,16 @@ void main() async {
           create: (context) => cm.CacheManager(
             cm.Config(
               'cacheKey',
-              fileService: DioFileService(dioWrapper.client),
+              fileService: DioFileService(sessionManager.client),
             ),
           ),
         ),
         Provider<LocalVault>.value(value: localVault),
         Provider<ConnectivityStatusService>.value(
           value: connectivityStatusService,
+        ),
+        Provider<LocalNotificationService>.value(
+          value: localNotificationService,
         ),
       ],
       child: MultiRepositoryProvider(
@@ -221,6 +215,7 @@ class _PaperlessMobileEntrypointState extends State<PaperlessMobileEntrypoint> {
         vertical: 16.0,
       ),
     ),
+    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     chipTheme: ChipThemeData(
       backgroundColor: Colors.lightGreen[50],
     ),
@@ -242,6 +237,7 @@ class _PaperlessMobileEntrypointState extends State<PaperlessMobileEntrypoint> {
         vertical: 16.0,
       ),
     ),
+    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     chipTheme: ChipThemeData(
       backgroundColor: Colors.green[900],
     ),
@@ -252,7 +248,9 @@ class _PaperlessMobileEntrypointState extends State<PaperlessMobileEntrypoint> {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => PaperlessServerInformationCubit(context.read()),
+          create: (context) => PaperlessServerInformationCubit(
+            context.read<PaperlessServerStatsApi>(),
+          ),
         ),
       ],
       child: BlocBuilder<ApplicationSettingsCubit, ApplicationSettingsState>(
@@ -260,14 +258,8 @@ class _PaperlessMobileEntrypointState extends State<PaperlessMobileEntrypoint> {
           return MaterialApp(
             debugShowCheckedModeBanner: true,
             title: "Paperless Mobile",
-            theme: _lightTheme.copyWith(
-              listTileTheme: _lightTheme.listTileTheme
-                  .copyWith(tileColor: Colors.transparent),
-            ),
-            darkTheme: _darkTheme.copyWith(
-              listTileTheme: _darkTheme.listTileTheme
-                  .copyWith(tileColor: Colors.transparent),
-            ),
+            theme: _lightTheme,
+            darkTheme: _darkTheme,
             themeMode: settings.preferredThemeMode,
             supportedLocales: S.delegate.supportedLocales,
             locale: Locale.fromSubtags(

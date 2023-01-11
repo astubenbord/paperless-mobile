@@ -23,6 +23,8 @@ class DocumentsState extends Equatable {
     this.selectedSavedViewId,
   });
 
+  List<int> get selectedIds => selection.map((e) => e.id).toList();
+
   int get currentPageNumber {
     return filter.page;
   }

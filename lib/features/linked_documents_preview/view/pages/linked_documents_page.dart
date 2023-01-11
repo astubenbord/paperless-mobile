@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/widgets/documents_list_loading_widget.dart';
 import 'package:paperless_mobile/features/document_details/bloc/document_details_cubit.dart';
@@ -18,15 +17,6 @@ class LinkedDocumentsPage extends StatefulWidget {
 }
 
 class _LinkedDocumentsPageState extends State<LinkedDocumentsPage> {
-  final _pagingController =
-      PagingController<int, DocumentModel>(firstPageKey: 1);
-
-  @override
-  void initState() {
-    super.initState();
-    _pagingController.nextPageKey = null;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,8 +28,6 @@ class _LinkedDocumentsPageState extends State<LinkedDocumentsPage> {
           if (!state.isLoaded) {
             return const DocumentsListLoadingWidget();
           }
-
-          _pagingController.itemList = state.documents!.results;
           return Column(
             children: [
               Text(
@@ -48,42 +36,34 @@ class _LinkedDocumentsPageState extends State<LinkedDocumentsPage> {
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               Expanded(
-                child: CustomScrollView(
-                  slivers: [
-                    PagedSliverList<int, DocumentModel>(
-                      pagingController: _pagingController,
-                      builderDelegate: PagedChildBuilderDelegate(
-                        animateTransitions: true,
-                        itemBuilder: (context, document, index) {
-                          return DocumentListItem(
-                            isLabelClickable: false,
-                            document: document,
-                            onTap: (doc) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => BlocProvider(
-                                    create: (context) => DocumentDetailsCubit(
-                                      context.read<PaperlessDocumentsApi>(),
-                                      document,
-                                    ),
-                                    child: const DocumentDetailsPage(
-                                      isLabelClickable: false,
-                                      allowEdit: false,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                            isSelected: false,
-                            isAtLeastOneSelected: false,
-                            isTagSelectedPredicate: (_) => false,
-                            onTagSelected: (int tag) {},
-                          );
-                        },
-                      ),
-                    ),
-                  ],
+                child: ListView.builder(
+                  itemBuilder: (context, index) {
+                    return DocumentListItem(
+                      isLabelClickable: false,
+                      document: state.documents!.results.elementAt(index),
+                      onTap: (doc) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BlocProvider(
+                              create: (context) => DocumentDetailsCubit(
+                                context.read<PaperlessDocumentsApi>(),
+                                state.documents!.results.elementAt(index),
+                              ),
+                              child: const DocumentDetailsPage(
+                                isLabelClickable: false,
+                                allowEdit: false,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                      isSelected: false,
+                      isAtLeastOneSelected: false,
+                      isTagSelectedPredicate: (_) => false,
+                      onTagSelected: (int tag) {},
+                    );
+                  },
                 ),
               ),
             ],

@@ -85,7 +85,7 @@ To get a local copy up and running follow these simple steps.
    ```sh
    flutter pub get
    ```
-3. Build generated files (e.g. for injectable library)
+3. Build generated files (for json_serializable etc.)
    ```sh
    flutter packages pub run build_runner build --delete-conflicting-outputs
    ```

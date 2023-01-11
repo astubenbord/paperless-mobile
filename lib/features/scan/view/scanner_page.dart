@@ -24,6 +24,7 @@ import 'package:paperless_mobile/features/documents/view/pages/document_view.dar
 import 'package:paperless_mobile/features/home/view/widget/info_drawer.dart';
 import 'package:paperless_mobile/features/scan/bloc/document_scanner_cubit.dart';
 import 'package:paperless_mobile/features/scan/view/widgets/grid_image_item_widget.dart';
+import 'package:paperless_mobile/features/tasks/cubit/task_status_cubit.dart';
 import 'package:paperless_mobile/generated/l10n.dart';
 import 'package:paperless_mobile/util.dart';
 import 'package:path/path.dart' as p;
@@ -140,7 +141,7 @@ class _ScannerPageState extends State<ScannerPage>
     final file = await _assembleFileBytes(
       context.read<DocumentScannerCubit>().state,
     );
-    final uploaded = await Navigator.of(context).push(
+    final taskId = await Navigator.of(context).push(
           MaterialPageRoute(
             builder: (_) => LabelRepositoriesProvider(
               child: BlocProvider(
@@ -165,8 +166,10 @@ class _ScannerPageState extends State<ScannerPage>
           ),
         ) ??
         false;
-    if (uploaded) {
+    if (taskId != null) {
+      // For paperless version older than 1.11.3, task id will always be null!
       context.read<DocumentScannerCubit>().reset();
+      context.read<TaskStatusCubit>().listenToTaskChanges(taskId);
     }
   }
 

@@ -11,7 +11,7 @@ class LinkedDocumentsCubit extends Cubit<LinkedDocumentsState> {
   }
 
   Future<void> _initialize() async {
-    final documents = await _api.find(
+    final documents = await _api.findAll(
       state.filter.copyWith(
         pageSize: 100,
       ),

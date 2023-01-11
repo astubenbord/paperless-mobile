@@ -17,8 +17,7 @@ Task _$TaskFromJson(Map<String, dynamic> json) => Task(
       type: json['type'] as String?,
       status: $enumDecodeNullable(_$TaskStatusEnumMap, json['status']),
       acknowledged: json['acknowledged'] as bool? ?? false,
-      relatedDocumentId:
-          tryParseNullable(json['related_document_id'] as String?),
+      relatedDocument: tryParseNullable(json['related_document'] as String?),
       result: json['result'] as String?,
     );
 
@@ -32,7 +31,7 @@ Map<String, dynamic> _$TaskToJson(Task instance) => <String, dynamic>{
       'status': _$TaskStatusEnumMap[instance.status],
       'result': instance.result,
       'acknowledged': instance.acknowledged,
-      'related_document_id': instance.relatedDocumentId,
+      'related_document': instance.relatedDocument,
     };
 
 const _$TaskStatusEnumMap = {

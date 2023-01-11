@@ -55,17 +55,16 @@ class DocumentUploadCubit extends Cubit<DocumentUploadState> {
     ));
   }
 
-  Future<void> upload(
+  Future<String?> upload(
     Uint8List bytes, {
     required String filename,
     required String title,
-    required void Function(DocumentModel document)? onConsumptionFinished,
     int? documentType,
     int? correspondent,
     Iterable<int> tags = const [],
     DateTime? createdAt,
   }) async {
-    await _documentApi.create(
+    return await _documentApi.create(
       bytes,
       filename: filename,
       title: title,
@@ -74,11 +73,6 @@ class DocumentUploadCubit extends Cubit<DocumentUploadState> {
       tags: tags,
       createdAt: createdAt,
     );
-    if (onConsumptionFinished != null) {
-      _documentApi
-          .waitForConsumptionFinished(filename, title)
-          .then((value) => onConsumptionFinished(value));
-    }
   }
 
   @override

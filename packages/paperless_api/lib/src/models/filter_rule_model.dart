@@ -346,15 +346,17 @@ class FilterRule with EquatableMixin {
       );
     }
 
-    //Join values of all extended filter rules
-    final FilterRule extendedFilterRule = filterRules
-        .where((r) => r.ruleType == extendedRule)
-        .reduce((previousValue, element) => previousValue.copyWith(
-              value: previousValue.value! + element.value!,
-            ));
-    filterRules
-      ..removeWhere((element) => element.ruleType == extendedRule)
-      ..add(extendedFilterRule);
+    //Join values of all extended filter rules if exist
+    if (filterRules.isNotEmpty) {
+      final FilterRule extendedFilterRule = filterRules
+          .where((r) => r.ruleType == extendedRule)
+          .reduce((previousValue, element) => previousValue.copyWith(
+                value: previousValue.value! + element.value!,
+              ));
+      filterRules
+        ..removeWhere((element) => element.ruleType == extendedRule)
+        ..add(extendedFilterRule);
+    }
     return filterRules;
   }
 

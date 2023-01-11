@@ -10,7 +10,7 @@ class TagsWidget extends StatefulWidget {
   final Iterable<int> tagIds;
   final bool isMultiLine;
   final VoidCallback? afterTagTapped;
-  final void Function(int tagId) onTagSelected;
+  final void Function(int tagId)? onTagSelected;
   final bool isClickable;
   final bool Function(int id) isSelectedPredicate;
 
@@ -42,7 +42,7 @@ class _TagsWidgetState extends State<TagsWidget> {
                   afterTagTapped: widget.afterTagTapped,
                   isClickable: widget.isClickable,
                   isSelected: widget.isSelectedPredicate(id),
-                  onSelected: () => widget.onTagSelected(id),
+                  onSelected: () => widget.onTagSelected?.call(id),
                 ),
               )
               .toList();

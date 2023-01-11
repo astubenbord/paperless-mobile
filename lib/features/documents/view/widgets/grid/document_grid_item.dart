@@ -13,7 +13,7 @@ class DocumentGridItem extends StatelessWidget {
   final void Function(DocumentModel) onSelected;
   final bool isAtLeastOneSelected;
   final bool Function(int tagId) isTagSelectedPredicate;
-  final void Function(int tagId) onTagSelected;
+  final void Function(int tagId)? onTagSelected;
 
   const DocumentGridItem({
     Key? key,
@@ -57,9 +57,11 @@ class DocumentGridItem extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         CorrespondentWidget(
-                            correspondentId: document.correspondent),
+                          correspondentId: document.correspondent,
+                        ),
                         DocumentTypeWidget(
-                            documentTypeId: document.documentType),
+                          documentTypeId: document.documentType,
+                        ),
                         Text(
                           document.title,
                           maxLines: document.tags.isEmpty ? 3 : 2,

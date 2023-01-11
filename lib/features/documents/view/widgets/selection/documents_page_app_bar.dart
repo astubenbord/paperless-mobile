@@ -138,3 +138,19 @@ class _DocumentsPageAppBarState extends State<DocumentsPageAppBar> {
     return count > 99 ? "99+" : count.toString();
   }
 }
+
+class ScrollListener extends ChangeNotifier {
+  double top = 0;
+  double _last = 0;
+
+  ScrollListener.initialise(ScrollController controller, [double height = 56]) {
+    controller.addListener(() {
+      final current = controller.offset;
+      top += _last - current;
+      if (top <= -height) top = -height;
+      if (top >= 0) top = 0;
+      _last = current;
+      if (top <= 0 && top >= -height) notifyListeners();
+    });
+  }
+}

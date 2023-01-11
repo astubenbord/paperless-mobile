@@ -7,20 +7,30 @@ class TaskStatusCubit extends Cubit<TaskStatusState> {
   final PaperlessTasksApi _api;
   TaskStatusCubit(this._api) : super(const TaskStatusState());
 
-  void startListeningToTask(String taskId) {
+  void listenToTaskChanges(String taskId) {
     _api
         .listenForTaskChanges(taskId)
         .forEach(
-          (element) => TaskStatusState(
-            isListening: true,
-            isAcknowledged: false,
-            task: element,
+          (element) => emit(
+            TaskStatusState(
+              isListening: true,
+              task: element,
+            ),
           ),
         )
         .whenComplete(() => emit(state.copyWith(isListening: false)));
   }
 
-  void acknowledgeCurrentTask() {
-    emit(state.copyWith(isListening: false, isAcknowledged: true));
+  Future<void> acknowledgeCurrentTask() async {
+    if (state.task == null) {
+      return;
+    }
+    final task = await _api.acknowledgeTask(state.task!);
+    emit(
+      state.copyWith(
+        task: task,
+        isListening: false,
+      ),
+    );
   }
 }

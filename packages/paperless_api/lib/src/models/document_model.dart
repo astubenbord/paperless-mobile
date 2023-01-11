@@ -131,6 +131,6 @@ class DocumentModel extends Equatable {
         archiveSerialNumber,
         originalFileName,
         archivedFileName,
-        storagePath
+        storagePath,
       ];
 }

@@ -17,7 +17,7 @@ class Task extends Equatable {
   final String? result;
   final bool acknowledged;
   @JsonKey(fromJson: tryParseNullable)
-  final int? relatedDocumentId;
+  final int? relatedDocument;
 
   const Task({
     required this.id,
@@ -28,7 +28,7 @@ class Task extends Equatable {
     this.type,
     this.status,
     this.acknowledged = false,
-    this.relatedDocumentId,
+    this.relatedDocument,
     this.result,
   });
 
@@ -47,6 +47,32 @@ class Task extends Equatable {
         status,
         result,
         acknowledged,
-        relatedDocumentId,
+        relatedDocument,
       ];
+
+  Task copyWith({
+    int? id,
+    String? taskId,
+    String? taskFileName,
+    DateTime? dateCreated,
+    DateTime? dateDone,
+    String? type,
+    TaskStatus? status,
+    String? result,
+    bool? acknowledged,
+    int? relatedDocument,
+  }) {
+    return Task(
+      id: id ?? this.id,
+      taskId: taskId ?? this.taskId,
+      dateCreated: dateCreated ?? this.dateCreated,
+      acknowledged: acknowledged ?? this.acknowledged,
+      dateDone: dateDone ?? this.dateDone,
+      relatedDocument: relatedDocument ?? this.relatedDocument,
+      result: result ?? this.result,
+      status: status ?? this.status,
+      taskFileName: taskFileName ?? this.taskFileName,
+      type: type ?? this.type,
+    );
+  }
 }

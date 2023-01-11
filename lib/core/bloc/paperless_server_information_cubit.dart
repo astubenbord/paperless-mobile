@@ -1,20 +1,17 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:injectable/injectable.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/bloc/paperless_server_information_state.dart';
+import 'package:paperless_mobile/core/security/session_manager.dart';
 
-@prod
-@test
-@lazySingleton
 class PaperlessServerInformationCubit
     extends Cubit<PaperlessServerInformationState> {
-  final PaperlessServerStatsApi service;
+  final PaperlessServerStatsApi _api;
 
-  PaperlessServerInformationCubit(this.service)
+  PaperlessServerInformationCubit(this._api)
       : super(PaperlessServerInformationState());
 
   Future<void> updateInformtion() async {
-    final information = await service.getServerInformation();
+    final information = await _api.getServerInformation();
     emit(PaperlessServerInformationState(
       isLoaded: true,
       information: information,

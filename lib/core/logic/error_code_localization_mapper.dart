@@ -68,5 +68,9 @@ String translateError(BuildContext context, ErrorCode code) {
       return S.of(context).errorMessageUnsupportedFileFormat;
     case ErrorCode.missingClientCertificate:
       return S.of(context).errorMessageMissingClientCertificate;
+    case ErrorCode.suggestionsQueryError:
+      return S.of(context).errorMessageSuggestionsQueryError;
+    case ErrorCode.acknowledgeTasksError:
+      return S.of(context).errorMessageAcknowledgeTasksError;
   }
 }
