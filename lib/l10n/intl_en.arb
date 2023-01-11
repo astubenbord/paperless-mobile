@@ -74,6 +74,8 @@
   "@documentDocumentTypePropertyLabel": {},
   "documentDownloadSuccessMessage": "Document successfully downloaded.",
   "@documentDownloadSuccessMessage": {},
+  "documentEditPageSuggestionsLabel": "Suggestions: ",
+  "@documentEditPageSuggestionsLabel": {},
   "documentEditPageTitle": "Edit Document",
   "@documentEditPageTitle": {},
   "documentFilterAdvancedLabel": "Advanced",

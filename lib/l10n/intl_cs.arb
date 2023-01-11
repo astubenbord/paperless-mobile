@@ -74,6 +74,8 @@
   "@documentDocumentTypePropertyLabel": {},
   "documentDownloadSuccessMessage": "Dokument úspěšně stažen.",
   "@documentDownloadSuccessMessage": {},
+  "documentEditPageSuggestionsLabel": "",
+  "@documentEditPageSuggestionsLabel": {},
   "documentEditPageTitle": "Upravit dokument",
   "@documentEditPageTitle": {},
   "documentFilterAdvancedLabel": "Rozšířené",
