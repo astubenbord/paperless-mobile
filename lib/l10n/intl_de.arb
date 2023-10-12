@@ -1001,5 +1001,6 @@
   "@discardChangesWarning": {
     "description": "Warning message shown when the user tries to close a route without saving the changes."
   },
-  "changelog": "Changelog"
+  "changelog": "Changelog",
+  "noDocumentsScanned": "Du hast noch keine Dokumente gescannt."
 }

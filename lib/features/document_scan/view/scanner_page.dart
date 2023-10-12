@@ -154,6 +154,7 @@ class _ScannerPageState extends State<ScannerPage>
                       );
                     },
                     disabled: state.scans.isEmpty,
+                    disabledReason: S.of(context)!.noDocumentsScanned,
                     child: TextButton.icon(
                       label: Text(S.of(context)!.upload),
                       style: TextButton.styleFrom(
