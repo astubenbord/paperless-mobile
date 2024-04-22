@@ -384,8 +384,9 @@ class _DocumentUploadPreparationPageState
 
   String _formatFilename(String source) {
     return source
+        .toLowerCase()
         .replaceAllMapped(fileNameReplacementPattern, (match) => fileNameReplacements[match.group(0)]!);
-        .replaceAll(RegExp(r"[\W_]"), "_").toLowerCase();
+        .replaceAll(RegExp(r"[\W_]"), "_");
   }
 
   // Future<Color> _computeAverageColor() async {
