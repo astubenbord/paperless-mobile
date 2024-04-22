@@ -55,6 +55,11 @@ class _DocumentUploadPreparationPageState
     extends State<DocumentUploadPreparationPage> {
   static const fkFileName = "filename";
   static final fileNameDateFormat = DateFormat("yyyy_MM_ddTHH_mm_ss");
+  static final Map<String, String> fileNameReplacements = {
+    'ä': 'ae', 'ö': 'oe', 'ü': 'ue', 'ß': 'ss', 'à': 'a', 'â': 'a', 'ç': 'c', 'é': 'e', 'è': 'e', 'ê': 'e', 'á': 'a', 'í': 'i', 'ó': 'o', 'ú': 'u', 'ñ': 'n', 'ì': 'i', 'ò': 'o', 'ù': 'u', 'ã': 'a', 'õ': 'o'
+  };
+  static final RegExp fileNameReplacementPattern = RegExp('[${fileNameReplacements.keys.join()}]');
+  
 
   final GlobalKey<FormBuilderState> _formKey = GlobalKey();
   Map<String, String> _errors = {};
@@ -378,7 +383,9 @@ class _DocumentUploadPreparationPageState
   }
 
   String _formatFilename(String source) {
-    return source.replaceAll(RegExp(r"[\W_]"), "_").toLowerCase();
+    return source
+        .replaceAllMapped(fileNameReplacementPattern, (match) => fileNameReplacements[match.group(0)]!);
+        .replaceAll(RegExp(r"[\W_]"), "_").toLowerCase();
   }
 
   // Future<Color> _computeAverageColor() async {
