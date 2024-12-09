@@ -37,7 +37,7 @@ If you want to manually install dependencies and build generated files, you can 
    ```
 3. Build generated files for `paperless_api`
    ```sh
-    flutter pub run build_runner build --delete-conflicting-outputs
+    dart run build_runner build --delete-conflicting-outputs
    ```
    
 ### Inside the project's root folder
