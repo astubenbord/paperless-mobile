@@ -150,11 +150,6 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
 
   Future<void> verifyMfaCode(String code) async {
     final current = state;
-    logger.fd(
-      "verifyMfaCode called with code length: ${code.length}, current state: ${current.runtimeType}",
-      className: runtimeType.toString(),
-      methodName: 'verifyMfaCode',
-    );
 
     if (current is! MfaState || current.currentStage != MfaStage.required) {
       logger.fw(
@@ -173,12 +168,6 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
       );
       return;
     }
-
-    logger.fd(
-      "Starting MFA verification, emitting MfaState(verifying)",
-      className: runtimeType.toString(),
-      methodName: 'verifyMfaCode',
-    );
 
     emit(MfaState(
       currentStage: MfaStage.verifying,

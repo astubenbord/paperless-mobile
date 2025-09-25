@@ -9,12 +9,6 @@ Future<bool> showTotpBottomSheet(
   BuildContext context, {
   required Future<String?> Function(String code) onVerify,
 }) async {
-  logger.fd(
-    "showTotpBottomSheet: Opening TOTP bottom sheet",
-    className: 'showTotpBottomSheet',
-    methodName: 'showTotpBottomSheet',
-  );
-
   final errorText = ValueNotifier<String?>(null);
 
   final result = await showModalBottomSheet<bool>(
@@ -30,26 +24,11 @@ Future<bool> showTotpBottomSheet(
         child: EnterTotpPage(
           errorTextListenable: errorText,
           onCancel: () {
-            logger.fd(
-              "showTotpBottomSheet: User canceled TOTP entry",
-              className: 'showTotpBottomSheet',
-              methodName: 'onCancel',
-            );
             Navigator.of(ctx).pop(false);
           },
           onSubmit: (code) async {
-            logger.fd(
-              "showTotpBottomSheet: User submitted TOTP code (length: ${code.length})",
-              className: 'showTotpBottomSheet',
-              methodName: 'onSubmit',
-            );
             final err = await onVerify(code);
             if (err == null) {
-              logger.fd(
-                "showTotpBottomSheet: TOTP verification successful, closing sheet",
-                className: 'showTotpBottomSheet',
-                methodName: 'onSubmit',
-              );
               Navigator.of(ctx).pop(true);
             } else {
               logger.fw(
@@ -63,12 +42,6 @@ Future<bool> showTotpBottomSheet(
         ),
       );
     },
-  );
-
-  logger.fd(
-    "showTotpBottomSheet: Bottom sheet closed with result: $result",
-    className: 'showTotpBottomSheet',
-    methodName: 'showTotpBottomSheet',
   );
 
   // result will be true on success, false on cancel, null on dismiss

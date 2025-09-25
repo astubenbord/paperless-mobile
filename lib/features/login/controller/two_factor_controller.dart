@@ -17,29 +17,12 @@ class TwoFactorController {
     required String serverUrl,
     ClientCertificate? clientCertificate,
   }) async {
-    logger.fd(
-      "TwoFactorController.handleMfaFlow started for user: $username",
-      className: 'TwoFactorController',
-      methodName: 'handleMfaFlow',
-    );
-
     final bool success = await showTotpBottomSheet(
       context,
       onVerify: (code) async {
-        logger.fd(
-          "TwoFactorController verifying TOTP code (length: ${code.length})",
-          className: 'TwoFactorController',
-          methodName: 'handleMfaFlow',
-        );
-
         try {
           // Use dedicated MFA path on the cubit
           await context.read<AuthenticationCubit>().verifyMfaCode(code);
-          logger.fd(
-            "TOTP verification successful",
-            className: 'TwoFactorController',
-            methodName: 'handleMfaFlow',
-          );
           return null; // no error -> success
         } on PaperlessFormValidationException catch (e) {
           final errorMessage = e.unspecificErrorMessage() ??
