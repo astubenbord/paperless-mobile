@@ -8,6 +8,7 @@ import 'package:paperless_mobile/features/login/cubit/authentication_cubit.dart'
 import 'package:paperless_mobile/features/login/model/client_certificate.dart';
 import 'package:paperless_mobile/features/login/model/login_form_credentials.dart';
 import 'package:paperless_mobile/features/login/view/add_account_page.dart';
+import 'package:paperless_mobile/features/login/controller/two_factor_controller.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
 import 'package:paperless_mobile/helpers/message_helpers.dart';
 import 'package:paperless_mobile/routing/routes/login_route.dart';
@@ -28,23 +29,36 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AddAccountPage(
-      titleText: S.of(context)!.connectToPaperless,
-      submitText: S.of(context)!.signIn,
-      onSubmit: _onLogin,
-      showLocalAccounts: true,
-      initialServerUrl: initialServerUrl,
-      initialUsername: initialUsername,
-      initialPassword: initialPassword,
-      initialClientCertificate: initialClientCertificate,
-      bottomLeftButton: Hive.localUserAccountBox.isNotEmpty
-          ? TextButton(
-              child: Text(S.of(context)!.logInToExistingAccount),
-              onPressed: () {
-                const LoginToExistingAccountRoute().go(context);
-              },
-            )
-          : null,
+    return BlocListener<AuthenticationCubit, AuthenticationState>(
+      listener: (context, state) {
+        if (state is MfaState && state.currentStage == MfaStage.required) {
+          TwoFactorController.instance.handleMfaFlow(
+            context,
+            username: state.username,
+            password: state.password,
+            serverUrl: state.serverUrl,
+            clientCertificate: state.clientCertificate,
+          );
+        }
+      },
+      child: AddAccountPage(
+        titleText: S.of(context)!.connectToPaperless,
+        submitText: S.of(context)!.signIn,
+        onSubmit: _onLogin,
+        showLocalAccounts: true,
+        initialServerUrl: initialServerUrl,
+        initialUsername: initialUsername,
+        initialPassword: initialPassword,
+        initialClientCertificate: initialClientCertificate,
+        bottomLeftButton: Hive.localUserAccountBox.isNotEmpty
+            ? TextButton(
+                child: Text(S.of(context)!.logInToExistingAccount),
+                onPressed: () {
+                  const LoginToExistingAccountRoute().go(context);
+                },
+              )
+            : null,
+      ),
     );
   }
 

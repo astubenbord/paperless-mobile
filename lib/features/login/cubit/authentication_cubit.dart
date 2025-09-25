@@ -52,10 +52,18 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     required LoginFormCredentials credentials,
     required String serverUrl,
     ClientCertificate? clientCertificate,
+    String? mfaCode,
   }) async {
     assert(credentials.username != null && credentials.password != null);
+    // Prevent duplicate attempts while busy; allow login if we are not in MFA verifying state.
     if (state is AuthenticatingState) {
       // Cancel duplicate login requests
+      return;
+    }
+    final currentState = state;
+    if (currentState is MfaState &&
+        currentState.currentStage == MfaStage.verifying) {
+      // Cancel duplicate login requests during MFA verification
       return;
     }
     emit(const AuthenticatingState(AuthenticatingStage.authenticating));
@@ -74,6 +82,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
         credentials,
         clientCertificate,
         _sessionManager,
+        mfaCode: mfaCode,
         onFetchUserInformation: () async {
           emit(const AuthenticatingState(
               AuthenticatingStage.fetchingUserInformation));
@@ -86,7 +95,34 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
               AuthenticatingStage.persistingLocalUserData));
         },
       );
-    } on PaperlessApiException catch (exception, stackTrace) {
+    } on PaperlessFormValidationException catch (e) {
+      // If MFA is required, surface a dedicated state for the UI/controller.
+      if (e.unspecificErrorMessage() == "MFA code is required") {
+        logger.fd(
+          "MFA required for login, emitting MfaState(required)",
+          className: runtimeType.toString(),
+          methodName: 'login',
+        );
+        emit(MfaState(
+          currentStage: MfaStage.required,
+          username: credentials.username!,
+          password: credentials.password!,
+          serverUrl: serverUrl,
+          clientCertificate: clientCertificate,
+        ));
+        return;
+      }
+      // For other form validation errors propagate as generic error for now
+      emit(
+        AuthenticationErrorState(
+          serverUrl: serverUrl,
+          username: credentials.username!,
+          password: credentials.password!,
+          clientCertificate: clientCertificate,
+        ),
+      );
+      rethrow;
+    } on PaperlessApiException catch (_) {
       emit(
         AuthenticationErrorState(
           serverUrl: serverUrl,
@@ -110,6 +146,129 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
       className: runtimeType.toString(),
       methodName: 'login',
     );
+  }
+
+  Future<void> verifyMfaCode(String code) async {
+    final current = state;
+    logger.fd(
+      "verifyMfaCode called with code length: ${code.length}, current state: ${current.runtimeType}",
+      className: runtimeType.toString(),
+      methodName: 'verifyMfaCode',
+    );
+
+    if (current is! MfaState || current.currentStage != MfaStage.required) {
+      logger.fw(
+        "verifyMfaCode called but not in MfaState.required. Current state: ${current.runtimeType}",
+        className: runtimeType.toString(),
+        methodName: 'verifyMfaCode',
+      );
+      return;
+    }
+    // Prevent duplicate verifications
+    if (current.currentStage == MfaStage.verifying) {
+      logger.fw(
+        "verifyMfaCode called but already verifying",
+        className: runtimeType.toString(),
+        methodName: 'verifyMfaCode',
+      );
+      return;
+    }
+
+    logger.fd(
+      "Starting MFA verification, emitting MfaState(verifying)",
+      className: runtimeType.toString(),
+      methodName: 'verifyMfaCode',
+    );
+
+    emit(MfaState(
+      currentStage: MfaStage.verifying,
+      username: current.username,
+      password: current.password,
+      serverUrl: current.serverUrl,
+      clientCertificate: current.clientCertificate,
+    ));
+
+    final credentials = LoginFormCredentials(
+      username: current.username,
+      password: current.password,
+    );
+
+    try {
+      await _addUser(
+        "${current.username}@${current.serverUrl}",
+        current.serverUrl,
+        credentials,
+        current.clientCertificate,
+        _sessionManager,
+        mfaCode: code,
+        onFetchUserInformation: () async {
+          emit(const AuthenticatingState(
+              AuthenticatingStage.fetchingUserInformation));
+        },
+        onPerformLogin: () async {
+          emit(const AuthenticatingState(AuthenticatingStage.authenticating));
+        },
+        onPersistLocalUserData: () async {
+          emit(const AuthenticatingState(
+              AuthenticatingStage.persistingLocalUserData));
+        },
+      );
+    } on PaperlessFormValidationException catch (e) {
+      logger.fw(
+        "MFA verification failed: ${e.unspecificErrorMessage() ?? e.validationMessages.toString()}",
+        className: runtimeType.toString(),
+        methodName: 'verifyMfaCode',
+      );
+      // Stay in MFA required state; UI can show error via controller
+      emit(MfaState(
+        currentStage: MfaStage.required,
+        username: current.username,
+        password: current.password,
+        serverUrl: current.serverUrl,
+        clientCertificate: current.clientCertificate,
+      ));
+      rethrow;
+    } on PaperlessApiException catch (_) {
+      // Convert to generic error and let caller handle messaging
+      emit(AuthenticationErrorState(
+        serverUrl: current.serverUrl,
+        username: current.username,
+        password: current.password,
+        clientCertificate: current.clientCertificate,
+      ));
+      rethrow;
+    }
+
+    // Mark logged in user as currently active user.
+    final globalSettings =
+        Hive.box<GlobalSettings>(HiveBoxes.globalSettings).getValue()!;
+    globalSettings.loggedInUserId = "${current.username}@${current.serverUrl}";
+    await globalSettings.save();
+
+    logger.fd(
+      "MFA verification successful, user authenticated",
+      className: runtimeType.toString(),
+      methodName: 'verifyMfaCode',
+    );
+
+    emit(AuthenticatedState(
+        localUserId: "${current.username}@${current.serverUrl}"));
+  }
+
+  Future<void> cancelMfa() async {
+    final current = state;
+
+    if (current is! MfaState) {
+      return;
+    }
+
+    logger.fd(
+      "Canceling MFA flow, resetting to UnauthenticatedState",
+      className: runtimeType.toString(),
+      methodName: 'cancelMfa',
+    );
+
+    emit(const UnauthenticatedState());
   }
 
   /// Switches to another account if it exists.
@@ -445,6 +604,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     LoginFormCredentials credentials,
     ClientCertificate? clientCert,
     SessionManager sessionManager, {
+    String? mfaCode,
     _FutureVoidCallback? onPerformLogin,
     _FutureVoidCallback? onPersistLocalUserData,
     _FutureVoidCallback? onFetchUserInformation,
@@ -471,10 +631,19 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
       className: runtimeType.toString(),
       methodName: '_addUser',
     );
-    final token = await authApi.login(
-      username: credentials.username!,
-      password: credentials.password!,
-    );
+    late final String token;
+    if (mfaCode == null) {
+      token = await authApi.login(
+        username: credentials.username!,
+        password: credentials.password!,
+      );
+    } else {
+      token = await authApi.login(
+        username: credentials.username!,
+        password: credentials.password!,
+        code: mfaCode,
+      );
+    }
 
     logger.fd(
       "Bearer token successfully retrieved.",

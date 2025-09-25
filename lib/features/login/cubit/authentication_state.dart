@@ -80,3 +80,28 @@ enum AuthenticatingStage {
   persistingLocalUserData,
   fetchingUserInformation,
 }
+
+enum MfaStage {
+  required,
+  verifying,
+}
+
+class MfaState extends AuthenticationState with EquatableMixin {
+  final MfaStage currentStage;
+  final String username;
+  final String password;
+  final String serverUrl;
+  final ClientCertificate? clientCertificate;
+
+  const MfaState({
+    required this.currentStage,
+    required this.username,
+    required this.password,
+    required this.serverUrl,
+    this.clientCertificate,
+  });
+
+  @override
+  List<Object?> get props =>
+      [currentStage, username, password, serverUrl, clientCertificate];
+}

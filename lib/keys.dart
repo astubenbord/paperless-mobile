@@ -16,4 +16,7 @@ class _LoginTestKeys {
   final clientCertificatePassphraseFormField =
       const Key('login-client-certificate-passphrase');
   final loggingInScreen = const Key('login-logging-in-screen');
+  final totpCodeFormField = const Key('login-totp-code');
+  final totpVerifyButton = const Key('login-totp-verify');
+  final totpCancelButton = const Key('login-totp-cancel');
 }

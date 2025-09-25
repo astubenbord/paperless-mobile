@@ -312,6 +312,9 @@ class _GoRouterShellState extends State<GoRouterShell> {
                         const LoginRoute().go(context);
                       }
                       break;
+                    case MfaState():
+                      // No navigation - let TwoFactorController handle UI presentation
+                      break;
                     case RestoringSessionState():
                       const RestoringSessionRoute().go(context);
                       break;
