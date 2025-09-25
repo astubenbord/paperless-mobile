@@ -46,6 +46,7 @@ class _UserCredentialsFormFieldState extends State<UserCredentialsFormField>
       builder: (field) => Column(
         children: [
           TextFormField(
+            initialValue: widget.initialUsername ?? '',
             key: const ValueKey('login-username'),
             focusNode: _usernameFocusNode,
             textCapitalization: TextCapitalization.none,
@@ -81,6 +82,7 @@ class _UserCredentialsFormFieldState extends State<UserCredentialsFormField>
             ),
           ),
           ObscuredInputTextFormField(
+            initialValue: widget.initialPassword ?? '',
             key: const ValueKey('login-password'),
             focusNode: _passwordFocusNode,
             label: S.of(context)!.password,

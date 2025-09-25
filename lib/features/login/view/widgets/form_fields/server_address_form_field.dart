@@ -30,6 +30,8 @@ class _ServerAddressFormFieldState extends State<ServerAddressFormField>
   @override
   void initState() {
     super.initState();
+    _textEditingController.text = widget.initialValue ?? "";
+
     _textEditingController.addListener(() {
       setState(() {
         _canClear = _textEditingController.text.isNotEmpty;

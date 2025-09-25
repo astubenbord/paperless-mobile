@@ -98,6 +98,7 @@ class _AddAccountPageState extends State<AddAccountPage> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         ServerAddressFormField(
+                          initialValue: widget.initialServerUrl,
                           onChanged: (value) {
                             setState(() {
                               _reachabilityStatus = ReachabilityStatus.unknown;
