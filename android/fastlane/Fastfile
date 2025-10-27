@@ -55,7 +55,7 @@ platform :android do |options|
     sh "$FLUTTER_ROOT/flutter build apk --split-per-abi --release"
     sh "$FLUTTER_ROOT/flutter build apk --release"
     set_github_release(
-      repository_name: "astubenbord/paperless-mobile",
+      repository_name: "soundwave12345/paperless-mobile",
       api_token: ENV["GH_ACCESS_TOKEN"],
       name: "v" + flutter_version()["version_name"],
       tag_name: "v" + flutter_version()["version_name"],
