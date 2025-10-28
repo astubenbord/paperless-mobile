@@ -11,7 +11,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
+      - name: Extract branch name
+        shell: bash
+        run: echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >>$GITHUB_OUTPUT
+        id: extract_branch
         
       # 1️⃣ Checkout del codice sorgente
       - name: Checkout repository
@@ -25,14 +28,13 @@ jobs:
           mkdir -p /tmp/build
           cp -R . /tmp/build
 
-      # 2️⃣ Setup Flutter (canale stable)
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: stable
+      - name: Set FLUTTER_ROOT environment variable and build dir
+        run: echo "FLUTTER_ROOT=/tmp/build/flutter/bin" >> $GITHUB_ENV
+        
 
 
-      - run: flutter doctor -v
+
+      - run: $FLUTTER_ROOT/flutter doctor -v
 
       # 3️⃣ Ottieni i pacchetti e genera codice (se serve)
       - name: Get dependencies
