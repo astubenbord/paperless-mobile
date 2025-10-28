@@ -20,4 +20,3 @@ $FLUTTER_ROOT/flutter packages pub get
 $FLUTTER_ROOT/dart run build_runner build --delete-conflicting-outputs
 $FLUTTER_ROOT/flutter gen-l10n
 popd
-
