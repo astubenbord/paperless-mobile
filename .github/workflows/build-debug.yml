@@ -49,7 +49,7 @@ jobs:
       - name: Build debug APK
         run: |
           cd /tmp/build/android 
-          flutter build apk --debug
+          $FLUTTER_ROOT/flutter build apk --debug
 
       # 5️⃣ Carica l’APK come artifact scaricabile
       - name: Upload debug APK artifact
