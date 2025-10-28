@@ -38,7 +38,7 @@ jobs:
 
       # 3️⃣ Ottieni i pacchetti e genera codice (se serve)
       - name: Get dependencies
-        run: FLUTTER_ROOT/flutter pub get
+        run: $FLUTTER_ROOT/flutter pub get
         
       - name: Get packages and run codegen
         run: |
