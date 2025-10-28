@@ -27,6 +27,11 @@ jobs:
       # 3️⃣ Ottieni i pacchetti e genera codice (se serve)
       - name: Get dependencies
         run: flutter pub get
+        
+      - name: Get packages and run codegen
+        run: |
+          bash /tmp/build/scripts/install_dependencies_with_submodule.sh
+          bash /tmp/build/scripts/update_changelogs.sh
 
       # 4️⃣ Compila la build debug
       - name: Build debug APK
