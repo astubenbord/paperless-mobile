@@ -1,0 +1,40 @@
+name: Build Android Debug APK
+
+on:
+  # Puoi avviarlo manualmente dal tab "Actions"
+  workflow_dispatch:
+
+permissions: read-all
+
+jobs:
+  build-android-debug:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Checkout del codice sorgente
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2️⃣ Setup Flutter (canale stable)
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Flutter doctor
+        run: flutter doctor -v
+
+      # 3️⃣ Ottieni i pacchetti e genera codice (se serve)
+      - name: Get dependencies
+        run: flutter pub get
+
+      # 4️⃣ Compila la build debug
+      - name: Build debug APK
+        run: flutter build apk --debug
+
+      # 5️⃣ Carica l’APK come artifact scaricabile
+      - name: Upload debug APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: build/app/outputs/flutter-apk/app-debug.apk
