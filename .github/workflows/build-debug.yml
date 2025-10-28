@@ -11,9 +11,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
+        
       # 1️⃣ Checkout del codice sorgente
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+          
+      - name: Copy files to build directory
+        run: |
+          mkdir -p /tmp/build
+          cp -R . /tmp/build
 
       # 2️⃣ Setup Flutter (canale stable)
       - name: Setup Flutter
@@ -21,8 +31,8 @@ jobs:
         with:
           channel: stable
 
-      - name: Flutter doctor
-        run: flutter doctor -v
+
+      - run: flutter doctor -v
 
       # 3️⃣ Ottieni i pacchetti e genera codice (se serve)
       - name: Get dependencies
@@ -35,7 +45,9 @@ jobs:
 
       # 4️⃣ Compila la build debug
       - name: Build debug APK
-        run: flutter build apk --debug
+        run: |
+          cd /tmp/build/android 
+          flutter build apk --debug
 
       # 5️⃣ Carica l’APK come artifact scaricabile
       - name: Upload debug APK artifact
