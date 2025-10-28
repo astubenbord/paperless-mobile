@@ -8,16 +8,16 @@ readonly __script_dir
 pushd "$__script_dir/../"
 
 pushd packages/paperless_api
-$FLUTTER_ROOT/flutter packages pub get
-$FLUTTER_ROOT/dart run build_runner build --delete-conflicting-outputs
+flutter packages pub get
+dart run build_runner build --delete-conflicting-outputs
 popd
 
 pushd packages/mock_server
-$FLUTTER_ROOT/flutter packages pub get
+flutter packages pub get
 popd
 
-$FLUTTER_ROOT/flutter packages pub get
-$FLUTTER_ROOT/dart run build_runner build --delete-conflicting-outputs
-$FLUTTER_ROOT/flutter gen-l10n
+flutter packages pub get
+dart run build_runner build --delete-conflicting-outputs
+flutter gen-l10n
 popd
 
