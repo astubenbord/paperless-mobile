@@ -10,9 +10,12 @@ class UserCredentials extends HiveObject {
   final String token;
   @HiveField(1)
   final ClientCertificate? clientCertificate;
+  @HiveField(2)
+  final Map<String, String> customHeaders;
 
   UserCredentials({
     required this.token,
     this.clientCertificate,
+    this.customHeaders = const {},
   });
 }

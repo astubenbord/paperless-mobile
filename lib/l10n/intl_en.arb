@@ -1044,5 +1044,25 @@
   },
   "permissions": "Permissions",
   "newNote": "New note",
-  "notesMarkdownSyntaxSupportHint": "Paperless Mobile can render notes using basic markdown syntax. Try it out!"
+  "notesMarkdownSyntaxSupportHint": "Paperless Mobile can render notes using basic markdown syntax. Try it out!",
+  "customHeaders": "Custom Headers",
+  "@customHeaders": {
+    "description": "Title for custom HTTP headers section"
+  },
+  "addHeader": "Add Header",
+  "@addHeader": {
+    "description": "Tooltip for button to add a new custom header"
+  },
+  "headerKey": "Header Name",
+  "@headerKey": {
+    "description": "Placeholder for header key input field"
+  },
+  "headerValue": "Header Value",
+  "@headerValue": {
+    "description": "Placeholder for header value input field"
+  },
+  "removeHeader": "Remove Header",
+  "@removeHeader": {
+    "description": "Tooltip for button to remove a custom header"
+  }
 }

@@ -15,6 +15,7 @@ import 'package:paperless_mobile/features/login/model/client_certificate.dart';
 import 'package:paperless_mobile/features/login/model/login_form_credentials.dart';
 import 'package:paperless_mobile/features/login/model/reachability_status.dart';
 import 'package:paperless_mobile/features/login/view/widgets/form_fields/client_certificate_form_field.dart';
+import 'package:paperless_mobile/features/login/view/widgets/form_fields/custom_headers_form_field.dart';
 import 'package:paperless_mobile/features/login/view/widgets/form_fields/server_address_form_field.dart';
 import 'package:paperless_mobile/features/login/view/widgets/form_fields/user_credentials_form_field.dart';
 import 'package:paperless_mobile/generated/assets.gen.dart';
@@ -29,12 +30,14 @@ class AddAccountPage extends StatefulWidget {
     String password,
     String serverUrl,
     ClientCertificate? clientCertificate,
+    Map<String, String> customHeaders,
   ) onSubmit;
 
   final String? initialServerUrl;
   final String? initialUsername;
   final String? initialPassword;
   final ClientCertificate? initialClientCertificate;
+  final Map<String, String>? initialCustomHeaders;
 
   final String submitText;
   final String titleText;
@@ -52,6 +55,7 @@ class AddAccountPage extends StatefulWidget {
     this.initialUsername,
     this.initialPassword,
     this.initialClientCertificate,
+    this.initialCustomHeaders,
     this.bottomLeftButton,
   });
 
@@ -94,76 +98,70 @@ class _AddAccountPageState extends State<AddAccountPage> {
                   controller: _pageController,
                   allowImplicitScrolling: false,
                   children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        ServerAddressFormField(
-                          onChanged: (value) {
-                            setState(() {
-                              _reachabilityStatus = ReachabilityStatus.unknown;
-                            });
-                          },
-                        ).paddedSymmetrically(
-                          horizontal: 12,
-                          vertical: 12,
-                        ),
-                        ClientCertificateFormField(
-                          initialBytes: widget.initialClientCertificate?.bytes,
-                          initialPassphrase:
-                              widget.initialClientCertificate?.passphrase,
-                        ).padded(),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            //TODO: Move additional headers and client cert to separate page
-                            // IconButton.filledTonal(
-                            //   onPressed: () {
-                            //     Navigator.of(context).push(
-                            //       MaterialPageRoute(builder: (context) {
-                            //         return LoginSettingsPage();
-                            //       }),
-                            //     );
-                            //   },
-                            //   icon: Icon(Icons.settings),
-                            // ),
-                            SizedBox(width: 8),
-                            FilledButton.icon(
-                              onPressed: () async {
-                                final status = await _updateReachability();
-                                if (status == ReachabilityStatus.reachable) {
-                                  Future.delayed(1.seconds, () {
-                                    _pageController.nextPage(
-                                      duration: Duration(milliseconds: 300),
-                                      curve: Curves.easeInOut,
-                                    );
-                                  });
-                                }
-                              },
-                              icon: _isCheckingConnection
-                                  ? SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSecondary,
-                                      ),
-                                    )
-                                  : _reachabilityStatus ==
-                                          ReachabilityStatus.reachable
-                                      ? Icon(Icons.done)
-                                      : Icon(Icons.arrow_forward),
-                              label: Text(S.of(context)!.continueLabel),
-                            ),
-                          ],
-                        ).paddedSymmetrically(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
+                    SingleChildScrollView(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          ServerAddressFormField(
+                            onChanged: (value) {
+                              setState(() {
+                                _reachabilityStatus = ReachabilityStatus.unknown;
+                              });
+                            },
+                          ).paddedSymmetrically(
+                            horizontal: 12,
+                            vertical: 12,
+                          ),
+                          ClientCertificateFormField(
+                            initialBytes: widget.initialClientCertificate?.bytes,
+                            initialPassphrase:
+                                widget.initialClientCertificate?.passphrase,
+                          ).padded(),
+                          CustomHeadersFormField(
+                            initialHeaders: widget.initialCustomHeaders ?? {},
+                          ).padded(),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              SizedBox(width: 8),
+                              FilledButton.icon(
+                                onPressed: () async {
+                                  final status = await _updateReachability();
+                                  if (status == ReachabilityStatus.reachable) {
+                                    Future.delayed(1.seconds, () {
+                                      _pageController.nextPage(
+                                        duration: Duration(milliseconds: 300),
+                                        curve: Curves.easeInOut,
+                                      );
+                                    });
+                                  }
+                                },
+                                icon: _isCheckingConnection
+                                    ? SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSecondary,
+                                        ),
+                                      )
+                                    : _reachabilityStatus ==
+                                            ReachabilityStatus.reachable
+                                        ? Icon(Icons.done)
+                                        : Icon(Icons.arrow_forward),
+                                label: Text(S.of(context)!.continueLabel),
+                              ),
+                            ],
+                          ).paddedSymmetrically(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
                         _buildStatusIndicator().padded(),
                       ],
                     ),
+                  ),
                     Column(
                       children: [
                         UserCredentialsFormField(
@@ -319,6 +317,9 @@ class _AddAccountPageState extends State<AddAccountPage> {
       final clientCertFormModel =
           form[ClientCertificateFormField.fkClientCertificate]
               as ClientCertificate?;
+      final customHeaders =
+          form[CustomHeadersFormField.fkCustomHeaders] as Map<String, String>? ??
+              {};
 
       final credentials =
           form[UserCredentialsFormField.fkCredentials] as LoginFormCredentials;
@@ -329,6 +330,7 @@ class _AddAccountPageState extends State<AddAccountPage> {
           credentials.password!,
           form[ServerAddressFormField.fkServerAddress],
           clientCertFormModel,
+          customHeaders,
         );
       } on PaperlessApiException catch (error) {
         if (mounted) showErrorMessage(context, error);

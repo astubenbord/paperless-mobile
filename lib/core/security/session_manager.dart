@@ -9,6 +9,7 @@ abstract interface class SessionManager implements ChangeNotifier {
     String? baseUrl,
     String? authToken,
     ClientCertificate? clientCertificate,
+    Map<String, String>? customHeaders,
   });
   void resetSettings();
 }

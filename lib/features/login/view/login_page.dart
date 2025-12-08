@@ -17,6 +17,7 @@ class LoginPage extends StatelessWidget {
   final String? initialUsername;
   final String? initialPassword;
   final ClientCertificate? initialClientCertificate;
+  final Map<String, String>? initialCustomHeaders;
 
   const LoginPage({
     super.key,
@@ -24,6 +25,7 @@ class LoginPage extends StatelessWidget {
     this.initialUsername,
     this.initialPassword,
     this.initialClientCertificate,
+    this.initialCustomHeaders,
   });
 
   @override
@@ -37,6 +39,7 @@ class LoginPage extends StatelessWidget {
       initialUsername: initialUsername,
       initialPassword: initialPassword,
       initialClientCertificate: initialClientCertificate,
+      initialCustomHeaders: initialCustomHeaders,
       bottomLeftButton: Hive.localUserAccountBox.isNotEmpty
           ? TextButton(
               child: Text(S.of(context)!.logInToExistingAccount),
@@ -48,18 +51,20 @@ class LoginPage extends StatelessWidget {
     );
   }
 
-  void _onLogin(
+  Future<void> _onLogin(
     BuildContext context,
     String username,
     String password,
     String serverUrl,
     ClientCertificate? clientCertificate,
+    Map<String, String> customHeaders,
   ) async {
     try {
       await context.read<AuthenticationCubit>().login(
             credentials: LoginFormCredentials(
               username: username,
               password: password,
+              customHeaders: customHeaders,
             ),
             serverUrl: serverUrl,
             clientCertificate: clientCertificate,

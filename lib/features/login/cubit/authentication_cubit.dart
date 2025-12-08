@@ -175,6 +175,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
         authToken: credentials!.token,
         clientCertificate: credentials.clientCertificate,
         baseUrl: account.serverUrl,
+        customHeaders: credentials.customHeaders,
       );
 
       globalSettings.loggedInUserId = localUserId;
@@ -335,6 +336,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
       clientCertificate: authentication.clientCertificate,
       authToken: authentication.token,
       baseUrl: localUserAccount.serverUrl,
+      customHeaders: authentication.customHeaders,
     );
     logger.fd(
       "Security context successfully updated.",
@@ -460,6 +462,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     sessionManager.updateSettings(
       baseUrl: serverUrl,
       clientCertificate: clientCert,
+      customHeaders: credentials.customHeaders,
     );
 
     final authApi = _apiFactory.createAuthenticationApi(sessionManager.client);
@@ -485,6 +488,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
       baseUrl: serverUrl,
       clientCertificate: clientCert,
       authToken: token,
+      customHeaders: credentials.customHeaders,
     );
     final userAccountBox =
         Hive.box<LocalUserAccount>(HiveBoxes.localUserAccount);
@@ -583,6 +587,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
         UserCredentials(
           token: token,
           clientCertificate: clientCert,
+          customHeaders: credentials.customHeaders,
         ),
       );
 

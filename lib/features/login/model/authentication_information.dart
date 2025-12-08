@@ -18,11 +18,15 @@ class AuthenticationInformation {
   @HiveField(3)
   String username;
 
+  @HiveField(4)
+  Map<String, String> customHeaders;
+
   AuthenticationInformation({
     required this.username,
     required this.serverUrl,
     this.token,
     this.clientCertificate,
+    this.customHeaders = const {},
   });
 
   bool get isValid {

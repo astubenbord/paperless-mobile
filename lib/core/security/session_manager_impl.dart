@@ -50,6 +50,7 @@ class SessionManagerImpl extends ValueNotifier<Dio> implements SessionManager {
     String? baseUrl,
     String? authToken,
     ClientCertificate? clientCertificate,
+    Map<String, String>? customHeaders,
   }) {
     if (clientCertificate != null) {
       final context = SecurityContext()
@@ -81,6 +82,10 @@ class SessionManagerImpl extends ValueNotifier<Dio> implements SessionManager {
       client.options.headers.addAll({
         HttpHeaders.authorizationHeader: 'Token $authToken',
       });
+    }
+
+    if (customHeaders != null && customHeaders.isNotEmpty) {
+      client.options.headers.addAll(customHeaders);
     }
 
     notifyListeners();
