@@ -800,6 +800,8 @@
   "@managePermissions": {
     "description": "Button which leads user to manage permissions page"
   },
+  "customHeadersDescription": "Accés mitjançant un servidor intermediari segur",
+  "@customHeadersDescription": {},
   "errorRetrievingServerVersion": "Error en determinar la versió del servidor.",
   "@errorRetrievingServerVersion": {
     "description": "Message shown at the bottom of the settings page when the remote server version could not be resolved."

@@ -1,3 +1,5 @@
+
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -8,12 +10,12 @@ plugins {
 import java.util.Properties
 import java.io.FileInputStream
 
-val keystorePropsFile = rootProject.file("key.properties")
-val keystoreProperties = Properties().apply {
-    if (keystorePropsFile.exists()) {
-        load(FileInputStream(keystorePropsFile))
-    }
+val keystoreProperties = Properties()
+val keystorePropertiesFile = rootProject.file("key.properties")
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
+
 
 android {
     namespace = "de.astubenbord.paperless_mobile"
@@ -58,9 +60,13 @@ android {
         }
     }
 
+
     buildTypes {
         getByName("release") {
             signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
         getByName("debug") {
             applicationIdSuffix = ".debug"

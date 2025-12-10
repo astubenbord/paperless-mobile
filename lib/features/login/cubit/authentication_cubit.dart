@@ -85,7 +85,17 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
               AuthenticatingStage.persistingLocalUserData));
         },
       );
-    } on PaperlessApiException catch (_) {
+    } on PaperlessApiException catch (error) {
+      emit(
+        AuthenticationErrorState(
+          serverUrl: serverUrl,
+          username: credentials.username!,
+          password: credentials.password!,
+          clientCertificate: clientCertificate,
+        ),
+      );
+      rethrow;
+    } catch (error) {
       emit(
         AuthenticationErrorState(
           serverUrl: serverUrl,
@@ -671,10 +681,17 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
 
     localUserAccount.paperlessUser = updatedPaperlessUser;
     await localUserAccount.save();
+    await localUserAccount.save();
     logger.fd(
       "Successfully updated remote user object.",
       className: runtimeType.toString(),
       methodName: '_updateRemoteUser',
     );
+  }
+
+  void reset() {
+    if (state is AuthenticatingState) {
+      emit(const UnauthenticatedState());
+    }
   }
 }

@@ -84,50 +84,41 @@ class _CustomHeadersFormFieldState extends State<CustomHeadersFormField> {
         // Update the field value whenever headers change
       },
       builder: (FormFieldState<Map<String, String>> field) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    S.of(context)!.customHeaders,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  IconButton.outlined(
+        final theme =
+            Theme.of(context).copyWith(dividerColor: Colors.transparent);
+        return Theme(
+          data: theme,
+          child: ExpansionTile(
+            title: Text(S.of(context)!.customHeaders),
+            subtitle: Text(S.of(context)!.customHeadersDescription),
+            children: [
+              ..._headers.asMap().entries.map((entry) {
+                final index = entry.key;
+                final header = entry.value;
+                return _HeaderInputRow(
+                  keyController: header.keyController,
+                  valueController: header.valueController,
+                  onRemove: _headers.length > 1
+                      ? () => _removeHeader(index)
+                      : null,
+                  onChanged: () {
+                    field.didChange(_getHeadersMap());
+                  },
+                );
+              }),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
                     onPressed: _addHeader,
                     icon: const Icon(Icons.add),
-                    tooltip: S.of(context)!.addHeader,
+                    label: Text(S.of(context)!.addHeader),
                   ),
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 300,
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    ..._headers.asMap().entries.map((entry) {
-                      final index = entry.key;
-                      final header = entry.value;
-                      return _HeaderInputRow(
-                        keyController: header.keyController,
-                        valueController: header.valueController,
-                        onRemove: _headers.length > 1
-                            ? () => _removeHeader(index)
-                            : null,
-                        onChanged: () {
-                          field.didChange(_getHeadersMap());
-                        },
-                      );
-                    }).toList(),
-                  ],
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         );
       },
     );

@@ -167,7 +167,11 @@ void main() async {
     ]);
 
     final localNotificationService = LocalNotificationService();
-    await localNotificationService.initialize();
+    try {
+      await localNotificationService.initialize();
+    } catch (e, st) {
+      logger.e("Failed to initialize notifications", error: e, stackTrace: st);
+    }
 
     final apiFactory = PaperlessApiFactoryImpl(sessionManager);
     final authenticationCubit = AuthenticationCubit(
@@ -203,6 +207,30 @@ void main() async {
       error: message == null ? error : null,
       methodName: "main",
       stackTrace: stackTrace,
+    );
+    // Initialisation failure fallback
+    runApp(
+        MaterialApp(
+          home: Scaffold(
+            backgroundColor: Colors.white,
+            body: SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: SafeArea(
+                child: Column(
+                  children: [
+                    const Icon(Icons.error_outline, color: Colors.red, size: 48),
+                    const SizedBox(height: 16),
+                    const Text("App Startup Failed", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black)),
+                    const SizedBox(height: 16),
+                    Text(error.toString(), style: const TextStyle(color: Colors.red)),
+                    const SizedBox(height: 8),
+                    Text(stackTrace.toString(), style: const TextStyle(fontSize: 10, color: Colors.black87)),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        )
     );
   });
 }
@@ -299,8 +327,8 @@ class _GoRouterShellState extends State<GoRouterShell> {
             child: Provider.value(
               value: widget.apiFactory,
               child: BlocListener<AuthenticationCubit, AuthenticationState>(
-                listener: (context, state) {
-                  switch (state) {
+                listener: (context, authState) {
+                  switch (authState) {
                     case UnauthenticatedState(
                         redirectToAccountSelection: var shouldRedirect
                       ):
@@ -324,13 +352,22 @@ class _GoRouterShellState extends State<GoRouterShell> {
                       break;
                     case AuthenticatingState state:
                       AuthenticatingRoute(state.currentStage.name)
-                          .push(context);
+                          .push(context)
+                          .then((_) {
+                        if (context.mounted) {
+                          final cubit = context.read<AuthenticationCubit>();
+                          if (cubit.state is AuthenticatingState) {
+                            cubit.reset();
+                          }
+                        }
+                      });
                       break;
                     case LoggingOutState():
                       const LoggingOutRoute().go(context);
                       break;
                     case AuthenticationErrorState():
-                      if (context.canPop()) {
+                      if (context.canPop() &&
+                          state.uri.toString().contains('/authenticating')) {
                         context.pop();
                       }
                       break;

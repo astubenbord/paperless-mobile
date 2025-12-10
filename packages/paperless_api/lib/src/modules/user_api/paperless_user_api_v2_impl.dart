@@ -16,7 +16,12 @@ class PaperlessUserApiV2Impl implements PaperlessUserApi {
           validateStatus: (status) => status == 200,
         ),
       );
-      return response.data['user_id'];
+      final data = response.data;
+      if (data is! Map) {
+         throw FormatException(
+            'Invalid API response. Expected Map, got ${data.runtimeType}. Content: $data');
+      }
+      return data['user_id'];
     } on DioException catch (exception) {
       throw exception.unravel(
         orElse: const PaperlessApiException(ErrorCode.userNotFound),

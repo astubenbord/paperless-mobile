@@ -800,6 +800,8 @@
   "@managePermissions": {
     "description": "Button which leads user to manage permissions page"
   },
+  "customHeadersDescription": "Acceso a través de un proxy seguro",
+  "@customHeadersDescription": {},
   "errorRetrievingServerVersion": "Ocurrió un error intentando determinar la versión del servidor.",
   "@errorRetrievingServerVersion": {
     "description": "Message shown at the bottom of the settings page when the remote server version could not be resolved."

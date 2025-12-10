@@ -307,6 +307,7 @@ class LocalNotificationService {
 }
 
 @protected
+@pragma('vm:entry-point')
 void onDidReceiveBackgroundNotificationResponse(NotificationResponse response) {
   //TODO: When periodic background inbox check is implemented, notification tap is handled here
   debugPrint(response.toString());

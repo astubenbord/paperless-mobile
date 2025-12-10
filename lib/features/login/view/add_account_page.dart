@@ -237,12 +237,22 @@ class _AddAccountPageState extends State<AddAccountPage> {
         _formKey.currentState?.getRawValue<ClientCertificate>(
       ClientCertificateFormField.fkClientCertificate,
     );
+    final serverAddress = address ??
+        _formKey.currentState!
+            .getRawValue(ServerAddressFormField.fkServerAddress) as String?;
+
+    if (serverAddress == null || serverAddress.isEmpty) {
+      setState(() {
+        _isCheckingConnection = false;
+        _reachabilityStatus = ReachabilityStatus.unknown;
+      });
+      return ReachabilityStatus.unknown;
+    }
+
     final status = await context
         .read<ConnectivityStatusService>()
         .isPaperlessServerReachable(
-          address ??
-              _formKey.currentState!
-                  .getRawValue(ServerAddressFormField.fkServerAddress),
+          serverAddress,
           selectedCertificate,
         );
     setState(() {
