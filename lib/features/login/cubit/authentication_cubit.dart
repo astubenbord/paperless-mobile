@@ -8,6 +8,7 @@ import 'package:paperless_mobile/constants.dart';
 import 'package:paperless_mobile/core/database/hive/hive_config.dart';
 import 'package:paperless_mobile/core/database/hive/hive_extensions.dart';
 import 'package:paperless_mobile/core/database/tables/global_settings.dart';
+import 'package:paperless_mobile/core/model/info_message_exception.dart';
 import 'package:paperless_mobile/core/database/tables/local_user_account.dart';
 import 'package:paperless_mobile/core/database/tables/local_user_app_state.dart';
 import 'package:paperless_mobile/core/database/tables/local_user_settings.dart';
@@ -606,81 +607,39 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     final userStateBox =
         Hive.box<LocalUserAppState>(HiveBoxes.localUserAppState);
 
-    // If user already exists, update their credentials instead of failing
+    // Check if user already exists
     if (userAccountBox.containsKey(localUserId)) {
-      logger.fd(
-        "The user $redactedId already exists. Updating credentials...",
-        className: runtimeType.toString(),
-        methodName: '_addUser',
-      );
-
-      // Update credentials in encrypted box
+      // Check if auth method has changed
+      bool authMethodChanged = false;
       await withEncryptedBox(HiveBoxes.localUserCredentials, (box) async {
-        logger.fd(
-          "Updating user credentials inside encrypted storage...",
-          className: runtimeType.toString(),
-          methodName: '_addUser',
-        );
-
-        await box.put(
-          localUserId,
-          UserCredentials(
-            token: token,
-            clientCertificate: clientCert,
-            isApiKeyAuth: isApiKeyAuth,
-          ),
-        );
-
-        logger.fd(
-          "User credentials successfully updated.",
-          className: runtimeType.toString(),
-          methodName: '_addUser',
-        );
+        final existingCredentials = box.get(localUserId) as UserCredentials?;
+        if (existingCredentials != null) {
+          authMethodChanged = existingCredentials.isApiKeyAuth != isApiKeyAuth;
+        }
       });
 
-      // Fetch and update API version
-      final apiVersion = await _getApiVersion(sessionManager.client);
-
-      // Fetch current user info from server
-      late UserModel serverUser;
-      try {
-        serverUser = await _apiFactory
-            .createUserApi(
-              sessionManager.client,
-              apiVersion: apiVersion,
-            )
-            .findCurrentUser();
-      } on DioException catch (error, stackTrace) {
-        logger.fe(
-          "An error occurred while fetching the remote paperless user.",
+      if (authMethodChanged) {
+        logger.fd(
+          "Auth method changed for user $redactedId. Updating...",
           className: runtimeType.toString(),
           methodName: '_addUser',
-          error: error,
-          stackTrace: stackTrace,
         );
-        rethrow;
+        return await _updateUserAuthMethod(
+          localUserId,
+          serverUrl,
+          token,
+          isApiKeyAuth,
+          clientCert,
+          sessionManager,
+        );
+      } else {
+        logger.fw(
+          "The user $redactedId already exists.",
+          className: runtimeType.toString(),
+          methodName: '_addUser',
+        );
+        throw InfoMessageException(code: ErrorCode.userAlreadyExists);
       }
-
-      // Update user account with latest info
-      final existingAccount = userAccountBox.get(localUserId)!;
-      await userAccountBox.put(
-        localUserId,
-        LocalUserAccount(
-          id: localUserId,
-          settings: existingAccount.settings, // Preserve existing settings
-          serverUrl: serverUrl,
-          paperlessUser: serverUser,
-          apiVersion: apiVersion,
-        ),
-      );
-
-      logger.fd(
-        "User account successfully updated with new credentials.",
-        className: runtimeType.toString(),
-        methodName: '_addUser',
-      );
-
-      return serverUser.id;
     }
     await onFetchUserInformation?.call();
     final apiVersion = await _getApiVersion(sessionManager.client);
@@ -786,6 +745,93 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
         methodName: '_addUser',
       );
     }
+
+    return serverUser.id;
+  }
+
+  Future<int> _updateUserAuthMethod(
+    String localUserId,
+    String serverUrl,
+    String token,
+    bool isApiKeyAuth,
+    ClientCertificate? clientCert,
+    SessionManager sessionManager,
+  ) async {
+    final redactedId = redactUserId(localUserId);
+    logger.fd(
+      "Updating authentication method for user $redactedId...",
+      className: runtimeType.toString(),
+      methodName: '_updateUserAuthMethod',
+    );
+
+    final userAccountBox =
+        Hive.box<LocalUserAccount>(HiveBoxes.localUserAccount);
+
+    // Update credentials in encrypted box
+    await withEncryptedBox(HiveBoxes.localUserCredentials, (box) async {
+      logger.fd(
+        "Updating user credentials inside encrypted storage...",
+        className: runtimeType.toString(),
+        methodName: '_updateUserAuthMethod',
+      );
+
+      await box.put(
+        localUserId,
+        UserCredentials(
+          token: token,
+          clientCertificate: clientCert,
+          isApiKeyAuth: isApiKeyAuth,
+        ),
+      );
+
+      logger.fd(
+        "User credentials successfully updated.",
+        className: runtimeType.toString(),
+        methodName: '_updateUserAuthMethod',
+      );
+    });
+
+    // Fetch and update API version
+    final apiVersion = await _getApiVersion(sessionManager.client);
+
+    // Fetch current user info from server
+    late UserModel serverUser;
+    try {
+      serverUser = await _apiFactory
+          .createUserApi(
+            sessionManager.client,
+            apiVersion: apiVersion,
+          )
+          .findCurrentUser();
+    } on DioException catch (error, stackTrace) {
+      logger.fe(
+        "An error occurred while fetching the remote paperless user.",
+        className: runtimeType.toString(),
+        methodName: '_updateUserAuthMethod',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+
+    // Update user account with latest info
+    final existingAccount = userAccountBox.get(localUserId)!;
+    await userAccountBox.put(
+      localUserId,
+      LocalUserAccount(
+        id: localUserId,
+        settings: existingAccount.settings, // Preserve existing settings
+        serverUrl: serverUrl,
+        paperlessUser: serverUser,
+        apiVersion: apiVersion,
+      ),
+    );
+
+    logger.fd(
+      "Authentication method successfully updated for user $redactedId.",
+      className: runtimeType.toString(),
+      methodName: '_updateUserAuthMethod',
+    );
 
     return serverUser.id;
   }
