@@ -1060,6 +1060,7 @@
   "code": "Code",
   "authenticatorCode": "Authenticator code",
   "invalidAuthenticatorCode": "Invalid authenticator code, please try again.",
+  "authenticatorCodeMustBeSixDigits": "Must be 6 digits long",
   "enableTwoFactorAuthentication": "Enable Two-factor Authentication",
   "disableTwoFactorAuthentication": "Disable Two-factor Authentication"
 }
