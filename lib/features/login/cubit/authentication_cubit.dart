@@ -47,6 +47,11 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     this._notificationService,
   ) : super(const UnauthenticatedState());
 
+  /// Cancels the current login attempt and returns to unauthenticated state
+  void cancelLogin() {
+    emit(const UnauthenticatedState());
+  }
+
   Future<void> login({
     required LoginFormCredentials credentials,
     required String serverUrl,
@@ -69,28 +74,56 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     String? username = credentials.username;
     if (isApiKeyAuth) {
       try {
-        // Temporarily set up session with API key to fetch user info
+        // First, reset session and set up WITHOUT auth token to fetch API version
+        // (the /api/ endpoint doesn't require authentication)
+        _sessionManager.resetSettings();
         _sessionManager.updateSettings(
           baseUrl: serverUrl,
           clientCertificate: clientCertificate,
-          authToken: credentials.apiKey,
         );
         final apiVersion = await _getApiVersion(_sessionManager.client);
+        logger.fd(
+          "Successfully fetched API version ($apiVersion), now setting API key and fetching user info...",
+          className: runtimeType.toString(),
+          methodName: 'login',
+        );
+
+        // Now set the API key for authenticated requests
+        _sessionManager.updateSettings(
+          authToken: credentials.apiKey,
+        );
+
         final userApi = _apiFactory.createUserApi(
           _sessionManager.client,
           apiVersion: apiVersion,
         );
-        final serverUser = await userApi.findCurrentUser();
+        logger.fd(
+          "Calling findCurrentUser()...",
+          className: runtimeType.toString(),
+          methodName: 'login',
+        );
+        final serverUser = await userApi.findCurrentUser().timeout(
+          const Duration(seconds: 5),
+          onTimeout: () {
+            logger.fw(
+              "findCurrentUser() timed out after 5 seconds",
+              className: runtimeType.toString(),
+              methodName: 'login',
+            );
+            throw const PaperlessApiException(
+              ErrorCode.invalidApiKey,
+            );
+          },
+        );
+        logger.fd(
+          "Successfully fetched user: ${serverUser.username}",
+          className: runtimeType.toString(),
+          methodName: 'login',
+        );
         username = serverUser.username;
       } catch (error) {
-        emit(
-          AuthenticationErrorState(
-            serverUrl: serverUrl,
-            username: '',
-            password: '',
-            clientCertificate: clientCertificate,
-          ),
-        );
+        // Don't emit error state - let exception bubble up to UI
+        // UI will handle showing error and returning to login form
         rethrow;
       }
     }
@@ -123,14 +156,8 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
         },
       );
     } on PaperlessApiException catch (_) {
-      emit(
-        AuthenticationErrorState(
-          serverUrl: serverUrl,
-          username: credentials.username ?? '',
-          password: credentials.password ?? '',
-          clientCertificate: clientCertificate,
-        ),
-      );
+      // Don't emit error state - let exception bubble up to UI
+      // UI will handle showing error and returning to login form
       rethrow;
     }
 
@@ -525,6 +552,8 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
       methodName: '_addUser',
     );
 
+    // Reset session to clear any previous auth state
+    sessionManager.resetSettings();
     sessionManager.updateSettings(
       baseUrl: serverUrl,
       clientCertificate: clientCert,

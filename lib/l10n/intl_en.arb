@@ -520,6 +520,8 @@
   "@apiKey": {},
   "apiKeyRequired": "API key is required.",
   "@apiKeyRequired": {},
+  "invalidApiKey": "Invalid API key, please try again.",
+  "@invalidApiKey": {},
   "loginWithApiKey": "or login via API Key",
   "@loginWithApiKey": {},
   "loginWithUsernamePassword": "or login via username and password",

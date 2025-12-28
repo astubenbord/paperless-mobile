@@ -11,6 +11,7 @@ import 'package:paperless_mobile/core/exception/server_message_exception.dart';
 import 'package:paperless_mobile/core/model/info_message_exception.dart';
 import 'package:paperless_mobile/core/service/connectivity_status_service.dart';
 import 'package:paperless_mobile/core/extensions/flutter_extensions.dart';
+import 'package:paperless_mobile/features/login/cubit/authentication_cubit.dart';
 import 'package:paperless_mobile/features/login/model/client_certificate.dart';
 import 'package:paperless_mobile/features/login/model/login_form_credentials.dart';
 import 'package:paperless_mobile/features/login/model/reachability_status.dart';
@@ -370,13 +371,25 @@ class _AddAccountPageState extends State<AddAccountPage> {
           clientCertFormModel,
         );
       } on PaperlessApiException catch (error) {
-        if (mounted) showErrorMessage(context, error);
+        if (mounted) {
+          context.read<AuthenticationCubit>().cancelLogin();
+          showErrorMessage(context, error);
+        }
       } on ServerMessageException catch (error) {
-        if (mounted) showLocalizedError(context, error.message);
+        if (mounted) {
+          context.read<AuthenticationCubit>().cancelLogin();
+          showLocalizedError(context, error.message);
+        }
       } on InfoMessageException catch (error) {
-        if (mounted) showInfoMessage(context, error);
+        if (mounted) {
+          context.read<AuthenticationCubit>().cancelLogin();
+          showInfoMessage(context, error);
+        }
       } catch (error) {
-        if (mounted) showGenericError(context, error);
+        if (mounted) {
+          context.read<AuthenticationCubit>().cancelLogin();
+          showGenericError(context, error);
+        }
       } finally {
         setState(() {
           _isFormSubmitted = false;

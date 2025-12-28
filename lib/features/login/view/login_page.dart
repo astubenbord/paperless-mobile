@@ -64,8 +64,16 @@ class LoginPage extends StatelessWidget {
 
       // DocumentsRoute().go(context);
     } on PaperlessApiException catch (error, stackTrace) {
-      if (context.mounted) showErrorMessage(context, error, stackTrace);
+      if (context.mounted) {
+        // Reset to unauthenticated state to dismiss authenticating screen
+        context.read<AuthenticationCubit>().cancelLogin();
+        showErrorMessage(context, error, stackTrace);
+      }
     } on PaperlessFormValidationException catch (exception, stackTrace) {
+      if (context.mounted) {
+        // Reset to unauthenticated state to dismiss authenticating screen
+        context.read<AuthenticationCubit>().cancelLogin();
+      }
       if (exception.hasUnspecificErrorMessage()) {
         if (context.mounted) {
           showLocalizedError(context, exception.unspecificErrorMessage()!);
@@ -80,9 +88,13 @@ class LoginPage extends StatelessWidget {
         }
       }
     } on InfoMessageException catch (error) {
-      if (context.mounted) showInfoMessage(context, error);
+      if (context.mounted) {
+        context.read<AuthenticationCubit>().cancelLogin();
+        showInfoMessage(context, error);
+      }
     } catch (unknownError, stackTrace) {
       if (context.mounted) {
+        context.read<AuthenticationCubit>().cancelLogin();
         showGenericError(context, unknownError.toString(), stackTrace);
       }
     }

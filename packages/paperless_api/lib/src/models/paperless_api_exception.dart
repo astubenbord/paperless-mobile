@@ -82,5 +82,6 @@ enum ErrorCode {
   customFieldLoadFailed,
   customFieldDeleteFailed,
   deleteNoteFailed,
-  addNoteFailed;
+  addNoteFailed,
+  invalidApiKey;
 }
