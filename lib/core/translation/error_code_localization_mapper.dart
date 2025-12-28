@@ -85,5 +85,7 @@ String translateError(BuildContext context, ErrorCode code) {
     ErrorCode.deleteNoteFailed => 'Could not delete note, please try again.',
     ErrorCode.addNoteFailed => 'Could not create note, please try again.',
     ErrorCode.invalidApiKey => S.of(context)!.invalidApiKey,
+    ErrorCode.mfaRequired => S.of(context)!.twoFactorAuthenticationRequired,
+    ErrorCode.invalidMfaCode => S.of(context)!.invalidAuthenticatorCode,
   };
 }

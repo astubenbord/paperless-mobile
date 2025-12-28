@@ -588,6 +588,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
       token = await authApi.login(
         username: credentials.username!,
         password: credentials.password!,
+        totpCode: credentials.totpCode,
       );
       logger.fd(
         "Bearer token successfully retrieved.",

@@ -100,7 +100,7 @@ void showErrorMessage(
   showSnackBar(
     context,
     translateError(context, error.code),
-    details: error.details,
+    details: error.code == ErrorCode.invalidMfaCode ? null : error.details,
   );
   log(
     "An error has occurred.",

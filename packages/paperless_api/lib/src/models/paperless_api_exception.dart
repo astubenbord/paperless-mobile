@@ -28,6 +28,12 @@ class PaperlessApiException implements Exception {
   }
 }
 
+class PaperlessMfaRequiredException extends PaperlessApiException {
+  PaperlessMfaRequiredException({
+    super.details = 'MFA code is required',
+  }) : super(ErrorCode.mfaRequired);
+}
+
 enum ErrorCode {
   unknown,
   authenticationFailed,
@@ -83,5 +89,7 @@ enum ErrorCode {
   customFieldDeleteFailed,
   deleteNoteFailed,
   addNoteFailed,
-  invalidApiKey;
+  invalidApiKey,
+  mfaRequired,
+  invalidMfaCode;
 }

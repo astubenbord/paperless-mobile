@@ -8,6 +8,7 @@ import 'package:paperless_mobile/features/login/cubit/authentication_cubit.dart'
 import 'package:paperless_mobile/features/login/model/client_certificate.dart';
 import 'package:paperless_mobile/features/login/model/login_form_credentials.dart';
 import 'package:paperless_mobile/features/login/view/add_account_page.dart';
+import 'package:paperless_mobile/features/login/view/widgets/totp_dialog.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
 import 'package:paperless_mobile/helpers/message_helpers.dart';
 import 'package:paperless_mobile/routing/routes/login_route.dart';
@@ -49,7 +50,7 @@ class LoginPage extends StatelessWidget {
     );
   }
 
-  void _onLogin(
+  Future<void> _onLogin(
     BuildContext context,
     LoginFormCredentials credentials,
     String serverUrl,
@@ -63,11 +64,40 @@ class LoginPage extends StatelessWidget {
           );
 
       // DocumentsRoute().go(context);
+    } on PaperlessMfaRequiredException {
+      // Show TOTP dialog
+      if (!context.mounted) return;
+
+      final totpCode = await showDialog<String>(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => TotpDialog(
+          onSubmit: (code) => Navigator.pop(context, code),
+        ),
+      );
+
+      if (totpCode != null && context.mounted) {
+        // Retry login with TOTP code
+        final updatedCredentials = credentials.copyWith(totpCode: totpCode);
+        // Reset to unauthenticated state so we can try logging in again
+        context.read<AuthenticationCubit>().cancelLogin();
+        await _onLogin(
+            context, updatedCredentials, serverUrl, clientCertificate);
+      } else {
+        if (context.mounted) {
+          context.read<AuthenticationCubit>().cancelLogin();
+        }
+      }
     } on PaperlessApiException catch (error, stackTrace) {
       if (context.mounted) {
         // Reset to unauthenticated state to dismiss authenticating screen
         context.read<AuthenticationCubit>().cancelLogin();
-        showErrorMessage(context, error, stackTrace);
+
+        if (error.code == ErrorCode.invalidMfaCode) {
+          showErrorMessage(context, error, stackTrace);
+        } else {
+          showErrorMessage(context, error, stackTrace);
+        }
       }
     } on PaperlessFormValidationException catch (exception, stackTrace) {
       if (context.mounted) {

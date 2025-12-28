@@ -1054,5 +1054,12 @@
   },
   "permissions": "Permissions",
   "newNote": "New note",
-  "notesMarkdownSyntaxSupportHint": "Paperless Mobile can render notes using basic markdown syntax. Try it out!"
+  "notesMarkdownSyntaxSupportHint": "Paperless Mobile can render notes using basic markdown syntax. Try it out!",
+  "twoFactorAuthentication": "Two-factor Authentication",
+  "twoFactorAuthenticationRequired": "Your account is protected by two-factor authentication. Please enter an authenticator code:",
+  "code": "Code",
+  "authenticatorCode": "Authenticator code",
+  "invalidAuthenticatorCode": "Invalid authenticator code, please try again.",
+  "enableTwoFactorAuthentication": "Enable Two-factor Authentication",
+  "disableTwoFactorAuthentication": "Disable Two-factor Authentication"
 }
