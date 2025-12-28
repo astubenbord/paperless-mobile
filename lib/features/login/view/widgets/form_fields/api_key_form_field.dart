@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 
-class ObscuredInputTextFormField extends StatefulWidget {
+class ApiKeyFormField extends StatefulWidget {
   final String? initialValue;
   final String label;
   final void Function(String?) onChanged;
   final FormFieldValidator<String>? validator;
   final bool enabled;
   final FocusNode? focusNode;
-
   final ValueChanged<String?>? onFieldSubmitted;
 
-  const ObscuredInputTextFormField({
+  const ApiKeyFormField({
     super.key,
     required this.onChanged,
     required this.label,
@@ -22,33 +21,23 @@ class ObscuredInputTextFormField extends StatefulWidget {
   });
 
   @override
-  State<ObscuredInputTextFormField> createState() =>
-      _ObscuredInputTextFormFieldState();
+  State<ApiKeyFormField> createState() => _ApiKeyFormFieldState();
 }
 
-class _ObscuredInputTextFormFieldState
-    extends State<ObscuredInputTextFormField> {
-  bool _showPassword = false;
-  late final FocusNode _passwordFocusNode;
-  bool _createdFocusNode = false;
+class _ApiKeyFormFieldState extends State<ApiKeyFormField> {
+  bool _showApiKey = false;
+  late final FocusNode _apiKeyFocusNode;
 
   @override
   void initState() {
     super.initState();
-    if (widget.focusNode == null) {
-      _passwordFocusNode = FocusNode();
-      _createdFocusNode = true;
-    } else {
-      _passwordFocusNode = widget.focusNode!;
-      _createdFocusNode = false;
-    }
+    _apiKeyFocusNode = widget.focusNode ?? FocusNode();
   }
 
   @override
   void dispose() {
-    // Only dispose if we created the FocusNode
-    if (_createdFocusNode) {
-      _passwordFocusNode.dispose();
+    if (widget.focusNode == null) {
+      _apiKeyFocusNode.dispose();
     }
     super.dispose();
   }
@@ -61,17 +50,16 @@ class _ObscuredInputTextFormFieldState
       onFieldSubmitted: widget.onFieldSubmitted,
       validator: widget.validator,
       initialValue: widget.initialValue,
-      focusNode: _passwordFocusNode,
-      obscureText: !_showPassword,
+      focusNode: _apiKeyFocusNode,
+      obscureText: !_showApiKey,
       autocorrect: false,
       onChanged: widget.onChanged,
-      autofillHints: const [AutofillHints.password],
       decoration: InputDecoration(
         label: Text(widget.label),
         suffixIcon: IconButton(
-          icon: Icon(_showPassword ? Icons.visibility_off : Icons.visibility),
+          icon: Icon(_showApiKey ? Icons.visibility_off : Icons.visibility),
           onPressed: () => setState(() {
-            _showPassword = !_showPassword;
+            _showApiKey = !_showApiKey;
           }),
         ),
       ),

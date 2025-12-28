@@ -52,13 +52,50 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     required String serverUrl,
     ClientCertificate? clientCertificate,
   }) async {
-    assert(credentials.username != null && credentials.password != null);
+    final bool isApiKeyAuth = credentials.isApiKeyAuth;
+    assert(
+      (isApiKeyAuth && credentials.apiKey != null) ||
+          (!isApiKeyAuth &&
+              credentials.username != null &&
+              credentials.password != null),
+    );
     if (state is AuthenticatingState) {
       // Cancel duplicate login requests
       return;
     }
     emit(const AuthenticatingState(AuthenticatingStage.authenticating));
-    final localUserId = "${credentials.username}@$serverUrl";
+
+    // For API key auth, we need to fetch the username first
+    String? username = credentials.username;
+    if (isApiKeyAuth) {
+      try {
+        // Temporarily set up session with API key to fetch user info
+        _sessionManager.updateSettings(
+          baseUrl: serverUrl,
+          clientCertificate: clientCertificate,
+          authToken: credentials.apiKey,
+        );
+        final apiVersion = await _getApiVersion(_sessionManager.client);
+        final userApi = _apiFactory.createUserApi(
+          _sessionManager.client,
+          apiVersion: apiVersion,
+        );
+        final serverUser = await userApi.findCurrentUser();
+        username = serverUser.username;
+      } catch (error) {
+        emit(
+          AuthenticationErrorState(
+            serverUrl: serverUrl,
+            username: '',
+            password: '',
+            clientCertificate: clientCertificate,
+          ),
+        );
+        rethrow;
+      }
+    }
+
+    final localUserId = "$username@$serverUrl";
     final redactedId = redactUserId(localUserId);
 
     logger.fd(
@@ -89,8 +126,8 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
       emit(
         AuthenticationErrorState(
           serverUrl: serverUrl,
-          username: credentials.username!,
-          password: credentials.password!,
+          username: credentials.username ?? '',
+          password: credentials.password ?? '',
           clientCertificate: clientCertificate,
         ),
       );
@@ -200,18 +237,43 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     required bool enableBiometricAuthentication,
     required String locale,
   }) async {
-    assert(credentials.password != null && credentials.username != null);
-    final localUserId = "${credentials.username}@$serverUrl";
-    final redactedId = redactUserId(localUserId);
-    logger.fd(
-      "Adding account $redactedId...",
-      className: runtimeType.toString(),
-      methodName: 'switchAccount',
+    final bool isApiKeyAuth = credentials.isApiKeyAuth;
+    assert(
+      (isApiKeyAuth && credentials.apiKey != null) ||
+          (!isApiKeyAuth &&
+              credentials.username != null &&
+              credentials.password != null),
     );
 
     final SessionManager sessionManager = SessionManagerImpl([
       LanguageHeaderInterceptor(() => locale),
     ]);
+
+    // For API key auth, we need to fetch the username first
+    String? username = credentials.username;
+    if (isApiKeyAuth) {
+      sessionManager.updateSettings(
+        baseUrl: serverUrl,
+        clientCertificate: clientCertificate,
+        authToken: credentials.apiKey,
+      );
+      final apiVersion = await _getApiVersion(sessionManager.client);
+      final userApi = _apiFactory.createUserApi(
+        sessionManager.client,
+        apiVersion: apiVersion,
+      );
+      final serverUser = await userApi.findCurrentUser();
+      username = serverUser.username;
+    }
+
+    final localUserId = "$username@$serverUrl";
+    final redactedId = redactUserId(localUserId);
+    logger.fd(
+      "Adding account $redactedId...",
+      className: runtimeType.toString(),
+      methodName: 'addAccount',
+    );
+
     await _addUser(
       localUserId,
       serverUrl,
@@ -448,7 +510,13 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     _FutureVoidCallback? onPersistLocalUserData,
     _FutureVoidCallback? onFetchUserInformation,
   }) async {
-    assert(credentials.username != null && credentials.password != null);
+    final bool isApiKeyAuth = credentials.isApiKeyAuth;
+    assert(
+      (isApiKeyAuth && credentials.apiKey != null) ||
+          (!isApiKeyAuth &&
+              credentials.username != null &&
+              credentials.password != null),
+    );
     final redactedId = redactUserId(localUserId);
 
     logger.fd(
@@ -465,21 +533,39 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     final authApi = _apiFactory.createAuthenticationApi(sessionManager.client);
 
     await onPerformLogin?.call();
-    logger.fd(
-      "Fetching bearer token from the server...",
-      className: runtimeType.toString(),
-      methodName: '_addUser',
-    );
-    final token = await authApi.login(
-      username: credentials.username!,
-      password: credentials.password!,
-    );
 
-    logger.fd(
-      "Bearer token successfully retrieved.",
-      className: runtimeType.toString(),
-      methodName: '_addUser',
-    );
+    late final String token;
+
+    if (isApiKeyAuth) {
+      logger.fd(
+        "Validating API key...",
+        className: runtimeType.toString(),
+        methodName: '_addUser',
+      );
+      token = await authApi.validateApiKey(
+        apiKey: credentials.apiKey!,
+      );
+      logger.fd(
+        "API key successfully validated.",
+        className: runtimeType.toString(),
+        methodName: '_addUser',
+      );
+    } else {
+      logger.fd(
+        "Fetching bearer token from the server...",
+        className: runtimeType.toString(),
+        methodName: '_addUser',
+      );
+      token = await authApi.login(
+        username: credentials.username!,
+        password: credentials.password!,
+      );
+      logger.fd(
+        "Bearer token successfully retrieved.",
+        className: runtimeType.toString(),
+        methodName: '_addUser',
+      );
+    }
 
     sessionManager.updateSettings(
       baseUrl: serverUrl,
@@ -583,6 +669,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
         UserCredentials(
           token: token,
           clientCertificate: clientCert,
+          isApiKeyAuth: isApiKeyAuth,
         ),
       );
 

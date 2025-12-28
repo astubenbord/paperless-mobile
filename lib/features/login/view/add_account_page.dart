@@ -25,8 +25,7 @@ import 'package:paperless_mobile/routing/routes/app_logs_route.dart';
 class AddAccountPage extends StatefulWidget {
   final FutureOr<void> Function(
     BuildContext context,
-    String username,
-    String password,
+    LoginFormCredentials credentials,
     String serverUrl,
     ClientCertificate? clientCertificate,
   ) onSubmit;
@@ -39,6 +38,7 @@ class AddAccountPage extends StatefulWidget {
   final String submitText;
   final String titleText;
   final bool showLocalAccounts;
+  final bool checkForExistingUser;
 
   final Widget? bottomLeftButton;
 
@@ -48,6 +48,7 @@ class AddAccountPage extends StatefulWidget {
     required this.submitText,
     required this.titleText,
     this.showLocalAccounts = false,
+    this.checkForExistingUser = true,
     this.initialServerUrl,
     this.initialUsername,
     this.initialPassword,
@@ -64,6 +65,7 @@ class _AddAccountPageState extends State<AddAccountPage> {
   bool _isCheckingConnection = false;
   ReachabilityStatus _reachabilityStatus = ReachabilityStatus.unknown;
   bool _isFormSubmitted = false;
+  bool _useApiKey = false;
 
   final _pageController = PageController();
   @override
@@ -168,27 +170,65 @@ class _AddAccountPageState extends State<AddAccountPage> {
                       children: [
                         UserCredentialsFormField(
                           formKey: _formKey,
+                          onFieldsSubmitted: _onSubmit,
                           initialUsername: widget.initialUsername,
                           initialPassword: widget.initialPassword,
+                          useApiKey: _useApiKey,
+                          checkForExistingUser: widget.checkForExistingUser,
+                          onAuthModeChanged: (useApiKey) {
+                            setState(() {
+                              _useApiKey = useApiKey;
+                            });
+                          },
                         ),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            TextButton.icon(
-                              onPressed: () {
-                                _pageController.previousPage(
-                                  duration: Duration(milliseconds: 300),
-                                  curve: Curves.easeInOut,
-                                );
-                              },
-                              icon: Icon(Icons.arrow_back),
-                              label: Text(S.of(context)!.edit),
+                            Flexible(
+                              child: TextButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _useApiKey = !_useApiKey;
+                                  });
+                                  // Clear form when switching auth modes
+                                  if (_useApiKey) {
+                                    _formKey.currentState?.fields[UserCredentialsFormField.fkCredentials]
+                                        ?.didChange(LoginFormCredentials(apiKey: ''));
+                                  } else {
+                                    _formKey.currentState?.fields[UserCredentialsFormField.fkCredentials]
+                                        ?.didChange(LoginFormCredentials(username: '', password: ''));
+                                  }
+                                },
+                                child: Text(
+                                  _useApiKey
+                                      ? S.of(context)!.loginWithUsernamePassword
+                                      : S.of(context)!.loginWithApiKey,
+                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                        color: Theme.of(context).colorScheme.primary,
+                                      ),
+                                ),
+                              ),
                             ),
-                            FilledButton(
-                              onPressed: () {
-                                _onSubmit();
-                              },
-                              child: Text(S.of(context)!.signIn),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                TextButton.icon(
+                                  onPressed: () {
+                                    _pageController.previousPage(
+                                      duration: Duration(milliseconds: 300),
+                                      curve: Curves.easeInOut,
+                                    );
+                                  },
+                                  icon: Icon(Icons.arrow_back),
+                                  label: Text(S.of(context)!.edit),
+                                ),
+                                FilledButton(
+                                  onPressed: () {
+                                    _onSubmit();
+                                  },
+                                  child: Text(S.of(context)!.signIn),
+                                ),
+                              ],
                             ),
                           ],
                         ).padded(),
@@ -325,8 +365,7 @@ class _AddAccountPageState extends State<AddAccountPage> {
       try {
         await widget.onSubmit(
           context,
-          credentials.username!,
-          credentials.password!,
+          credentials,
           form[ServerAddressFormField.fkServerAddress],
           clientCertFormModel,
         );

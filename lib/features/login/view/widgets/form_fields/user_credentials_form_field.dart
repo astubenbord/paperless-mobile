@@ -5,6 +5,7 @@ import 'package:paperless_mobile/core/database/hive/hive_extensions.dart';
 
 import 'package:paperless_mobile/core/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/login/model/login_form_credentials.dart';
+import 'package:paperless_mobile/features/login/view/widgets/form_fields/api_key_form_field.dart';
 import 'package:paperless_mobile/features/login/view/widgets/form_fields/obscured_input_text_form_field.dart';
 import 'package:paperless_mobile/features/login/view/widgets/form_fields/server_address_form_field.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
@@ -16,12 +17,19 @@ class UserCredentialsFormField extends StatefulWidget {
   final String? initialUsername;
   final String? initialPassword;
   final GlobalKey<FormBuilderState> formKey;
+  final ValueChanged<bool>? onAuthModeChanged;
+  final bool? useApiKey;
+  final bool checkForExistingUser;
+
   const UserCredentialsFormField({
     super.key,
     this.onFieldsSubmitted,
     this.initialUsername,
     this.initialPassword,
     required this.formKey,
+    this.onAuthModeChanged,
+    this.useApiKey,
+    this.checkForExistingUser = true,
   });
 
   @override
@@ -33,6 +41,9 @@ class _UserCredentialsFormFieldState extends State<UserCredentialsFormField>
     with AutomaticKeepAliveClientMixin {
   final _usernameFocusNode = FocusNode();
   final _passwordFocusNode = FocusNode();
+  final _apiKeyFocusNode = FocusNode();
+
+  bool get _useApiKey => widget.useApiKey ?? false;
 
   @override
   Widget build(BuildContext context) {
@@ -45,60 +56,83 @@ class _UserCredentialsFormFieldState extends State<UserCredentialsFormField>
       name: UserCredentialsFormField.fkCredentials,
       builder: (field) => Column(
         children: [
-          TextFormField(
-            key: const ValueKey('login-username'),
-            focusNode: _usernameFocusNode,
-            textCapitalization: TextCapitalization.none,
-            textInputAction: TextInputAction.next,
-            onFieldSubmitted: (value) {
-              _passwordFocusNode.requestFocus();
-            },
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            autocorrect: false,
-            onChanged: (username) => field.didChange(
-              field.value?.copyWith(username: username) ??
-                  LoginFormCredentials(username: username),
-            ),
-            validator: (value) {
-              if (value?.trim().isEmpty ?? true) {
-                return S.of(context)!.usernameMustNotBeEmpty;
-              }
-              final serverAddress = widget.formKey.currentState!
-                  .getRawValue<String>(ServerAddressFormField.fkServerAddress);
-              if (serverAddress != null) {
-                final userExists = Hive.localUserAccountBox.values
-                    .map((e) => e.id)
-                    .contains('$value@$serverAddress');
-                if (userExists) {
-                  return S.of(context)!.userAlreadyExists;
+          if (!_useApiKey) ...[
+            TextFormField(
+              key: const ValueKey('login-username'),
+              focusNode: _usernameFocusNode,
+              textCapitalization: TextCapitalization.none,
+              textInputAction: TextInputAction.next,
+              onFieldSubmitted: (value) {
+                _passwordFocusNode.requestFocus();
+              },
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              autocorrect: false,
+              onChanged: (username) => field.didChange(
+                field.value?.copyWith(username: username, apiKey: null) ??
+                    LoginFormCredentials(username: username),
+              ),
+              validator: (value) {
+                if (value?.trim().isEmpty ?? true) {
+                  return S.of(context)!.usernameMustNotBeEmpty;
                 }
-              }
-              return null;
-            },
-            autofillHints: const [AutofillHints.username],
-            decoration: InputDecoration(
-              label: Text(S.of(context)!.username),
-            ),
-          ),
-          ObscuredInputTextFormField(
-            key: const ValueKey('login-password'),
-            focusNode: _passwordFocusNode,
-            label: S.of(context)!.password,
-            onChanged: (password) => field.didChange(
-              field.value?.copyWith(password: password) ??
-                  LoginFormCredentials(password: password),
-            ),
-            onFieldSubmitted: (_) {
-              widget.onFieldsSubmitted?.call();
-            },
-            validator: (value) {
-              if (value?.trim().isEmpty ?? true) {
-                return S.of(context)!.passwordMustNotBeEmpty;
-              }
-              return null;
-            },
-          ),
-        ].map((child) => child.padded()).toList(),
+                if (widget.checkForExistingUser) {
+                  final serverAddress = widget.formKey.currentState!
+                      .getRawValue<String>(ServerAddressFormField.fkServerAddress);
+                  if (serverAddress != null) {
+                    final userExists = Hive.localUserAccountBox.values
+                        .map((e) => e.id)
+                        .contains('$value@$serverAddress');
+                    if (userExists) {
+                      return S.of(context)!.userAlreadyExists;
+                    }
+                  }
+                }
+                return null;
+              },
+              autofillHints: const [AutofillHints.username],
+              decoration: InputDecoration(
+                label: Text(S.of(context)!.username),
+              ),
+            ).padded(),
+            ObscuredInputTextFormField(
+              key: const ValueKey('login-password'),
+              focusNode: _passwordFocusNode,
+              label: S.of(context)!.password,
+              onChanged: (password) => field.didChange(
+                field.value?.copyWith(password: password, apiKey: null) ??
+                    LoginFormCredentials(password: password),
+              ),
+              onFieldSubmitted: (_) {
+                widget.onFieldsSubmitted?.call();
+              },
+              validator: (value) {
+                if (value?.trim().isEmpty ?? true) {
+                  return S.of(context)!.passwordMustNotBeEmpty;
+                }
+                return null;
+              },
+            ).padded(),
+          ] else ...[
+            ApiKeyFormField(
+              key: const ValueKey('login-apikey'),
+              focusNode: _apiKeyFocusNode,
+              label: S.of(context)!.apiKey,
+              onChanged: (apiKey) => field.didChange(
+                field.value?.copyWith(apiKey: apiKey, username: null, password: null) ??
+                    LoginFormCredentials(apiKey: apiKey),
+              ),
+              onFieldSubmitted: (_) {
+                widget.onFieldsSubmitted?.call();
+              },
+              validator: (value) {
+                if (value?.trim().isEmpty ?? true) {
+                  return S.of(context)!.apiKeyRequired;
+                }
+                return null;
+              },
+            ).padded(),
+          ],
+        ],
       ),
     );
   }

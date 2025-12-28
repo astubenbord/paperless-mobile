@@ -44,4 +44,30 @@ class PaperlessAuthenticationApiImpl implements PaperlessAuthenticationApi {
       );
     }
   }
+
+  @override
+  Future<String> validateApiKey({
+    required String apiKey,
+  }) async {
+    try {
+      // API keys are already valid tokens, but we should validate them
+      // by making a test request with the key
+      await client.get(
+        "/api/",
+        options: Options(
+          headers: {"Authorization": "Token $apiKey"},
+          sendTimeout: const Duration(seconds: 5),
+          receiveTimeout: const Duration(seconds: 5),
+        ),
+      );
+      return apiKey; // If successful, the API key is valid
+    } on DioException catch (exception) {
+      throw exception.unravel();
+    } catch (error, stackTrace) {
+      throw PaperlessApiException.unknown(
+        details: error.toString(),
+        stackTrace: stackTrace,
+      );
+    }
+  }
 }

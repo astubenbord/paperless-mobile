@@ -10,9 +10,12 @@ class UserCredentials extends HiveObject {
   final String token;
   @HiveField(1)
   final ClientCertificate? clientCertificate;
+  @HiveField(2)
+  final bool isApiKeyAuth;
 
   UserCredentials({
     required this.token,
     this.clientCertificate,
+    this.isApiKeyAuth = false,
   });
 }

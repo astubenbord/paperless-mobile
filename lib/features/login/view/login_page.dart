@@ -33,6 +33,7 @@ class LoginPage extends StatelessWidget {
       submitText: S.of(context)!.signIn,
       onSubmit: _onLogin,
       showLocalAccounts: true,
+      checkForExistingUser: false,
       initialServerUrl: initialServerUrl,
       initialUsername: initialUsername,
       initialPassword: initialPassword,
@@ -50,17 +51,13 @@ class LoginPage extends StatelessWidget {
 
   void _onLogin(
     BuildContext context,
-    String username,
-    String password,
+    LoginFormCredentials credentials,
     String serverUrl,
     ClientCertificate? clientCertificate,
   ) async {
     try {
       await context.read<AuthenticationCubit>().login(
-            credentials: LoginFormCredentials(
-              username: username,
-              password: password,
-            ),
+            credentials: credentials,
             serverUrl: serverUrl,
             clientCertificate: clientCertificate,
           );
