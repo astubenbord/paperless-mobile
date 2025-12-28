@@ -31,6 +31,7 @@ class _TotpDialogState extends State<TotpDialog> {
       title: Text(S.of(context)!.twoFactorAuthentication),
       content: Column(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             S.of(context)!.twoFactorAuthenticationRequired,
@@ -45,6 +46,16 @@ class _TotpDialogState extends State<TotpDialog> {
             keyboardType: TextInputType.number,
             maxLength: 6,
             autocorrect: false,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return S.of(context)!.thisFieldIsRequired;
+              }
+              if (value.length != 6 || !RegExp(r'^\d+$').hasMatch(value)) {
+                return S.of(context)!.invalidAuthenticatorCode;
+              }
+              return null;
+            },
             decoration: InputDecoration(
               labelText: S.of(context)!.code,
               hintText: '123456',
