@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:paperless_mobile/core/widgets/dialog_utils/dialog_cancel_button.dart';
+import 'package:paperless_mobile/core/widgets/dialog_utils/dialog_confirm_button.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
 
 class TotpDialog extends StatefulWidget {
@@ -24,14 +26,20 @@ class _TotpDialogState extends State<TotpDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return AlertDialog(
       title: Text(S.of(context)!.twoFactorAuthentication),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(S.of(context)!.twoFactorAuthenticationRequired),
+          Text(
+            S.of(context)!.twoFactorAuthenticationRequired,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
           const SizedBox(height: 16),
-          TextField(
+          TextFormField(
             controller: _controller,
             autofocus: true,
             keyboardType: TextInputType.number,
@@ -42,22 +50,19 @@ class _TotpDialogState extends State<TotpDialog> {
               hintText: '123456',
               counterText: '',
             ),
-            onSubmitted: widget.onSubmit,
+            onFieldSubmitted: (value) => widget.onSubmit(value),
           ),
         ],
       ),
       actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text(S.of(context)!.cancel),
-        ),
-        ElevatedButton(
+        const DialogCancelButton(),
+        DialogConfirmButton(
+          label: S.of(context)!.signIn,
           onPressed: () {
             if (_controller.text.isNotEmpty) {
               widget.onSubmit(_controller.text);
             }
           },
-          child: Text(S.of(context)!.signIn),
         ),
       ],
     );
