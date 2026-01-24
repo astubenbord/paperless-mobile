@@ -8,6 +8,7 @@ import 'package:paperless_mobile/core/interceptor/dio_offline_interceptor.dart';
 import 'package:paperless_mobile/core/interceptor/dio_unauthorized_interceptor.dart';
 import 'package:paperless_mobile/core/interceptor/retry_on_connection_change_interceptor.dart';
 import 'package:paperless_mobile/core/security/session_manager.dart';
+import 'package:paperless_mobile/core/security/native_keychain_http_client_adapter.dart';
 import 'package:paperless_mobile/features/login/model/client_certificate.dart';
 
 /// Manages the security context, authentication and base request URL for
@@ -52,25 +53,35 @@ class SessionManagerImpl extends ValueNotifier<Dio> implements SessionManager {
     ClientCertificate? clientCertificate,
   }) {
     if (clientCertificate != null) {
-      final context = SecurityContext()
-        ..usePrivateKeyBytes(
-          clientCertificate.bytes,
-          password: clientCertificate.passphrase,
-        )
-        ..useCertificateChainBytes(
-          clientCertificate.bytes,
-          password: clientCertificate.passphrase,
-        )
-        ..setTrustedCertificatesBytes(
-          clientCertificate.bytes,
-          password: clientCertificate.passphrase,
+      // Android: Use the system KeyChain ("VPN and apps" cert store) by alias.
+      if (Platform.isAndroid && clientCertificate.androidKeyAlias != null) {
+        client.httpClientAdapter = NativeKeyChainHttpClientAdapter(
+          alias: clientCertificate.androidKeyAlias!,
         );
-      final adapter = IOHttpClientAdapter()
-        ..createHttpClient = () => HttpClient(context: context)
-          ..badCertificateCallback =
-              (X509Certificate cert, String host, int port) => true;
+      } else {
+        try {
+          // PKCS#12 (.pfx) files contain the certificate chain *and* private key.
+          // Dart can load them via useCertificateChainBytes.
+          //
+          // Important: some BoringSSL builds treat a null password as an error
+          // ("passed a null parameter"). Passing an empty string keeps the
+          // parameter non-null.
+          final context = SecurityContext()
+            ..useCertificateChainBytes(
+              clientCertificate.bytes,
+              password: clientCertificate.passphrase ?? '',
+            );
+          final adapter = IOHttpClientAdapter()
+            ..createHttpClient = () => HttpClient(context: context)
+              ..badCertificateCallback =
+                  (X509Certificate cert, String host, int port) => true;
 
-      client.httpClientAdapter = adapter;
+          client.httpClientAdapter = adapter;
+        } on TlsException catch (e) {
+          debugPrint('Failed to load client certificate: $e');
+          rethrow;
+        }
+      }
     }
 
     if (baseUrl != null) {
@@ -88,7 +99,10 @@ class SessionManagerImpl extends ValueNotifier<Dio> implements SessionManager {
 
   @override
   void resetSettings() {
-    client.httpClientAdapter = IOHttpClientAdapter();
+    final adapter = IOHttpClientAdapter()
+      ..createHttpClient =
+          () => HttpClient()..badCertificateCallback = (cert, host, port) => true;
+    client.httpClientAdapter = adapter;
     client.options.baseUrl = '';
     client.options.headers.remove(HttpHeaders.authorizationHeader);
     notifyListeners();

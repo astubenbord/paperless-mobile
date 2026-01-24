@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:paperless_mobile/core/security/android_keychain.dart';
 import 'package:paperless_mobile/core/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/login/model/client_certificate.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
@@ -14,17 +15,13 @@ import 'obscured_input_text_form_field.dart';
 class ClientCertificateFormField extends StatefulWidget {
   static const fkClientCertificate = 'clientCertificate';
 
-  final String? initialPassphrase;
-  final String? initialFilename;
-  final Uint8List? initialBytes;
+  final ClientCertificate? initialValue;
 
   final ValueChanged<ClientCertificate?>? onChanged;
   const ClientCertificateFormField({
     super.key,
     this.onChanged,
-    this.initialPassphrase,
-    this.initialBytes,
-    this.initialFilename,
+    this.initialValue,
   });
 
   @override
@@ -41,13 +38,7 @@ class _ClientCertificateFormFieldState extends State<ClientCertificateFormField>
       key: const ValueKey('login-client-cert'),
       name: ClientCertificateFormField.fkClientCertificate,
       onChanged: widget.onChanged,
-      initialValue: widget.initialBytes != null
-          ? ClientCertificate(
-              bytes: widget.initialBytes!,
-              filename: widget.initialFilename!,
-              passphrase: widget.initialPassphrase,
-            )
-          : null,
+      initialValue: widget.initialValue,
       builder: (field) {
         final theme =
             Theme.of(context).copyWith(dividerColor: Colors.transparent);
@@ -70,7 +61,7 @@ class _ClientCertificateFormFieldState extends State<ClientCertificateFormField>
                         Row(
                           children: [
                             ElevatedButton(
-                              onPressed: () => _onSelectFile(field),
+                              onPressed: () => _onSelect(field),
                               child: Text(S.of(context)!.select),
                             ),
                             _buildSelectedFileText(field).paddedOnly(left: 8),
@@ -104,7 +95,11 @@ class _ClientCertificateFormFieldState extends State<ClientCertificateFormField>
                     //         : null,
                     //   ),
                     // ),
-                    if (field.value?.filename != null) ...[
+                    // Passphrase is only relevant when the client cert is a
+                    // PKCS#12 file (desktop/iOS). Android KeyChain entries are
+                    // protected by the system and do not use a passphrase here.
+                    if (field.value?.filename != null &&
+                        field.value?.androidKeyAlias == null) ...[
                       ObscuredInputTextFormField(
                         key: const ValueKey('login-client-cert-passphrase'),
                         initialValue: field.value?.passphrase,
@@ -124,41 +119,58 @@ class _ClientCertificateFormFieldState extends State<ClientCertificateFormField>
     );
   }
 
-  Future<void> _onSelectFile(
+  Future<void> _onSelect(
     FormFieldState<ClientCertificate?> field,
   ) async {
-    final result = await FilePicker.platform.pickFiles(
-      allowMultiple: false,
-    );
-    if (result == null || result.files.single.path == null) {
+    // Android: pick from system credential store (KeyChain)
+    if (AndroidKeyChain.isSupported) {
+      final alias = await AndroidKeyChain.selectClientCertificateAlias();
+      if (alias == null || alias.isEmpty) {
+        return;
+      }
+      field.didChange(
+        ClientCertificate(
+          bytes: Uint8List(0),
+          filename: 'Android KeyChain',
+          androidKeyAlias: alias,
+        ),
+      );
       return;
     }
+
+    // Other platforms: upload a PKCS#12 (.pfx) file
+    final result = await FilePicker.platform.pickFiles(allowMultiple: false);
+    if (result == null || result.files.single.path == null) return;
+
     final path = result.files.single.path!;
     if (p.extension(path) != '.pfx') {
-      if (mounted) {
-        showSnackBar(context, S.of(context)!.invalidCertificateFormat);
-      }
+      if (mounted) showSnackBar(context, S.of(context)!.invalidCertificateFormat);
       return;
     }
-    File file = File(path);
+
+    final file = File(path);
     final bytes = await file.readAsBytes();
 
-    final changedValue = ClientCertificate(
-      bytes: bytes,
-      filename: p.basename(path),
-    );
-    field.didChange(changedValue);
+    field.didChange(ClientCertificate(bytes: bytes, filename: p.basename(path)));
   }
 
   Widget _buildSelectedFileText(FormFieldState<ClientCertificate?> field) {
     if (field.value == null) {
       return Text(
-        S.of(context)!.selectFile,
+        AndroidKeyChain.isSupported
+            ? S.of(context)!.select
+            : S.of(context)!.selectFile,
         style: Theme.of(context).textTheme.labelMedium?.apply(
               color: Theme.of(context).hintColor,
             ),
       );
     } else {
+      if (field.value?.androidKeyAlias != null) {
+        return Text(
+          field.value!.androidKeyAlias!,
+          style: const TextStyle(overflow: TextOverflow.ellipsis),
+        );
+      }
       return Text(
         p.basename(field.value!.filename),
         style: const TextStyle(

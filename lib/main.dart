@@ -334,6 +334,10 @@ class _GoRouterShellState extends State<GoRouterShell> {
                         context.pop();
                       }
                       break;
+                    case ClientCertificateRequiredState():
+                      // Certificate prompt is handled by AddAccountPage's BlocListener
+                      // No navigation needed - user stays on login page
+                      break;
                   }
                 },
                 child: child,

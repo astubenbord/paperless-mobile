@@ -85,7 +85,83 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
               AuthenticatingStage.persistingLocalUserData));
         },
       );
-    } on PaperlessApiException catch (_) {
+    } on DioException catch (error) {
+      // Debug logging
+      debugPrint('AuthenticationCubit - DioException caught');
+      debugPrint('AuthenticationCubit - error.error type: ${error.error.runtimeType}');
+      debugPrint('AuthenticationCubit - error.error value: ${error.error}');
+
+      final inner = error.error;
+
+      // Check for ReachabilityStatus (from reachability probe path)
+      if (inner == ReachabilityStatus.missingClientCertificate) {
+        logger.fd(
+          "Server requires client certificate (ReachabilityStatus), prompting user...",
+          className: runtimeType.toString(),
+          methodName: 'login',
+        );
+        debugPrint('AuthenticationCubit - EMITTING ClientCertificateRequiredState (ReachabilityStatus)');
+        emit(
+          ClientCertificateRequiredState(
+            serverUrl: serverUrl,
+            username: credentials.username!,
+            password: credentials.password!,
+          ),
+        );
+        return;
+      }
+
+      // Check for PaperlessApiException (from API error interceptor)
+      if (inner is PaperlessApiException &&
+          inner.code == ErrorCode.missingClientCertificate) {
+        logger.fd(
+          "Server requires client certificate (PaperlessApiException), prompting user...",
+          className: runtimeType.toString(),
+          methodName: 'login',
+        );
+        debugPrint('AuthenticationCubit - EMITTING ClientCertificateRequiredState (PaperlessApiException in DioException)');
+        emit(
+          ClientCertificateRequiredState(
+            serverUrl: serverUrl,
+            username: credentials.username!,
+            password: credentials.password!,
+          ),
+        );
+        return;
+      }
+
+      debugPrint('AuthenticationCubit - Emitting AuthenticationErrorState and rethrowing');
+      emit(
+        AuthenticationErrorState(
+          serverUrl: serverUrl,
+          username: credentials.username!,
+          password: credentials.password!,
+          clientCertificate: clientCertificate,
+        ),
+      );
+      rethrow;
+    } on PaperlessApiException catch (e) {
+      // This is the primary path for missing client certificate errors
+      debugPrint('AuthenticationCubit - PaperlessApiException caught');
+      debugPrint('AuthenticationCubit - code: ${e.code}');
+
+      if (e.code == ErrorCode.missingClientCertificate) {
+        logger.fd(
+          "Server requires client certificate (PaperlessApiException), prompting user...",
+          className: runtimeType.toString(),
+          methodName: 'login',
+        );
+        debugPrint('AuthenticationCubit - EMITTING ClientCertificateRequiredState (PaperlessApiException)');
+        emit(
+          ClientCertificateRequiredState(
+            serverUrl: serverUrl,
+            username: credentials.username!,
+            password: credentials.password!,
+          ),
+        );
+        return;
+      }
+
       emit(
         AuthenticationErrorState(
           serverUrl: serverUrl,
