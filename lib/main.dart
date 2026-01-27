@@ -161,7 +161,7 @@ void main() async {
         request: false,
         requestBody: false,
         requestHeader: false,
-        logPrint: (object) => logger.t,
+        logPrint: (object) => logger.t(object.toString()),
       ),
       languageHeaderInterceptor,
     ]);
