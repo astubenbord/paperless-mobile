@@ -40,6 +40,7 @@ class FileService {
       debugPrint("Could not initialize directories.");
       debugPrint(error.toString());
       debugPrintStack(stackTrace: stackTrace);
+      rethrow;
     }
   }
 
@@ -194,7 +195,14 @@ class FileService {
     if (Platform.isAndroid) {
       final dirs =
           await getExternalStorageDirectories(type: StorageDirectory.documents);
-      _documentsDirectory = await dirs!.first.create(recursive: true);
+      if (dirs != null && dirs.isNotEmpty) {
+        _documentsDirectory = await dirs.first.create(recursive: true);
+      } else {
+        final fallback = await getApplicationDocumentsDirectory();
+        _documentsDirectory =
+            await Directory(p.join(fallback.path, 'documents'))
+                .create(recursive: true);
+      }
       return;
     } else if (Platform.isIOS) {
       final dir = await getApplicationDocumentsDirectory();
@@ -231,7 +239,13 @@ class FileService {
         final downloadsDir = await getExternalStorageDirectories(
           type: StorageDirectory.downloads,
         );
-        directory = await downloadsDir!.first.create(recursive: true);
+        if (downloadsDir != null && downloadsDir.isNotEmpty) {
+          directory = await downloadsDir.first.create(recursive: true);
+        } else {
+          final fallback = await getApplicationDocumentsDirectory();
+          directory = await Directory(p.join(fallback.path, 'downloads'))
+              .create(recursive: true);
+        }
       }
       _downloadsDirectory = directory;
       return;

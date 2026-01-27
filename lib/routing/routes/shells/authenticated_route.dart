@@ -161,7 +161,10 @@ class AuthenticatedRoute extends ShellRouteData {
           final authenticatedUser =
               Hive.box<LocalUserAccount>(HiveBoxes.localUserAccount).get(
             currentUserId,
-          )!;
+          );
+          if (authenticatedUser == null) {
+            return const SizedBox.shrink();
+          }
           final apiFactory = context.read<PaperlessApiFactory>();
           return HomeShellWidget(
             localUserId: authenticatedUser.id,
