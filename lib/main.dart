@@ -289,6 +289,132 @@ class _GoRouterShellState extends State<GoRouterShell> {
     await FlutterDisplayMode.setPreferredMode(mostOptimalMode);
   }
 
+  void _showTotpDialog(BuildContext context, MfaRequiredState mfaState) {
+    final totpController = TextEditingController();
+    var isSubmitting = false;
+
+    Future<void> submitTotp(
+      BuildContext dialogContext,
+      void Function(void Function()) setDialogState,
+    ) async {
+      final code = totpController.text.trim();
+      if (code.isEmpty || code.length < 6) {
+        return;
+      }
+      setDialogState(() => isSubmitting = true);
+      try {
+        await context.read<AuthenticationCubit>().loginWithMfa(
+              username: mfaState.username,
+              password: mfaState.password,
+              serverUrl: mfaState.serverUrl,
+              totpCode: code,
+              clientCertificate: mfaState.clientCertificate,
+            );
+        if (dialogContext.mounted) {
+          Navigator.of(dialogContext).pop();
+        }
+      } on PaperlessApiException catch (error) {
+        setDialogState(() => isSubmitting = false);
+        if (dialogContext.mounted) {
+          ScaffoldMessenger.of(dialogContext)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(
+                behavior: SnackBarBehavior.floating,
+                content: Text(error.details ?? 'Authentication failed'),
+              ),
+            );
+        }
+      } on PaperlessFormValidationException catch (error) {
+        setDialogState(() => isSubmitting = false);
+        if (dialogContext.mounted) {
+          ScaffoldMessenger.of(dialogContext)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(
+                behavior: SnackBarBehavior.floating,
+                content: Text(
+                  error.unspecificErrorMessage() ?? 'Invalid code',
+                ),
+              ),
+            );
+        }
+      } catch (error) {
+        setDialogState(() => isSubmitting = false);
+        if (dialogContext.mounted) {
+          ScaffoldMessenger.of(dialogContext)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(
+                behavior: SnackBarBehavior.floating,
+                content: Text(error.toString()),
+              ),
+            );
+        }
+      }
+    }
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text('Two-Factor Authentication'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Your account is protected by two-factor authentication. '
+                    'Please enter the code from your authenticator app.',
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: totpController,
+                    autofocus: true,
+                    keyboardType: TextInputType.number,
+                    maxLength: 6,
+                    decoration: const InputDecoration(
+                      labelText: 'TOTP Code',
+                      hintText: '000000',
+                      border: OutlineInputBorder(),
+                      counterText: '',
+                    ),
+                    onSubmitted: isSubmitting
+                        ? null
+                        : (_) => submitTotp(dialogContext, setDialogState),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: isSubmitting
+                      ? null
+                      : () => Navigator.of(dialogContext).pop(),
+                  child: const Text('Cancel'),
+                ),
+                FilledButton(
+                  onPressed: isSubmitting
+                      ? null
+                      : () => submitTotp(dialogContext, setDialogState),
+                  child: isSubmitting
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text('Verify'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   late final _router = GoRouter(
     debugLogDiagnostics: kDebugMode,
     initialLocation: "/login",
@@ -333,6 +459,12 @@ class _GoRouterShellState extends State<GoRouterShell> {
                       if (context.canPop()) {
                         context.pop();
                       }
+                      break;
+                    case MfaRequiredState():
+                      if (context.canPop()) {
+                        context.pop();
+                      }
+                      _showTotpDialog(context, state);
                       break;
                   }
                 },

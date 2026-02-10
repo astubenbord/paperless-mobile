@@ -85,6 +85,21 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
               AuthenticatingStage.persistingLocalUserData));
         },
       );
+    } on PaperlessMfaRequiredException catch (_) {
+      logger.fd(
+        "MFA required for $redactedId, prompting for TOTP code...",
+        className: runtimeType.toString(),
+        methodName: 'login',
+      );
+      emit(
+        MfaRequiredState(
+          serverUrl: serverUrl,
+          username: credentials.username!,
+          password: credentials.password!,
+          clientCertificate: clientCertificate,
+        ),
+      );
+      return;
     } on PaperlessApiException catch (_) {
       emit(
         AuthenticationErrorState(
@@ -112,6 +127,48 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
   }
 
   /// Switches to another account if it exists.
+  Future<void> loginWithMfa({
+    required String username,
+    required String password,
+    required String serverUrl,
+    required String totpCode,
+    ClientCertificate? clientCertificate,
+  }) async {
+    final localUserId = "$username@$serverUrl";
+    final redactedId = redactUserId(localUserId);
+
+    logger.fd(
+      "Trying to log in $redactedId with MFA...",
+      className: runtimeType.toString(),
+      methodName: 'loginWithMfa',
+    );
+    // Do not emit AuthenticatingState or AuthenticationErrorState here;
+    // the TOTP dialog manages its own loading/error UI.
+    await _addUser(
+      localUserId,
+      serverUrl,
+      LoginFormCredentials(
+        username: username,
+        password: password,
+      ),
+      clientCertificate,
+      _sessionManager,
+      totpCode: totpCode,
+    );
+
+    final globalSettings =
+        Hive.box<GlobalSettings>(HiveBoxes.globalSettings).getValue()!;
+    globalSettings.loggedInUserId = localUserId;
+    await globalSettings.save();
+
+    emit(AuthenticatedState(localUserId: localUserId));
+    logger.fd(
+      'User $redactedId successfully logged in with MFA.',
+      className: runtimeType.toString(),
+      methodName: 'loginWithMfa',
+    );
+  }
+
   Future<void> switchAccount(String localUserId) async {
     emit(const SwitchingAccountsState());
     await FileService.instance.initialize();
@@ -447,6 +504,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     _FutureVoidCallback? onPerformLogin,
     _FutureVoidCallback? onPersistLocalUserData,
     _FutureVoidCallback? onFetchUserInformation,
+    String? totpCode,
   }) async {
     assert(credentials.username != null && credentials.password != null);
     final redactedId = redactUserId(localUserId);
@@ -473,6 +531,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     final token = await authApi.login(
       username: credentials.username!,
       password: credentials.password!,
+      totpCode: totpCode,
     );
 
     logger.fd(

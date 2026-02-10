@@ -11,14 +11,19 @@ class PaperlessAuthenticationApiImpl implements PaperlessAuthenticationApi {
   Future<String> login({
     required String username,
     required String password,
+    String? totpCode,
   }) async {
     try {
+      final data = <String, dynamic>{
+        "username": username,
+        "password": password,
+      };
+      if (totpCode != null) {
+        data["code"] = totpCode;
+      }
       final response = await client.post(
         "/api/token/",
-        data: {
-          "username": username,
-          "password": password,
-        },
+        data: data,
         options: Options(
           sendTimeout: const Duration(seconds: 5),
           receiveTimeout: const Duration(seconds: 5),
@@ -26,16 +31,18 @@ class PaperlessAuthenticationApiImpl implements PaperlessAuthenticationApi {
           headers: {
             "Accept": "application/json",
           },
-          // validateStatus: (status) {
-          //   return status! == 200;
-          // },
         ),
       );
       return response.data['token'];
-      // } else if (response.statusCode == 302) {
-      // final redirectUrl = response.headers.value("location");
-      // return AuthenticationTemporaryRedirect(redirectUrl!);
     } on DioException catch (exception) {
+      final error = exception.error;
+      if (error is PaperlessFormValidationException) {
+        final message = error.unspecificErrorMessage();
+        if (message != null &&
+            message.contains('MFA code is required')) {
+          throw PaperlessMfaRequiredException();
+        }
+      }
       throw exception.unravel();
     } catch (error, stackTrace) {
       throw PaperlessApiException.unknown(

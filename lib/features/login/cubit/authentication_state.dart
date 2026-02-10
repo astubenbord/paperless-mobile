@@ -50,6 +50,23 @@ class SwitchingAccountsState extends AuthenticationState {
   const SwitchingAccountsState();
 }
 
+class MfaRequiredState extends AuthenticationState with EquatableMixin {
+  final String serverUrl;
+  final String username;
+  final String password;
+  final ClientCertificate? clientCertificate;
+
+  const MfaRequiredState({
+    required this.serverUrl,
+    required this.username,
+    required this.password,
+    this.clientCertificate,
+  });
+
+  @override
+  List<Object?> get props => [serverUrl, username, password, clientCertificate];
+}
+
 class AuthenticationErrorState extends AuthenticationState with EquatableMixin {
   final ErrorCode? errorCode;
   final String serverUrl;
