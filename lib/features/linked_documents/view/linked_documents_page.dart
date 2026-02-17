@@ -5,7 +5,7 @@ import 'package:paperless_mobile/core/extensions/document_extensions.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/adaptive_documents_view.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/selection/view_type_selection_widget.dart';
 import 'package:paperless_mobile/features/linked_documents/cubit/linked_documents_cubit.dart';
-import 'package:paperless_mobile/features/paged_document_view/view/document_paging_view_mixin.dart';
+import 'package:paperless_mobile/core/paging/view/document_paging_view_mixin.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
 import 'package:paperless_mobile/routing/routes/documents_route.dart';
 

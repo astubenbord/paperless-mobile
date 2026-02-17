@@ -6,7 +6,7 @@ import 'package:paperless_mobile/features/documents/view/widgets/items/document_
 import 'package:paperless_mobile/features/documents/view/widgets/items/document_grid_item.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/items/document_list_item.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/placeholder/documents_list_loading_widget.dart';
-import 'package:paperless_mobile/features/paged_document_view/cubit/paged_documents_state.dart';
+import 'package:paperless_mobile/core/paging/cubit/paged_documents_state.dart';
 import 'package:paperless_mobile/core/model/view_type.dart';
 
 abstract class AdaptiveDocumentsView extends StatelessWidget {

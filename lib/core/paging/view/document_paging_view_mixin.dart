@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_api/paperless_api.dart';
-import 'package:paperless_mobile/features/paged_document_view/cubit/document_paging_bloc_mixin.dart';
+import 'package:paperless_mobile/core/paging/cubit/document_paging_bloc_mixin.dart';
 import 'package:paperless_mobile/core/util/message_helpers.dart';
 
 mixin DocumentPagingViewMixin<T extends StatefulWidget,
