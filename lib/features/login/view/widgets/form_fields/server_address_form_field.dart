@@ -5,7 +5,7 @@ import 'package:hive_ce_flutter/adapters.dart';
 import 'package:paperless_mobile/core/database/hive/hive_config.dart';
 
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
-import 'package:paperless_mobile/keys.dart';
+import 'package:paperless_mobile/features/login/view/test_keys.dart';
 
 class ServerAddressFormField extends StatefulWidget {
   static const String fkServerAddress = "serverAddress";

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:paperless_mobile/features/settings/view/widgets/global_settings_builder.dart';
+import 'package:paperless_mobile/core/widgets/global_settings_builder.dart';
 
 class DisableAnimationsSetting extends StatelessWidget {
   const DisableAnimationsSetting({super.key});

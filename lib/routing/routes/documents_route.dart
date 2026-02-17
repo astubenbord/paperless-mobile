@@ -15,7 +15,7 @@ import 'package:paperless_mobile/features/documents/view/pages/document_view.dar
 import 'package:paperless_mobile/features/documents/view/pages/documents_page.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
 import 'package:paperless_mobile/routing/navigation_keys.dart';
-import 'package:paperless_mobile/theme.dart';
+import 'package:paperless_mobile/core/theme.dart';
 
 import 'shells/authenticated_route.dart';
 

@@ -6,7 +6,7 @@ import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/features/app_drawer/view/app_drawer.dart';
 import 'package:paperless_mobile/features/inbox/cubit/inbox_cubit.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
-import 'package:paperless_mobile/theme.dart';
+import 'package:paperless_mobile/core/theme.dart';
 
 class ScaffoldWithNavigationBar extends StatefulWidget {
   final UserModel authenticatedUser;

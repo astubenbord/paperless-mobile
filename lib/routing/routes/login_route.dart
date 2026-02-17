@@ -12,7 +12,7 @@ import 'package:paperless_mobile/features/login/view/login_to_existing_account_p
 import 'package:paperless_mobile/features/login/view/verify_identity_page.dart';
 import 'package:paperless_mobile/features/login/view/widgets/login_transition_page.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
-import 'package:paperless_mobile/keys.dart';
+import 'package:paperless_mobile/features/login/view/test_keys.dart';
 import 'package:paperless_mobile/routing/navigation_keys.dart';
 import 'package:paperless_mobile/routing/routes.dart';
 part 'login_route.g.dart';

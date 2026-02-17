@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:paperless_mobile/core/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
 import 'package:paperless_mobile/routing/routes/app_logs_route.dart';
-import 'package:paperless_mobile/theme.dart';
+import 'package:paperless_mobile/core/theme.dart';
 
 class LoginTransitionPage extends StatelessWidget {
   final String text;

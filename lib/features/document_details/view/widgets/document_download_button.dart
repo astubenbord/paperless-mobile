@@ -14,7 +14,7 @@ import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
 
 import 'package:paperless_mobile/helpers/message_helpers.dart';
 import 'package:paperless_mobile/helpers/permission_helpers.dart';
-import 'package:paperless_mobile/constants.dart';
+import 'package:paperless_mobile/core/global/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
