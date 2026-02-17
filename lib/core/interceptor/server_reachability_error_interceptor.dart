@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:paperless_mobile/core/global/os_error_codes.dart';
-import 'package:paperless_mobile/features/login/model/reachability_status.dart';
+import 'package:paperless_mobile/core/model/reachability_status.dart';
 
 class ServerReachabilityErrorInterceptor extends Interceptor {
   static const _missingClientCertText = "No required SSL certificate was sent";

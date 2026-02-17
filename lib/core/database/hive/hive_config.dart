@@ -5,12 +5,12 @@ import 'package:paperless_mobile/core/database/tables/global_settings.dart';
 import 'package:paperless_mobile/core/database/tables/local_user_app_state.dart';
 import 'package:paperless_mobile/core/database/tables/user_credentials.dart';
 import 'package:paperless_mobile/features/login/model/authentication_information.dart';
-import 'package:paperless_mobile/features/login/model/client_certificate.dart';
+import 'package:paperless_mobile/core/model/client_certificate.dart';
 import 'package:paperless_mobile/core/database/tables/local_user_account.dart';
-import 'package:paperless_mobile/features/settings/model/color_scheme_option.dart';
+import 'package:paperless_mobile/core/model/color_scheme_option.dart';
 import 'package:paperless_mobile/core/database/tables/local_user_settings.dart';
-import 'package:paperless_mobile/features/settings/model/file_download_type.dart';
-import 'package:paperless_mobile/features/settings/model/view_type.dart';
+import 'package:paperless_mobile/core/model/file_download_type.dart';
+import 'package:paperless_mobile/core/model/view_type.dart';
 
 class HiveBoxes {
   HiveBoxes._();

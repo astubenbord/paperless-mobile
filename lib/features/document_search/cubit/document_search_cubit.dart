@@ -7,7 +7,7 @@ import 'package:paperless_mobile/core/notifier/document_changed_notifier.dart';
 import 'package:paperless_mobile/core/service/connectivity_status_service.dart';
 import 'package:paperless_mobile/features/paged_document_view/cubit/document_paging_bloc_mixin.dart';
 import 'package:paperless_mobile/features/paged_document_view/cubit/paged_documents_state.dart';
-import 'package:paperless_mobile/features/settings/model/view_type.dart';
+import 'package:paperless_mobile/core/model/view_type.dart';
 
 part 'document_search_cubit.g.dart';
 part 'document_search_state.dart';

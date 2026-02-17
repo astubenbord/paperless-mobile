@@ -5,7 +5,7 @@ import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/database/hive/hive_extensions.dart';
 import 'package:paperless_mobile/core/model/info_message_exception.dart';
 import 'package:paperless_mobile/features/login/cubit/authentication_cubit.dart';
-import 'package:paperless_mobile/features/login/model/client_certificate.dart';
+import 'package:paperless_mobile/core/model/client_certificate.dart';
 import 'package:paperless_mobile/features/login/model/login_form_credentials.dart';
 import 'package:paperless_mobile/features/login/view/add_account_page.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';

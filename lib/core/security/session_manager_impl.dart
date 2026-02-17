@@ -8,7 +8,7 @@ import 'package:paperless_mobile/core/interceptor/dio_offline_interceptor.dart';
 import 'package:paperless_mobile/core/interceptor/dio_unauthorized_interceptor.dart';
 import 'package:paperless_mobile/core/interceptor/retry_on_connection_change_interceptor.dart';
 import 'package:paperless_mobile/core/security/session_manager.dart';
-import 'package:paperless_mobile/features/login/model/client_certificate.dart';
+import 'package:paperless_mobile/core/model/client_certificate.dart';
 
 /// Manages the security context, authentication and base request URL for
 /// an underlying [Dio] client which is injected into all services

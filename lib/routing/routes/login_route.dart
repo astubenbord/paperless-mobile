@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hive_ce_flutter/adapters.dart';
 import 'package:paperless_mobile/core/database/hive/hive_extensions.dart';
 import 'package:paperless_mobile/features/login/cubit/authentication_cubit.dart';
-import 'package:paperless_mobile/features/login/model/client_certificate.dart';
+import 'package:paperless_mobile/core/model/client_certificate.dart';
 import 'package:paperless_mobile/features/login/view/login_page.dart';
 import 'package:paperless_mobile/features/login/view/login_to_existing_account_page.dart';
 import 'package:paperless_mobile/features/login/view/verify_identity_page.dart';
