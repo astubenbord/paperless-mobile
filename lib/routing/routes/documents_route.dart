@@ -11,7 +11,7 @@ import 'package:paperless_mobile/features/document_details/cubit/document_detail
 import 'package:paperless_mobile/features/document_details/view/pages/document_details_page.dart';
 import 'package:paperless_mobile/features/document_edit/cubit/document_edit_cubit.dart';
 import 'package:paperless_mobile/features/document_edit/view/document_edit_page.dart';
-import 'package:paperless_mobile/features/documents/view/pages/document_view.dart';
+import 'package:paperless_mobile/core/widgets/document_view.dart';
 import 'package:paperless_mobile/features/documents/view/pages/documents_page.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
 import 'package:paperless_mobile/routing/navigation_keys.dart';

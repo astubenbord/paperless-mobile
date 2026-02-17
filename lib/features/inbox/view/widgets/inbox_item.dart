@@ -6,7 +6,7 @@ import 'package:paperless_mobile/core/extensions/document_extensions.dart';
 import 'package:paperless_mobile/core/repository/label_repository.dart';
 import 'package:paperless_mobile/core/util/lambda_utils.dart';
 import 'package:paperless_mobile/core/widgets/shimmer_placeholder.dart';
-import 'package:paperless_mobile/core/workarounds/colored_chip.dart';
+import 'package:paperless_mobile/core/widgets/colored_chip.dart';
 import 'package:paperless_mobile/core/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/delete_document_confirmation_dialog.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/document_preview.dart';

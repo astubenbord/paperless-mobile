@@ -12,7 +12,7 @@ import 'package:paperless_mobile/core/service/connectivity_status_service.dart';
 import 'package:paperless_mobile/features/login/cubit/authentication_cubit.dart';
 import 'package:paperless_mobile/features/login/services/authentication_service.dart';
 import 'package:paperless_mobile/features/notifications/services/local_notification_service.dart';
-import 'package:paperless_mobile/keys.dart';
+import 'package:paperless_mobile/features/login/view/test_keys.dart';
 import 'package:paperless_mobile/main.dart'
     show initializeDefaultParameters, AppEntrypoint;
 import 'package:path_provider/path_provider.dart';

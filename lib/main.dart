@@ -26,7 +26,7 @@ import 'package:paperless_mobile/core/bloc/my_bloc_observer.dart';
 import 'package:paperless_mobile/core/database/hive/hive_config.dart';
 import 'package:paperless_mobile/core/database/hive/hive_extensions.dart';
 import 'package:paperless_mobile/core/database/hive/hive_initialization.dart';
-import 'package:paperless_mobile/core/exception/server_message_exception.dart';
+import 'package:paperless_mobile/core/model/server_message_exception.dart';
 import 'package:paperless_mobile/core/factory/paperless_api_factory.dart';
 import 'package:paperless_mobile/core/factory/paperless_api_factory_impl.dart';
 import 'package:paperless_mobile/core/interceptor/language_header.interceptor.dart';

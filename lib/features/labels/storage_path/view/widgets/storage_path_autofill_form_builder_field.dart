@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
-import 'package:paperless_mobile/core/workarounds/colored_chip.dart';
+import 'package:paperless_mobile/core/widgets/colored_chip.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
 
 class StoragePathAutofillFormBuilderField extends StatefulWidget {

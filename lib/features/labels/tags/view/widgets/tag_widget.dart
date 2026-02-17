@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:paperless_api/paperless_api.dart';
-import 'package:paperless_mobile/core/workarounds/colored_chip.dart';
+import 'package:paperless_mobile/core/widgets/colored_chip.dart';
 
 class TagWidget extends StatelessWidget {
   final Tag tag;

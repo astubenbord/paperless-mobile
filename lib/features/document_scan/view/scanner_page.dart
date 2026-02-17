@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:paperless_api/paperless_api.dart';
-import 'package:paperless_mobile/core/global/constants.dart';
 import 'package:paperless_mobile/core/bloc/loading_status.dart';
 import 'package:paperless_mobile/core/database/hive/hive_config.dart';
 import 'package:paperless_mobile/core/database/tables/global_settings.dart';
@@ -22,7 +21,7 @@ import 'package:paperless_mobile/features/document_scan/view/widgets/export_scan
 import 'package:paperless_mobile/features/document_scan/view/widgets/scanned_image_item.dart';
 import 'package:paperless_mobile/features/document_search/view/sliver_search_bar.dart';
 import 'package:paperless_mobile/features/document_upload/view/document_upload_preparation_page.dart';
-import 'package:paperless_mobile/features/documents/view/pages/document_view.dart';
+import 'package:paperless_mobile/core/widgets/document_view.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
 import 'package:paperless_mobile/core/widgets/connectivity_aware_action_wrapper.dart';
 import 'package:paperless_mobile/core/util/message_helpers.dart';

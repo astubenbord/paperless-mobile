@@ -6,7 +6,7 @@ import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
 import 'package:paperless_mobile/core/database/hive/hive_config.dart';
 import 'package:paperless_mobile/core/database/tables/global_settings.dart';
 import 'package:paperless_mobile/core/database/tables/local_user_account.dart';
-import 'package:paperless_mobile/core/delegate/customizable_sliver_persistent_header_delegate.dart';
+import 'package:paperless_mobile/core/widgets/customizable_sliver_persistent_header_delegate.dart';
 import 'package:paperless_mobile/core/logging/logger.dart';
 import 'package:paperless_mobile/core/widgets/material/colored_tab_bar.dart';
 import 'package:paperless_mobile/features/app_drawer/view/app_drawer.dart';

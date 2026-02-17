@@ -9,7 +9,7 @@ import 'package:paperless_mobile/features/document_search/view/sliver_search_bar
 import 'package:paperless_mobile/features/landing/view/widgets/expansion_card.dart';
 import 'package:paperless_mobile/features/landing/view/widgets/mime_types_pie_chart.dart';
 import 'package:paperless_mobile/features/saved_view/cubit/saved_view_cubit.dart';
-import 'package:paperless_mobile/features/saved_view_details/view/saved_view_preview.dart';
+import 'package:paperless_mobile/features/saved_view/view/saved_view_preview.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
 import 'package:paperless_mobile/routing/routes/documents_route.dart';
 import 'package:paperless_mobile/routing/routes/inbox_route.dart';

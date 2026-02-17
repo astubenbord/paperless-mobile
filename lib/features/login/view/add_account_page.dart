@@ -7,7 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/global/constants.dart';
-import 'package:paperless_mobile/core/exception/server_message_exception.dart';
+import 'package:paperless_mobile/core/model/server_message_exception.dart';
 import 'package:paperless_mobile/core/model/info_message_exception.dart';
 import 'package:paperless_mobile/core/service/connectivity_status_service.dart';
 import 'package:paperless_mobile/core/extensions/flutter_extensions.dart';
