@@ -16,7 +16,7 @@ import 'package:paperless_mobile/features/inbox/cubit/inbox_cubit.dart';
 import 'package:paperless_mobile/features/labels/tags/view/widgets/tags_widget.dart';
 import 'package:paperless_mobile/features/labels/view/widgets/label_text.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
-import 'package:paperless_mobile/helpers/connectivity_aware_action_wrapper.dart';
+import 'package:paperless_mobile/core/widgets/connectivity_aware_action_wrapper.dart';
 import 'package:paperless_mobile/routing/routes/documents_route.dart';
 
 class InboxItemPlaceholder extends StatelessWidget {

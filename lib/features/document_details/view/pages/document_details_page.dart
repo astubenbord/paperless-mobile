@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:paperless_api/paperless_api.dart';
-import 'package:paperless_mobile/accessibility/accessibility_utils.dart';
+import 'package:paperless_mobile/core/accessibility/accessibility_utils.dart';
 import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
 import 'package:paperless_mobile/core/bloc/loading_status.dart';
 import 'package:paperless_mobile/core/database/tables/local_user_account.dart';
@@ -24,8 +24,8 @@ import 'package:paperless_mobile/features/documents/view/widgets/document_previe
 import 'package:paperless_mobile/features/similar_documents/cubit/similar_documents_cubit.dart';
 import 'package:paperless_mobile/features/similar_documents/view/similar_documents_view.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
-import 'package:paperless_mobile/helpers/connectivity_aware_action_wrapper.dart';
-import 'package:paperless_mobile/helpers/message_helpers.dart';
+import 'package:paperless_mobile/core/widgets/connectivity_aware_action_wrapper.dart';
+import 'package:paperless_mobile/core/util/message_helpers.dart';
 import 'package:paperless_mobile/routing/routes/documents_route.dart';
 import 'package:paperless_mobile/core/theme.dart';
 

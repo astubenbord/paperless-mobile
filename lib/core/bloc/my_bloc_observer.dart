@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_mobile/core/bloc/transient_error.dart';
 import 'package:paperless_mobile/core/translation/error_code_localization_mapper.dart';
-import 'package:paperless_mobile/helpers/message_helpers.dart';
+import 'package:paperless_mobile/core/util/message_helpers.dart';
 import 'package:paperless_mobile/routing/navigation_keys.dart';
 
 class MyBlocObserver extends BlocObserver {

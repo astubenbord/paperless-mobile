@@ -25,7 +25,7 @@ import 'package:paperless_mobile/core/logging/logger.dart';
 import 'package:paperless_mobile/features/saved_view/cubit/saved_view_cubit.dart';
 import 'package:paperless_mobile/features/tasks/model/pending_tasks_notifier.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
-import 'package:paperless_mobile/helpers/message_helpers.dart';
+import 'package:paperless_mobile/core/util/message_helpers.dart';
 import 'package:paperless_mobile/routing/routes/documents_route.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 

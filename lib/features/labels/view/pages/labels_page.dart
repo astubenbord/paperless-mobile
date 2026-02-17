@@ -14,7 +14,7 @@ import 'package:paperless_mobile/features/document_search/view/sliver_search_bar
 import 'package:paperless_mobile/features/labels/cubit/label_cubit.dart';
 import 'package:paperless_mobile/features/labels/view/widgets/label_tab_view.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
-import 'package:paperless_mobile/helpers/connectivity_aware_action_wrapper.dart';
+import 'package:paperless_mobile/core/widgets/connectivity_aware_action_wrapper.dart';
 import 'package:paperless_mobile/routing/routes/labels_route.dart';
 
 class LabelsPage extends StatefulWidget {

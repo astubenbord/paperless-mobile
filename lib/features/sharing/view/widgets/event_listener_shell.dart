@@ -21,7 +21,7 @@ import 'package:paperless_mobile/features/sharing/cubit/receive_share_cubit.dart
 import 'package:paperless_mobile/features/sharing/view/dialog/discard_shared_file_dialog.dart';
 import 'package:paperless_mobile/features/tasks/model/pending_tasks_notifier.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
-import 'package:paperless_mobile/helpers/message_helpers.dart';
+import 'package:paperless_mobile/core/util/message_helpers.dart';
 import 'package:paperless_mobile/routing/routes/scanner_route.dart';
 import 'package:path/path.dart' as p;
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';

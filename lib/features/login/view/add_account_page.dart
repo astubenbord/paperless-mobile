@@ -19,7 +19,7 @@ import 'package:paperless_mobile/features/login/view/widgets/form_fields/server_
 import 'package:paperless_mobile/features/login/view/widgets/form_fields/user_credentials_form_field.dart';
 import 'package:paperless_mobile/generated/assets.gen.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
-import 'package:paperless_mobile/helpers/message_helpers.dart';
+import 'package:paperless_mobile/core/util/message_helpers.dart';
 import 'package:paperless_mobile/routing/routes/app_logs_route.dart';
 
 class AddAccountPage extends StatefulWidget {

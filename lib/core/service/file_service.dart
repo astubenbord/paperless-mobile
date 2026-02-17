@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:paperless_mobile/core/logging/logger.dart';
 import 'package:paperless_mobile/features/logging/utils/redaction_utils.dart';
-import 'package:paperless_mobile/helpers/format_helpers.dart';
+import 'package:paperless_mobile/core/util/format_helpers.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:rxdart/rxdart.dart';

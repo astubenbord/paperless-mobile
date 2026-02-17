@@ -18,7 +18,7 @@ import 'package:paperless_mobile/features/documents/view/pages/document_view.dar
 import 'package:paperless_mobile/features/labels/tags/view/widgets/tags_form_field.dart';
 import 'package:paperless_mobile/features/labels/view/widgets/label_form_field.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
-import 'package:paperless_mobile/helpers/message_helpers.dart';
+import 'package:paperless_mobile/core/util/message_helpers.dart';
 import 'package:paperless_mobile/routing/routes/labels_route.dart';
 
 typedef ItemBuilder<T> = Widget Function(BuildContext context, T itemData);

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:paperless_mobile/core/service/file_service.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
-import 'package:paperless_mobile/helpers/format_helpers.dart';
-import 'package:paperless_mobile/helpers/message_helpers.dart';
+import 'package:paperless_mobile/core/util/format_helpers.dart';
+import 'package:paperless_mobile/core/util/message_helpers.dart';
 
 class ClearCacheSetting extends StatefulWidget {
   const ClearCacheSetting({super.key});

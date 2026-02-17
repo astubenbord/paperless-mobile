@@ -19,7 +19,7 @@ import 'package:local_auth/local_auth.dart';
 import 'package:logger/logger.dart' as l;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:paperless_api/paperless_api.dart';
-import 'package:paperless_mobile/accessibility/accessible_page.dart';
+import 'package:paperless_mobile/core/accessibility/accessible_page.dart';
 import 'package:paperless_mobile/core/global/constants.dart';
 import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
 import 'package:paperless_mobile/core/bloc/my_bloc_observer.dart';

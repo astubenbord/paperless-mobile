@@ -18,8 +18,8 @@ import 'package:paperless_mobile/features/inbox/view/widgets/inbox_empty_widget.
 import 'package:paperless_mobile/features/inbox/view/widgets/inbox_item.dart';
 import 'package:paperless_mobile/features/paged_document_view/view/document_paging_view_mixin.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
-import 'package:paperless_mobile/helpers/connectivity_aware_action_wrapper.dart';
-import 'package:paperless_mobile/helpers/message_helpers.dart';
+import 'package:paperless_mobile/core/widgets/connectivity_aware_action_wrapper.dart';
+import 'package:paperless_mobile/core/util/message_helpers.dart';
 
 class InboxPage extends StatefulWidget {
   const InboxPage({super.key});

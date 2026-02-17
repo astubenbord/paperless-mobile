@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_api/paperless_api.dart';
-import 'package:paperless_mobile/accessibility/accessibility_utils.dart';
+import 'package:paperless_mobile/core/accessibility/accessibility_utils.dart';
 import 'package:paperless_mobile/core/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/core/widgets/shimmer_placeholder.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/saved_views/saved_view_chip.dart';
 import 'package:paperless_mobile/features/saved_view/cubit/saved_view_cubit.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
-import 'package:paperless_mobile/helpers/connectivity_aware_action_wrapper.dart';
+import 'package:paperless_mobile/core/widgets/connectivity_aware_action_wrapper.dart';
 import 'package:paperless_mobile/routing/routes/saved_views_route.dart';
 
 class SavedViewsWidget extends StatefulWidget {

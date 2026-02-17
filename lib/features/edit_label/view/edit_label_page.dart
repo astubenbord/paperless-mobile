@@ -12,7 +12,7 @@ import 'package:paperless_mobile/core/widgets/dialog_utils/pop_with_unsaved_chan
 import 'package:paperless_mobile/features/edit_label/view/label_form.dart';
 import 'package:paperless_mobile/features/labels/cubit/label_cubit.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
-import 'package:paperless_mobile/helpers/message_helpers.dart';
+import 'package:paperless_mobile/core/util/message_helpers.dart';
 
 class EditLabelPage<T extends Label> extends StatelessWidget {
   final T label;

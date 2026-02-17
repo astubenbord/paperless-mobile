@@ -21,7 +21,7 @@ import 'package:paperless_mobile/features/labels/view/widgets/label_form_field.d
 import 'package:paperless_mobile/core/logging/logger.dart';
 import 'package:paperless_mobile/features/sharing/view/widgets/file_thumbnail.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
-import 'package:paperless_mobile/helpers/message_helpers.dart';
+import 'package:paperless_mobile/core/util/message_helpers.dart';
 import 'package:paperless_mobile/routing/routes/labels_route.dart';
 
 class DocumentUploadResult {

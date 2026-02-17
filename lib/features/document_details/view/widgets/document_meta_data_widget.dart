@@ -7,7 +7,7 @@ import 'package:paperless_mobile/core/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/document_details/view/widgets/archive_serial_number_field.dart';
 import 'package:paperless_mobile/features/document_details/view/widgets/details_item.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
-import 'package:paperless_mobile/helpers/format_helpers.dart';
+import 'package:paperless_mobile/core/util/format_helpers.dart';
 
 class DocumentMetaDataWidget extends StatelessWidget {
   final DocumentModel document;

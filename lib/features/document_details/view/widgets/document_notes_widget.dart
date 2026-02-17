@@ -8,7 +8,7 @@ import 'package:paperless_mobile/core/widgets/hint_card.dart';
 import 'package:paperless_mobile/core/widgets/hint_state_builder.dart';
 import 'package:paperless_mobile/features/document_details/cubit/document_details_cubit.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
-import 'package:paperless_mobile/helpers/message_helpers.dart';
+import 'package:paperless_mobile/core/util/message_helpers.dart';
 import 'package:markdown/markdown.dart' show markdownToHtml;
 import 'package:url_launcher/url_launcher_string.dart';
 

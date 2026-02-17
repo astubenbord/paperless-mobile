@@ -10,7 +10,7 @@ import 'package:paperless_mobile/features/documents/view/widgets/adaptive_docume
 import 'package:paperless_mobile/features/paged_document_view/view/document_paging_view_mixin.dart';
 import 'package:paperless_mobile/features/similar_documents/cubit/similar_documents_cubit.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
-import 'package:paperless_mobile/helpers/message_helpers.dart';
+import 'package:paperless_mobile/core/util/message_helpers.dart';
 import 'package:paperless_mobile/routing/routes/documents_route.dart';
 
 class SimilarDocumentsView extends StatefulWidget {
