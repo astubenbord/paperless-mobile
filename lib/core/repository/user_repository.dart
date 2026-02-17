@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/repository/persistent_repository.dart';
-import 'package:paperless_mobile/features/logging/data/logger.dart';
+import 'package:paperless_mobile/core/logging/logger.dart';
 
 part 'user_repository_state.dart';
 

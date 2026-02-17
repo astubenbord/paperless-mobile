@@ -15,7 +15,7 @@ import 'package:paperless_mobile/core/database/tables/user_credentials.dart';
 import 'package:paperless_mobile/core/factory/paperless_api_factory.dart';
 import 'package:paperless_mobile/core/interceptor/language_header.interceptor.dart';
 import 'package:paperless_mobile/core/security/session_manager_impl.dart';
-import 'package:paperless_mobile/features/logging/data/logger.dart';
+import 'package:paperless_mobile/core/logging/logger.dart';
 import 'package:paperless_mobile/features/logging/utils/redaction_utils.dart';
 import 'package:paperless_mobile/core/model/info_message_exception.dart';
 import 'package:paperless_mobile/core/security/session_manager.dart';

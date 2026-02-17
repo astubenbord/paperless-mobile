@@ -10,7 +10,7 @@ import 'package:paperless_mobile/core/bloc/loading_status.dart';
 import 'package:paperless_mobile/core/bloc/transient_error.dart';
 import 'package:paperless_mobile/core/notifier/document_changed_notifier.dart';
 import 'package:paperless_mobile/core/service/file_service.dart';
-import 'package:paperless_mobile/features/logging/data/logger.dart';
+import 'package:paperless_mobile/core/logging/logger.dart';
 import 'package:paperless_mobile/features/notifications/services/local_notification_service.dart';
 import 'package:path/path.dart' as p;
 import 'package:printing/printing.dart';
