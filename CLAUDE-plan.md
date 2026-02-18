@@ -1,21 +1,12 @@
 # Paperless Mobile Directory Structure Refactoring Plan
 
-## Context
+## Status: COMPLETE
 
-The `lib/` directory has several structural issues: `core/` imports from `features/` (inverted dependencies), orphan top-level directories, misclassified "features" that are really shared infrastructure, and fragmented/inconsistent feature organization. This plan fixes all of these in 17 steps, grouped into 7 commits.
-
-## Verification After Each Step
-
-```bash
-dart run build_runner build --delete-conflicting-outputs
-flutter analyze
-```
+All 17 steps executed successfully. Verified with `build_runner`, `flutter analyze` (0 errors in lib/), and both debug and release APK builds.
 
 ---
 
 ## Commit 1: Move misplaced models from features/ to core/model/ (Steps 1-5) -- DONE
-
-Fixes the inverted dependency problem where `core/` imports from `features/`.
 
 - [x] **Step 1** -- `features/settings/model/view_type.dart` -> `core/model/view_type.dart`
 - [x] **Step 2** -- `features/settings/model/file_download_type.dart` -> `core/model/file_download_type.dart`
@@ -40,66 +31,40 @@ Fixes the inverted dependency problem where `core/` imports from `features/`.
 
 ---
 
-## Commit 4: Move accessibility/, helpers/, translations/ into core/ (Steps 11-13) -- IN PROGRESS
+## Commit 4: Move accessibility/, helpers/, translations/ into core/ (Steps 11-13) -- DONE
 
 - [x] **Step 11** -- `lib/accessibility/*.dart` -> `lib/core/accessibility/*.dart`
-- [ ] **Step 12** -- `lib/helpers/` files into core/:
-  - `format_helpers.dart` -> `core/util/format_helpers.dart` (4 importers)
-  - `message_helpers.dart` -> `core/util/message_helpers.dart` (23 importers)
-  - `permission_helpers.dart` -> `core/util/permission_helpers.dart` (3 importers)
-  - `connectivity_aware_action_wrapper.dart` -> `core/widgets/connectivity_aware_action_wrapper.dart` (9 importers)
+- [x] **Step 12** -- `lib/helpers/` files into core/:
+  - `format_helpers.dart` -> `core/util/format_helpers.dart`
+  - `message_helpers.dart` -> `core/util/message_helpers.dart`
+  - `permission_helpers.dart` -> `core/util/permission_helpers.dart`
+  - `connectivity_aware_action_wrapper.dart` -> `core/widgets/connectivity_aware_action_wrapper.dart`
 - [x] **Step 13** -- `lib/translations/app_localizations_en_extensions.dart` -> `lib/core/translation/app_localizations_en_extensions.dart`
 
 ---
 
-## Commit 5: Move paged_document_view to core/paging/ (Step 14)
+## Commit 5: Move paged_document_view to core/paging/ + saved_view merge + widget extraction (Steps 14-17) -- DONE
 
-- [ ] **Step 14** -- Move all 3 files from `features/paged_document_view/` -> `core/paging/`
-  - `document_paging_bloc_mixin.dart`, `paged_documents_state.dart`, `document_paging_view_mixin.dart`
-  - Update imports in 12 files across 7 features
-
----
-
-## Commit 6: Merge saved_view_details into saved_view (Step 15)
-
-- [ ] **Step 15** -- Move 5 files from `features/saved_view_details/` -> `features/saved_view/` (cubit + view)
-  - Also move 3 saved_view widgets from `features/documents/view/widgets/saved_views/` -> `features/saved_view/view/widgets/`
-  - Update imports in landing_page, documents_page, and internal references
-  - Delete empty `features/saved_view_details/` and `features/documents/view/widgets/saved_views/`
+- [x] **Step 14** -- Move all 3 files from `features/paged_document_view/` -> `core/paging/`
+- [x] **Step 15** -- Move 5 files from `features/saved_view_details/` -> `features/saved_view/` and 3 saved_view widgets from `features/documents/view/widgets/saved_views/` -> `features/saved_view/view/widgets/`
+- [x] **Step 16** -- `features/documents/view/pages/document_view.dart` -> `core/widgets/document_view.dart`
+- [x] **Step 17a** -- `core/workarounds/colored_chip.dart` -> `core/widgets/colored_chip.dart`
+- [x] **Step 17b** -- `core/delegate/customizable_sliver_persistent_header_delegate.dart` -> `core/widgets/customizable_sliver_persistent_header_delegate.dart`
+- [x] **Step 17d** -- `core/exception/server_message_exception.dart` -> `core/model/server_message_exception.dart`
+- [x] Deleted empty directories: `core/workarounds/`, `core/delegate/`, `core/exception/`, `features/saved_view_details/`, `features/paged_document_view/`, `features/documents/view/widgets/saved_views/`
 
 ---
 
-## Commit 7: Extract shared widget + flatten single-file dirs (Steps 16-17)
+## Commit 6: Update remaining imports -- DONE
 
-- [ ] **Step 16** -- `features/documents/view/pages/document_view.dart` -> `core/widgets/document_view.dart`
-  - Update imports in 3 files (documents_route, document_edit_page, scanner_page)
-
-- [ ] **Step 17a** -- `core/workarounds/colored_chip.dart` -> `core/widgets/colored_chip.dart` (7 importers)
-
-- [ ] **Step 17b** -- `core/delegate/customizable_sliver_persistent_header_delegate.dart` -> `core/widgets/customizable_sliver_persistent_header_delegate.dart` (1 importer)
-
-- [ ] **Step 17d** -- `core/exception/server_message_exception.dart` -> `core/model/server_message_exception.dart` (3 importers)
-
-- [ ] Delete empty directories: `core/workarounds/`, `core/delegate/`, `core/exception/`
+- [x] Fixed duplicate import in `scanner_page.dart`
+- [x] Fixed stale import in `integration_test/login_integration_test.dart`
 
 ---
 
-## Key Files to Watch
+## Verification Results
 
-| File | Why |
-|------|-----|
-| `core/database/hive/hive_config.dart` | Central Hive config -- touched by steps 1-4, must verify adapter registration still works |
-| `core/database/tables/global_settings.dart` | Has `part .g.dart` -- must regenerate after steps 2-3 |
-| `core/database/tables/local_user_app_state.dart` | Has `part .g.dart` -- must regenerate after step 1 |
-| `helpers/message_helpers.dart` | 23 importers -- largest single batch of import updates (step 12) |
-| `build.yaml` / `l10n.yaml` | Verify no path references break (l10n.yaml only references `lib/l10n/` which we don't touch) |
-
-## Execution Strategy
-
-For each file move:
-1. `git mv old_path new_path`
-2. Project-wide find-and-replace of the old package import path -> new path
-3. Run `build_runner` if file has `.g.dart` / `.freezed.dart`
-4. Run `flutter analyze` to verify
-
-Total: ~35 files moved, ~100+ import updates across ~287 Dart files.
+- `build_runner`: 61 outputs generated (lib/) + 73 outputs (packages/paperless_api/) -- all clean
+- `flutter analyze lib/`: 0 errors, 6 pre-existing warnings, 9 pre-existing infos
+- `flutter build apk --debug`: SUCCESS
+- `flutter build apk --release`: SUCCESS (183.7MB)
