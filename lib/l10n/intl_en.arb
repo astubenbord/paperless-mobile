@@ -161,6 +161,8 @@
   "@filterDocuments": {
     "description": "Title of the document filter"
   },
+  "originalFileName": "Original File Name",
+  "@originalFileName": {},
   "originalMD5Checksum": "Original MD5-Checksum",
   "@originalMD5Checksum": {},
   "mediaFilename": "Media Filename",
@@ -1044,5 +1046,6 @@
   },
   "permissions": "Permissions",
   "newNote": "New note",
-  "notesMarkdownSyntaxSupportHint": "Paperless Mobile can render notes using basic markdown syntax. Try it out!"
+  "notesMarkdownSyntaxSupportHint": "Paperless Mobile can render notes using basic markdown syntax. Try it out!",
+  "noDocumentsScanned": "You have not scanned any documents yet."
 }

@@ -1044,5 +1044,6 @@
   },
   "permissions": "Berechtigungen",
   "newNote": "Neue Notiz",
-  "notesMarkdownSyntaxSupportHint": "Paperless Mobile unterstützt Markdown-Syntax zur Darstellung und Formatierung von Notizen. Probiere es aus!"
+  "notesMarkdownSyntaxSupportHint": "Paperless Mobile unterstützt Markdown-Syntax zur Darstellung und Formatierung von Notizen. Probiere es aus!",
+  "noDocumentsScanned": "Du hast noch keine Dokumente gescannt."
 }

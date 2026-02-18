@@ -303,6 +303,7 @@ class _DocumentEditPageState extends State<DocumentEditPage>
                   name: fkContent,
                   maxLines: null,
                   keyboardType: TextInputType.multiline,
+                  enableSuggestions: true,
                   initialValue: state.document.content,
                   decoration: const InputDecoration(
                     border: InputBorder.none,
@@ -403,6 +404,7 @@ class _DocumentEditPageState extends State<DocumentEditPage>
   Widget _buildTitleFormField(String? initialTitle) {
     return FormBuilderTextField(
       name: fkTitle,
+      enableSuggestions: true,
       decoration: InputDecoration(
         label: Text(S.of(context)!.title),
         suffixIcon: IconButton(

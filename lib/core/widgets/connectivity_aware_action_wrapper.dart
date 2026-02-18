@@ -11,6 +11,7 @@ class ConnectivityAwareActionWrapper extends StatelessWidget {
   final OfflineBuilder offlineBuilder;
   final Widget child;
   final bool disabled;
+  final String? disabledReason;
 
   static Widget disabledBuilder(BuildContext context, Widget? child) {
     return ColorFiltered(
@@ -34,6 +35,7 @@ class ConnectivityAwareActionWrapper extends StatelessWidget {
     this.offlineBuilder = ConnectivityAwareActionWrapper.disabledBuilder,
     required this.child,
     this.disabled = false,
+    this.disabledReason,
   });
 
   @override
@@ -41,13 +43,25 @@ class ConnectivityAwareActionWrapper extends StatelessWidget {
     return StreamBuilder<bool>(
       stream: context.read<ConnectivityStatusService>().connectivityChanges(),
       builder: (context, snapshot) {
-        final disableButton =
-            !snapshot.hasData || snapshot.data == false || disabled;
+        final isOffline = !snapshot.hasData || snapshot.data == false;
+        final disableButton = isOffline || disabled;
         if (disableButton) {
           return GestureDetector(
             onTap: () {
               HapticFeedback.heavyImpact();
-              showSnackBar(context, S.of(context)!.youAreCurrentlyOffline);
+              var errorString = "";
+              if (isOffline) {
+                errorString = S.of(context)!.youAreCurrentlyOffline;
+                if (disabled && disabledReason != null) {
+                  errorString = "$errorString\n";
+                }
+              }
+              if (disabled && disabledReason != null) {
+                errorString = "$errorString${disabledReason!}";
+              }
+              if (errorString.isNotEmpty) {
+                showSnackBar(context, errorString);
+              }
             },
             child: AbsorbPointer(
               child: offlineBuilder(context, child),

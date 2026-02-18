@@ -65,7 +65,7 @@ class DocumentPreview extends StatelessWidget {
           cacheKey: "thumb_$documentId",
           imageUrl:
               context.read<PaperlessDocumentsApi>().getThumbnailUrl(documentId),
-          errorWidget: (ctxt, msg, __) => Text(msg),
+          errorWidget: (ctxt, msg, _) => Text(msg),
           placeholder: (context, value) => Shimmer.fromColors(
             baseColor: Colors.grey[300]!,
             highlightColor: Colors.grey[100]!,

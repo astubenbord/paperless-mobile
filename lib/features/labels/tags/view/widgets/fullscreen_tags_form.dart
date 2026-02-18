@@ -33,6 +33,7 @@ class _FullscreenTagsFormState extends State<FullscreenTagsForm> {
   final _textEditingController = TextEditingController();
   final _focusNode = FocusNode();
   late List<Tag> _options;
+  late Map<int, Tag> _allOptions;
 
   List<int> _include = [];
   List<int> _exclude = [];
@@ -44,6 +45,7 @@ class _FullscreenTagsFormState extends State<FullscreenTagsForm> {
   void initState() {
     super.initState();
     _options = widget.options.values.toList();
+    _allOptions = Map.of(widget.options);
     final value = widget.initialValue;
     if (value is IdsTagsQuery) {
       _include = value.include.toList();
@@ -120,7 +122,7 @@ class _FullscreenTagsFormState extends State<FullscreenTagsForm> {
                 widget.onSubmit(
                   returnValue: IdsTagsQuery(
                     include:
-                        _include.sortedBy((id) => widget.options[id]!.name),
+                        _include.sortedBy((id) => _allOptions[id]!.name),
                   ),
                 );
                 return;
@@ -130,12 +132,12 @@ class _FullscreenTagsFormState extends State<FullscreenTagsForm> {
                 query = const NotAssignedTagsQuery();
               } else if (_anyAssigned) {
                 query = AnyAssignedTagsQuery(
-                  tagIds: _include.sortedBy((id) => widget.options[id]!.name),
+                  tagIds: _include.sortedBy((id) => _allOptions[id]!.name),
                 );
               } else {
                 query = IdsTagsQuery(
-                  include: _include.sortedBy((id) => widget.options[id]!.name),
-                  exclude: _exclude.sortedBy((id) => widget.options[id]!.name),
+                  include: _include.sortedBy((id) => _allOptions[id]!.name),
+                  exclude: _exclude.sortedBy((id) => _allOptions[id]!.name),
                 );
               }
               widget.onSubmit(returnValue: query);
@@ -209,6 +211,7 @@ class _FullscreenTagsFormState extends State<FullscreenTagsForm> {
     if (createdTag != null) {
       setState(() {
         _options.add(createdTag);
+        _allOptions[createdTag.id!] = createdTag;
         _toggleSelection(createdTag.id!);
       });
     }

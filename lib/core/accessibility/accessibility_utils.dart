@@ -74,7 +74,7 @@ class _AccessibilityAwareObserverWidgetState
     setState(() {
       _accessibilityFeatures = WidgetsBinding.instance.accessibilityFeatures;
     });
-    print("Accessibility features changed");
+    // Accessibility features changed - no action needed.
   }
 
   @override

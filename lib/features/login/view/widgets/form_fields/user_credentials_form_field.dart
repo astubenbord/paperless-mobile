@@ -43,62 +43,64 @@ class _UserCredentialsFormFieldState extends State<UserCredentialsFormField>
         username: widget.initialUsername,
       ),
       name: UserCredentialsFormField.fkCredentials,
-      builder: (field) => Column(
-        children: [
-          TextFormField(
-            key: const ValueKey('login-username'),
-            focusNode: _usernameFocusNode,
-            textCapitalization: TextCapitalization.none,
-            textInputAction: TextInputAction.next,
-            onFieldSubmitted: (value) {
-              _passwordFocusNode.requestFocus();
-            },
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            autocorrect: false,
-            onChanged: (username) => field.didChange(
-              field.value?.copyWith(username: username) ??
-                  LoginFormCredentials(username: username),
-            ),
-            validator: (value) {
-              if (value?.trim().isEmpty ?? true) {
-                return S.of(context)!.usernameMustNotBeEmpty;
-              }
-              final serverAddress = widget.formKey.currentState!
-                  .getRawValue<String>(ServerAddressFormField.fkServerAddress);
-              if (serverAddress != null) {
-                final userExists = Hive.localUserAccountBox.values
-                    .map((e) => e.id)
-                    .contains('$value@$serverAddress');
-                if (userExists) {
-                  return S.of(context)!.userAlreadyExists;
+      builder: (field) => AutofillGroup(
+        child: Column(
+          children: [
+            TextFormField(
+              key: const ValueKey('login-username'),
+              focusNode: _usernameFocusNode,
+              textCapitalization: TextCapitalization.none,
+              textInputAction: TextInputAction.next,
+              onFieldSubmitted: (value) {
+                _passwordFocusNode.requestFocus();
+              },
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              autocorrect: false,
+              onChanged: (username) => field.didChange(
+                field.value?.copyWith(username: username) ??
+                    LoginFormCredentials(username: username),
+              ),
+              validator: (value) {
+                if (value?.trim().isEmpty ?? true) {
+                  return S.of(context)!.usernameMustNotBeEmpty;
                 }
-              }
-              return null;
-            },
-            autofillHints: const [AutofillHints.username],
-            decoration: InputDecoration(
-              label: Text(S.of(context)!.username),
+                final serverAddress = widget.formKey.currentState!
+                    .getRawValue<String>(ServerAddressFormField.fkServerAddress);
+                if (serverAddress != null) {
+                  final userExists = Hive.localUserAccountBox.values
+                      .map((e) => e.id)
+                      .contains('$value@$serverAddress');
+                  if (userExists) {
+                    return S.of(context)!.userAlreadyExists;
+                  }
+                }
+                return null;
+              },
+              autofillHints: const [AutofillHints.username],
+              decoration: InputDecoration(
+                label: Text(S.of(context)!.username),
+              ),
             ),
-          ),
-          ObscuredInputTextFormField(
-            key: const ValueKey('login-password'),
-            focusNode: _passwordFocusNode,
-            label: S.of(context)!.password,
-            onChanged: (password) => field.didChange(
-              field.value?.copyWith(password: password) ??
-                  LoginFormCredentials(password: password),
+            ObscuredInputTextFormField(
+              key: const ValueKey('login-password'),
+              focusNode: _passwordFocusNode,
+              label: S.of(context)!.password,
+              onChanged: (password) => field.didChange(
+                field.value?.copyWith(password: password) ??
+                    LoginFormCredentials(password: password),
+              ),
+              onFieldSubmitted: (_) {
+                widget.onFieldsSubmitted?.call();
+              },
+              validator: (value) {
+                if (value?.trim().isEmpty ?? true) {
+                  return S.of(context)!.passwordMustNotBeEmpty;
+                }
+                return null;
+              },
             ),
-            onFieldSubmitted: (_) {
-              widget.onFieldsSubmitted?.call();
-            },
-            validator: (value) {
-              if (value?.trim().isEmpty ?? true) {
-                return S.of(context)!.passwordMustNotBeEmpty;
-              }
-              return null;
-            },
-          ),
-        ].map((child) => child.padded()).toList(),
+          ].map((child) => child.padded()).toList(),
+        ),
       ),
     );
   }
@@ -106,41 +108,3 @@ class _UserCredentialsFormFieldState extends State<UserCredentialsFormField>
   @override
   bool get wantKeepAlive => true;
 }
-
-/**
- * AutofillGroup(
-      child: Column(
-        children: [
-          FormBuilderTextField(
-            name: fkUsername,
-            focusNode: _focusNodes[fkUsername],
-            onSubmitted: (_) {
-              FocusScope.of(context).requestFocus(_focusNodes[fkPassword]);
-            },
-            validator: FormBuilderValidators.required(
-              errorText: S.of(context)!.usernameMustNotBeEmpty,
-            ),
-            autofillHints: const [AutofillHints.username],
-            decoration: InputDecoration(
-              labelText: S.of(context)!.username,
-            ),
-          ).padded(),
-          FormBuilderTextField(
-            name: fkPassword,
-            focusNode: _focusNodes[fkPassword],
-            onSubmitted: (_) {
-              FocusScope.of(context).unfocus();
-            },
-            autofillHints: const [AutofillHints.password],
-            validator: FormBuilderValidators.required(
-              errorText: S.of(context)!.passwordMustNotBeEmpty,
-            ),
-            obscureText: true,
-            decoration: InputDecoration(
-              labelText: S.of(context)!.password,
-            ),
-          ).padded(),
-        ],
-      ),
-    );
- */

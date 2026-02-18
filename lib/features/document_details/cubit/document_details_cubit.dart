@@ -299,9 +299,9 @@ class DocumentDetailsCubit extends Cubit<DocumentDetailsState> {
     bool original,
     Directory dir,
   ) {
-    final normalizedPath = meta.mediaFilename.replaceAll("/", " ");
-    final extension = original ? p.extension(normalizedPath) : '.pdf';
-    return "${dir.path}/${p.basenameWithoutExtension(normalizedPath)}$extension";
+    final baseName = p.basenameWithoutExtension(meta.mediaFilename);
+    final extension = original ? p.extension(meta.mediaFilename) : '.pdf';
+    return "${dir.path}/$baseName$extension";
   }
 
   @override

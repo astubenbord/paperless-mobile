@@ -321,42 +321,4 @@ class AppDrawer extends StatelessWidget {
     );
   }
 
-  Widget _buildOnboardingImageCredits() {
-    return RichText(
-      text: TextSpan(
-        children: [
-          const TextSpan(
-            text: 'Onboarding images by ',
-          ),
-          TextSpan(
-            text: 'pch.vector',
-            style: const TextStyle(color: Colors.blue),
-            recognizer: TapGestureRecognizer()
-              ..onTap = () {
-                launchUrlString(
-                    'https://www.freepik.com/free-vector/business-team-working-cogwheel-mechanism-together_8270974.htm#query=setting&position=4&from_view=author');
-              },
-          ),
-          const TextSpan(
-            text: ' on Freepik.',
-          ),
-        ],
-      ),
-    );
-  }
 }
-
-//Wrap(
-//   children: [
-//     const Text('Onboarding images by '),
-//     GestureDetector(
-//       onTap: followLink,
-//       child: RichText(
-
-//         'pch.vector',
-//         style: TextStyle(color: Colors.blue),
-//       ),
-//     ),
-//     const Text(' on Freepik.')
-//   ],
-// )

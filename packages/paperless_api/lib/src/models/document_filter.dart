@@ -71,7 +71,7 @@ class DocumentFilter extends Equatable {
     this.sortField = SortField.created,
     this.sortOrder = SortOrder.descending,
     this.page = 1,
-    this.pageSize = 25,
+    this.pageSize = 100,
     this.query = const TextQuery(),
     this.added = const UnsetDateRangeQuery(),
     this.created = const UnsetDateRangeQuery(),

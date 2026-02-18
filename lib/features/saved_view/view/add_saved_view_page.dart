@@ -52,6 +52,7 @@ class _AddSavedViewPageState extends State<AddSavedViewPage> {
                 children: [
                   FormBuilderTextField(
                     name: _fkName,
+                    enableSuggestions: true,
                     validator: (value) {
                       if (value?.trim().isEmpty ?? true) {
                         return S.of(context)!.thisFieldIsRequired;

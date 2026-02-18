@@ -18,6 +18,7 @@ class TagsFormField extends StatelessWidget {
   final bool allowCreation;
   final bool allowExclude;
   final Iterable<int> suggestions;
+  final String? labelSuffix;
 
   const TagsFormField({
     super.key,
@@ -28,6 +29,7 @@ class TagsFormField extends StatelessWidget {
     required this.allowCreation,
     required this.allowExclude,
     this.suggestions = const [],
+    this.labelSuffix,
   });
 
   @override
@@ -68,7 +70,7 @@ class TagsFormField extends StatelessWidget {
                     decoration: InputDecoration(
                       contentPadding: const EdgeInsets.all(12),
                       labelText:
-                          '${S.of(context)!.tags}${anyAssigned ? ' (${S.of(context)!.anyAssigned})' : ''}',
+                          '${S.of(context)!.tags}${labelSuffix ?? ''}${anyAssigned ? ' (${S.of(context)!.anyAssigned})' : ''}',
                       prefixIcon: const Icon(Icons.label_outline),
                       enabled: enabled,
                     ),
@@ -117,7 +119,6 @@ class TagsFormField extends StatelessWidget {
                       scrollDirection: Axis.horizontal,
                       itemCount: displayedSuggestions.length,
                       itemBuilder: (context, index) {
-                        print(options);
                         final suggestion =
                             options[displayedSuggestions.elementAt(index)];
                         if (suggestion == null) {

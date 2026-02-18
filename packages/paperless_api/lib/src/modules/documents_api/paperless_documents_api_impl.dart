@@ -73,10 +73,26 @@ class PaperlessDocumentsApiImpl implements PaperlessDocumentsApi {
 
   @override
   Future<DocumentModel> update(DocumentModel doc) async {
+    // Only send fields that are writable via the Paperless-ngx API.
+    // Sending read-only fields (id, added, modified, owner, permissions, etc.)
+    // causes the server to reject the request on newer API versions.
+    final updatePayload = {
+      'title': doc.title,
+      'content': doc.content,
+      'tags': doc.tags.toList(),
+      'document_type': doc.documentType,
+      'correspondent': doc.correspondent,
+      'storage_path': doc.storagePath,
+      'archive_serial_number': doc.archiveSerialNumber,
+      'custom_fields': doc.customFields
+          .map((cf) => {'field': cf.id, 'value': cf.value})
+          .toList(),
+      'created': doc.created.toUtc().toIso8601String(),
+    };
     try {
       final response = await client.put(
         "/api/documents/${doc.id}/",
-        data: doc.toJson(),
+        data: updatePayload,
         options: Options(validateStatus: (status) => status == 200),
       );
       return DocumentModel.fromJson(response.data);

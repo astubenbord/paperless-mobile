@@ -141,6 +141,7 @@ class _DocumentUploadPreparationPageState
                             FormBuilderTextField(
                               autovalidateMode: AutovalidateMode.always,
                               name: DocumentModel.titleKey,
+                              enableSuggestions: true,
                               initialValue: widget.title ??
                                   "scan_${fileNameDateFormat.format(_now)}",
                               validator: (value) {
@@ -180,6 +181,7 @@ class _DocumentUploadPreparationPageState
                               readOnly: _syncTitleAndFilename,
                               enabled: !_syncTitleAndFilename,
                               name: fkFileName,
+                              enableSuggestions: true,
                               decoration: InputDecoration(
                                 labelText: S.of(context)!.fileName,
                                 suffixText: widget.fileExtension,
@@ -282,6 +284,7 @@ class _DocumentUploadPreparationPageState
                                 allowExclude: false,
                                 allowOnlySelection: true,
                                 options: labelRepository.tags,
+                                labelSuffix: ' *',
                               ),
                             Text(
                               "* ${S.of(context)!.uploadInferValuesHint}",

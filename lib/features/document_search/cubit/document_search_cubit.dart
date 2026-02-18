@@ -96,7 +96,7 @@ class DocumentSearchCubit extends Cubit<DocumentSearchState>
       ),
     );
     final suggestions = await api.autocomplete(query);
-    print("Suggestions found: $suggestions");
+    // Suggestions loaded from API.
     emit(
       state.copyWith(
         suggestions: suggestions,

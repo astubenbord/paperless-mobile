@@ -87,6 +87,7 @@ class _LabelFormState<T extends Label> extends State<LabelForm<T>> {
             FormBuilderTextField(
               autofocus: widget.autofocusNameField,
               name: Label.nameKey,
+              enableSuggestions: true,
               decoration: InputDecoration(
                 labelText: S.of(context)!.name,
                 errorText: _errors[Label.nameKey],
@@ -130,6 +131,7 @@ class _LabelFormState<T extends Label> extends State<LabelForm<T>> {
             if (_enableMatchFormField)
               FormBuilderTextField(
                 name: Label.matchKey,
+                enableSuggestions: true,
                 decoration: InputDecoration(
                   labelText: S.of(context)!.match,
                   errorText: _errors[Label.matchKey],

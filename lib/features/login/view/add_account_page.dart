@@ -63,8 +63,6 @@ class _AddAccountPageState extends State<AddAccountPage> {
   final _formKey = GlobalKey<FormBuilderState>();
   bool _isCheckingConnection = false;
   ReachabilityStatus _reachabilityStatus = ReachabilityStatus.unknown;
-  bool _isFormSubmitted = false;
-
   final _pageController = PageController();
   @override
   Widget build(BuildContext context) {
@@ -311,9 +309,6 @@ class _AddAccountPageState extends State<AddAccountPage> {
 
   Future<void> _onSubmit() async {
     FocusScope.of(context).unfocus();
-    setState(() {
-      _isFormSubmitted = true;
-    });
     if (_formKey.currentState?.saveAndValidate() ?? false) {
       final form = _formKey.currentState!.value;
       final clientCertFormModel =
@@ -338,10 +333,6 @@ class _AddAccountPageState extends State<AddAccountPage> {
         if (mounted) showInfoMessage(context, error);
       } catch (error) {
         if (mounted) showGenericError(context, error);
-      } finally {
-        setState(() {
-          _isFormSubmitted = false;
-        });
       }
     }
   }

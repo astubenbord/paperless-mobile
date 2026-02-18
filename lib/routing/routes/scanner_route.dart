@@ -47,8 +47,6 @@ class DocumentUploadRoute extends GoRouteData with $DocumentUploadRoute {
       create: (_) => DocumentUploadCubit(
         context.read(),
         context.read(),
-        context.read(),
-        context.read(),
       ),
       child: DocumentUploadPreparationPage(
         title: title,

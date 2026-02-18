@@ -23,7 +23,6 @@ import 'package:paperless_mobile/features/documents/view/widgets/sort_documents_
 import 'package:paperless_mobile/features/labels/cubit/label_cubit.dart';
 import 'package:paperless_mobile/core/logging/logger.dart';
 import 'package:paperless_mobile/features/saved_view/cubit/saved_view_cubit.dart';
-import 'package:paperless_mobile/features/tasks/model/pending_tasks_notifier.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
 import 'package:paperless_mobile/core/util/message_helpers.dart';
 import 'package:paperless_mobile/routing/routes/documents_route.dart';
@@ -66,28 +65,6 @@ class _DocumentsPageState extends State<DocumentsPage> {
       _nestedScrollViewKey.currentState!.innerController
           .addListener(_scrollExtentChangedListener);
     });
-  }
-
-  void _onTasksChanged() {
-    final notifier = context.read<PendingTasksNotifier>();
-    final tasks = notifier.value;
-    final finishedTasks = tasks.values.where((element) => element.isSuccess);
-    if (finishedTasks.isNotEmpty) {
-      showSnackBar(
-        context,
-        S.of(context)!.newDocumentAvailable,
-        action: SnackBarActionConfig(
-          label: S.of(context)!.reload,
-          onPressed: () {
-            // finishedTasks.forEach((task) {
-            //   notifier.acknowledgeTasks([finishedTasks]);
-            // });
-            context.read<DocumentsCubit>().reload();
-          },
-        ),
-        duration: const Duration(seconds: 10),
-      );
-    }
   }
 
   Future<void> _reloadData() async {
