@@ -67,7 +67,7 @@ class _AddAccountPageState extends State<AddAccountPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: Text(widget.titleText),
       ),
@@ -92,114 +92,110 @@ class _AddAccountPageState extends State<AddAccountPage> {
                   controller: _pageController,
                   allowImplicitScrolling: false,
                   children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        ServerAddressFormField(
-                          onChanged: (value) {
-                            setState(() {
-                              _reachabilityStatus = ReachabilityStatus.unknown;
-                            });
-                          },
-                        ).paddedSymmetrically(
-                          horizontal: 12,
-                          vertical: 12,
-                        ),
-                        ClientCertificateFormField(
-                          initialBytes: widget.initialClientCertificate?.bytes,
-                          initialPassphrase:
-                              widget.initialClientCertificate?.passphrase,
-                        ).padded(),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            //TODO: Move additional headers and client cert to separate page
-                            // IconButton.filledTonal(
-                            //   onPressed: () {
-                            //     Navigator.of(context).push(
-                            //       MaterialPageRoute(builder: (context) {
-                            //         return LoginSettingsPage();
-                            //       }),
-                            //     );
-                            //   },
-                            //   icon: Icon(Icons.settings),
-                            // ),
-                            SizedBox(width: 8),
-                            FilledButton.icon(
-                              onPressed: () async {
-                                final status = await _updateReachability();
-                                if (status == ReachabilityStatus.reachable) {
-                                  Future.delayed(1.seconds, () {
-                                    _pageController.nextPage(
-                                      duration: Duration(milliseconds: 300),
-                                      curve: Curves.easeInOut,
-                                    );
-                                  });
-                                }
-                              },
-                              icon: _isCheckingConnection
-                                  ? SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSecondary,
-                                      ),
-                                    )
-                                  : _reachabilityStatus ==
-                                          ReachabilityStatus.reachable
-                                      ? Icon(Icons.done)
-                                      : Icon(Icons.arrow_forward),
-                              label: Text(S.of(context)!.continueLabel),
-                            ),
-                          ],
-                        ).paddedSymmetrically(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        _buildStatusIndicator().padded(),
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        UserCredentialsFormField(
-                          formKey: _formKey,
-                          initialUsername: widget.initialUsername,
-                          initialPassword: widget.initialPassword,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            TextButton.icon(
-                              onPressed: () {
-                                _pageController.previousPage(
-                                  duration: Duration(milliseconds: 300),
-                                  curve: Curves.easeInOut,
-                                );
-                              },
-                              icon: Icon(Icons.arrow_back),
-                              label: Text(S.of(context)!.edit),
-                            ),
-                            FilledButton(
-                              onPressed: () {
-                                _onSubmit();
-                              },
-                              child: Text(S.of(context)!.signIn),
-                            ),
-                          ],
-                        ).padded(),
-                        Text(
-                          S.of(context)!.loginRequiredPermissionsHint,
-                          style: Theme.of(context).textTheme.bodySmall?.apply(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurface
-                                    .withAlpha(153),
+                    SingleChildScrollView(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          ServerAddressFormField(
+                            onChanged: (value) {
+                              setState(() {
+                                _reachabilityStatus =
+                                    ReachabilityStatus.unknown;
+                              });
+                            },
+                          ).paddedSymmetrically(
+                            horizontal: 12,
+                            vertical: 12,
+                          ),
+                          ClientCertificateFormField(
+                            initialBytes:
+                                widget.initialClientCertificate?.bytes,
+                            initialPassphrase:
+                                widget.initialClientCertificate?.passphrase,
+                          ).padded(),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              SizedBox(width: 8),
+                              FilledButton.icon(
+                                onPressed: () async {
+                                  final status = await _updateReachability();
+                                  if (status == ReachabilityStatus.reachable) {
+                                    Future.delayed(1.seconds, () {
+                                      _pageController.nextPage(
+                                        duration: Duration(milliseconds: 300),
+                                        curve: Curves.easeInOut,
+                                      );
+                                    });
+                                  }
+                                },
+                                icon: _isCheckingConnection
+                                    ? SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSecondary,
+                                        ),
+                                      )
+                                    : _reachabilityStatus ==
+                                            ReachabilityStatus.reachable
+                                        ? Icon(Icons.done)
+                                        : Icon(Icons.arrow_forward),
+                                label: Text(S.of(context)!.continueLabel),
                               ),
-                        ).padded(16),
-                      ],
+                            ],
+                          ).paddedSymmetrically(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          _buildStatusIndicator().padded(),
+                        ],
+                      ),
+                    ),
+                    SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          UserCredentialsFormField(
+                            formKey: _formKey,
+                            initialUsername: widget.initialUsername,
+                            initialPassword: widget.initialPassword,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              TextButton.icon(
+                                onPressed: () {
+                                  _pageController.previousPage(
+                                    duration: Duration(milliseconds: 300),
+                                    curve: Curves.easeInOut,
+                                  );
+                                },
+                                icon: Icon(Icons.arrow_back),
+                                label: Text(S.of(context)!.edit),
+                              ),
+                              FilledButton(
+                                onPressed: () {
+                                  _onSubmit();
+                                },
+                                child: Text(S.of(context)!.signIn),
+                              ),
+                            ],
+                          ).padded(),
+                          Text(
+                            S.of(context)!.loginRequiredPermissionsHint,
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.apply(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface
+                                          .withAlpha(153),
+                                    ),
+                          ).padded(16),
+                        ],
+                      ),
                     ),
                   ],
                 ),

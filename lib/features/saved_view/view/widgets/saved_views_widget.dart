@@ -109,6 +109,9 @@ class _SavedViewsWidgetState extends State<SavedViewsWidget>
                     onPressed: () {
                       final newView = selectedView!.copyWith(
                         filterRules: FilterRule.fromFilter(widget.filter),
+                        sortField: widget.filter.sortField,
+                        sortReverse: widget.filter.sortOrder ==
+                            SortOrder.descending,
                       );
                       widget.onUpdateView(newView);
                     },
