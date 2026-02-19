@@ -41,6 +41,11 @@ class PaperlessApiFactoryImpl implements PaperlessApiFactory {
   }
 
   @override
+  CustomFieldsApi createCustomFieldsApi(Dio dio) {
+    return CustomFieldsApiImpl(dio);
+  }
+
+  @override
   PaperlessUserApi createUserApi(Dio dio, {required int apiVersion}) {
     if (apiVersion == 3) {
       return PaperlessUserApiV3Impl(dio);

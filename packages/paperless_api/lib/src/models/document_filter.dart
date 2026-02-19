@@ -62,11 +62,15 @@ class DocumentFilter extends Equatable {
   @HiveField(14)
   final int? selectedView;
 
+  @HiveField(15)
+  final IdQueryParameter owner;
+
   const DocumentFilter({
     this.documentType = const UnsetIdQueryParameter(),
     this.correspondent = const UnsetIdQueryParameter(),
     this.storagePath = const UnsetIdQueryParameter(),
     this.asnQuery = const UnsetIdQueryParameter(),
+    this.owner = const UnsetIdQueryParameter(),
     this.tags = const IdsTagsQuery(),
     this.sortField = SortField.created,
     this.sortOrder = SortOrder.descending,
@@ -94,6 +98,7 @@ class DocumentFilter extends Equatable {
       ...correspondent.toQueryParameter('correspondent').entries,
       ...storagePath.toQueryParameter('storage_path').entries,
       ...asnQuery.toQueryParameter('archive_serial_number').entries,
+      ...owner.toQueryParameter('owner').entries,
       ...tags.toQueryParameter().entries,
       ...added.toQueryParameter(DateRangeQueryField.added).entries,
       ...created.toQueryParameter(DateRangeQueryField.created).entries,
@@ -135,6 +140,7 @@ class DocumentFilter extends Equatable {
     IdQueryParameter? correspondent,
     IdQueryParameter? storagePath,
     IdQueryParameter? asnQuery,
+    IdQueryParameter? owner,
     TagsQuery? tags,
     SortField? sortField,
     SortOrder? sortOrder,
@@ -155,6 +161,7 @@ class DocumentFilter extends Equatable {
       sortField: sortField ?? this.sortField,
       sortOrder: sortOrder ?? this.sortOrder,
       asnQuery: asnQuery ?? this.asnQuery,
+      owner: owner ?? this.owner,
       query: query ?? this.query,
       added: added ?? this.added,
       created: created ?? this.created,
@@ -180,6 +187,7 @@ class DocumentFilter extends Equatable {
     return correspondent.matches(document.correspondent) &&
         documentType.matches(document.documentType) &&
         storagePath.matches(document.storagePath) &&
+        owner.matches(document.owner) &&
         tags.matches(document.tags) &&
         created.matches(document.created) &&
         added.matches(document.added) &&
@@ -228,6 +236,10 @@ class DocumentFilter extends Equatable {
           UnsetIdQueryParameter() => 0,
           _ => 1,
         },
+        switch (owner) {
+          UnsetIdQueryParameter() => 0,
+          _ => 1,
+        },
         (query.queryText?.isNotEmpty ?? false) ? 1 : 0,
       ].fold(0, (previousValue, element) => previousValue + element);
 
@@ -239,6 +251,7 @@ class DocumentFilter extends Equatable {
         correspondent,
         storagePath,
         asnQuery,
+        owner,
         tags,
         sortField,
         sortOrder,

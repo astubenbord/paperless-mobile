@@ -1,5 +1,7 @@
 export 'authentication_api/authentication_api.dart';
 export 'authentication_api/authentication_api_impl.dart';
+export 'custom_fields/custom_fields_api.dart';
+export 'custom_fields/custom_fields_api_impl.dart';
 
 export 'labels_api/paperless_labels_api.dart';
 export 'labels_api/paperless_labels_api_impl.dart';

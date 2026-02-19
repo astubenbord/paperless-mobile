@@ -5,7 +5,9 @@ import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/database/tables/local_user_account.dart';
 import 'package:paperless_mobile/core/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/core/repository/label_repository.dart';
+import 'package:paperless_mobile/core/repository/user_repository.dart';
 import 'package:paperless_mobile/core/widgets/form_builder_fields/extended_date_range_form_field/form_builder_extended_date_range_picker.dart';
+import 'package:paperless_mobile/features/documents/view/widgets/search/owner_form_field.dart';
 import 'package:paperless_mobile/features/labels/tags/view/widgets/tags_form_field.dart';
 import 'package:paperless_mobile/features/labels/view/widgets/label_form_field.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
@@ -17,6 +19,7 @@ class DocumentFilterForm extends StatefulWidget {
   static const fkDocumentType = DocumentModel.documentTypeKey;
   static const fkStoragePath = DocumentModel.storagePathKey;
   static const fkQuery = "query";
+  static const fkOwner = "owner";
   static const fkCreatedAt = DocumentModel.createdKey;
   static const fkAddedAt = DocumentModel.addedKey;
 
@@ -36,6 +39,8 @@ class DocumentFilterForm extends StatefulWidget {
           DocumentFilter.initial.storagePath,
       tags:
           v[DocumentModel.tagsKey] as TagsQuery? ?? DocumentFilter.initial.tags,
+      owner: v[DocumentFilterForm.fkOwner] as IdQueryParameter? ??
+          DocumentFilter.initial.owner,
       query: v[DocumentFilterForm.fkQuery] as TextQuery? ??
           DocumentFilter.initial.query,
       created: (v[DocumentFilterForm.fkCreatedAt] as DateRangeQuery),
@@ -93,6 +98,8 @@ class _DocumentFilterFormState extends State<DocumentFilterForm> {
   }
 
   List<Widget> _buildFormFieldList(LabelRepository labelRepository) {
+    final hasMultiUserSupport =
+        context.watch<LocalUserAccount>().hasMultiUserSupport;
     return [
       _buildQueryFormField().paddedSymmetrically(horizontal: 12),
       Align(
@@ -139,6 +146,11 @@ class _DocumentFilterFormState extends State<DocumentFilterForm> {
         horizontal: 16,
         vertical: 4,
       ),
+      if (hasMultiUserSupport)
+        _buildOwnerFormField().paddedSymmetrically(
+          horizontal: 16,
+          vertical: 4,
+        ),
     ].map((e) => SliverToBoxAdapter(child: e)).toList();
   }
 
@@ -206,6 +218,18 @@ class _DocumentFilterFormState extends State<DocumentFilterForm> {
       name: DocumentFilterForm.fkQuery,
       onlyExtendedQueryAllowed: _allowOnlyExtendedQuery,
       initialValue: widget.initialFilter.query,
+    );
+  }
+
+  Widget _buildOwnerFormField() {
+    return BlocBuilder<UserRepository, UserRepositoryState>(
+      builder: (context, state) {
+        return OwnerFormField(
+          name: DocumentFilterForm.fkOwner,
+          users: state.users,
+          initialValue: widget.initialFilter.owner,
+        );
+      },
     );
   }
 

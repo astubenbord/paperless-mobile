@@ -7,6 +7,7 @@ import 'package:paperless_mobile/core/repository/label_repository.dart';
 import 'package:paperless_mobile/core/widgets/highlighted_text.dart';
 import 'package:paperless_mobile/core/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/document_details/view/widgets/details_item.dart';
+import 'package:paperless_mobile/features/document_details/view/widgets/document_custom_fields_widget.dart';
 import 'package:paperless_mobile/features/labels/tags/view/widgets/tags_widget.dart';
 import 'package:paperless_mobile/features/labels/view/widgets/label_text.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
@@ -79,6 +80,11 @@ class DocumentOverviewWidget extends StatelessWidget {
                     document.tags.map((e) => labelRepository.tags[e]!).toList(),
               ),
             ),
+          ).paddedOnly(bottom: itemSpacing),
+        if (document.customFields.isNotEmpty)
+          DocumentCustomFieldsWidget(
+            document: document,
+            itemSpacing: itemSpacing,
           ).paddedOnly(bottom: itemSpacing),
       ],
     );

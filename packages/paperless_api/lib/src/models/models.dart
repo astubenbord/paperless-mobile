@@ -1,4 +1,6 @@
 export 'bulk_edit_model.dart';
+export 'custom_field_data_type.dart';
+export 'custom_field_model.dart';
 export 'document_filter.dart';
 export 'document_meta_data_model.dart';
 export 'document_model.dart';

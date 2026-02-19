@@ -105,6 +105,12 @@ class HomeShellWidget extends StatelessWidget {
                     apiVersion: paperlessApiVersion,
                   ),
                 ),
+                Provider(
+                  create: (context) =>
+                      paperlessProviderFactory.createCustomFieldsApi(
+                    context.read<SessionManager>().client,
+                  ),
+                ),
                 if (currentLocalUser.hasMultiUserSupport)
                   Provider(
                     create: (context) => paperlessProviderFactory.createUserApi(

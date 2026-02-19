@@ -23,6 +23,7 @@ abstract class PaperlessApiFactory {
     required int apiVersion,
   });
   PaperlessAuthenticationApi createAuthenticationApi(Dio dio);
+  CustomFieldsApi createCustomFieldsApi(Dio dio);
   PaperlessUserApi createUserApi(
     Dio dio, {
     required int apiVersion,
