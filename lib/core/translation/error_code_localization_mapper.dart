@@ -84,5 +84,8 @@ String translateError(BuildContext context, ErrorCode code) {
       'Could not delete custom field, please try again.', //TODO: INTL
     ErrorCode.deleteNoteFailed => 'Could not delete note, please try again.',
     ErrorCode.addNoteFailed => 'Could not create note, please try again.',
+    ErrorCode.invalidApiKey => 'Invalid API key.',
+    ErrorCode.mfaRequired => 'Multi-factor authentication code is required.',
+    ErrorCode.invalidMfaCode => 'Invalid MFA code, please try again.',
   };
 }

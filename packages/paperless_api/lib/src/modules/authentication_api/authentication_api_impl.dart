@@ -11,14 +11,19 @@ class PaperlessAuthenticationApiImpl implements PaperlessAuthenticationApi {
   Future<String> login({
     required String username,
     required String password,
+    String? totpCode,
   }) async {
     try {
+      final data = <String, dynamic>{
+        "username": username,
+        "password": password,
+      };
+      if (totpCode != null && totpCode.isNotEmpty) {
+        data["code"] = totpCode;
+      }
       final response = await client.post(
         "/api/token/",
-        data: {
-          "username": username,
-          "password": password,
-        },
+        data: data,
         options: Options(
           sendTimeout: const Duration(seconds: 30),
           receiveTimeout: const Duration(seconds: 60),
@@ -26,21 +31,38 @@ class PaperlessAuthenticationApiImpl implements PaperlessAuthenticationApi {
           headers: {
             "Accept": "application/json",
           },
-          // validateStatus: (status) {
-          //   return status! == 200;
-          // },
         ),
       );
       return response.data['token'];
-      // } else if (response.statusCode == 302) {
-      // final redirectUrl = response.headers.value("location");
-      // return AuthenticationTemporaryRedirect(redirectUrl!);
     } on DioException catch (exception) {
       throw exception.unravel();
     } catch (error, stackTrace) {
       throw PaperlessApiException.unknown(
         details: error.toString(),
         stackTrace: stackTrace,
+      );
+    }
+  }
+
+  @override
+  Future<bool> validateApiKey(String apiKey) async {
+    try {
+      final response = await client.get(
+        "/api/ui_settings/",
+        options: Options(
+          sendTimeout: const Duration(seconds: 30),
+          receiveTimeout: const Duration(seconds: 60),
+          headers: {
+            "Accept": "application/json",
+            "Authorization": "Token $apiKey",
+          },
+          validateStatus: (status) => status == 200 || status == 403,
+        ),
+      );
+      return response.statusCode == 200;
+    } on DioException catch (exception) {
+      throw exception.unravel(
+        orElse: const PaperlessApiException(ErrorCode.invalidApiKey),
       );
     }
   }

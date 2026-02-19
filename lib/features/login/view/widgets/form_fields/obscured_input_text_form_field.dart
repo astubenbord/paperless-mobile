@@ -39,7 +39,10 @@ class _ObscuredInputTextFormFieldState
 
   @override
   void dispose() {
-    _passwordFocusNode.dispose();
+    // Only dispose the FocusNode if we created it internally
+    if (widget.focusNode == null) {
+      _passwordFocusNode.dispose();
+    }
     super.dispose();
   }
 

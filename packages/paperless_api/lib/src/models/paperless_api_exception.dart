@@ -82,5 +82,13 @@ enum ErrorCode {
   customFieldLoadFailed,
   customFieldDeleteFailed,
   deleteNoteFailed,
-  addNoteFailed;
+  addNoteFailed,
+  invalidApiKey,
+  mfaRequired,
+  invalidMfaCode;
+}
+
+class PaperlessMfaRequiredException extends PaperlessApiException {
+  const PaperlessMfaRequiredException()
+      : super(ErrorCode.mfaRequired, details: 'MFA code is required');
 }
