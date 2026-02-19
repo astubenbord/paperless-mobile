@@ -168,6 +168,14 @@ class _LandingPageState extends State<LandingPage> {
       content: FutureBuilder<PaperlessServerStatisticsModel>(
         future: context.read<PaperlessServerStatsApi>().getServerStatistics(),
         builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(
+              child: Text(
+                S.of(context)!.anUnknownErrorOccurred,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ).paddedOnly(top: 8, bottom: 24);
+          }
           if (!snapshot.hasData) {
             return const Center(
               child: CircularProgressIndicator(),

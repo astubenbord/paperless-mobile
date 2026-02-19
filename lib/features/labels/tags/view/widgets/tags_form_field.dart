@@ -185,7 +185,8 @@ class TagsFormField extends StatelessWidget {
   ) {
     assert(field.value is IdsTagsQuery);
     final formValue = field.value as IdsTagsQuery;
-    final tag = options[id]!;
+    final tag = options[id];
+    if (tag == null) return const SizedBox.shrink();
     return QueryTagChip(
       onDeleted: () => field.didChange(formValue.copyWith(
         include:
@@ -253,9 +254,9 @@ class TagsFormField extends StatelessWidget {
         }
       },
       exclude: false,
-      backgroundColor: options[e]!.color,
-      foregroundColor: options[e]!.textColor,
-      labelText: options[e]!.name,
+      backgroundColor: options[e]?.color,
+      foregroundColor: options[e]?.textColor,
+      labelText: options[e]?.name ?? 'Tag #$e',
     );
   }
 }

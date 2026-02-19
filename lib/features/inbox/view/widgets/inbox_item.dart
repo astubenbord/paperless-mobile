@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/database/tables/local_user_account.dart';
 import 'package:paperless_mobile/core/extensions/document_extensions.dart';
@@ -213,6 +214,21 @@ class _InboxItemState extends State<InboxItem> {
                                     widget.document.documentType],
                                 style: Theme.of(context).textTheme.bodyMedium,
                                 placeholder: "-",
+                              ),
+                            ).paddedSymmetrically(horizontal: 8),
+                            _buildTextWithLeadingIcon(
+                              Icon(
+                                Icons.calendar_today,
+                                size: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.fontSize,
+                              ),
+                              Text(
+                                DateFormat.yMMMd(
+                                  Localizations.localeOf(context).toString(),
+                                ).format(widget.document.created),
+                                style: Theme.of(context).textTheme.bodyMedium,
                               ),
                             ).paddedSymmetrically(horizontal: 8),
                             const Spacer(),

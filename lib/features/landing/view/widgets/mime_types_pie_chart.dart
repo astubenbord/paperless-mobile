@@ -106,10 +106,14 @@ class _MimeTypesPieChartState extends State<MimeTypesPieChart> {
                       width: 20,
                       height: 20,
                     ),
-                    Text(
-                      _mimeTypeNames[
-                          widget.statistics.fileTypeCounts[i].mimeType]!,
-                      style: Theme.of(context).textTheme.bodyLarge,
+                    Flexible(
+                      child: Text(
+                        _mimeTypeNames[
+                                widget.statistics.fileTypeCounts[i].mimeType] ??
+                            widget.statistics.fileTypeCounts[i].mimeType,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ],
                 ),
@@ -126,8 +130,9 @@ class _MimeTypesPieChartState extends State<MimeTypesPieChart> {
       final isTouched = i == _touchedIndex;
       final fontSize = isTouched ? 14.0 : 12.0;
       final radius = isTouched ? 70.0 : 60.0;
-      final percentage = type.count / widget.statistics.documentsTotal * 100;
-      final showTitle = percentage >= 5.0;
+      final total = widget.statistics.documentsTotal;
+      final percentage = total > 0 ? type.count / total * 100 : 0.0;
+      final showTitle = percentage >= 10.0;
       yield PieChartSectionData(
         color: colorShades[i % colorShades.length],
         value: type.count.toDouble(),

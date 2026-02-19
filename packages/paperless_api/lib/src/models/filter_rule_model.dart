@@ -175,7 +175,7 @@ class FilterRule with EquatableMixin {
           );
         } else {
           return filter.copyWith(
-            added: AbsoluteDateRangeQuery(
+            modified: AbsoluteDateRangeQuery(
                 after: _dateTimeConverter.fromJson(value!)),
           );
         }

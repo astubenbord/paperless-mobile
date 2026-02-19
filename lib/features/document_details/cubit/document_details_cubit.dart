@@ -299,7 +299,10 @@ class DocumentDetailsCubit extends Cubit<DocumentDetailsState> {
     bool original,
     Directory dir,
   ) {
-    final baseName = p.basenameWithoutExtension(meta.mediaFilename);
+    // Prefer archivedFileName for user-friendly download names
+    final filename = state.document?.archivedFileName ?? meta.mediaFilename;
+    final baseName = p.basenameWithoutExtension(filename)
+        .replaceAll(RegExp(r'[/\\:*?"<>|]'), '_');
     final extension = original ? p.extension(meta.mediaFilename) : '.pdf';
     return "${dir.path}/$baseName$extension";
   }
