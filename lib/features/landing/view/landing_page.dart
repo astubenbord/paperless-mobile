@@ -72,17 +72,32 @@ class _LandingPageState extends State<LandingPage> {
           body: CustomScrollView(
             slivers: [
               SliverToBoxAdapter(
-                child: Text(
-                  S.of(context)!.welcomeUser(
-                        currentUser.fullName ?? currentUser.username,
-                      ),
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context)
-                      .textTheme
-                      .displaySmall
-                      ?.copyWith(fontSize: 28),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      S.of(context)!.welcomeUser(
+                            currentUser.fullName ?? currentUser.username,
+                          ),
+                      textAlign: TextAlign.left,
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineSmall
+                          ?.copyWith(fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Quick overview',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurfaceVariant,
+                          ),
+                    ),
+                  ],
                 ).padded(24),
               ),
+              SliverToBoxAdapter(child: _buildQuickActions(context)),
               SliverToBoxAdapter(child: _buildStatisticsCard(context)),
               if (currentUser.canViewSavedViews) ...[
                 SliverPadding(
@@ -157,10 +172,80 @@ class _LandingPageState extends State<LandingPage> {
     );
   }
 
+  Widget _buildQuickActions(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            _buildQuickActionCard(
+              context,
+              icon: Icons.upload_file,
+              label: 'Upload',
+              color: colorScheme.primaryContainer,
+              onTap: () {},
+            ),
+            const SizedBox(width: 8),
+            _buildQuickActionCard(
+              context,
+              icon: Icons.document_scanner,
+              label: 'Scan',
+              color: colorScheme.primaryContainer,
+              onTap: () {},
+            ),
+            const SizedBox(width: 8),
+            _buildQuickActionCard(
+              context,
+              icon: Icons.inbox,
+              label: 'Inbox',
+              color: colorScheme.primaryContainer,
+              onTap: () => InboxRoute().go(context),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildQuickActionCard(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return Card(
+      elevation: 0,
+      color: color,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.w500,
+                    ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildStatisticsCard(BuildContext context) {
     final currentUser = context.read<LocalUserAccount>().paperlessUser;
     return ExpansionCard(
-      initiallyExpanded: false,
+      initiallyExpanded: true,
       title: Text(
         S.of(context)!.statistics,
         style: Theme.of(context).textTheme.titleLarge,
@@ -186,25 +271,32 @@ class _LandingPageState extends State<LandingPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Card(
-                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                color: Theme.of(context).colorScheme.surfaceContainerLow,
+                elevation: 0,
                 child: ListTile(
                   shape: Theme.of(context).cardTheme.shape,
                   titleTextStyle: Theme.of(context).textTheme.labelLarge,
+                  leading: Icon(Icons.inbox, color: Theme.of(context).colorScheme.primary),
                   title: Text(S.of(context)!.documentsInInbox),
                   onTap: currentUser.canViewInbox
                       ? () => InboxRoute().go(context)
                       : null,
                   trailing: Text(
                     stats.documentsInInbox.toString(),
-                    style: Theme.of(context).textTheme.labelLarge,
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                   ),
                 ),
               ),
               Card(
-                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                color: Theme.of(context).colorScheme.surfaceContainerLow,
+                elevation: 0,
                 child: ListTile(
                   shape: Theme.of(context).cardTheme.shape,
                   titleTextStyle: Theme.of(context).textTheme.labelLarge,
+                  leading: Icon(Icons.description, color: Theme.of(context).colorScheme.primary),
                   title: Text(S.of(context)!.totalDocuments),
                   onTap: currentUser.canViewDocuments
                       ? () {
@@ -213,19 +305,27 @@ class _LandingPageState extends State<LandingPage> {
                       : null,
                   trailing: Text(
                     stats.documentsTotal.toString(),
-                    style: Theme.of(context).textTheme.labelLarge,
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                   ),
                 ),
               ),
               Card(
-                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                color: Theme.of(context).colorScheme.surfaceContainerLow,
+                elevation: 0,
                 child: ListTile(
                   shape: Theme.of(context).cardTheme.shape,
                   titleTextStyle: Theme.of(context).textTheme.labelLarge,
+                  leading: Icon(Icons.text_fields, color: Theme.of(context).colorScheme.primary),
                   title: Text(S.of(context)!.totalCharacters),
                   trailing: Text(
                     (stats.totalChars ?? 0).toString(),
-                    style: Theme.of(context).textTheme.labelLarge,
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                   ),
                 ),
               ),

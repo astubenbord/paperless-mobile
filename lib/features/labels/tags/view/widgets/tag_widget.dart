@@ -28,16 +28,23 @@ class TagWidget extends StatelessWidget {
           child: FilterChip(
             labelPadding:
                 dense ? const EdgeInsets.symmetric(horizontal: 2) : null,
-            padding: dense ? const EdgeInsets.all(4) : null,
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             selectedColor: tag.color,
             onSelected: (_) => onSelected(),
             visualDensity: const VisualDensity(vertical: -2),
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(6),
+            ),
             label: Text(
-              showShortName && tag.name.length > 6
-                  ? '${tag.name.substring(0, 6)}...'
+              showShortName && tag.name.length > 8
+                  ? '${tag.name.substring(0, 8)}...'
                   : tag.name,
-              style: TextStyle(color: tag.textColor),
+              style: TextStyle(
+                color: tag.textColor,
+                fontSize: Theme.of(context).textTheme.labelMedium?.fontSize,
+                fontWeight: FontWeight.w500,
+              ),
             ),
             checkmarkColor: tag.textColor,
             backgroundColor: tag.color,

@@ -25,13 +25,11 @@ class _DocumentSearchBarState extends State<DocumentSearchBar> {
     return OpenContainer(
       transitionDuration: const Duration(milliseconds: 200),
       transitionType: ContainerTransitionType.fadeThrough,
-      closedElevation: 1,
-      middleColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+      closedElevation: 0,
+      middleColor: Theme.of(context).colorScheme.surfaceContainer,
       openColor: Theme.of(context).colorScheme.surface,
-      closedColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-      closedShape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(56),
-      ),
+      closedColor: Theme.of(context).colorScheme.surfaceContainer,
+      closedShape: const StadiumBorder(),
       closedBuilder: (_, action) {
         return InkWell(
           onTap: action,
@@ -39,8 +37,8 @@ class _DocumentSearchBarState extends State<DocumentSearchBar> {
             constraints: const BoxConstraints(
               maxWidth: 720,
               minWidth: 360,
-              maxHeight: 48,
-              minHeight: 48,
+              maxHeight: 56,
+              minHeight: 56,
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -61,8 +59,8 @@ class _DocumentSearchBarState extends State<DocumentSearchBar> {
                                     .read<ConsumptionChangeNotifier>()
                                     .pendingFiles
                                     .isNotEmpty,
-                                backgroundColor: Colors.red,
-                                smallSize: 8,
+                                backgroundColor: Theme.of(context).colorScheme.error,
+                                smallSize: 10,
                                 child: const Icon(Icons.menu),
                               );
                             },
@@ -74,8 +72,7 @@ class _DocumentSearchBarState extends State<DocumentSearchBar> {
                             S.of(context)!.searchDocuments,
                             style:
                                 Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                      fontWeight: FontWeight.w500,
-                                      color: Theme.of(context).hintColor,
+                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                                     ),
                           ),
                         ),

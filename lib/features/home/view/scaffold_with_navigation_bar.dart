@@ -31,7 +31,8 @@ class ScaffoldWithNavigationBarState extends State<ScaffoldWithNavigationBar> {
       child: Scaffold(
         drawer: const AppDrawer(),
         bottomNavigationBar: NavigationBar(
-          elevation: 3,
+          elevation: 0,
+          surfaceTintColor: Colors.transparent,
           backgroundColor: Theme.of(context).colorScheme.surface,
           selectedIndex: widget.navigationShell.currentIndex,
           onDestinationSelected: (index) {
@@ -43,19 +44,13 @@ class ScaffoldWithNavigationBarState extends State<ScaffoldWithNavigationBar> {
           destinations: [
             NavigationDestination(
               icon: const Icon(Icons.home_outlined),
-              selectedIcon: Icon(
-                Icons.home,
-                color: theme.colorScheme.primary,
-              ),
+              selectedIcon: const Icon(Icons.home_rounded),
               label: S.of(context)!.home,
             ),
             _toggleDestination(
               NavigationDestination(
                 icon: const Icon(Icons.description_outlined),
-                selectedIcon: Icon(
-                  Icons.description,
-                  color: theme.colorScheme.primary,
-                ),
+                selectedIcon: const Icon(Icons.description_rounded),
                 label: S.of(context)!.documents,
               ),
               disableWhen: !widget.authenticatedUser.canViewDocuments,
@@ -63,10 +58,7 @@ class ScaffoldWithNavigationBarState extends State<ScaffoldWithNavigationBar> {
             _toggleDestination(
               NavigationDestination(
                 icon: const Icon(Icons.document_scanner_outlined),
-                selectedIcon: Icon(
-                  Icons.document_scanner,
-                  color: theme.colorScheme.primary,
-                ),
+                selectedIcon: const Icon(Icons.document_scanner_rounded),
                 label: S.of(context)!.scanner,
               ),
               disableWhen: !widget.authenticatedUser.canCreateDocuments,
@@ -74,10 +66,7 @@ class ScaffoldWithNavigationBarState extends State<ScaffoldWithNavigationBar> {
             _toggleDestination(
               NavigationDestination(
                 icon: const Icon(Icons.sell_outlined),
-                selectedIcon: Icon(
-                  Icons.sell,
-                  color: theme.colorScheme.primary,
-                ),
+                selectedIcon: const Icon(Icons.sell_rounded),
                 label: S.of(context)!.labels,
               ),
               disableWhen: !widget.authenticatedUser.canViewAnyLabel,
@@ -103,10 +92,7 @@ class ScaffoldWithNavigationBarState extends State<ScaffoldWithNavigationBar> {
                       isLabelVisible: state.itemsInInboxCount > 0 &&
                           widget.authenticatedUser.canViewInbox,
                       count: state.itemsInInboxCount,
-                      child: Icon(
-                        Icons.inbox,
-                        color: theme.colorScheme.primary,
-                      ),
+                      child: const Icon(Icons.inbox_rounded),
                     );
                   },
                 ),

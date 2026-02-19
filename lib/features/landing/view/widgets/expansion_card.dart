@@ -18,6 +18,8 @@ class ExpansionCard extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     return Card(
       margin: const EdgeInsets.all(16),
+      elevation: 0,
+      color: colorScheme.surfaceContainerLow,
       child: Theme(
         data: Theme.of(context).copyWith(
           dividerColor: Colors.transparent,
@@ -30,17 +32,9 @@ class ExpansionCard extends StatelessWidget {
           ),
         ),
         child: ExpansionTile(
-          backgroundColor: ElevationOverlay.applySurfaceTint(
-            colorScheme.surface,
-            colorScheme.surfaceTint,
-            4,
-          ),
+          backgroundColor: colorScheme.surfaceContainerLow,
           initiallyExpanded: initiallyExpanded,
-          collapsedBackgroundColor: ElevationOverlay.applySurfaceTint(
-            colorScheme.surface,
-            colorScheme.surfaceTint,
-            4,
-          ),
+          collapsedBackgroundColor: colorScheme.surfaceContainerLow,
           title: title,
           children: [content],
         ),

@@ -33,9 +33,9 @@ class DocumentGridItem extends DocumentItem {
     return Stack(
       children: [
         Card(
-          elevation: 1.0,
+          elevation: 0,
           color: isSelected
-              ? Theme.of(context).colorScheme.inversePrimary
+              ? Theme.of(context).colorScheme.secondaryContainer
               : Theme.of(context).cardColor,
           child: InkWell(
             borderRadius: BorderRadius.circular(12),
@@ -124,23 +124,40 @@ class DocumentGridItem extends DocumentItem {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              DateFormat.yMMMMd(
+                              DateFormat.yMMMd(
                                 Localizations.localeOf(context).toString(),
                               ).format(document.created),
-                              style: Theme.of(context).textTheme.bodySmall,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .labelSmall
+                                  ?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
                             ),
                             if (document.archiveSerialNumber != null)
-                              Text(
-                                '#${document.archiveSerialNumber!}',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall
-                                    ?.copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface,
-                                    ),
-                              )
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .tertiaryContainer,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  '#${document.archiveSerialNumber!}',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .labelSmall
+                                      ?.copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onTertiaryContainer,
+                                      ),
+                                ),
+                              ),
                           ],
                         ),
                       ],

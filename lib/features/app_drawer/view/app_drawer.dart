@@ -77,14 +77,29 @@ class AppDrawer extends StatelessWidget {
               ],
             ).paddedSymmetrically(horizontal: 16),
             const Divider(),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+              child: Text(
+                'GENERAL',
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.5,
+                    ),
+              ),
+            ),
             ListTile(
-              dense: true,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
               title: Text(S.of(context)!.aboutThisApp),
               leading: const Icon(Icons.info_outline),
               onTap: () => _showAboutDialog(context),
             ),
             ListTile(
-              dense: true,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
               leading: const Icon(Icons.favorite_outline),
               title: Text(S.of(context)!.donate),
               onTap: () {
@@ -109,7 +124,9 @@ class AppDrawer extends StatelessWidget {
               },
             ),
             ListTile(
-              dense: true,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
               leading: const Icon(Icons.bug_report_outlined),
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -129,7 +146,9 @@ class AppDrawer extends StatelessWidget {
               },
             ),
             ListTile(
-              dense: true,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
               leading: Assets.images.githubMark.svg(
                 colorFilter: ColorFilter.mode(
                   Theme.of(context).colorScheme.onSurface,
@@ -154,7 +173,9 @@ class AppDrawer extends StatelessWidget {
               builder: (context, value, child) {
                 final files = value.pendingFiles;
                 final child = ListTile(
-                  dense: true,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                   leading: const Icon(Icons.drive_folder_upload_outlined),
                   title: const Text("Pending Files"),
                   onTap: () {
@@ -176,9 +197,22 @@ class AppDrawer extends StatelessWidget {
                     .fade(duration: 1.seconds, begin: 1, end: 0.3);
               },
             ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+              child: Text(
+                'AI FEATURES',
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.5,
+                    ),
+              ),
+            ),
             _buildAiDrawerItems(context),
             ListTile(
-              dense: true,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
               leading: const Icon(Icons.settings_outlined),
               title: Text(
                 S.of(context)!.settings,
@@ -267,7 +301,9 @@ class AppDrawer extends StatelessWidget {
           children: [
             if (isConfigured)
               ListTile(
-                dense: true,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
                 leading: const Icon(Icons.auto_awesome),
                 title: Text(S.of(context)!.aiChat),
                 onTap: () {
@@ -286,7 +322,9 @@ class AppDrawer extends StatelessWidget {
                 },
               ),
             ListTile(
-              dense: true,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
               leading: const Icon(Icons.smart_toy_outlined),
               title: Text(S.of(context)!.aiSettings),
               onTap: () {

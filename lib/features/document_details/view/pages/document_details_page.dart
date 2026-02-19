@@ -166,59 +166,26 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
                             tabBar: TabBar(
                               isScrollable: true,
                               tabAlignment: TabAlignment.start,
+                              dividerColor: Colors.transparent,
+                              indicatorSize: TabBarIndicatorSize.label,
                               tabs: [
                                 Tab(
-                                  child: Text(
-                                    S.of(context)!.overview,
-                                    style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onPrimaryContainer,
-                                    ),
-                                  ),
+                                  child: Text(S.of(context)!.overview),
                                 ),
                                 Tab(
-                                  child: Text(
-                                    S.of(context)!.content,
-                                    style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onPrimaryContainer,
-                                    ),
-                                  ),
+                                  child: Text(S.of(context)!.content),
                                 ),
                                 Tab(
-                                  child: Text(
-                                    S.of(context)!.metaData,
-                                    style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onPrimaryContainer,
-                                    ),
-                                  ),
+                                  child: Text(S.of(context)!.metaData),
                                 ),
                                 Tab(
-                                  child: Text(
-                                    S.of(context)!.similarDocuments,
-                                    style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onPrimaryContainer,
-                                    ),
-                                  ),
+                                  child: Text(S.of(context)!.similarDocuments),
                                 ),
                                 Tab(
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Text(
-                                        S.of(context)!.notes(0),
-                                        style: TextStyle(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onPrimaryContainer,
-                                        ),
-                                      ),
+                                      Text(S.of(context)!.notes(0)),
                                       if ((state.document?.notes.length ?? 0) >
                                           0)
                                         Card(
@@ -232,25 +199,11 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
                                   ),
                                 ),
                                 Tab(
-                                  child: Text(
-                                    S.of(context)!.shareLinks,
-                                    style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onPrimaryContainer,
-                                    ),
-                                  ),
+                                  child: Text(S.of(context)!.shareLinks),
                                 ),
                                 if (hasMultiUserSupport)
                                   Tab(
-                                    child: Text(
-                                      S.of(context)!.permissions,
-                                      style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onPrimaryContainer,
-                                      ),
-                                    ),
+                                    child: Text(S.of(context)!.permissions),
                                   ),
                               ],
                             ),
@@ -466,6 +419,7 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
       builder: (context, state) {
         final currentUser = context.watch<LocalUserAccount>();
         return BottomAppBar(
+          elevation: 0,
           child: Builder(
             builder: (context) {
               return switch (state.status) {

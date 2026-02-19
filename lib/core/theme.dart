@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:paperless_mobile/core/model/color_scheme_option.dart';
 
-const _classicThemeColorSeed = Colors.lightGreen;
+const _classicThemeColorSeed = Color(0xFF2E7D32);
 
 const _defaultListTileTheme = ListTileThemeData(
   tileColor: Colors.transparent,
@@ -17,8 +17,9 @@ final _defaultCardTheme = CardThemeData(
 
 final _defaultInputDecorationTheme = InputDecorationTheme(
   border: OutlineInputBorder(
-    borderRadius: BorderRadius.circular(16),
+    borderRadius: BorderRadius.circular(12),
   ),
+  filled: true,
   contentPadding: const EdgeInsets.symmetric(
     horizontal: 16.0,
     vertical: 16.0,
@@ -52,18 +53,27 @@ ThemeData buildTheme({
     ),
     navigationBarTheme: NavigationBarThemeData(
       backgroundColor: colorScheme.surface,
+      elevation: 0,
+      surfaceTintColor: Colors.transparent,
+      height: 64,
     ),
-    cardTheme: _defaultCardTheme,
     inputDecorationTheme: _defaultInputDecorationTheme,
     listTileTheme: _defaultListTileTheme,
     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     appBarTheme: const AppBarTheme(
       scrolledUnderElevation: 0,
     ),
+    cardTheme: _defaultCardTheme.copyWith(
+      elevation: 0.5,
+    ),
     chipTheme: ChipThemeData(
-      backgroundColor: colorScheme.surfaceContainerHighest,
+      backgroundColor: colorScheme.surfaceContainerLow,
       checkmarkColor: colorScheme.onSurfaceVariant,
       deleteIconColor: colorScheme.onSurfaceVariant,
+      side: BorderSide.none,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+      ),
     ),
   );
 }

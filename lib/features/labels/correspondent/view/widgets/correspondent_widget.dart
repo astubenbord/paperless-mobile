@@ -32,7 +32,8 @@ class CorrespondentWidget extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style:
                 (textStyle ?? Theme.of(context).textTheme.bodyMedium)?.copyWith(
-              color: textColor ?? Theme.of(context).colorScheme.primary,
+              color: textColor ?? Theme.of(context).colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ),
