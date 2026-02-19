@@ -36,8 +36,12 @@ class ConsumptionChangeNotifier extends ChangeNotifier {
     final List<File> localFiles = [];
     for (final file in files) {
       if (!file.path.startsWith(consumptionDirectory.path)) {
+        // Sanitize filename to remove characters invalid on the filesystem.
+        final sanitizedName = p
+            .basename(file.path)
+            .replaceAll(RegExp(r'[/\\:*?"<>|]'), '_');
         final localFile = await file
-            .copy(p.join(consumptionDirectory.path, p.basename(file.path)));
+            .copy(p.join(consumptionDirectory.path, sanitizedName));
         localFiles.add(localFile);
       } else {
         localFiles.add(file);

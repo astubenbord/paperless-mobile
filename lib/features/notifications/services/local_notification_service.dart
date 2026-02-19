@@ -55,7 +55,7 @@ class LocalNotificationService {
       "File download complete.",
       NotificationDetails(
         android: AndroidNotificationDetails(
-          "${NotificationChannel.fileDownload.id}_${filePath.hashCode}",
+          NotificationChannel.fileDownload.id,
           NotificationChannel.fileDownload.name,
           importance: Importance.max,
           priority: Priority.high,
@@ -91,7 +91,7 @@ class LocalNotificationService {
           : tr.notificationDownloadingDocument,
       NotificationDetails(
         android: AndroidNotificationDetails(
-          "${NotificationChannel.documentDownload.id}_${document.id}",
+          NotificationChannel.documentDownload.id,
           NotificationChannel.documentDownload.name,
           progress: ((progress ?? 0) * 100).toInt(),
           maxProgress: 100,
@@ -145,7 +145,7 @@ class LocalNotificationService {
           : tr.notificationDownloadingDocument,
       NotificationDetails(
         android: AndroidNotificationDetails(
-          "${NotificationChannel.documentDownload.id}_$filename",
+          NotificationChannel.documentDownload.id,
           NotificationChannel.documentDownload.name,
           ongoing: !finished,
           indeterminate: true,
@@ -212,7 +212,7 @@ class LocalNotificationService {
       body,
       NotificationDetails(
         android: AndroidNotificationDetails(
-          '${NotificationChannel.task.id}_${task.id}',
+          NotificationChannel.task.id,
           NotificationChannel.task.name,
           category: AndroidNotificationCategory.status,
           ongoing: showProgress,

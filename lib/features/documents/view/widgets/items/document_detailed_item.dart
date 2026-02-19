@@ -91,6 +91,7 @@ class DocumentDetailedItem extends DocumentItem {
                       alignment: Alignment.bottomLeft,
                       child: TagsWidget(
                         tags: document.tags
+                            .where((e) => labelRepository.tags.containsKey(e))
                             .map((e) => labelRepository.tags[e]!)
                             .toList(),
                         onTagSelected: onTagSelected,

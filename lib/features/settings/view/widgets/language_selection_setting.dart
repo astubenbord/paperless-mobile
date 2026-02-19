@@ -24,6 +24,8 @@ class _LanguageSelectionSettingState extends State<LanguageSelectionSetting> {
     'ca': LanguageOption('Català', true),
     'ru': LanguageOption('Русский', true),
     'it': LanguageOption('Italiano', true),
+    'nl': LanguageOption('Nederlands', true),
+    'ro': LanguageOption('Română', true),
   };
 
   @override
@@ -32,8 +34,9 @@ class _LanguageSelectionSettingState extends State<LanguageSelectionSetting> {
       builder: (context, settings) {
         return ListTile(
           title: Text(S.of(context)!.language),
-          subtitle:
-              Text(_languageOptions[settings.preferredLocaleSubtag]!.name),
+          subtitle: Text(
+              _languageOptions[settings.preferredLocaleSubtag]?.name ??
+                  settings.preferredLocaleSubtag),
           onTap: () => showDialog<String>(
             context: context,
             builder: (_) => RadioSettingsDialog<String>(

@@ -26,10 +26,42 @@ class LabelRepository extends ChangeNotifier {
     storagePaths = {};
     tags = {};
     await Future.wait([
-      if (loadCorrespondents) findAllCorrespondents(),
-      if (loadDocumentTypes) findAllDocumentTypes(),
-      if (loadStoragePaths) findAllStoragePaths(),
-      if (loadTags) findAllTags(),
+      if (loadCorrespondents)
+        findAllCorrespondents().catchError((e) {
+          logger.fw(
+            'Failed to load correspondents: $e',
+            className: runtimeType.toString(),
+            methodName: 'initialize',
+          );
+          return <Correspondent>[];
+        }),
+      if (loadDocumentTypes)
+        findAllDocumentTypes().catchError((e) {
+          logger.fw(
+            'Failed to load document types: $e',
+            className: runtimeType.toString(),
+            methodName: 'initialize',
+          );
+          return <DocumentType>[];
+        }),
+      if (loadStoragePaths)
+        findAllStoragePaths().catchError((e) {
+          logger.fw(
+            'Failed to load storage paths: $e',
+            className: runtimeType.toString(),
+            methodName: 'initialize',
+          );
+          return <StoragePath>[];
+        }),
+      if (loadTags)
+        findAllTags().catchError((e) {
+          logger.fw(
+            'Failed to load tags: $e',
+            className: runtimeType.toString(),
+            methodName: 'initialize',
+          );
+          return <Tag>[];
+        }),
     ]);
   }
 

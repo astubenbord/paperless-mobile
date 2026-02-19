@@ -30,6 +30,11 @@ class DocumentScannerCubit extends Cubit<DocumentScannerState> {
     );
     emit(const DocumentScannerState(status: LoadingStatus.loading));
     final tempDir = FileService.instance.temporaryScansDirectory;
+    if (!tempDir.existsSync()) {
+      tempDir.createSync(recursive: true);
+      emit(const DocumentScannerState());
+      return;
+    }
     final allFiles = tempDir.list().whereType<File>();
     final scans =
         await allFiles.where((event) => event.path.endsWith(".jpeg")).toList();

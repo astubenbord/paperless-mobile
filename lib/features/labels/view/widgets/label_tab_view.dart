@@ -69,6 +69,9 @@ class LabelTabView<T extends Label> extends StatelessWidget {
         return SliverList(
           delegate: SliverChildBuilderDelegate(
             (context, index) {
+              if (index == labels.length) {
+                return const SizedBox(height: 80);
+              }
               final l = sortedLabels.elementAt(index);
               return LabelItem<T>(
                 name: l.name,
@@ -85,7 +88,7 @@ class LabelTabView<T extends Label> extends StatelessWidget {
                 label: l,
               );
             },
-            childCount: labels.length,
+            childCount: labels.length + 1,
           ),
         );
       },

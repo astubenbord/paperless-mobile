@@ -76,8 +76,10 @@ class DocumentOverviewWidget extends StatelessWidget {
               padding: const EdgeInsets.only(top: 8.0),
               child: TagsWidget(
                 isClickable: false,
-                tags:
-                    document.tags.map((e) => labelRepository.tags[e]!).toList(),
+                tags: document.tags
+                    .where((e) => labelRepository.tags.containsKey(e))
+                    .map((e) => labelRepository.tags[e]!)
+                    .toList(),
               ),
             ),
           ).paddedOnly(bottom: itemSpacing),

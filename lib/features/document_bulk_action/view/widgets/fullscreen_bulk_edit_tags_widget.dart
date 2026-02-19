@@ -156,9 +156,11 @@ class _FullscreenBulkEditTagsWidgetState
       final bloc = context.read<DocumentBulkActionCubit>();
       final labelRepository = context.read<LabelRepository>();
       final addNames = _addTags
+          .where((value) => labelRepository.tags.containsKey(value))
           .map((value) => "\"${labelRepository.tags[value]!.name}\"")
           .toList();
       final removeNames = _removeTags
+          .where((value) => labelRepository.tags.containsKey(value))
           .map((value) => "\"${labelRepository.tags[value]!.name}\"")
           .toList();
       final shouldPerformAction = await showDialog<bool>(

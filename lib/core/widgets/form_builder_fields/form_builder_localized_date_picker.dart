@@ -40,7 +40,7 @@ class FormDateTime {
     if (!isComplete) {
       throw ArgumentError.notNull("day, month and year must be set together");
     }
-    return DateTime(year!, month!, day!);
+    return DateTime.utc(year!, month!, day!);
   }
 }
 

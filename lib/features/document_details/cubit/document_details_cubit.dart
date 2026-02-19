@@ -158,9 +158,13 @@ class DocumentDetailsCubit extends Cubit<DocumentDetailsState> {
       );
     }
     final cacheDir = FileService.instance.temporaryDirectory;
-    final filePath = state.metaData!.mediaFilename.replaceAll("/", " ");
+    final mediaFilename = state.metaData!.mediaFilename;
+    final baseName = p.basenameWithoutExtension(mediaFilename);
+    final extension = p.extension(mediaFilename);
+    final sanitizedName =
+        baseName.replaceAll(RegExp(r'[/\\:*?"<>|]'), '_');
 
-    final fileName = "${p.basenameWithoutExtension(filePath)}.pdf";
+    final fileName = "$sanitizedName$extension";
     final file = File("${cacheDir.path}/$fileName");
 
     if (!file.existsSync()) {
@@ -170,10 +174,7 @@ class DocumentDetailsCubit extends Cubit<DocumentDetailsState> {
         file.path,
       );
     }
-    return OpenFilex.open(
-      file.path,
-      type: "application/pdf",
-    ).then((value) => value.type);
+    return OpenFilex.open(file.path).then((value) => value.type);
   }
 
   void replace(DocumentModel document) {
@@ -262,7 +263,6 @@ class DocumentDetailsCubit extends Cubit<DocumentDetailsState> {
         XFile(
           filePath,
           name: state.document!.originalFileName,
-          mimeType: "application/pdf",
           lastModified: state.document!.modified,
         ),
       ],

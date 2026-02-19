@@ -28,6 +28,11 @@ class FilterRule with EquatableMixin {
   static const int titleAndContentRule = 19;
   static const int extendedRule = 20;
   static const int storagePathRule = 25;
+  static const int ownerRule = 26;
+  static const int hasStoragePathIn = 30;
+  static const int hasCorrespondentIn = 31;
+  static const int hasDocumentTypeIn = 32;
+  static const int ownerIsnull = 33;
   // Currently unsupported view options:
   static const int _content = 1;
   static const int _isInInbox = 5;
@@ -36,7 +41,7 @@ class FilterRule with EquatableMixin {
   static const int _createdDayIs = 12;
   static const int _doesNotHaveAsn = 18;
   static const int _moreLikeThis = 21;
-  static const int _hasTagsIn = 22;
+  static const int hasTagsIn = 22;
   static const int _asnGreaterThan = 23;
   static const int _asnLessThan = 24;
 
@@ -79,25 +84,27 @@ class FilterRule with EquatableMixin {
               : const NotAssignedTagsQuery(),
         );
       case includeTagsRule:
-        assert(filter.tags is IdsTagsQuery);
         return filter.copyWith(
           tags: switch (filter.tags) {
             IdsTagsQuery(include: var i, exclude: var e) => IdsTagsQuery(
                 include: [...i, int.parse(value!)],
                 exclude: e,
               ),
-            _ => filter.tags,
+            _ => IdsTagsQuery(
+                include: [int.parse(value!)],
+              ),
           },
         );
       case excludeTagsRule:
-        assert(filter.tags is IdsTagsQuery);
         return filter.copyWith(
           tags: switch (filter.tags) {
             IdsTagsQuery(include: var i, exclude: var e) => IdsTagsQuery(
                 include: i,
                 exclude: [...e, int.parse(value!)],
               ),
-            _ => filter.tags,
+            _ => IdsTagsQuery(
+                exclude: [int.parse(value!)],
+              ),
           },
         );
       case createdBeforeRule:
@@ -176,6 +183,47 @@ class FilterRule with EquatableMixin {
         return filter.copyWith(query: TextQuery.titleAndContent(value));
       case extendedRule:
         return _parseExtendedRule(filter);
+      case ownerRule:
+        return filter.copyWith(
+          owner: value == null
+              ? const NotAssignedIdQueryParameter()
+              : SetIdQueryParameter(id: int.parse(value!)),
+        );
+      case ownerIsnull:
+        return filter.copyWith(
+          owner: value == '1'
+              ? const NotAssignedIdQueryParameter()
+              : const AnyAssignedIdQueryParameter(),
+        );
+      case hasTagsIn:
+        return filter.copyWith(
+          tags: switch (filter.tags) {
+            AnyAssignedTagsQuery(tagIds: var ids) => AnyAssignedTagsQuery(
+                tagIds: [...ids, int.parse(value!)],
+              ),
+            _ => AnyAssignedTagsQuery(
+                tagIds: [int.parse(value!)],
+              ),
+          },
+        );
+      case hasStoragePathIn:
+        return filter.copyWith(
+          storagePath: value == null
+              ? const NotAssignedIdQueryParameter()
+              : SetIdQueryParameter(id: int.parse(value!)),
+        );
+      case hasCorrespondentIn:
+        return filter.copyWith(
+          correspondent: value == null
+              ? const NotAssignedIdQueryParameter()
+              : SetIdQueryParameter(id: int.parse(value!)),
+        );
+      case hasDocumentTypeIn:
+        return filter.copyWith(
+          documentType: value == null
+              ? const NotAssignedIdQueryParameter()
+              : SetIdQueryParameter(id: int.parse(value!)),
+        );
       default:
         return filter;
     }
@@ -274,8 +322,23 @@ class FilterRule with EquatableMixin {
     if (sPathRule != null) {
       filterRules.add(sPathRule);
     }
+
+    final ownerFilterRule = switch (filter.owner) {
+      NotAssignedIdQueryParameter() => FilterRule(ownerRule, null),
+      SetIdQueryParameter(id: var id) =>
+        FilterRule(ownerRule, id.toString()),
+      _ => null,
+    };
+    if (ownerFilterRule != null) {
+      filterRules.add(ownerFilterRule);
+    }
+
     final tagRules = switch (filter.tags) {
       NotAssignedTagsQuery() => [FilterRule(hasAnyTag, 'false')],
+      AnyAssignedTagsQuery(tagIds: var ids) when ids.isNotEmpty => [
+          FilterRule(hasAnyTag, 'true'),
+          ...ids.map((id) => FilterRule(hasTagsIn, id.toString())),
+        ],
       AnyAssignedTagsQuery() => [FilterRule(hasAnyTag, 'true')],
       IdsTagsQuery(include: var i, exclude: var e) => [
           ...i.map((id) => FilterRule(includeTagsRule, id.toString())),

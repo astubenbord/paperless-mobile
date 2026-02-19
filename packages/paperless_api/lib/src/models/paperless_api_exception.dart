@@ -85,7 +85,8 @@ enum ErrorCode {
   addNoteFailed,
   invalidApiKey,
   mfaRequired,
-  invalidMfaCode;
+  invalidMfaCode,
+  fileTooLarge;
 }
 
 class PaperlessMfaRequiredException extends PaperlessApiException {

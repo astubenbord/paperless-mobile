@@ -87,5 +87,7 @@ String translateError(BuildContext context, ErrorCode code) {
     ErrorCode.invalidApiKey => 'Invalid API key.',
     ErrorCode.mfaRequired => 'Multi-factor authentication code is required.',
     ErrorCode.invalidMfaCode => 'Invalid MFA code, please try again.',
+    ErrorCode.fileTooLarge =>
+      'The file is too large. Please check your server\'s upload size limit.',
   };
 }
