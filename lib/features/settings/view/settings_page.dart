@@ -1,7 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_ce_flutter/adapters.dart';
 import 'package:paperless_api/paperless_api.dart';
+import 'package:paperless_mobile/core/database/hive/hive_config.dart';
+import 'package:paperless_mobile/core/database/tables/global_settings.dart';
 import 'package:paperless_mobile/features/settings/view/widgets/app_logs_tile.dart';
 import 'package:paperless_mobile/features/settings/view/widgets/biometric_authentication_setting.dart';
 import 'package:paperless_mobile/features/settings/view/widgets/changelogs_tile.dart';
@@ -41,6 +44,8 @@ class SettingsPage extends StatelessWidget {
           const DefaultShareFileTypeSetting(),
           const EnforcePdfUploadSetting(),
           const SkipDocumentPreprationOnShareSetting(),
+          _buildSectionHeader(context, S.of(context)!.suggestions.trim()),
+          const _ShowAiSuggestionsSetting(),
           _buildSectionHeader(context, S.of(context)!.storage),
           const ClearCacheSetting(),
           _buildSectionHeader(context, 'Accessibility'),
@@ -143,6 +148,30 @@ class SettingsPage extends StatelessWidget {
             .labelLarge
             ?.copyWith(color: Theme.of(context).colorScheme.primary),
       ),
+    );
+  }
+}
+
+class _ShowAiSuggestionsSetting extends StatelessWidget {
+  const _ShowAiSuggestionsSetting();
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<Box<GlobalSettings>>(
+      valueListenable:
+          Hive.box<GlobalSettings>(HiveBoxes.globalSettings).listenable(),
+      builder: (context, box, _) {
+        final settings = box.getValue()!;
+        return SwitchListTile(
+          title: Text(S.of(context)!.suggestions.trim()),
+          subtitle: Text(S.of(context)!.showAiSuggestionsDescription),
+          value: settings.showAiSuggestions,
+          onChanged: (value) {
+            settings.showAiSuggestions = value;
+            box.setValue(settings);
+          },
+        );
+      },
     );
   }
 }

@@ -17,3 +17,5 @@ export 'user_api/paperless_user_api.dart';
 export 'user_api/paperless_user_api_v2_impl.dart';
 export 'user_api/paperless_user_api_v3.dart';
 export 'user_api/paperless_user_api_v3_impl.dart';
+export 'share_links_api/share_links_api.dart';
+export 'share_links_api/share_links_api_impl.dart';

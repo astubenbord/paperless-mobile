@@ -18,6 +18,10 @@ import 'package:paperless_mobile/features/labels/tags/view/widgets/tags_widget.d
 import 'package:paperless_mobile/features/labels/view/widgets/label_text.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
 import 'package:paperless_mobile/core/widgets/connectivity_aware_action_wrapper.dart';
+import 'package:paperless_mobile/core/util/message_helpers.dart';
+import 'package:paperless_mobile/core/database/tables/global_settings.dart';
+import 'package:paperless_mobile/core/database/hive/hive_config.dart';
+import 'package:hive_ce_flutter/adapters.dart';
 import 'package:paperless_mobile/routing/routes/documents_route.dart';
 
 class InboxItemPlaceholder extends StatelessWidget {
@@ -143,9 +147,42 @@ class InboxItem extends StatefulWidget {
 }
 
 class _InboxItemState extends State<InboxItem> {
-  // late final Future<FieldSuggestions> _fieldSuggestions;
-
   bool _isAsnAssignLoading = false;
+  FieldSuggestions? _suggestions;
+  bool _suggestionsLoading = false;
+  bool _suggestionsLoaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSuggestions();
+  }
+
+  Future<void> _loadSuggestions() async {
+    if (_suggestionsLoaded || _suggestionsLoading) return;
+    final settings = Hive.box<GlobalSettings>(HiveBoxes.globalSettings).getValue();
+    if (settings != null && !settings.showAiSuggestions) return;
+    setState(() => _suggestionsLoading = true);
+    try {
+      final suggestions = await context
+          .read<PaperlessDocumentsApi>()
+          .findSuggestions(widget.document);
+      if (mounted) {
+        setState(() {
+          _suggestions = suggestions.documentDifference(widget.document);
+          _suggestionsLoading = false;
+          _suggestionsLoaded = true;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _suggestionsLoading = false;
+          _suggestionsLoaded = true;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -263,6 +300,7 @@ class _InboxItemState extends State<InboxItem> {
 
   Widget _buildActions(BuildContext context) {
     final currentUser = context.watch<LocalUserAccount>().paperlessUser;
+    final labelRepository = context.read<LabelRepository>();
     final canEdit = currentUser.canEditDocuments;
     final canDelete = currentUser.canDeleteDocuments;
     final chipShape = RoundedRectangleBorder(
@@ -324,13 +362,12 @@ class _InboxItemState extends State<InboxItem> {
             scrollDirection: Axis.horizontal,
             children: [
               ...actions,
-              // if (suggestions != null) ...suggestions,
+              if (_suggestions != null && _suggestions!.hasSuggestions)
+                ..._buildSuggestionChips(chipShape, labelRepository),
             ],
           ),
         ),
       ],
-      // );
-      // },
     );
   }
 
@@ -393,103 +430,147 @@ class _InboxItemState extends State<InboxItem> {
     );
   }
 
-  // List<Widget> _buildSuggestionChips(
-  //   OutlinedBorder chipShape,
-  //   FieldSuggestions suggestions,
-  //   InboxState state,
-  // ) {
-  //   return [
-  //     ...suggestions.correspondents
-  //         .whereNot((e) => widget.document.correspondent == e)
-  //         .map(
-  //           (e) => ActionChip(
-  //             avatar: const Icon(Icons.person_outline),
-  //             shape: chipShape,
-  //             label: Text(state.availableCorrespondents[e]?.name ?? ''),
-  //             onPressed: () {
-  //               context
-  //                   .read<InboxCubit>()
-  //                   .update(
-  //                     widget.document.copyWith(correspondent: () => e),
-  //                   )
-  //                   .then((value) => showSnackBar(
-  //                       context,
-  //                       S
-  //                           .of(context)
-  //                           .suggestionSuccessfullyApplied));
-  //             },
-  //           ),
-  //         )
-  //         .toList(),
-  //     ...suggestions.documentTypes
-  //         .whereNot((e) => widget.document.documentType == e)
-  //         .map(
-  //           (e) => ActionChip(
-  //             avatar: const Icon(Icons.description_outlined),
-  //             shape: chipShape,
-  //             label: Text(state.availableDocumentTypes[e]?.name ?? ''),
-  //             onPressed: () => context
-  //                 .read<InboxCubit>()
-  //                 .update(
-  //                   widget.document.copyWith(documentType: () => e),
-  //                   shouldReload: false,
-  //                 )
-  //                 .then((value) => showSnackBar(
-  //                     context,
-  //                     S
-  //                         .of(context)
-  //                         .suggestionSuccessfullyApplied)),
-  //           ),
-  //         )
-  //         .toList(),
-  //     ...suggestions.tags
-  //         .whereNot((e) => widget.document.tags.contains(e))
-  //         .map(
-  //           (e) => ActionChip(
-  //             avatar: const Icon(Icons.label_outline),
-  //             shape: chipShape,
-  //             label: Text(state.availableTags[e]?.name ?? ''),
-  //             onPressed: () {
-  //               context
-  //                   .read<InboxCubit>()
-  //                   .update(
-  //                     widget.document.copyWith(
-  //                       tags: {...widget.document.tags, e}.toList(),
-  //                     ),
-  //                     shouldReload: false,
-  //                   )
-  //                   .then((value) => showSnackBar(
-  //                       context,
-  //                       S
-  //                           .of(context)
-  //                           .suggestionSuccessfullyApplied));
-  //             },
-  //           ),
-  //         )
-  //         .toList(),
-  //     ...suggestions.dates
-  //         .whereNot((e) => widget.document.created.isEqualToIgnoringDate(e))
-  //         .map(
-  //           (e) => ActionChip(
-  //             avatar: const Icon(Icons.calendar_today_outlined),
-  //             shape: chipShape,
-  //             label: Text(
-  //               "${S.of(context)!.createdAt}: ${DateFormat.yMd().format(e)}",
-  //             ),
-  //             onPressed: () => context
-  //                 .read<InboxCubit>()
-  //                 .update(
-  //                   widget.document.copyWith(created: e),
-  //                   shouldReload: false,
-  //                 )
-  //                 .then((value) => showSnackBar(
-  //                     context,
-  //                     S
-  //                         .of(context)
-  //                         .suggestionSuccessfullyApplied)),
-  //           ),
-  //         )
-  //         .toList(),
-  //   ].expand((element) => [element, const SizedBox(width: 4)]).toList();
-  // }
+  List<Widget> _buildSuggestionChips(
+    RoundedRectangleBorder chipShape,
+    LabelRepository labelRepository,
+  ) {
+    final suggestions = _suggestions!;
+    final chips = <Widget>[];
+
+    for (final e in suggestions.correspondents) {
+      final name = labelRepository.correspondents[e]?.name;
+      if (name == null) continue;
+      chips.add(ColoredChipWrapper(
+        child: ActionChip(
+          avatar: const Icon(Icons.person_outline),
+          shape: chipShape,
+          label: Text(name),
+          onPressed: () {
+            context
+                .read<InboxCubit>()
+                .update(widget.document.copyWith(correspondent: () => e))
+                .then((_) {
+              if (mounted) {
+                showSnackBar(
+                    context, S.of(context)!.suggestionSuccessfullyApplied);
+              }
+            });
+          },
+        ),
+      ));
+    }
+
+    for (final e in suggestions.documentTypes) {
+      final name = labelRepository.documentTypes[e]?.name;
+      if (name == null) continue;
+      chips.add(ColoredChipWrapper(
+        child: ActionChip(
+          avatar: const Icon(Icons.description_outlined),
+          shape: chipShape,
+          label: Text(name),
+          onPressed: () {
+            context
+                .read<InboxCubit>()
+                .update(widget.document.copyWith(documentType: () => e))
+                .then((_) {
+              if (mounted) {
+                showSnackBar(
+                    context, S.of(context)!.suggestionSuccessfullyApplied);
+              }
+            });
+          },
+        ),
+      ));
+    }
+
+    for (final e in suggestions.tags) {
+      final name = labelRepository.tags[e]?.name;
+      if (name == null) continue;
+      chips.add(ColoredChipWrapper(
+        child: ActionChip(
+          avatar: const Icon(Icons.label_outline),
+          shape: chipShape,
+          label: Text(name),
+          onPressed: () {
+            context
+                .read<InboxCubit>()
+                .update(widget.document.copyWith(
+                  tags: {...widget.document.tags, e}.toList(),
+                ))
+                .then((_) {
+              if (mounted) {
+                showSnackBar(
+                    context, S.of(context)!.suggestionSuccessfullyApplied);
+              }
+            });
+          },
+        ),
+      ));
+    }
+
+    for (final e in suggestions.dates) {
+      chips.add(ColoredChipWrapper(
+        child: ActionChip(
+          avatar: const Icon(Icons.calendar_today_outlined),
+          shape: chipShape,
+          label: Text(
+            "${S.of(context)!.createdAt}: ${DateFormat.yMd().format(e)}",
+          ),
+          onPressed: () {
+            context
+                .read<InboxCubit>()
+                .update(widget.document.copyWith(created: e))
+                .then((_) {
+              if (mounted) {
+                showSnackBar(
+                    context, S.of(context)!.suggestionSuccessfullyApplied);
+              }
+            });
+          },
+        ),
+      ));
+    }
+
+    if (chips.length > 1) {
+      chips.insert(
+        0,
+        ColoredChipWrapper(
+          child: ActionChip(
+            avatar: const Icon(Icons.auto_awesome),
+            shape: chipShape,
+            label: Text(S.of(context)!.acceptAllSuggestions),
+            onPressed: () => _acceptAllSuggestions(suggestions),
+          ),
+        ),
+      );
+    }
+
+    return chips
+        .expand((chip) => [chip, const SizedBox(width: 4)])
+        .toList();
+  }
+
+  Future<void> _acceptAllSuggestions(FieldSuggestions suggestions) async {
+    var doc = widget.document;
+    if (suggestions.correspondents.isNotEmpty) {
+      doc = doc.copyWith(
+          correspondent: () => suggestions.correspondents.first);
+    }
+    if (suggestions.documentTypes.isNotEmpty) {
+      doc = doc.copyWith(
+          documentType: () => suggestions.documentTypes.first);
+    }
+    if (suggestions.tags.isNotEmpty) {
+      doc = doc.copyWith(
+        tags: {...doc.tags, ...suggestions.tags}.toList(),
+      );
+    }
+    if (suggestions.dates.isNotEmpty) {
+      doc = doc.copyWith(created: suggestions.dates.first);
+    }
+    await context.read<InboxCubit>().update(doc);
+    if (mounted) {
+      showSnackBar(context, S.of(context)!.suggestionSuccessfullyApplied);
+    }
+  }
 }

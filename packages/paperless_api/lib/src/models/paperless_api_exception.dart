@@ -86,7 +86,10 @@ enum ErrorCode {
   invalidApiKey,
   mfaRequired,
   invalidMfaCode,
-  fileTooLarge;
+  fileTooLarge,
+  shareLinkCreateFailed,
+  shareLinkLoadFailed,
+  shareLinkDeleteFailed;
 }
 
 class PaperlessMfaRequiredException extends PaperlessApiException {

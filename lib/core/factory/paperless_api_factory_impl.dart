@@ -46,6 +46,11 @@ class PaperlessApiFactoryImpl implements PaperlessApiFactory {
   }
 
   @override
+  PaperlessShareLinksApi createShareLinksApi(Dio dio) {
+    return PaperlessShareLinksApiImpl(dio);
+  }
+
+  @override
   PaperlessUserApi createUserApi(Dio dio, {required int apiVersion}) {
     if (apiVersion == 3) {
       return PaperlessUserApiV3Impl(dio);

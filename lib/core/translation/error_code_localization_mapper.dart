@@ -89,5 +89,10 @@ String translateError(BuildContext context, ErrorCode code) {
     ErrorCode.invalidMfaCode => 'Invalid MFA code, please try again.',
     ErrorCode.fileTooLarge =>
       'The file is too large. Please check your server\'s upload size limit.',
+    ErrorCode.shareLinkCreateFailed =>
+      'Could not create share link, please try again.',
+    ErrorCode.shareLinkLoadFailed => 'Could not load share links.',
+    ErrorCode.shareLinkDeleteFailed =>
+      'Could not delete share link, please try again.',
   };
 }

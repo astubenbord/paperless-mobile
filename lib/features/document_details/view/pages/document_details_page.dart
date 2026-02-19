@@ -19,6 +19,7 @@ import 'package:paperless_mobile/features/document_details/view/widgets/document
 import 'package:paperless_mobile/features/document_details/view/widgets/document_overview_widget.dart';
 import 'package:paperless_mobile/features/document_details/view/widgets/document_permissions_widget.dart';
 import 'package:paperless_mobile/features/document_details/view/widgets/document_share_button.dart';
+import 'package:paperless_mobile/features/document_details/view/widgets/document_share_links_widget.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/delete_document_confirmation_dialog.dart';
 import 'package:paperless_mobile/features/documents/view/widgets/document_preview.dart';
 import 'package:paperless_mobile/features/similar_documents/cubit/similar_documents_cubit.dart';
@@ -28,6 +29,10 @@ import 'package:paperless_mobile/core/widgets/connectivity_aware_action_wrapper.
 import 'package:paperless_mobile/core/util/message_helpers.dart';
 import 'package:paperless_mobile/routing/routes/documents_route.dart';
 import 'package:paperless_mobile/core/theme.dart';
+import 'package:paperless_mobile/core/database/tables/global_settings.dart';
+import 'package:paperless_mobile/core/database/hive/hive_config.dart';
+import 'package:hive_ce_flutter/adapters.dart';
+import 'package:paperless_mobile/features/ai_chat/cubit/ai_chat_cubit.dart';
 
 class DocumentDetailsPage extends StatefulWidget {
   final int id;
@@ -67,7 +72,7 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
     debugPrint(disableAnimations.toString());
     final hasMultiUserSupport =
         context.watch<LocalUserAccount>().hasMultiUserSupport;
-    final tabLength = 5 + (hasMultiUserSupport ? 1 : 0);
+    final tabLength = 6 + (hasMultiUserSupport ? 1 : 0);
     return AnnotatedRegion(
       value: buildOverlayStyle(
         Theme.of(context),
@@ -226,6 +231,16 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
                                     ],
                                   ),
                                 ),
+                                Tab(
+                                  child: Text(
+                                    S.of(context)!.shareLinks,
+                                    style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimaryContainer,
+                                    ),
+                                  ),
+                                ),
                                 if (hasMultiUserSupport)
                                   Tab(
                                     child: Text(
@@ -348,6 +363,25 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
                                 LoadingStatus.error => _buildErrorState(),
                                 _ => _buildLoadingState(),
                               },
+                            ],
+                          ),
+                          CustomScrollView(
+                            slivers: [
+                              SliverOverlapInjector(
+                                handle: NestedScrollView
+                                    .sliverOverlapAbsorberHandleFor(context),
+                              ),
+                              switch (state.status) {
+                                LoadingStatus.loaded =>
+                                  DocumentShareLinksWidget(
+                                    document: state.document!,
+                                  ).paddedSymmetrically(
+                                    vertical: 16,
+                                    sliver: true,
+                                  ),
+                                LoadingStatus.error => _buildErrorState(),
+                                _ => _buildLoadingState(),
+                              }
                             ],
                           ),
                           if (hasMultiUserSupport)
@@ -481,6 +515,22 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
                             .printDocument(),
                         icon: const Icon(Icons.print),
                       ),
+                      Builder(
+                        builder: (context) {
+                          final settings = Hive.box<GlobalSettings>(
+                                  HiveBoxes.globalSettings)
+                              .getValue()!;
+                          if (settings.aiServerUrl.isEmpty) {
+                            return const SizedBox.shrink();
+                          }
+                          return IconButton(
+                            tooltip: S.of(context)!.autoClassify,
+                            icon: const Icon(Icons.auto_awesome),
+                            onPressed: () =>
+                                _onAutoClassify(state.document!),
+                          );
+                        },
+                      ),
                     ],
                   ),
                 _ => SizedBox.shrink(),
@@ -490,6 +540,74 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
         );
       },
     );
+  }
+
+  Future<void> _onAutoClassify(DocumentModel document) async {
+    final settings =
+        Hive.box<GlobalSettings>(HiveBoxes.globalSettings).getValue()!;
+    final cubit = AiChatCubit(
+      serverUrl: settings.aiServerUrl,
+      apiKey: settings.aiApiKey,
+    );
+    try {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+      final result = await cubit.autoClassify(document.id);
+      if (mounted) Navigator.of(context).pop(); // dismiss loading
+      if (result == null) {
+        if (mounted) {
+          showGenericError(context, 'Auto-classification failed.');
+        }
+        return;
+      }
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            icon: const Icon(Icons.auto_awesome),
+            title: Text(S.of(context)!.classificationProposal),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (result['correspondent_name'] != null)
+                  Text('Correspondent: ${result['correspondent_name']}'),
+                if (result['document_type_name'] != null)
+                  Text('Document Type: ${result['document_type_name']}'),
+                if (result['tags'] != null)
+                  Text('Tags: ${(result['tags'] as List).join(', ')}'),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+              ),
+              FilledButton(
+                onPressed: () {
+                  Navigator.of(ctx).pop();
+                  // Refresh the document to pick up any server-side changes
+                  context.read<DocumentDetailsCubit>().initialize();
+                },
+                child: Text(S.of(context)!.applyClassification),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        Navigator.of(context).pop(); // dismiss loading
+        showGenericError(context, 'Classification error: $e');
+      }
+    } finally {
+      await cubit.close();
+    }
   }
 
   void _onOpenFileInSystemViewer() async {

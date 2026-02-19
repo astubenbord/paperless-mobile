@@ -14,6 +14,12 @@ import 'package:paperless_mobile/routing/routes/documents_route.dart';
 import 'package:paperless_mobile/routing/routes/saved_views_route.dart';
 import 'package:paperless_mobile/routing/routes/settings_route.dart';
 import 'package:paperless_mobile/routing/routes/upload_queue_route.dart';
+import 'package:paperless_mobile/core/database/tables/global_settings.dart';
+import 'package:paperless_mobile/core/database/hive/hive_config.dart';
+import 'package:hive_ce_flutter/adapters.dart';
+import 'package:paperless_mobile/features/ai_chat/cubit/ai_chat_cubit.dart';
+import 'package:paperless_mobile/features/ai_chat/view/ai_chat_page.dart';
+import 'package:paperless_mobile/features/ai_chat/view/ai_settings_page.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -170,6 +176,7 @@ class AppDrawer extends StatelessWidget {
                     .fade(duration: 1.seconds, begin: 1, end: 0.3);
               },
             ),
+            _buildAiDrawerItems(context),
             ListTile(
               dense: true,
               leading: const Icon(Icons.settings_outlined),
@@ -246,6 +253,55 @@ class AppDrawer extends StatelessWidget {
         error: () => Text(S.of(context)!.couldNotLoadSavedViews),
       );
     });
+  }
+
+  Widget _buildAiDrawerItems(BuildContext context) {
+    return ValueListenableBuilder<Box<GlobalSettings>>(
+      valueListenable:
+          Hive.box<GlobalSettings>(HiveBoxes.globalSettings).listenable(),
+      builder: (context, box, _) {
+        final settings = box.getValue()!;
+        final isConfigured = settings.aiServerUrl.isNotEmpty;
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (isConfigured)
+              ListTile(
+                dense: true,
+                leading: const Icon(Icons.auto_awesome),
+                title: Text(S.of(context)!.aiChat),
+                onTap: () {
+                  Scaffold.of(context).closeDrawer();
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => BlocProvider(
+                        create: (_) => AiChatCubit(
+                          serverUrl: settings.aiServerUrl,
+                          apiKey: settings.aiApiKey,
+                        ),
+                        child: const AiChatPage(),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ListTile(
+              dense: true,
+              leading: const Icon(Icons.smart_toy_outlined),
+              title: Text(S.of(context)!.aiSettings),
+              onTap: () {
+                Scaffold.of(context).closeDrawer();
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const AiSettingsPage(),
+                  ),
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _showAboutDialog(BuildContext context) {

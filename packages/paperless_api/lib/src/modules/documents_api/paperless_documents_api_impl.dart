@@ -88,6 +88,18 @@ class PaperlessDocumentsApiImpl implements PaperlessDocumentsApi {
           .map((cf) => {'field': cf.id, 'value': cf.value})
           .toList(),
       'created': doc.created.toUtc().toIso8601String(),
+      if (doc.owner != null) 'owner': doc.owner,
+      if (doc.permissions != null)
+        'set_permissions': {
+          'view': {
+            'users': doc.permissions!.view.users,
+            'groups': doc.permissions!.view.groups,
+          },
+          'change': {
+            'users': doc.permissions!.change.users,
+            'groups': doc.permissions!.change.groups,
+          },
+        },
     };
     try {
       final response = await client.put(

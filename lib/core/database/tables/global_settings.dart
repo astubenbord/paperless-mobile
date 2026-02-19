@@ -38,6 +38,15 @@ class GlobalSettings with HiveObjectMixin {
   @HiveField(9, defaultValue: false)
   bool disableAnimations;
 
+  @HiveField(10, defaultValue: true)
+  bool showAiSuggestions;
+
+  @HiveField(11, defaultValue: '')
+  String aiServerUrl;
+
+  @HiveField(12, defaultValue: '')
+  String aiApiKey;
+
   GlobalSettings({
     required this.preferredLocaleSubtag,
     this.preferredThemeMode = ThemeMode.system,
@@ -49,5 +58,8 @@ class GlobalSettings with HiveObjectMixin {
     this.enforceSinglePagePdfUpload = false,
     this.skipDocumentPreprarationOnUpload = false,
     this.disableAnimations = false,
+    this.showAiSuggestions = true,
+    this.aiServerUrl = '',
+    this.aiApiKey = '',
   });
 }

@@ -15,6 +15,8 @@ import 'package:paperless_mobile/core/widgets/form_builder_fields/form_builder_l
 import 'package:paperless_mobile/core/widgets/colored_chip.dart';
 import 'package:paperless_mobile/features/document_edit/cubit/document_edit_cubit.dart';
 import 'package:paperless_mobile/core/widgets/document_view.dart';
+import 'package:paperless_mobile/features/document_edit/view/widgets/custom_field_editors.dart';
+import 'package:paperless_mobile/features/document_edit/view/widgets/permissions_editor.dart';
 import 'package:paperless_mobile/features/labels/tags/view/widgets/tags_form_field.dart';
 import 'package:paperless_mobile/features/labels/view/widgets/label_form_field.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
@@ -43,6 +45,11 @@ class _DocumentEditPageState extends State<DocumentEditPage>
   final _formKey = GlobalKey<FormBuilderState>();
 
   bool _isShowingPdf = false;
+  List<CustomFieldInstance>? _editedCustomFields;
+  int? _editedOwner;
+  bool _ownerChanged = false;
+  Permissions? _editedPermissions;
+  bool _permissionsChanged = false;
 
   late final AnimationController _animationController;
   late final Animation<double> _animation;
@@ -293,6 +300,29 @@ class _DocumentEditPageState extends State<DocumentEditPage>
                   ),
                 ).padded(),
 
+              // Custom Fields
+              CustomFieldEditSection(
+                initialFields: state.document.customFields.toList(),
+                onChanged: (fields) {
+                  _editedCustomFields = fields;
+                },
+              ).padded(),
+
+              // Permissions (only for multi-user setups)
+              if (context.watch<LocalUserAccount>().hasMultiUserSupport)
+                PermissionsEditorSection(
+                  initialOwner: state.document.owner,
+                  initialPermissions: state.document.permissions,
+                  onOwnerChanged: (owner) {
+                    _editedOwner = owner;
+                    _ownerChanged = true;
+                  },
+                  onPermissionsChanged: (permissions) {
+                    _editedPermissions = permissions;
+                    _permissionsChanged = true;
+                  },
+                ).padded(),
+
               const SizedBox(height: 140),
             ],
           ),
@@ -386,6 +416,9 @@ class _DocumentEditPageState extends State<DocumentEditPage>
         storagePath: () => storagePath,
         tags: tags,
         content: content,
+        customFields: _editedCustomFields ?? document.customFields.toList(),
+        owner: _ownerChanged ? () => _editedOwner : null,
+        permissions: _permissionsChanged ? _editedPermissions : null,
       );
 
       try {
