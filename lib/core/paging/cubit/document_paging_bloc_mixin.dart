@@ -95,6 +95,9 @@ mixin DocumentPagingBlocMixin<State extends DocumentPagingState>
           hasLoaded: true,
         ),
       );
+    } catch (e) {
+      // Don't rethrow — allow the app to continue with empty/stale data
+      debugPrint('Failed to load documents: $e');
     } finally {
       // await onFilterUpdated(filter);
       emit(state.copyWithPaged(isLoading: false));

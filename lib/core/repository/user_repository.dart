@@ -11,7 +11,15 @@ class UserRepository extends PersistentRepository<UserRepositoryState> {
   UserRepository(this._userApi) : super(const UserRepositoryState());
 
   Future<void> initialize() async {
-    await findAll();
+    try {
+      await findAll();
+    } catch (e) {
+      logger.fw(
+        'Failed to initialize user repository: $e',
+        className: 'UserRepository',
+        methodName: 'initialize',
+      );
+    }
   }
 
   Future<Iterable<UserModel>> findAll() async {

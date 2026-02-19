@@ -65,8 +65,16 @@ class InboxCubit extends HydratedCubit<InboxState>
 
   @override
   Future<void> initialize() async {
-    await refreshItemsInInboxCount(false);
-    await loadInbox();
+    try {
+      await refreshItemsInInboxCount(false);
+      await loadInbox();
+    } catch (e) {
+      logger.fw(
+        "Failed to initialize inbox: $e",
+        className: runtimeType.toString(),
+        methodName: "initialize",
+      );
+    }
   }
 
   Future<void> refreshItemsInInboxCount([bool shouldLoadInbox = true]) async {
@@ -75,23 +83,32 @@ class InboxCubit extends HydratedCubit<InboxState>
       className: runtimeType.toString(),
       methodName: "refreshItemsInInboxCount",
     );
-    final stats = await _statsApi.getServerStatistics();
+    try {
+      final stats = await _statsApi.getServerStatistics();
 
-    if (stats.documentsInInbox != state.itemsInInboxCount && shouldLoadInbox) {
-      logger.fi(
-        "New documents found in inbox, reloading.",
-        className: runtimeType.toString(),
-        methodName: "refreshItemsInInboxCount",
-      );
-      await loadInbox();
-    } else {
-      logger.fi(
-        "No new documents found in inbox.",
+      if (stats.documentsInInbox != state.itemsInInboxCount &&
+          shouldLoadInbox) {
+        logger.fi(
+          "New documents found in inbox, reloading.",
+          className: runtimeType.toString(),
+          methodName: "refreshItemsInInboxCount",
+        );
+        await loadInbox();
+      } else {
+        logger.fi(
+          "No new documents found in inbox.",
+          className: runtimeType.toString(),
+          methodName: "refreshItemsInInboxCount",
+        );
+      }
+      emit(state.copyWith(itemsInInboxCount: stats.documentsInInbox));
+    } catch (e) {
+      logger.fw(
+        "Failed to refresh inbox count: $e",
         className: runtimeType.toString(),
         methodName: "refreshItemsInInboxCount",
       );
     }
-    emit(state.copyWith(itemsInInboxCount: stats.documentsInInbox));
   }
 
   ///
@@ -99,28 +116,36 @@ class InboxCubit extends HydratedCubit<InboxState>
   ///
   Future<void> loadInbox() async {
     if (!isClosed) {
-      final inboxTags = await _labelRepository.findAllTags().then(
-            (tags) => tags.where((t) => t.isInboxTag).map((t) => t.id!),
+      try {
+        final inboxTags = await _labelRepository.findAllTags().then(
+              (tags) => tags.where((t) => t.isInboxTag).map((t) => t.id!),
+            );
+
+        if (inboxTags.isEmpty) {
+          // no inbox tags = no inbox items.
+          return emit(
+            state.copyWith(
+              hasLoaded: true,
+              value: [],
+              inboxTags: [],
+            ),
           );
+        }
+        if (!isClosed) {
+          emit(state.copyWith(inboxTags: inboxTags));
 
-      if (inboxTags.isEmpty) {
-        // no inbox tags = no inbox items.
-        return emit(
-          state.copyWith(
-            hasLoaded: true,
-            value: [],
-            inboxTags: [],
-          ),
-        );
-      }
-      if (!isClosed) {
-        emit(state.copyWith(inboxTags: inboxTags));
-
-        updateFilter(
-          filter: DocumentFilter(
-            sortField: SortField.added,
-            tags: IdsTagsQuery(include: inboxTags.toList()),
-          ),
+          updateFilter(
+            filter: DocumentFilter(
+              sortField: SortField.added,
+              tags: IdsTagsQuery(include: inboxTags.toList()),
+            ),
+          );
+        }
+      } catch (e) {
+        logger.fw(
+          "Failed to load inbox: $e",
+          className: runtimeType.toString(),
+          methodName: "loadInbox",
         );
       }
     }

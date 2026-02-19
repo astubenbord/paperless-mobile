@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:paperless_api/paperless_api.dart';
+import 'package:paperless_mobile/core/logging/logger.dart';
 
 class SavedViewRepository extends ChangeNotifier {
   final PaperlessSavedViewsApi _api;
@@ -10,7 +11,15 @@ class SavedViewRepository extends ChangeNotifier {
   SavedViewRepository(this._api);
 
   Future<void> initialize() async {
-    await findAll();
+    try {
+      await findAll();
+    } catch (e) {
+      logger.fw(
+        'Failed to initialize saved views: $e',
+        className: runtimeType.toString(),
+        methodName: 'initialize',
+      );
+    }
   }
 
   Future<SavedView> create(SavedView object) async {
