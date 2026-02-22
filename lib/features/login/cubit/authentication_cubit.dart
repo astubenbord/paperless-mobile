@@ -160,7 +160,6 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     await withEncryptedBox<UserCredentials, void>(
         HiveBoxes.localUserCredentials, (credentialsBox) async {
       if (!credentialsBox.containsKey(localUserId)) {
-        await credentialsBox.close();
         logger.fw(
           "Invalid authentication for $redactedId.",
           className: runtimeType.toString(),
@@ -237,8 +236,8 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     await userAccountBox.delete(userId);
     await userAppStateBox.delete(userId);
     await withEncryptedBox<UserCredentials, void>(
-        HiveBoxes.localUserCredentials, (box) {
-      box.delete(userId);
+        HiveBoxes.localUserCredentials, (box) async {
+      await box.delete(userId);
     });
   }
 

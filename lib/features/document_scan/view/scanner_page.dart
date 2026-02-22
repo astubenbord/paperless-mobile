@@ -244,6 +244,12 @@ class _ScannerPageState extends State<ScannerPage>
         dev.log(
             '[ScannerPage] Scan either not successful or canceled by user.');
       }
+      // Clean up temporary file on cancel/failure
+      try {
+        if (await file.exists()) {
+          await file.delete();
+        }
+      } catch (_) {}
       return;
     }
     if (kDebugMode) {

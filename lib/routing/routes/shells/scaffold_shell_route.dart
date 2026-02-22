@@ -20,13 +20,19 @@ class ScaffoldShellRoute extends StatefulShellRouteData {
     GoRouterState state,
     StatefulNavigationShell navigationShell,
   ) {
-    final currentUserId = Hive.box<GlobalSettings>(HiveBoxes.globalSettings)
-        .getValue()!
-        .loggedInUserId!;
+    final globalSettings = Hive.box<GlobalSettings>(HiveBoxes.globalSettings)
+        .getValue();
+    final currentUserId = globalSettings?.loggedInUserId;
+    if (currentUserId == null) {
+      return const SizedBox.shrink();
+    }
     final authenticatedUser =
         Hive.box<LocalUserAccount>(HiveBoxes.localUserAccount).get(
       currentUserId,
-    )!;
+    );
+    if (authenticatedUser == null) {
+      return const SizedBox.shrink();
+    }
     return ScaffoldWithNavigationBar(
       authenticatedUser: authenticatedUser.paperlessUser,
       navigationShell: navigationShell,

@@ -13,9 +13,9 @@ class SkipDocumentPreprationOnShareSetting extends StatelessWidget {
           title: Text(S.of(context)!.skipEditingReceivedFiles),
           subtitle: Text(S.of(context)!.uploadWithoutPromptingUploadForm),
           value: settings.skipDocumentPreprarationOnUpload,
-          onChanged: (value) {
+          onChanged: (value) async {
             settings.skipDocumentPreprarationOnUpload = value;
-            settings.save();
+            await settings.save();
           },
         );
       },

@@ -97,6 +97,7 @@ class _EventListenerShellState extends State<EventListenerShell>
     _subscription?.cancel();
     _documentDeletedSubscription?.cancel();
     _inboxTimer?.cancel();
+    context.read<PendingTasksNotifier>().removeListener(_onTasksChanged);
     super.dispose();
   }
 

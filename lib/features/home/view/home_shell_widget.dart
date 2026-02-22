@@ -56,7 +56,10 @@ class HomeShellWidget extends StatelessWidget {
               //FIXME: Find way so this does not occur anymore
               return const SizedBox.shrink();
             }
-            final currentLocalUser = box.get(currentUserId)!;
+            final currentLocalUser = box.get(currentUserId);
+            if (currentLocalUser == null) {
+              return const SizedBox.shrink();
+            }
             return MultiProvider(
               key: ValueKey(currentUserId),
               providers: [

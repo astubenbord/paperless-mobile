@@ -44,9 +44,8 @@ class DefaultDownloadFileTypeSetting extends StatelessWidget {
               },
             );
             if (selectedValue != null) {
-              settings
-                ..defaultDownloadType = selectedValue
-                ..save();
+              settings.defaultDownloadType = selectedValue;
+              await settings.save();
             }
           },
         );

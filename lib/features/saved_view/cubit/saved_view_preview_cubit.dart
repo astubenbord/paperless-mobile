@@ -52,12 +52,18 @@ class SavedViewPreviewCubit extends Cubit<SavedViewPreviewState> {
         } else {
           emit(
             LoadedSavedViewPreviewState(
-              documents: s.documents.withDocumentreplaced(document).toList(),
+              documents: s.documents.withDocumentReplaced(document).toList(),
             ),
           );
         }
       },
     );
+  }
+
+  @override
+  Future<void> close() {
+    _changedNotifier.removeListener(this);
+    return super.close();
   }
 
   Future<void> initialize() async {

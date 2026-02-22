@@ -14,7 +14,7 @@ class DisableAnimationsSetting extends StatelessWidget {
             ' Temporary workaround until system accessibility settings can be used.'),
         onChanged: (val) async {
           settings.disableAnimations = val;
-          settings.save();
+          await settings.save();
         },
       );
     });

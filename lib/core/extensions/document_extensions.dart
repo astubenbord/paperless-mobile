@@ -6,7 +6,7 @@ import 'package:paperless_api/paperless_api.dart';
 extension DocumentModelIterableExtension on Iterable<DocumentModel> {
   Iterable<int> get ids => map((e) => e.id);
 
-  Iterable<DocumentModel> withDocumentreplaced(DocumentModel document) {
+  Iterable<DocumentModel> withDocumentReplaced(DocumentModel document) {
     return map((e) => e.id == document.id ? document : e);
   }
 

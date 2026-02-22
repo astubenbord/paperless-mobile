@@ -41,7 +41,7 @@ class DocumentsCubit extends Cubit<DocumentsState>
         emit(
           state.copyWith(
               selection:
-                  state.selection.withDocumentreplaced(document).toList()),
+                  state.selection.withDocumentReplaced(document).toList()),
         );
       },
       onDeleted: (document) {

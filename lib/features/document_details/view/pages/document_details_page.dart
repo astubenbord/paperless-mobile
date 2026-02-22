@@ -60,6 +60,13 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
   static const double _itemSpacing = 24;
 
   final _pagingScrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _pagingScrollController.dispose();
+    super.dispose();
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();

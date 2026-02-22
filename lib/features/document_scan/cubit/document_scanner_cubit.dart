@@ -82,7 +82,7 @@ class DocumentScannerCubit extends Cubit<DocumentScannerState> {
 
   Future<void> reset() async {
     try {
-      Future.wait([for (final file in state.scans) file.delete()]);
+      await Future.wait([for (final file in state.scans) file.delete()]);
       imageCache.clear();
     } catch (_) {
       addError(TransientPaperlessApiError(code: ErrorCode.scanRemoveFailed));

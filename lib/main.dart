@@ -267,7 +267,7 @@ class _GoRouterShellState extends State<GoRouterShell> {
     }
     initializeDateFormatting();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      context.read<AuthenticationCubit>().restoreSession();
+      await context.read<AuthenticationCubit>().restoreSession();
       FlutterNativeSplash.remove();
     });
   }

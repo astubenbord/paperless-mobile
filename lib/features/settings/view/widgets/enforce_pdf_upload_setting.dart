@@ -12,9 +12,9 @@ class EnforcePdfUploadSetting extends StatelessWidget {
         title: Text(S.of(context)!.uploadScansAsPdf),
         subtitle: Text(S.of(context)!.convertSinglePageScanToPdf),
         value: settings.enforceSinglePagePdfUpload,
-        onChanged: (value) {
+        onChanged: (value) async {
           settings.enforceSinglePagePdfUpload = value;
-          settings.save();
+          await settings.save();
         },
       );
     });

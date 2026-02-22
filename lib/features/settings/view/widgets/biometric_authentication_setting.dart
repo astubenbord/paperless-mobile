@@ -30,7 +30,7 @@ class BiometricAuthenticationSetting extends StatelessWidget {
                 .authenticateLocalUser(localizedReason);
             if (isAuthenticated) {
               account.settings.isBiometricAuthenticationEnabled = val;
-              account.save();
+              await account.save();
             }
           },
         );

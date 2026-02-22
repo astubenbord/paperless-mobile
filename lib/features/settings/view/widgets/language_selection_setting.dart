@@ -54,10 +54,10 @@ class _LanguageSelectionSettingState extends State<LanguageSelectionSetting> {
               ],
               initialValue: settings.preferredLocaleSubtag,
             ),
-          ).then((value) {
+          ).then((value) async {
             if (value != null) {
               settings.preferredLocaleSubtag = value;
-              settings.save();
+              await settings.save();
             }
           }),
         );

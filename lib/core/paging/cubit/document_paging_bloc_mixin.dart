@@ -30,16 +30,22 @@ mixin DocumentPagingBlocMixin<State extends DocumentPagingState>
     debugPrint("Fetching page ${newFilter.page}");
     try {
       final result = await api.findAll(newFilter);
-      emit(
-        state.copyWithPaged(
-          hasLoaded: true,
-          filter: newFilter,
-          value: [...state.value, result],
-        ),
-      );
+      if (!isClosed) {
+        emit(
+          state.copyWithPaged(
+            hasLoaded: true,
+            filter: newFilter,
+            value: [...state.value, result],
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Failed to load more documents: $e');
     } finally {
       await onFilterUpdated(newFilter);
-      emit(state.copyWithPaged(isLoading: false));
+      if (!isClosed) {
+        emit(state.copyWithPaged(isLoading: false));
+      }
     }
   }
 
@@ -99,8 +105,10 @@ mixin DocumentPagingBlocMixin<State extends DocumentPagingState>
       // Don't rethrow — allow the app to continue with empty/stale data
       debugPrint('Failed to load documents: $e');
     } finally {
-      // await onFilterUpdated(filter);
-      emit(state.copyWithPaged(isLoading: false));
+      await onFilterUpdated(filter);
+      if (!isClosed) {
+        emit(state.copyWithPaged(isLoading: false));
+      }
     }
   }
 

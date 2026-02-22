@@ -246,6 +246,7 @@ class LocalNotificationService {
     await Future.wait([
       for (var id in _pendingNotifications[userId] ?? []) _plugin.cancel(id),
     ]);
+    _pendingNotifications.remove(userId);
   }
 
   void onDidReceiveNotificationResponse(NotificationResponse response) {

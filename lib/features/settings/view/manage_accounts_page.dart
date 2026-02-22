@@ -48,7 +48,7 @@ class ManageAccountsPage extends StatelessWidget {
               children: [
                 Card(
                   child: UserAccountListTile(
-                    account: box.get(globalSettings.loggedInUserId!)!,
+                    account: box.get(globalSettings.loggedInUserId ?? '')!,
                     trailing: PopupMenuButton(
                       icon: const Icon(Icons.more_vert),
                       itemBuilder: (context) => [
@@ -106,7 +106,7 @@ class ManageAccountsPage extends StatelessWidget {
                           onSelected: (value) async {
                             if (value == 0) {
                               // Switch
-                              _onSwitchAccount(
+                              await _onSwitchAccount(
                                 context,
                                 globalSettings.loggedInUserId!,
                                 otherAccounts[index],
@@ -126,7 +126,7 @@ class ManageAccountsPage extends StatelessWidget {
                   title: Text(S.of(context)!.addAccount),
                   leading: const Icon(Icons.person_add),
                   onTap: () {
-                    _onAddAccount(context, globalSettings.loggedInUserId!);
+                    _onAddAccount(context, globalSettings.loggedInUserId ?? '');
                   },
                 ),
                 //TODO: Implement permission/user settings at some point...
@@ -148,7 +148,7 @@ class ManageAccountsPage extends StatelessWidget {
     const AddAccountRoute().push<String>(context);
   }
 
-  void _onSwitchAccount(
+  Future<void> _onSwitchAccount(
     BuildContext context,
     String currentUser,
     String newUser,
