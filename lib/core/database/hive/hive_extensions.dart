@@ -55,4 +55,8 @@ extension HiveBoxAccessors on HiveInterface {
   Box<GlobalSettings> get globalSettingsBox =>
       box<GlobalSettings>(HiveBoxes.globalSettings);
   Box<bool> get hintStateBox => box<bool>(HiveBoxes.hintStateBox);
+
+  /// Returns global settings, falling back to defaults if not yet initialized.
+  GlobalSettings get globalSettings =>
+      globalSettingsBox.getValue() ?? GlobalSettings(preferredLocaleSubtag: 'en');
 }

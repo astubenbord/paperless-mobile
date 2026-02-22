@@ -89,15 +89,6 @@ class AppLogsCubit extends Cubit<AppLogsState> {
   Future<void> saveLogs(DateTime date, String locale) async {
     var formattedDate = _fileNameFormat.format(date);
     final filename = 'paperless_mobile_logs_$formattedDate.log';
-    // final parentDir = await FilePicker.platform.getDirectoryPath(
-    //   dialogTitle: "Save log from ${DateFormat.yMd(locale).format(date)}",
-    //   initialDirectory: Platform.isAndroid
-    //       ? FileService.instance.downloadsDirectory.path
-    //       : null,
-    // );
-    // if (parentDir == null) {
-    //   return;
-    // }
     final logFile = _getLogfile(date);
     final parentDir = FileService.instance.downloadsDirectory;
     final downloadedFile = await logFile.copy(p.join(parentDir.path, filename));

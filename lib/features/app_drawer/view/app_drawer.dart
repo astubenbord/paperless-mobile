@@ -294,7 +294,8 @@ class AppDrawer extends StatelessWidget {
       valueListenable:
           Hive.box<GlobalSettings>(HiveBoxes.globalSettings).listenable(),
       builder: (context, box, _) {
-        final settings = box.getValue()!;
+        final settings = box.getValue();
+        if (settings == null) return const SizedBox.shrink();
         final isConfigured = settings.aiServerUrl.isNotEmpty;
         return Column(
           mainAxisSize: MainAxisSize.min,

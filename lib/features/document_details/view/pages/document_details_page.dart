@@ -29,8 +29,7 @@ import 'package:paperless_mobile/core/widgets/connectivity_aware_action_wrapper.
 import 'package:paperless_mobile/core/util/message_helpers.dart';
 import 'package:paperless_mobile/routing/routes/documents_route.dart';
 import 'package:paperless_mobile/core/theme.dart';
-import 'package:paperless_mobile/core/database/tables/global_settings.dart';
-import 'package:paperless_mobile/core/database/hive/hive_config.dart';
+import 'package:paperless_mobile/core/database/hive/hive_extensions.dart';
 import 'package:hive_ce_flutter/adapters.dart';
 import 'package:paperless_mobile/features/ai_chat/cubit/ai_chat_cubit.dart';
 
@@ -478,9 +477,7 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
                       ),
                       Builder(
                         builder: (context) {
-                          final settings = Hive.box<GlobalSettings>(
-                                  HiveBoxes.globalSettings)
-                              .getValue()!;
+                          final settings = Hive.globalSettings;
                           if (settings.aiServerUrl.isEmpty) {
                             return const SizedBox.shrink();
                           }
@@ -504,8 +501,7 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
   }
 
   Future<void> _onAutoClassify(DocumentModel document) async {
-    final settings =
-        Hive.box<GlobalSettings>(HiveBoxes.globalSettings).getValue()!;
+    final settings = Hive.globalSettings;
     final cubit = AiChatCubit(
       serverUrl: settings.aiServerUrl,
       apiKey: settings.aiApiKey,
@@ -571,7 +567,7 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
     }
   }
 
-  void _onOpenFileInSystemViewer() async {
+  Future<void> _onOpenFileInSystemViewer() async {
     final status =
         await context.read<DocumentDetailsCubit>().openDocumentInSystemViewer();
     switch (status) {
@@ -595,7 +591,7 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
     }
   }
 
-  void _onDelete(DocumentModel document) async {
+  Future<void> _onDelete(DocumentModel document) async {
     final delete = await showDialog(
           context: context,
           builder: (context) =>

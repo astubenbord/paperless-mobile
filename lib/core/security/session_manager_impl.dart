@@ -75,7 +75,9 @@ class SessionManagerImpl extends ValueNotifier<Dio> implements SessionManager {
     }
 
     if (baseUrl != null) {
-      client.options.baseUrl = baseUrl;
+      // Normalize to always end with '/' to prevent trailing-slash redirects
+      client.options.baseUrl =
+          baseUrl.endsWith('/') ? baseUrl : '$baseUrl/';
     }
 
     if (authToken != null) {

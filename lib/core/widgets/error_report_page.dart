@@ -114,7 +114,7 @@ Note: If you have the GitHub Android app installed, the descriptions will not be
     );
   }
 
-  void _onSubmit() async {
+  Future<void> _onSubmit() async {
     if (_formKey.currentState?.saveAndValidate() ?? false) {
       final fk = _formKey.currentState!.value;
       if (!_stackTraceCopied) {

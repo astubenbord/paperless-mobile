@@ -13,24 +13,6 @@ class DocumentContentWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // if (document == null) {
-    //   final widths = [.3, .8, .9, .7, .6, .4, .8, .8, .6, .4];
-    //   return SliverToBoxAdapter(
-    //     child: ShimmerPlaceholder(
-    //       child: Column(
-    //         children: [
-    //           for (int i = 0; i < 10; i++)
-    //             Container(
-    //               width: MediaQuery.sizeOf(context).width * widths[i],
-    //               height: 14,
-    //               color: Colors.white,
-    //               margin: EdgeInsets.symmetric(vertical: 4),
-    //             ),
-    //         ],
-    //       ),
-    //     ),
-    //   );
-    // }
     return SliverToBoxAdapter(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

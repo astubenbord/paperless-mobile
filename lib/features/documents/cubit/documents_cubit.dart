@@ -110,14 +110,4 @@ class DocumentsCubit extends Cubit<DocumentsState>
     _userState.currentDocumentFilter = filter;
     await _userState.save();
   }
-
-  // @override
-  // DocumentsState? fromJson(Map<String, dynamic> json) {
-  //   return DocumentsState.fromJson(json);
-  // }
-
-  // @override
-  // Map<String, dynamic>? toJson(DocumentsState state) {
-  //   return state.toJson();
-  // }
 }

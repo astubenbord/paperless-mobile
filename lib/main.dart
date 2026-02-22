@@ -150,7 +150,7 @@ void main() async {
     FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
     final languageHeaderInterceptor = LanguageHeaderInterceptor(
-      () => Hive.globalSettingsBox.getValue()!.preferredLocaleSubtag,
+      () => Hive.globalSettings.preferredLocaleSubtag,
     );
     // Manages security context, required for self signed client certificates
     final SessionManager sessionManager = SessionManagerImpl([

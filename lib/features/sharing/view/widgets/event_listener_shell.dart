@@ -9,7 +9,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
-import 'package:paperless_mobile/core/database/hive/hive_config.dart';
 import 'package:paperless_mobile/core/database/hive/hive_extensions.dart';
 import 'package:paperless_mobile/core/database/tables/local_user_account.dart';
 import 'package:paperless_mobile/core/notifier/document_changed_notifier.dart';
@@ -55,29 +54,6 @@ class _EventListenerShellState extends State<EventListenerShell>
       showSnackBar(context, S.of(context)!.documentSuccessfullyDeleted);
     });
     _listenToInboxChanges();
-    // WidgetsBinding.instance.addPostFrameCallback((_) async {
-    //   final notifier = context.read<ConsumptionChangeNotifier>();
-    //   await notifier.isInitialized;
-    //   final pendingFiles = notifier.pendingFiles;
-    //   if (pendingFiles.isEmpty) {
-    //     return;
-    //   }
-
-    //   final shouldProcess = await showDialog<bool>(
-    //         context: context,
-    //         builder: (context) =>
-    //             PendingFilesInfoDialog(pendingFiles: pendingFiles),
-    //       ) ??
-    //       false;
-    //   if (shouldProcess) {
-    //     final userId = context.read<LocalUserAccount>().id;
-    //     await consumeLocalFiles(
-    //       context,
-    //       files: pendingFiles,
-    //       userId: userId,
-    //     );
-    //   }
-    // });
   }
 
   void _listenToInboxChanges() {
@@ -136,7 +112,7 @@ class _EventListenerShellState extends State<EventListenerShell>
     }
   }
 
-  void _onReceiveSharedFiles(List<SharedMediaFile> sharedFiles) async {
+  Future<void> _onReceiveSharedFiles(List<SharedMediaFile> sharedFiles) async {
     final files = sharedFiles.map((file) => File(file.path)).toList();
 
     if (files.isNotEmpty) {
@@ -193,7 +169,7 @@ Future<void> consumeLocalFile(
 
   final bytes = await file.readAsBytes();
   final shouldDirectlyUpload =
-      Hive.globalSettingsBox.getValue()!.skipDocumentPreprarationOnUpload;
+      Hive.globalSettings.skipDocumentPreprarationOnUpload;
   if (shouldDirectlyUpload) {
     try {
       final taskId = await context.read<PaperlessDocumentsApi>().create(
@@ -233,9 +209,6 @@ Future<void> consumeLocalFile(
       }
       await consumptionNotifier.discardFile(file, userId: userId);
 
-      // if (result.taskId != null) {
-      //   taskNotifier.listenToTaskChanges(result.taskId!);
-      // }
       if (exitAppAfterConsumed) {
         SystemNavigator.pop();
       }

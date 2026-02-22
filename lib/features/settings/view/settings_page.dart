@@ -161,7 +161,8 @@ class _ShowAiSuggestionsSetting extends StatelessWidget {
       valueListenable:
           Hive.box<GlobalSettings>(HiveBoxes.globalSettings).listenable(),
       builder: (context, box, _) {
-        final settings = box.getValue()!;
+        final settings = box.getValue();
+        if (settings == null) return const SizedBox.shrink();
         return SwitchListTile(
           title: Text(S.of(context)!.suggestions.trim()),
           subtitle: Text(S.of(context)!.showAiSuggestionsDescription),

@@ -50,7 +50,7 @@ class DocumentScannerCubit extends Cubit<DocumentScannerState> {
     );
   }
 
-  void addScan(File file) async {
+  Future<void> addScan(File file) async {
     emit(DocumentScannerState(
       status: LoadingStatus.loaded,
       scans: [...state.scans, file],

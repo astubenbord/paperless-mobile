@@ -51,8 +51,6 @@ class DocumentDetailsCubit extends Cubit<DocumentDetailsState> {
             value[0] as DocumentModel,
             value[1] as DocumentMetaData,
           ));
-      // final document = await _api.find(id);
-      // final metaData = await _api.getMetaData(id);
       debugPrint("Document data loaded for $id");
       emit(DocumentDetailsState(
         status: LoadingStatus.loaded,
@@ -207,15 +205,6 @@ class DocumentDetailsCubit extends Cubit<DocumentDetailsState> {
         userId: userId,
       );
     }
-
-    // await _notificationService.notifyFileDownload(
-    //   document: state.document,
-    //   filename: p.basename(targetPath),
-    //   filePath: targetPath,
-    //   finished: false,
-    //   locale: locale,
-    //   userId: userId,
-    // );
 
     await _api.downloadToFile(
       state.document!.id,

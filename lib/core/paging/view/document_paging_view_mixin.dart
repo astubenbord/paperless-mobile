@@ -22,7 +22,7 @@ mixin DocumentPagingViewMixin<T extends StatefulWidget,
 
   DocumentPagingBlocMixin get _bloc => context.read<Bloc>();
 
-  void shouldLoadMoreDocumentsListener() async {
+  Future<void> shouldLoadMoreDocumentsListener() async {
     if (shouldLoadMoreDocuments) {
       try {
         await _bloc.loadMore();

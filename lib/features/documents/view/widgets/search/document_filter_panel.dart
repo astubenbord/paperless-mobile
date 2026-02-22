@@ -156,7 +156,7 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
     );
   }
 
-  void _resetFilter() async {
+  Future<void> _resetFilter() async {
     FocusScope.of(context).unfocus();
     Navigator.pop(
       context,
@@ -164,7 +164,7 @@ class _DocumentFilterPanelState extends State<DocumentFilterPanel> {
     );
   }
 
-  void _onApplyFilter() async {
+  Future<void> _onApplyFilter() async {
     _formKey.currentState?.save();
     if (_formKey.currentState?.validate() ?? false) {
       DocumentFilter newFilter =

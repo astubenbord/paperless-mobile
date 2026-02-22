@@ -13,7 +13,8 @@ class GlobalSettingsBuilder extends StatelessWidget {
       valueListenable:
           Hive.box<GlobalSettings>(HiveBoxes.globalSettings).listenable(),
       builder: (context, value, _) {
-        final settings = value.getValue()!;
+        final settings = value.getValue() ??
+            GlobalSettings(preferredLocaleSubtag: 'en');
         return builder(context, settings);
       },
     );

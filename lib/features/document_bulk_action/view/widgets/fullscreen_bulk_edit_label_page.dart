@@ -122,7 +122,7 @@ class _FullscreenBulkEditLabelPageState<T extends Label>
     );
   }
 
-  void _onSubmit() async {
+  Future<void> _onSubmit() async {
     if (_selection == null) {
       context.pop();
     } else {

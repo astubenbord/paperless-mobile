@@ -2,7 +2,7 @@ import 'dart:developer' as dev;
 import 'dart:io';
 import 'dart:math';
 
-import 'package:edge_detection/edge_detection.dart';
+import 'package:cunning_document_scanner/cunning_document_scanner.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -10,11 +10,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/bloc/loading_status.dart';
-import 'package:paperless_mobile/core/database/hive/hive_config.dart';
-import 'package:paperless_mobile/core/database/tables/global_settings.dart';
+import 'package:paperless_mobile/core/database/hive/hive_extensions.dart';
 import 'package:paperless_mobile/core/global/constants.dart';
 import 'package:paperless_mobile/core/model/info_message_exception.dart';
-import 'package:paperless_mobile/core/service/file_service.dart';
 import 'package:paperless_mobile/features/app_drawer/view/app_drawer.dart';
 import 'package:paperless_mobile/features/document_scan/cubit/document_scanner_cubit.dart';
 import 'package:paperless_mobile/features/document_scan/view/widgets/export_scans_dialog.dart';
@@ -182,7 +180,7 @@ class _ScannerPageState extends State<ScannerPage>
     );
   }
 
-  void _onSaveToFile() async {
+  Future<void> _onSaveToFile() async {
     final fileName = await showDialog<String>(
       context: context,
       builder: (context) => const ExportScansDialog(),
@@ -195,8 +193,7 @@ class _ScannerPageState extends State<ScannerPage>
         context.read<DocumentScannerCubit>().state.scans,
       );
       try {
-        final globalSettings =
-            Hive.box<GlobalSettings>(HiveBoxes.globalSettings).getValue()!;
+        final globalSettings = Hive.globalSettings;
         if (Platform.isAndroid && androidInfo!.version.sdkInt <= 29) {
           final isGranted = await askForPermission(Permission.storage);
           if (!isGranted) {
@@ -224,47 +221,37 @@ class _ScannerPageState extends State<ScannerPage>
     }
   }
 
-  void _openDocumentScanner(BuildContext context) async {
-    final isGranted = await askForPermission(Permission.camera);
-    if (!isGranted) {
-      return;
-    }
-    final file = await FileService.instance.allocateTemporaryFile(
-      PaperlessDirectoryType.scans,
-      extension: 'jpeg',
-      create: true,
-    );
-    if (kDebugMode) {
-      dev.log('[ScannerPage] Created temporary file: ${file.path}');
-    }
-
-    final success = await EdgeDetection.detectEdge(file.path);
-    if (!success) {
-      if (kDebugMode) {
-        dev.log(
-            '[ScannerPage] Scan either not successful or canceled by user.');
-      }
-      // Clean up temporary file on cancel/failure
-      try {
-        if (await file.exists()) {
-          await file.delete();
+  Future<void> _openDocumentScanner(BuildContext context) async {
+    try {
+      // cunning_document_scanner handles camera permission internally
+      final imagePaths = await CunningDocumentScanner.getPictures(
+        isGalleryImportAllowed: true,
+      );
+      if (imagePaths == null || imagePaths.isEmpty) {
+        if (kDebugMode) {
+          dev.log('[ScannerPage] Scan canceled by user or returned no images.');
         }
-      } catch (_) {}
-      return;
+        return;
+      }
+      if (!context.mounted) return;
+      final cubit = context.read<DocumentScannerCubit>();
+      for (final path in imagePaths) {
+        if (kDebugMode) {
+          dev.log('[ScannerPage] Scanned image: $path');
+        }
+        cubit.addScan(File(path));
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        dev.log('[ScannerPage] Scanner error: $e');
+      }
     }
-    if (kDebugMode) {
-      dev.log('[ScannerPage] Wrote image to temporary file: ${file.path}');
-    }
-    if (!context.mounted) return;
-    context.read<DocumentScannerCubit>().addScan(file);
   }
 
-  void _onPrepareDocumentUpload(BuildContext context, List<File> scans) async {
+  Future<void> _onPrepareDocumentUpload(BuildContext context, List<File> scans) async {
     final file = await _assembleFileBytes(
       scans,
-      forcePdf: Hive.box<GlobalSettings>(HiveBoxes.globalSettings)
-          .getValue()!
-          .enforceSinglePagePdfUpload,
+      forcePdf: Hive.globalSettings.enforceSinglePagePdfUpload,
     );
     if (!context.mounted) return;
     final uploadResult = await DocumentUploadRoute(
@@ -275,9 +262,6 @@ class _ScannerPageState extends State<ScannerPage>
       if (!context.mounted) return;
       // For paperless version older than 1.11.3, task id will always be null!
       context.read<DocumentScannerCubit>().reset();
-      // context
-      //     .read<PendingTasksNotifier>()
-      //     .listenToTaskChanges(uploadResult!.taskId!);
     }
   }
 
@@ -360,7 +344,7 @@ class _ScannerPageState extends State<ScannerPage>
     }
   }
 
-  void _onUploadFromFilesystem() async {
+  Future<void> _onUploadFromFilesystem() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions:
@@ -388,11 +372,6 @@ class _ScannerPageState extends State<ScannerPage>
         title: filename,
         fileExtension: extension,
       ).push<DocumentUploadResult>(context);
-      // if (uploadResult.success && uploadResult.taskId != null) {
-      //   context
-      //       .read<PendingTasksNotifier>()
-      //       .listenToTaskChanges(uploadResult.taskId!);
-      // }
     }
   }
 

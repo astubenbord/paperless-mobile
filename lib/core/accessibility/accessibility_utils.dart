@@ -3,14 +3,13 @@ import 'dart:ui';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hive_ce/hive.dart';
-import 'package:paperless_mobile/core/database/hive/hive_config.dart';
 import 'package:paperless_mobile/core/database/hive/hive_extensions.dart';
 import 'package:paperless_mobile/core/widgets/global_settings_builder.dart';
 
 extension AccessibilityAwareAnimationDurationExtension on Duration {
   Duration accessible() {
     bool shouldDisableAnimations = WidgetsBinding.instance.disableAnimations ||
-        Hive.globalSettingsBox.getValue()!.disableAnimations;
+        Hive.globalSettings.disableAnimations;
     // print(shouldDisableAnimations);
     if (shouldDisableAnimations) {
       return 0.seconds;
@@ -30,16 +29,6 @@ extension AccessibleHero on Hero {
         );
       },
     );
-    // bool shouldDisableAnimations = WidgetsBinding.instance.disableAnimations ||
-    //     Hive.globalSettingsBox.getValue()!.disableAnimations;
-    // return _AccessibilityAwareObserverWidget(
-    //   accessibilityAwareBuilder: (context, accessibilityFeatures) {
-    //     return HeroMode(
-    //       enabled: !accessibilityFeatures.disableAnimations,
-    //       child: this,
-    //     );
-    //   },
-    // );
   }
 }
 

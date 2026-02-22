@@ -90,7 +90,7 @@ class _EditSavedViewPageState extends State<EditSavedViewPage> {
     );
   }
 
-  void _onCreate(BuildContext context) async {
+  Future<void> _onCreate(BuildContext context) async {
     if (_savedViewFormKey.currentState?.saveAndValidate() ?? false) {
       final cubit = context.read<SavedViewCubit>();
       var savedView = widget.savedView.copyWith(

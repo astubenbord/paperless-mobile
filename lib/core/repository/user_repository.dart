@@ -49,14 +49,4 @@ class UserRepository extends PersistentRepository<UserRepositoryState> {
     );
     return null;
   }
-
-  // @override
-  // UserRepositoryState? fromJson(Map<String, dynamic> json) {
-  //   return UserRepositoryState.fromJson(json);
-  // }
-
-  // @override
-  // Map<String, dynamic>? toJson(UserRepositoryState state) {
-  //   return state.toJson();
-  // }
 }

@@ -8,8 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:paperless_api/paperless_api.dart';
-import 'package:paperless_mobile/core/database/hive/hive_config.dart';
-import 'package:paperless_mobile/core/database/tables/global_settings.dart';
+import 'package:paperless_mobile/core/database/hive/hive_extensions.dart';
 import 'package:paperless_mobile/core/database/tables/local_user_account.dart';
 import 'package:paperless_mobile/core/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/core/repository/label_repository.dart';
@@ -306,7 +305,7 @@ class _DocumentUploadPreparationPageState
     );
   }
 
-  void _onSubmit() async {
+  Future<void> _onSubmit() async {
     if (_formKey.currentState?.saveAndValidate() ?? false) {
       final cubit = context.read<DocumentUploadCubit>();
       try {
@@ -339,9 +338,7 @@ class _DocumentUploadPreparationPageState
             _formKey.currentState?.value[fkFileName],
             widget.fileExtension,
           ),
-          userId: Hive.box<GlobalSettings>(HiveBoxes.globalSettings)
-              .getValue()!
-              .loggedInUserId!,
+          userId: Hive.globalSettings.loggedInUserId!,
           title: title,
           documentType: docType,
           correspondent: correspondent,
@@ -385,33 +382,4 @@ class _DocumentUploadPreparationPageState
   String _formatFilename(String source) {
     return source.replaceAll(RegExp(r"[\W_]"), "_").toLowerCase();
   }
-
-  // Future<Color> _computeAverageColor() async {
-  //   final bitmap = img.decodeImage(await widget.fileBytes);
-  //   if (bitmap == null) {
-  //     return Colors.black;
-  //   }
-  //   int redBucket = 0;
-  //   int greenBucket = 0;
-  //   int blueBucket = 0;
-  //   int pixelCount = 0;
-
-  //   for (int y = 0; y < bitmap.height; y++) {
-  //     for (int x = 0; x < bitmap.width; x++) {
-  //       final c = bitmap.getPixel(x, y);
-
-  //       pixelCount++;
-  //       redBucket += c.r.toInt();
-  //       greenBucket += c.g.toInt();
-  //       blueBucket += c.b.toInt();
-  //     }
-  //   }
-
-  //   return Color.fromRGBO(
-  //     redBucket ~/ pixelCount,
-  //     greenBucket ~/ pixelCount,
-  //     blueBucket ~/ pixelCount,
-  //     1,
-  //   );
-  // }
 }

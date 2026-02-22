@@ -101,7 +101,7 @@ class EditLabelForm<T extends Label> extends StatelessWidget {
     );
   }
 
-  void _onDelete(BuildContext context) async {
+  Future<void> _onDelete(BuildContext context) async {
     if ((label.documentCount ?? 0) > 0) {
       final shouldDelete = await showDialog<bool>(
             context: context,

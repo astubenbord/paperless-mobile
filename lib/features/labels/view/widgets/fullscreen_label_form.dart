@@ -166,7 +166,7 @@ class _FullscreenLabelFormState<T extends Label>
     );
   }
 
-  void _onCreateNewLabel() async {
+  Future<void> _onCreateNewLabel() async {
     final label = await widget.onCreateNewLabel!(_textEditingController.text);
     if (label?.id != null) {
       widget.onSubmit(

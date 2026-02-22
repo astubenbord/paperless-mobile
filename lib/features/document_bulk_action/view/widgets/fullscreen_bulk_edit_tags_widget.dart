@@ -151,7 +151,7 @@ class _FullscreenBulkEditTagsWidgetState
     );
   }
 
-  void _submit() async {
+  Future<void> _submit() async {
     if (_addTags.isNotEmpty || _removeTags.isNotEmpty) {
       final bloc = context.read<DocumentBulkActionCubit>();
       final labelRepository = context.read<LabelRepository>();

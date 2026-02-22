@@ -169,7 +169,7 @@ class _LabelFormState<T extends Label> extends State<LabelForm<T>> {
     return selectableMatchingAlgorithmValues;
   }
 
-  void _onSubmit() async {
+  Future<void> _onSubmit() async {
     if (_formKey.currentState?.saveAndValidate() ?? false) {
       try {
         final mergedJson = {

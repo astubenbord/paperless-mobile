@@ -241,14 +241,4 @@ class LabelRepository extends ChangeNotifier {
     notifyListeners();
     return updated;
   }
-
-  // @override
-  // LabelRepositoryState? fromJson(Map<String, dynamic> json) {
-  //   return LabelRepositoryState.fromJson(json);
-  // }
-
-  // @override
-  // Map<String, dynamic>? toJson(LabelRepositoryState state) {
-  //   return state.toJson();
-  // }
 }

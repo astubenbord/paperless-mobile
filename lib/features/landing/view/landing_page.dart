@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:paperless_api/paperless_api.dart';
 import 'package:paperless_mobile/core/global/constants.dart';
 import 'package:paperless_mobile/core/database/tables/local_user_account.dart';
 import 'package:paperless_mobile/core/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/app_drawer/view/app_drawer.dart';
 import 'package:paperless_mobile/features/document_search/view/sliver_search_bar.dart';
+import 'package:paperless_mobile/features/inbox/cubit/inbox_cubit.dart';
 import 'package:paperless_mobile/features/landing/view/widgets/expansion_card.dart';
 import 'package:paperless_mobile/features/landing/view/widgets/mime_types_pie_chart.dart';
 import 'package:paperless_mobile/features/saved_view/cubit/saved_view_cubit.dart';
@@ -14,6 +16,7 @@ import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
 import 'package:paperless_mobile/routing/routes/documents_route.dart';
 import 'package:paperless_mobile/routing/routes/inbox_route.dart';
 import 'package:paperless_mobile/routing/routes/saved_views_route.dart';
+import 'package:paperless_mobile/routing/routes/scanner_route.dart';
 import 'package:paperless_mobile/routing/routes/changelog_route.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -85,20 +88,15 @@ class _LandingPageState extends State<LandingPage> {
                           .headlineSmall
                           ?.copyWith(fontWeight: FontWeight.w600),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Quick overview',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurfaceVariant,
-                          ),
-                    ),
                   ],
                 ).padded(24),
               ),
               SliverToBoxAdapter(child: _buildQuickActions(context)),
-              SliverToBoxAdapter(child: _buildStatisticsCard(context)),
+              if (currentUser.canViewInbox)
+                SliverToBoxAdapter(child: _buildInboxPreview(context)),
+              SliverToBoxAdapter(
+                child: _buildStatisticsCard(context),
+              ),
               if (currentUser.canViewSavedViews) ...[
                 SliverPadding(
                   padding: const EdgeInsets.fromLTRB(16, 16, 0, 8),
@@ -182,26 +180,26 @@ class _LandingPageState extends State<LandingPage> {
           children: [
             _buildQuickActionCard(
               context,
-              icon: Icons.upload_file,
-              label: 'Upload',
-              color: colorScheme.primaryContainer,
-              onTap: () {},
-            ),
-            const SizedBox(width: 8),
-            _buildQuickActionCard(
-              context,
               icon: Icons.document_scanner,
-              label: 'Scan',
+              label: S.of(context)!.scanner,
               color: colorScheme.primaryContainer,
-              onTap: () {},
+              onTap: () => const ScannerRoute().go(context),
             ),
             const SizedBox(width: 8),
             _buildQuickActionCard(
               context,
               icon: Icons.inbox,
-              label: 'Inbox',
+              label: S.of(context)!.inbox,
               color: colorScheme.primaryContainer,
               onTap: () => InboxRoute().go(context),
+            ),
+            const SizedBox(width: 8),
+            _buildQuickActionCard(
+              context,
+              icon: Icons.description,
+              label: S.of(context)!.documents,
+              color: colorScheme.primaryContainer,
+              onTap: () => DocumentsRoute().go(context),
             ),
           ],
         ),
@@ -242,10 +240,95 @@ class _LandingPageState extends State<LandingPage> {
     );
   }
 
+  Widget _buildInboxPreview(BuildContext context) {
+    return BlocBuilder<InboxCubit, InboxState>(
+      builder: (context, state) {
+        final documents = state.documents;
+        if (!state.hasLoaded) {
+          return const SizedBox.shrink();
+        }
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.inbox,
+                      color: Theme.of(context).colorScheme.primary),
+                  const SizedBox(width: 8),
+                  Text(
+                    S.of(context)!.inbox,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const Spacer(),
+                  if (documents.isNotEmpty)
+                    TextButton(
+                      onPressed: () => InboxRoute().go(context),
+                      child: Text(S.of(context)!.showAll),
+                    ),
+                ],
+              ),
+              if (documents.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Text(
+                    S.of(context)!.youDoNotHaveUnseenDocuments,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color:
+                              Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                  ),
+                )
+              else
+                ...documents.take(5).map(
+                      (doc) => _buildInboxDocumentTile(context, doc),
+                    ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildInboxDocumentTile(BuildContext context, DocumentModel doc) {
+    final dateStr = DateFormat.yMMMd().format(doc.created);
+    return Card(
+      elevation: 0,
+      color: Theme.of(context).colorScheme.surfaceContainerLow,
+      margin: const EdgeInsets.only(bottom: 4),
+      child: ListTile(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: Text(
+          doc.title,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: Theme.of(context)
+              .textTheme
+              .titleSmall
+              ?.copyWith(fontWeight: FontWeight.w500),
+        ),
+        subtitle: Text(
+          dateStr,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+        ),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: () {
+          DocumentDetailsRoute(
+            id: doc.id,
+            isLabelClickable: true,
+          ).push(context);
+        },
+      ),
+    );
+  }
+
   Widget _buildStatisticsCard(BuildContext context) {
     final currentUser = context.read<LocalUserAccount>().paperlessUser;
     return ExpansionCard(
-      initiallyExpanded: true,
+      initiallyExpanded: false,
       title: Text(
         S.of(context)!.statistics,
         style: Theme.of(context).textTheme.titleLarge,

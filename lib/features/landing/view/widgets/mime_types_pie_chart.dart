@@ -49,20 +49,6 @@ class _MimeTypesPieChartState extends State<MimeTypesPieChart> {
           child: PieChart(
             PieChartData(
               startDegreeOffset: 90,
-              // pieTouchData: PieTouchData(
-              //   touchCallback: (event, response) {
-              //     setState(() {
-              //       if (!event.isInterestedForInteractions ||
-              //           response == null ||
-              //           response.touchedSection == null) {
-              //         _touchedIndex = -1;
-              //         return;
-              //       }
-              //       _touchedIndex =
-              //           response.touchedSection!.touchedSectionIndex;
-              //     });
-              //   },
-              // ),
               borderData: FlBorderData(
                 show: false,
               ),

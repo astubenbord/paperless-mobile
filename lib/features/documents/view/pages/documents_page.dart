@@ -60,7 +60,6 @@ class _DocumentsPageState extends State<DocumentsPage> {
   @override
   void initState() {
     super.initState();
-    // context.read<PendingTasksNotifier>().addListener(_onTasksChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _nestedScrollViewKey.currentState!.innerController
           .addListener(_scrollExtentChangedListener);
@@ -105,7 +104,6 @@ class _DocumentsPageState extends State<DocumentsPage> {
   void dispose() {
     _nestedScrollViewKey.currentState?.innerController
         .removeListener(_scrollExtentChangedListener);
-    // context.read<PendingTasksNotifier>().removeListener(_onTasksChanged);
     super.dispose();
   }
 
@@ -456,7 +454,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
     );
   }
 
-  void _openDocumentFilter() async {
+  Future<void> _openDocumentFilter() async {
     final draggableSheetController = DraggableScrollableController();
     final filterIntent = await showModalBottomSheet<DocumentFilterIntent>(
       useSafeArea: true,
@@ -652,7 +650,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
     final cubit = context.read<DocumentsCubit>();
     final savedViewCubit = context.read<SavedViewCubit>();
 
-    void toTop() async {
+    Future<void> toTop() async {
       await _nestedScrollViewKey.currentState?.outerController.animateTo(
         0,
         duration: const Duration(milliseconds: 300),

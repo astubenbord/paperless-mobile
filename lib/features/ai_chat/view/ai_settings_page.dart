@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_ce_flutter/adapters.dart';
 import 'package:paperless_mobile/core/database/hive/hive_config.dart';
+import 'package:paperless_mobile/core/database/hive/hive_extensions.dart';
 import 'package:paperless_mobile/core/database/tables/global_settings.dart';
 import 'package:paperless_mobile/core/util/message_helpers.dart';
 import 'package:paperless_mobile/features/ai_chat/cubit/ai_chat_cubit.dart';
@@ -21,8 +22,7 @@ class _AiSettingsPageState extends State<AiSettingsPage> {
   @override
   void initState() {
     super.initState();
-    final settings =
-        Hive.box<GlobalSettings>(HiveBoxes.globalSettings).getValue()!;
+    final settings = Hive.globalSettings;
     _urlController = TextEditingController(text: settings.aiServerUrl);
     _apiKeyController = TextEditingController(text: settings.aiApiKey);
   }
@@ -36,7 +36,8 @@ class _AiSettingsPageState extends State<AiSettingsPage> {
 
   void _save() {
     final box = Hive.box<GlobalSettings>(HiveBoxes.globalSettings);
-    final settings = box.getValue()!;
+    final settings = box.getValue();
+    if (settings == null) return;
     settings.aiServerUrl = _urlController.text.trim();
     settings.aiApiKey = _apiKeyController.text.trim();
     box.setValue(settings);

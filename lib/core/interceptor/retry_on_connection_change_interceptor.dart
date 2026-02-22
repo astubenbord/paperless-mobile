@@ -1,51 +1,65 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 class RetryOnConnectionChangeInterceptor extends Interceptor {
   final Dio dio;
+  final int maxRetries;
 
   RetryOnConnectionChangeInterceptor({
     required this.dio,
+    this.maxRetries = 3,
   });
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
-    if (_shouldRetryOnHttpException(err)) {
-      try {
-        handler.resolve(await DioHttpRequestRetrier(dio: dio)
-            .requestRetry(err.requestOptions)
-            // ignore: body_might_complete_normally_catch_error
-            .catchError((e) {
-          handler.next(err);
-        }));
-      } catch (e) {
-        handler.next(err);
+    if (_shouldRetry(err)) {
+      final retryCount = err.requestOptions.extra['retryCount'] as int? ?? 0;
+      if (retryCount < maxRetries) {
+        final delay = Duration(milliseconds: 500 * (1 << retryCount)); // 500ms, 1s, 2s
+        if (kDebugMode) {
+          debugPrint(
+            '[Retry] Attempt ${retryCount + 1}/$maxRetries after ${delay.inMilliseconds}ms '
+            'for ${err.requestOptions.method} ${err.requestOptions.path}',
+          );
+        }
+        await Future.delayed(delay);
+        try {
+          err.requestOptions.extra['retryCount'] = retryCount + 1;
+          final response = await _retry(err.requestOptions);
+          handler.resolve(response);
+          return;
+        } catch (e) {
+          // Fall through to handler.next
+        }
       }
-    } else {
-      handler.next(err);
     }
+    handler.next(err);
   }
 
-  bool _shouldRetryOnHttpException(DioException err) {
-    return err.type == DioExceptionType.unknown &&
-        (err.error is HttpException &&
-            (err.message?.contains(
-                  'Connection closed before full header was received',
-                ) ??
-                false));
+  bool _shouldRetry(DioException err) {
+    // Retry on connection errors (network flakes, VPN reconnects)
+    if (err.type == DioExceptionType.connectionTimeout ||
+        err.type == DioExceptionType.receiveTimeout) {
+      return true;
+    }
+    // Retry on connection closed / socket errors
+    if (err.type == DioExceptionType.unknown && err.error is SocketException) {
+      return true;
+    }
+    if (err.type == DioExceptionType.unknown && err.error is HttpException) {
+      return true;
+    }
+    // Retry on 502/503/504 (server temporarily unavailable)
+    final statusCode = err.response?.statusCode;
+    if (statusCode != null && (statusCode == 502 || statusCode == 503 || statusCode == 504)) {
+      return true;
+    }
+    return false;
   }
-}
 
-/// Retrier
-class DioHttpRequestRetrier {
-  final Dio dio;
-
-  DioHttpRequestRetrier({
-    required this.dio,
-  });
-
-  Future<Response> requestRetry(RequestOptions requestOptions) async {
+  Future<Response> _retry(RequestOptions requestOptions) {
     return dio.request(
       requestOptions.path,
       cancelToken: requestOptions.cancelToken,

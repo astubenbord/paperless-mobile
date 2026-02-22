@@ -102,7 +102,7 @@ class _AddSavedViewPageState extends State<AddSavedViewPage> {
     );
   }
 
-  void _onCreate(BuildContext context) async {
+  Future<void> _onCreate(BuildContext context) async {
     if (_savedViewFormKey.currentState?.saveAndValidate() ?? false) {
       final cubit = context.read<SavedViewCubit>();
       var savedView = SavedView.fromDocumentFilter(

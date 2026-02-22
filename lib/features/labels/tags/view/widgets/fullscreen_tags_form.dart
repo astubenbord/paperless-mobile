@@ -203,7 +203,7 @@ class _FullscreenTagsFormState extends State<FullscreenTagsForm> {
     );
   }
 
-  void _onAddTag() async {
+  Future<void> _onAddTag() async {
     final createdTag =
         await CreateLabelRoute(LabelType.tag, name: _textEditingController.text)
             .push<Tag>(context);

@@ -154,7 +154,7 @@ class _DocumentSearchPageState extends State<DocumentSearchPage> {
     );
   }
 
-  void _onDeleteHistoryEntry(String entry) async {
+  Future<void> _onDeleteHistoryEntry(String entry) async {
     final shouldRemove = await showDialog<bool>(
           context: context,
           builder: (context) => RemoveHistoryEntryDialog(entry: entry),
