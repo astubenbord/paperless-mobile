@@ -120,6 +120,12 @@ class HomeShellWidget extends StatelessWidget {
                     context.read<SessionManager>().client,
                   ),
                 ),
+                Provider(
+                  create: (context) =>
+                      paperlessProviderFactory.createTrashApi(
+                    context.read<SessionManager>().client,
+                  ),
+                ),
                 if (currentLocalUser.hasMultiUserSupport)
                   Provider(
                     create: (context) => paperlessProviderFactory.createUserApi(

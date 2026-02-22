@@ -93,6 +93,7 @@ class DocumentDetailedItem extends DocumentItem {
                             .map((e) => labelRepository.tags[e]!)
                             .toList(),
                         onTagSelected: onTagSelected,
+                        maxTags: 3,
                       ).padded(),
                     ),
                 ],

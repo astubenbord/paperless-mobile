@@ -11,6 +11,7 @@ import 'package:paperless_mobile/features/documents/view/widgets/search/owner_fo
 import 'package:paperless_mobile/features/labels/tags/view/widgets/tags_form_field.dart';
 import 'package:paperless_mobile/features/labels/view/widgets/label_form_field.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
+import 'package:paperless_mobile/features/documents/view/widgets/search/custom_field_filter_section.dart';
 
 import 'text_query_form_field.dart';
 
@@ -20,6 +21,7 @@ class DocumentFilterForm extends StatefulWidget {
   static const fkStoragePath = DocumentModel.storagePathKey;
   static const fkQuery = "query";
   static const fkOwner = "owner";
+  static const fkCustomFields = "customFields";
   static const fkCreatedAt = DocumentModel.createdKey;
   static const fkAddedAt = DocumentModel.addedKey;
 
@@ -45,6 +47,8 @@ class DocumentFilterForm extends StatefulWidget {
           DocumentFilter.initial.query,
       created: (v[DocumentFilterForm.fkCreatedAt] as DateRangeQuery),
       added: (v[DocumentFilterForm.fkAddedAt] as DateRangeQuery),
+      customFieldQueries:
+          v[DocumentFilterForm.fkCustomFields] as List<CustomFieldQueryClause>?,
       page: 1,
     );
   }
@@ -151,6 +155,13 @@ class _DocumentFilterFormState extends State<DocumentFilterForm> {
           horizontal: 16,
           vertical: 4,
         ),
+      CustomFieldFilterSection(
+        name: DocumentFilterForm.fkCustomFields,
+        initialClauses: widget.initialFilter.customFieldQueries,
+      ).paddedSymmetrically(
+        horizontal: 16,
+        vertical: 4,
+      ),
     ].map((e) => SliverToBoxAdapter(child: e)).toList();
   }
 

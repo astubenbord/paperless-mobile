@@ -21,6 +21,7 @@ import 'package:paperless_mobile/routing/routes/labels_route.dart';
 import 'package:paperless_mobile/routing/routes/landing_route.dart';
 import 'package:paperless_mobile/routing/routes/saved_views_route.dart';
 import 'package:paperless_mobile/routing/routes/scanner_route.dart';
+import 'package:paperless_mobile/routing/routes/trash_route.dart';
 import 'package:paperless_mobile/routing/routes/upload_queue_route.dart';
 import 'package:paperless_mobile/routing/routes/shells/scaffold_shell_route.dart';
 import 'package:paperless_mobile/routing/routes/settings_route.dart';
@@ -39,6 +40,10 @@ part 'authenticated_route.g.dart';
     TypedGoRoute<UploadQueueRoute>(
       path: "/upload-queue",
       name: R.uploadQueue,
+    ),
+    TypedGoRoute<TrashRoute>(
+      path: "/trash",
+      name: R.trash,
     ),
     TypedGoRoute<SavedViewsRoute>(
       path: "/saved-views",

@@ -13,6 +13,7 @@ import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
 import 'package:paperless_mobile/routing/routes/documents_route.dart';
 import 'package:paperless_mobile/routing/routes/saved_views_route.dart';
 import 'package:paperless_mobile/routing/routes/settings_route.dart';
+import 'package:paperless_mobile/routing/routes/trash_route.dart';
 import 'package:paperless_mobile/routing/routes/upload_queue_route.dart';
 import 'package:paperless_mobile/core/database/tables/global_settings.dart';
 import 'package:paperless_mobile/core/database/hive/hive_config.dart';
@@ -195,6 +196,17 @@ class AppDrawer extends StatelessWidget {
                       autoPlay: !MediaQuery.disableAnimationsOf(context),
                     )
                     .fade(duration: 1.seconds, begin: 1, end: 0.3);
+              },
+            ),
+            ListTile(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              leading: const Icon(Icons.delete_outline),
+              title: const Text("Trash"),
+              onTap: () {
+                Scaffold.of(context).closeDrawer();
+                TrashRoute().push(context);
               },
             ),
             Padding(

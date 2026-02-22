@@ -121,6 +121,7 @@ class DocumentListItem extends DocumentItem {
                             .map((e) => labelRepository.tags[e]!)
                             .toList(),
                         onTagSelected: (id) => onTagSelected?.call(id),
+                        maxTags: 3,
                       ),
                     ),
                     const SizedBox(height: 4),

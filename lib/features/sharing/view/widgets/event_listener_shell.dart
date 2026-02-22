@@ -38,6 +38,7 @@ class _EventListenerShellState extends State<EventListenerShell>
   StreamSubscription? _subscription;
   StreamSubscription? _documentDeletedSubscription;
   Timer? _inboxTimer;
+  StreamSubscription<ConnectivityState>? _connectivitySub;
 
   @override
   void initState() {
@@ -54,6 +55,33 @@ class _EventListenerShellState extends State<EventListenerShell>
       showSnackBar(context, S.of(context)!.documentSuccessfullyDeleted);
     });
     _listenToInboxChanges();
+    _connectivitySub = context.read<ConnectivityCubit>().stream.listen(
+      _onConnectivityChanged,
+    );
+  }
+
+  ConnectivityState _previousConnectivity = ConnectivityState.undefined;
+
+  void _onConnectivityChanged(ConnectivityState state) {
+    if (_previousConnectivity == ConnectivityState.notConnected &&
+        state == ConnectivityState.connected) {
+      _retryPendingUploads();
+    }
+    _previousConnectivity = state;
+  }
+
+  Future<void> _retryPendingUploads() async {
+    if (!mounted) return;
+    final notifier = context.read<ConsumptionChangeNotifier>();
+    final pendingFiles = List<File>.from(notifier.pendingFiles);
+    if (pendingFiles.isEmpty) return;
+    final userId = context.read<LocalUserAccount>().id;
+    debugPrint('Auto-retrying ${pendingFiles.length} pending uploads on reconnect');
+    await consumeLocalFiles(
+      context,
+      files: pendingFiles,
+      userId: userId,
+    );
   }
 
   void _listenToInboxChanges() {
@@ -72,6 +100,7 @@ class _EventListenerShellState extends State<EventListenerShell>
     WidgetsBinding.instance.removeObserver(this);
     _subscription?.cancel();
     _documentDeletedSubscription?.cancel();
+    _connectivitySub?.cancel();
     _inboxTimer?.cancel();
     context.read<PendingTasksNotifier>().removeListener(_onTasksChanged);
     super.dispose();

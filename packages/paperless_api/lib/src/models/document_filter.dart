@@ -65,6 +65,9 @@ class DocumentFilter extends Equatable {
   @HiveField(15)
   final IdQueryParameter owner;
 
+  // Not persisted to Hive — transient filter for custom field queries
+  final List<CustomFieldQueryClause>? customFieldQueries;
+
   const DocumentFilter({
     this.documentType = const UnsetIdQueryParameter(),
     this.correspondent = const UnsetIdQueryParameter(),
@@ -82,6 +85,7 @@ class DocumentFilter extends Equatable {
     this.modified = const UnsetDateRangeQuery(),
     this.moreLike,
     this.selectedView,
+    this.customFieldQueries,
   });
 
   bool get forceExtendedQuery {
@@ -117,6 +121,12 @@ class DocumentFilter extends Equatable {
     if (moreLike != null) {
       params.add(MapEntry('more_like_id', moreLike.toString()));
     }
+    if (customFieldQueries != null && customFieldQueries!.isNotEmpty) {
+      params.add(MapEntry(
+        'custom_field_query',
+        CustomFieldQueryClause.encodeAll(customFieldQueries!),
+      ));
+    }
     // Reverse ordering can also be encoded using &reverse=1
     // Merge query params
     final queryParams = groupBy(params, (e) => e.key).map(
@@ -150,6 +160,7 @@ class DocumentFilter extends Equatable {
     TextQuery? query,
     int? Function()? moreLike,
     int? Function()? selectedView,
+    List<CustomFieldQueryClause>? customFieldQueries,
   }) {
     final newFilter = DocumentFilter(
       pageSize: pageSize ?? this.pageSize,
@@ -169,6 +180,7 @@ class DocumentFilter extends Equatable {
       moreLike: moreLike != null ? moreLike.call() : this.moreLike,
       selectedView:
           selectedView != null ? selectedView.call() : this.selectedView,
+      customFieldQueries: customFieldQueries ?? this.customFieldQueries,
     );
     if (query?.queryType != QueryType.extended &&
         newFilter.forceExtendedQuery) {

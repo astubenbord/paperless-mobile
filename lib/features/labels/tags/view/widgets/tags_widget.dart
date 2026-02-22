@@ -8,6 +8,7 @@ class TagsWidget extends StatelessWidget {
   final bool isClickable;
   final bool showShortNames;
   final bool dense;
+  final int? maxTags;
 
   const TagsWidget({
     super.key,
@@ -16,18 +17,24 @@ class TagsWidget extends StatelessWidget {
     this.isClickable = true,
     this.showShortNames = false,
     this.dense = true,
+    this.maxTags,
   });
 
   List<Widget> get _children {
+    final displayTags = (maxTags != null && tags.length > maxTags!)
+        ? tags.sublist(0, maxTags!)
+        : tags;
     return [
-      for (var tag in tags)
+      for (var tag in displayTags)
         TagWidget(
           tag: tag,
           isClickable: isClickable,
           onSelected: () => onTagSelected?.call(tag.id!),
           showShortName: showShortNames,
           dense: dense,
-        )
+        ),
+      if (maxTags != null && tags.length > maxTags!)
+        _OverflowChip(count: tags.length - maxTags!, dense: dense),
     ];
   }
 
@@ -38,6 +45,7 @@ class TagsWidget extends StatelessWidget {
     required bool isClickable,
     required bool showShortNames,
     required bool dense,
+    int? maxTags,
   }) = _MultiLineTagsWidget;
 
   const factory TagsWidget.sliver({
@@ -47,6 +55,7 @@ class TagsWidget extends StatelessWidget {
     bool isClickable,
     bool showShortNames,
     bool dense,
+    int? maxTags,
   }) = _SliverTagsWidget;
 
   @override
@@ -54,6 +63,28 @@ class TagsWidget extends StatelessWidget {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(children: _children),
+    );
+  }
+}
+
+class _OverflowChip extends StatelessWidget {
+  final int count;
+  final bool dense;
+
+  const _OverflowChip({required this.count, required this.dense});
+
+  @override
+  Widget build(BuildContext context) {
+    return Chip(
+      label: Text(
+        '+$count',
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+      ),
+      visualDensity: dense ? VisualDensity.compact : VisualDensity.standard,
+      padding: EdgeInsets.zero,
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     );
   }
 }
@@ -66,6 +97,7 @@ class _MultiLineTagsWidget extends TagsWidget {
     super.isClickable,
     super.showShortNames,
     super.dense,
+    super.maxTags,
   });
 
   @override
@@ -87,6 +119,7 @@ class _SliverTagsWidget extends TagsWidget {
     super.showShortNames,
     super.dense,
     super.onTagSelected,
+    super.maxTags,
   });
 
   @override

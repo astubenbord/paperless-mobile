@@ -79,6 +79,7 @@ class DocumentGridItem extends DocumentItem {
                                           .map((e) => labelRepository.tags[e]!)
                                           .toList(),
                                       onTagSelected: onTagSelected,
+                                      maxTags: 3,
                                     ),
                                   const SliverToBoxAdapter(
                                     child: SizedBox(width: 8),

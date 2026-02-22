@@ -11,6 +11,9 @@ import 'package:mockito/annotations.dart';
   MockSpec<PaperlessServerStatsApi>(),
   MockSpec<PaperlessSavedViewsApi>(),
   MockSpec<PaperlessTasksApi>(),
+  MockSpec<CustomFieldsApi>(),
+  MockSpec<PaperlessShareLinksApi>(),
+  MockSpec<PaperlessTrashApi>(),
 ])
 import 'mock_paperless_api.mocks.dart';
 
@@ -23,6 +26,9 @@ class MockPaperlessApiFactory implements PaperlessApiFactory {
   final PaperlessSavedViewsApi savedViewsApi = MockPaperlessSavedViewsApi();
   final PaperlessServerStatsApi serverStatsApi = MockPaperlessServerStatsApi();
   final PaperlessTasksApi tasksApi = MockPaperlessTasksApi();
+  final CustomFieldsApi customFieldsApi = MockCustomFieldsApi();
+  final PaperlessShareLinksApi shareLinksApi = MockPaperlessShareLinksApi();
+  final PaperlessTrashApi trashApi = MockPaperlessTrashApi();
 
   @override
   PaperlessAuthenticationApi createAuthenticationApi(Dio dio) {
@@ -61,5 +67,20 @@ class MockPaperlessApiFactory implements PaperlessApiFactory {
   @override
   PaperlessUserApi createUserApi(Dio dio, {required int apiVersion}) {
     return userApi;
+  }
+
+  @override
+  CustomFieldsApi createCustomFieldsApi(Dio dio) {
+    return customFieldsApi;
+  }
+
+  @override
+  PaperlessShareLinksApi createShareLinksApi(Dio dio) {
+    return shareLinksApi;
+  }
+
+  @override
+  PaperlessTrashApi createTrashApi(Dio dio) {
+    return trashApi;
   }
 }

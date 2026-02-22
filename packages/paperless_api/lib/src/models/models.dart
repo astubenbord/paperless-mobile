@@ -25,6 +25,7 @@ export 'query_parameters/query_type.dart';
 export 'query_parameters/sort_field.dart';
 export 'query_parameters/sort_order.dart';
 export 'query_parameters/tags_query/tags_query.dart';
+export 'query_parameters/custom_field_query.dart';
 export 'query_parameters/text_query.dart';
 export 'saved_view_model.dart';
 export 'task/task.dart';

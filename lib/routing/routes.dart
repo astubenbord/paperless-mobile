@@ -27,4 +27,5 @@ class R {
   static const restoringSession = "restoringSession";
   static const addAccount = 'addAccount';
   static const addNote = 'addNote';
+  static const trash = 'trash';
 }
