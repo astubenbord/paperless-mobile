@@ -109,31 +109,52 @@ class _EventListenerShellState extends State<EventListenerShell>
       context
           .read<LocalNotificationService>()
           .notifyTaskChanged(task, userId: userId);
+      if (mounted && task.status == TaskStatus.success) {
+        showSnackBar(
+          context,
+          S.of(context)!.documentSuccessfullyUploadedProcessing,
+        );
+        context.read<InboxCubit>().reloadInbox();
+      }
     }
   }
 
   Future<void> _onReceiveSharedFiles(List<SharedMediaFile> sharedFiles) async {
-    final files = sharedFiles.map((file) => File(file.path)).toList();
+    final validFiles = <File>[];
+    for (final shared in sharedFiles) {
+      final file = File(shared.path);
+      if (await file.exists()) {
+        validFiles.add(file);
+      } else {
+        debugPrint('Shared file does not exist: ${shared.path}');
+      }
+    }
 
-    if (files.isNotEmpty) {
+    if (validFiles.isNotEmpty) {
       try {
         final userId = context.read<LocalUserAccount>().id;
         final notifier = context.read<ConsumptionChangeNotifier>();
         final addedLocalFiles = await notifier.addFiles(
-          files: files,
+          files: validFiles,
           userId: userId,
         );
         if (!mounted) return;
-        consumeLocalFiles(
+        await consumeLocalFiles(
           context,
           files: addedLocalFiles,
           userId: userId,
           exitAppAfterConsumed: true,
         );
+      } on PaperlessApiException catch (error, stackTrace) {
+        debugPrint('API error receiving shared files: $error');
+        if (mounted) showErrorMessage(context, error, stackTrace);
       } catch (e) {
         debugPrint('Failed to receive shared files: $e');
         if (mounted) {
-          showSnackBar(context, 'Failed to process shared files.');
+          showSnackBar(
+            context,
+            S.of(context)!.couldNotUploadDocument,
+          );
         }
       }
     }

@@ -24,6 +24,7 @@ import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
 import 'package:paperless_mobile/core/widgets/connectivity_aware_action_wrapper.dart';
 import 'package:paperless_mobile/core/util/message_helpers.dart';
 import 'package:paperless_mobile/core/util/permission_helpers.dart';
+import 'package:paperless_mobile/features/tasks/model/pending_tasks_notifier.dart';
 import 'package:paperless_mobile/routing/routes/scanner_route.dart';
 import 'package:path/path.dart' as p;
 import 'package:pdf/pdf.dart';
@@ -260,7 +261,11 @@ class _ScannerPageState extends State<ScannerPage>
     ).push<DocumentUploadResult>(context);
     if (uploadResult?.success ?? false) {
       if (!context.mounted) return;
-      // For paperless version older than 1.11.3, task id will always be null!
+      if (uploadResult!.taskId != null) {
+        context
+            .read<PendingTasksNotifier>()
+            .listenToTaskChanges(uploadResult.taskId!);
+      }
       context.read<DocumentScannerCubit>().reset();
     }
   }

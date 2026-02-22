@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:paperless_api/paperless_api.dart';
+import 'package:paperless_mobile/core/bloc/connectivity_cubit.dart';
 import 'package:paperless_mobile/core/global/constants.dart';
 import 'package:paperless_mobile/core/database/tables/local_user_account.dart';
 import 'package:paperless_mobile/core/extensions/flutter_extensions.dart';
+import 'package:paperless_mobile/core/service/connectivity_status_service.dart';
+import 'package:paperless_mobile/core/widgets/shimmer_placeholder.dart';
 import 'package:paperless_mobile/features/app_drawer/view/app_drawer.dart';
 import 'package:paperless_mobile/features/document_search/view/sliver_search_bar.dart';
 import 'package:paperless_mobile/features/inbox/cubit/inbox_cubit.dart';
@@ -13,6 +16,7 @@ import 'package:paperless_mobile/features/landing/view/widgets/mime_types_pie_ch
 import 'package:paperless_mobile/features/saved_view/cubit/saved_view_cubit.dart';
 import 'package:paperless_mobile/features/saved_view/view/saved_view_preview.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
+import 'package:paperless_mobile/core/util/message_helpers.dart';
 import 'package:paperless_mobile/routing/routes/documents_route.dart';
 import 'package:paperless_mobile/routing/routes/inbox_route.dart';
 import 'package:paperless_mobile/routing/routes/saved_views_route.dart';
@@ -57,6 +61,19 @@ class _LandingPageState extends State<LandingPage> {
     });
   }
 
+  Future<void> _onRefresh() async {
+    final currentUser = context.read<LocalUserAccount>().paperlessUser;
+    final futures = <Future>[];
+    if (currentUser.canViewInbox) {
+      futures.add(context.read<InboxCubit>().reloadInbox());
+    }
+    if (currentUser.canViewSavedViews) {
+      futures.add(context.read<SavedViewCubit>().reload());
+    }
+    await Future.wait(futures);
+    if (mounted) setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     final currentUser = context.watch<LocalUserAccount>().paperlessUser;
@@ -72,8 +89,38 @@ class _LandingPageState extends State<LandingPage> {
               ),
             ),
           ],
-          body: CustomScrollView(
+          body: RefreshIndicator(
+            onRefresh: _onRefresh,
+            child: CustomScrollView(
             slivers: [
+              // Offline banner
+              BlocBuilder<ConnectivityCubit, ConnectivityState>(
+                builder: (context, connectivity) {
+                  if (connectivity == ConnectivityState.notConnected) {
+                    return SliverToBoxAdapter(
+                      child: MaterialBanner(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        leading: Icon(
+                          Icons.cloud_off,
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                        content: Text(
+                          S.of(context)!.youAreCurrentlyOffline,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                        backgroundColor: Theme.of(context).colorScheme.errorContainer,
+                        actions: [
+                          TextButton(
+                            onPressed: () => context.read<ConnectivityCubit>().reload(),
+                            child: Text(S.of(context)!.tryAgain),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                  return const SliverToBoxAdapter(child: SizedBox.shrink());
+                },
+              ),
               SliverToBoxAdapter(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -154,9 +201,15 @@ class _LandingPageState extends State<LandingPage> {
                           itemCount: dashboardViews.length,
                         );
                       },
-                      orElse: () => const SliverToBoxAdapter(
-                        child: Center(
-                          child: CircularProgressIndicator(),
+                      orElse: () => SliverToBoxAdapter(
+                        child: ShimmerPlaceholder(
+                          child: Column(
+                            children: List.generate(2, (_) => Card(
+                              elevation: 0,
+                              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                              child: Container(height: 60),
+                            )),
+                          ),
                         ),
                       ),
                     );
@@ -164,6 +217,7 @@ class _LandingPageState extends State<LandingPage> {
                 ),
               ],
             ],
+          ),
           ),
         ),
       ),
@@ -245,7 +299,27 @@ class _LandingPageState extends State<LandingPage> {
       builder: (context, state) {
         final documents = state.documents;
         if (!state.hasLoaded) {
-          return const SizedBox.shrink();
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.inbox,
+                        color: Theme.of(context).colorScheme.primary),
+                    const SizedBox(width: 8),
+                    Text(
+                      S.of(context)!.inbox,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                ...List.generate(3, (_) => _buildShimmerTile(context)),
+              ],
+            ),
+          );
         }
         return Padding(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -293,34 +367,127 @@ class _LandingPageState extends State<LandingPage> {
 
   Widget _buildInboxDocumentTile(BuildContext context, DocumentModel doc) {
     final dateStr = DateFormat.yMMMd().format(doc.created);
-    return Card(
-      elevation: 0,
-      color: Theme.of(context).colorScheme.surfaceContainerLow,
-      margin: const EdgeInsets.only(bottom: 4),
-      child: ListTile(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        title: Text(
-          doc.title,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: Theme.of(context)
-              .textTheme
-              .titleSmall
-              ?.copyWith(fontWeight: FontWeight.w500),
+    return Dismissible(
+      key: ValueKey('landing_inbox_${doc.id}'),
+      direction: DismissDirection.endToStart,
+      background: Container(
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.only(right: 16),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Icon(Icons.done_all, color: Theme.of(context).colorScheme.primary),
+            const SizedBox(width: 8),
+            Text(
+              S.of(context)!.markAsSeen,
+              style: TextStyle(color: Theme.of(context).colorScheme.primary),
+            ),
+          ],
         ),
-        subtitle: Text(
-          dateStr,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+      ),
+      confirmDismiss: (_) => _onInboxItemDismissed(doc),
+      child: Card(
+        elevation: 0,
+        color: Theme.of(context).colorScheme.surfaceContainerLow,
+        margin: const EdgeInsets.only(bottom: 4),
+        child: ListTile(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          title: Text(
+            doc.title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context)
+                .textTheme
+                .titleSmall
+                ?.copyWith(fontWeight: FontWeight.w500),
+          ),
+          subtitle: Text(
+            dateStr,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+          ),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () {
+            DocumentDetailsRoute(
+              id: doc.id,
+              isLabelClickable: true,
+            ).push(context);
+          },
         ),
-        trailing: const Icon(Icons.chevron_right),
-        onTap: () {
-          DocumentDetailsRoute(
-            id: doc.id,
-            isLabelClickable: true,
-          ).push(context);
-        },
+      ),
+    );
+  }
+
+  Future<bool> _onInboxItemDismissed(DocumentModel doc) async {
+    if (!context.read<LocalUserAccount>().paperlessUser.canEditDocuments) {
+      showSnackBar(context, S.of(context)!.missingPermissions);
+      return false;
+    }
+    final isConnected =
+        await context.read<ConnectivityStatusService>().isConnectedToInternet();
+    if (!isConnected) {
+      if (mounted) showSnackBar(context, S.of(context)!.youAreCurrentlyOffline);
+      return false;
+    }
+    try {
+      if (mounted) {
+        final removedTags =
+            await context.read<InboxCubit>().removeFromInbox(doc);
+        if (mounted) {
+          showSnackBar(
+            context,
+            S.of(context)!.removeDocumentFromInbox,
+            action: SnackBarActionConfig(
+              label: S.of(context)!.undo,
+              onPressed: () async {
+                await context
+                    .read<InboxCubit>()
+                    .undoRemoveFromInbox(doc, removedTags);
+              },
+            ),
+          );
+        }
+      }
+      return true;
+    } catch (error) {
+      if (mounted) showGenericError(context, error);
+    }
+    return false;
+  }
+
+  Widget _buildShimmerTile(BuildContext context) {
+    return ShimmerPlaceholder(
+      child: Card(
+        elevation: 0,
+        margin: const EdgeInsets.only(bottom: 4),
+        child: ListTile(
+          title: Container(
+            height: 14,
+            width: 180,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+          subtitle: Container(
+            height: 10,
+            width: 100,
+            margin: const EdgeInsets.only(top: 4),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+          trailing: Container(
+            height: 20,
+            width: 20,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -337,16 +504,54 @@ class _LandingPageState extends State<LandingPage> {
         future: context.read<PaperlessServerStatsApi>().getServerStatistics(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            return Center(
-              child: Text(
-                S.of(context)!.anUnknownErrorOccurred,
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ).paddedOnly(top: 8, bottom: 24);
+            return Column(
+              children: [
+                const SizedBox(height: 8),
+                Icon(Icons.error_outline, color: Theme.of(context).colorScheme.error),
+                const SizedBox(height: 8),
+                Text(
+                  S.of(context)!.anUnknownErrorOccurred,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                TextButton.icon(
+                  onPressed: () => setState(() {}),
+                  icon: const Icon(Icons.refresh),
+                  label: Text(S.of(context)!.tryAgain),
+                ),
+                const SizedBox(height: 8),
+              ],
+            );
           }
           if (!snapshot.hasData) {
-            return const Center(
-              child: CircularProgressIndicator(),
+            return ShimmerPlaceholder(
+              child: Column(
+                children: List.generate(3, (_) => Card(
+                  elevation: 0,
+                  margin: const EdgeInsets.only(bottom: 4),
+                  child: ListTile(
+                    leading: Container(
+                      width: 24, height: 24,
+                      decoration: const BoxDecoration(
+                        color: Colors.white, shape: BoxShape.circle,
+                      ),
+                    ),
+                    title: Container(
+                      height: 14, width: 120,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                    trailing: Container(
+                      height: 20, width: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ),
+                )),
+              ),
             ).paddedOnly(top: 8, bottom: 24);
           }
           final stats = snapshot.data!;
