@@ -139,19 +139,26 @@ class _EventListenerShellState extends State<EventListenerShell>
     final files = sharedFiles.map((file) => File(file.path)).toList();
 
     if (files.isNotEmpty) {
-      final userId = context.read<LocalUserAccount>().id;
-      final notifier = context.read<ConsumptionChangeNotifier>();
-      final addedLocalFiles = await notifier.addFiles(
-        files: files,
-        userId: userId,
-      );
-      if (!mounted) return;
-      consumeLocalFiles(
-        context,
-        files: addedLocalFiles,
-        userId: userId,
-        exitAppAfterConsumed: true,
-      );
+      try {
+        final userId = context.read<LocalUserAccount>().id;
+        final notifier = context.read<ConsumptionChangeNotifier>();
+        final addedLocalFiles = await notifier.addFiles(
+          files: files,
+          userId: userId,
+        );
+        if (!mounted) return;
+        consumeLocalFiles(
+          context,
+          files: addedLocalFiles,
+          userId: userId,
+          exitAppAfterConsumed: true,
+        );
+      } catch (e) {
+        debugPrint('Failed to receive shared files: $e');
+        if (mounted) {
+          showSnackBar(context, 'Failed to process shared files.');
+        }
+      }
     }
   }
 
@@ -183,17 +190,17 @@ Future<void> consumeLocalFile(
   final consumptionNotifier = context.read<ConsumptionChangeNotifier>();
   final taskNotifier = context.read<PendingTasksNotifier>();
 
-  final bytes = file.readAsBytes();
+  final bytes = await file.readAsBytes();
   final shouldDirectlyUpload =
       Hive.globalSettingsBox.getValue()!.skipDocumentPreprarationOnUpload;
   if (shouldDirectlyUpload) {
     try {
       final taskId = await context.read<PaperlessDocumentsApi>().create(
-            await bytes,
+            bytes,
             filename: filename,
             title: p.basenameWithoutExtension(file.path),
           );
-      consumptionNotifier.discardFile(file, userId: userId);
+      await consumptionNotifier.discardFile(file, userId: userId);
       if (taskId != null) {
         taskNotifier.listenToTaskChanges(taskId);
       }
@@ -210,7 +217,7 @@ Future<void> consumeLocalFile(
     }
   } else {
     final result = await DocumentUploadRoute(
-          $extra: bytes,
+          $extra: Future.value(bytes),
           filename: p.basenameWithoutExtension(file.path),
           title: p.basenameWithoutExtension(file.path),
           fileExtension: p.extension(file.path),
@@ -235,7 +242,7 @@ Future<void> consumeLocalFile(
       if (!context.mounted) return;
       final shouldDiscard = await showDialog<bool>(
             context: context,
-            builder: (context) => DiscardSharedFileDialog(bytes: bytes),
+            builder: (context) => DiscardSharedFileDialog(bytes: Future.value(bytes)),
           ) ??
           false;
       if (shouldDiscard && context.mounted) {

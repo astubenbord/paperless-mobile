@@ -30,6 +30,7 @@ class SessionManagerImpl extends ValueNotifier<Dio> implements SessionManager {
       ),
     );
     dio.options
+      ..connectTimeout = const Duration(seconds: 15)
       ..receiveTimeout = const Duration(seconds: 30)
       ..sendTimeout = const Duration(seconds: 60)
       ..responseType = ResponseType.json;
