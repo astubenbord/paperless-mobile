@@ -357,7 +357,171 @@
       "count": {}
     }
   },
-  "create": "Aanmaken",
+  "storagePath": "Storage Path",
+  "@storagePath": {},
+  "prepareDocument": "Prepare document",
+  "@prepareDocument": {},
+  "tags": "Tags",
+  "@tags": {},
+  "documentSuccessfullyUpdated": "Document successfully updated.",
+  "@documentSuccessfullyUpdated": {},
+  "fileName": "File Name",
+  "@fileName": {},
+  "synchronizeTitleAndFilename": "Synchronize title and filename",
+  "@synchronizeTitleAndFilename": {},
+  "reload": "Reload",
+  "@reload": {},
+  "documentSuccessfullyUploadedProcessing": "Document successfully uploaded, processing...",
+  "@documentSuccessfullyUploadedProcessing": {},
+  "deleteLabelWarningText": "This label contains references to other documents. By deleting this label, all references will be removed. Continue?",
+  "@deleteLabelWarningText": {},
+  "couldNotAcknowledgeTasks": "Could not acknowledge tasks.",
+  "@couldNotAcknowledgeTasks": {},
+  "authenticationFailedPleaseTryAgain": "Authentication failed, please try again.",
+  "@authenticationFailedPleaseTryAgain": {},
+  "anErrorOccurredWhileTryingToAutocompleteYourQuery": "An error ocurred while trying to autocomplete your query.",
+  "@anErrorOccurredWhileTryingToAutocompleteYourQuery": {},
+  "biometricAuthenticationFailed": "Biometric authentication failed.",
+  "@biometricAuthenticationFailed": {},
+  "biometricAuthenticationNotSupported": "Biometric authentication not supported on this device.",
+  "@biometricAuthenticationNotSupported": {},
+  "couldNotBulkEditDocuments": "Could not bulk edit documents.",
+  "@couldNotBulkEditDocuments": {},
+  "couldNotCreateCorrespondent": "Could not create correspondent, please try again.",
+  "@couldNotCreateCorrespondent": {},
+  "couldNotLoadCorrespondents": "Could not load correspondents.",
+  "@couldNotLoadCorrespondents": {},
+  "couldNotCreateSavedView": "Could not create saved view, please try again.",
+  "@couldNotCreateSavedView": {},
+  "couldNotDeleteSavedView": "Could not delete saved view, please try again",
+  "@couldNotDeleteSavedView": {},
+  "youAreCurrentlyOffline": "You are currently offline. Please make sure you are connected to the internet.",
+  "@youAreCurrentlyOffline": {},
+  "couldNotAssignArchiveSerialNumber": "Could not assign archive serial number.",
+  "@couldNotAssignArchiveSerialNumber": {},
+  "couldNotDeleteDocument": "Could not delete document, please try again.",
+  "@couldNotDeleteDocument": {},
+  "couldNotLoadDocuments": "Could not load documents, please try again.",
+  "@couldNotLoadDocuments": {},
+  "couldNotLoadDocumentPreview": "Could not load document preview.",
+  "@couldNotLoadDocumentPreview": {},
+  "couldNotCreateDocument": "Could not create document, please try again.",
+  "@couldNotCreateDocument": {},
+  "couldNotLoadDocumentTypes": "Could not load document types, please try again.",
+  "@couldNotLoadDocumentTypes": {},
+  "couldNotUpdateDocument": "Could not update document, please try again.",
+  "@couldNotUpdateDocument": {},
+  "couldNotUploadDocument": "Could not upload document, please try again.",
+  "@couldNotUploadDocument": {},
+  "invalidCertificateOrMissingPassphrase": "Invalid certificate or missing passphrase, please try again",
+  "@invalidCertificateOrMissingPassphrase": {},
+  "couldNotLoadSavedViews": "Could not load saved views.",
+  "@couldNotLoadSavedViews": {},
+  "aClientCertificateWasExpectedButNotSent": "A client certificate was expected but not sent. Please provide a valid client certificate.",
+  "@aClientCertificateWasExpectedButNotSent": {},
+  "userIsNotAuthenticated": "User is not authenticated.",
+  "@userIsNotAuthenticated": {},
+  "requestTimedOut": "The request to the server timed out.",
+  "@requestTimedOut": {},
+  "anErrorOccurredRemovingTheScans": "An error occurred removing the scans.",
+  "@anErrorOccurredRemovingTheScans": {},
+  "couldNotReachYourPaperlessServer": "Could not reach your Paperless server, is it up and running?",
+  "@couldNotReachYourPaperlessServer": {},
+  "couldNotLoadSimilarDocuments": "Could not load similar documents.",
+  "@couldNotLoadSimilarDocuments": {},
+  "couldNotCreateStoragePath": "Could not create storage path, please try again.",
+  "@couldNotCreateStoragePath": {},
+  "couldNotLoadStoragePaths": "Could not load storage paths.",
+  "@couldNotLoadStoragePaths": {},
+  "couldNotLoadSuggestions": "Could not load suggestions.",
+  "@couldNotLoadSuggestions": {},
+  "couldNotCreateTag": "Could not create tag, please try again.",
+  "@couldNotCreateTag": {},
+  "couldNotLoadTags": "Could not load tags.",
+  "@couldNotLoadTags": {},
+  "anUnknownErrorOccurred": "An unknown error occurred.",
+  "@anUnknownErrorOccurred": {},
+  "fileFormatNotSupported": "This file format is not supported.",
+  "@fileFormatNotSupported": {},
+  "report": "REPORT",
+  "@report": {},
+  "absolute": "Absolute",
+  "@absolute": {},
+  "hintYouCanAlsoSpecifyRelativeValues": "Hint: Apart from concrete dates, you can also specify a time range relative to the current date.",
+  "@hintYouCanAlsoSpecifyRelativeValues": {
+    "description": "Displayed in the extended date range picker"
+  },
+  "amount": "Amount",
+  "@amount": {},
+  "relative": "Relative",
+  "@relative": {},
+  "last": "Last",
+  "@last": {},
+  "timeUnit": "Time unit",
+  "@timeUnit": {},
+  "selectDateRange": "Select date range",
+  "@selectDateRange": {},
+  "after": "After",
+  "@after": {},
+  "before": "Before",
+  "@before": {},
+  "date": "Datum",
+  "@date": {},
+  "days": "{count, plural, zero{days} one{day} other{days}}",
+  "@days": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "lastNDays": "{count, plural, zero{} one{Yesterday} other{Last {count} days}}",
+  "@lastNDays": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "lastNMonths": "{count, plural, zero{} one{Last month} other{Last {count} months}}",
+  "@lastNMonths": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "lastNWeeks": "{count, plural, zero{} one{Last week} other{Last {count} weeks}}",
+  "@lastNWeeks": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "lastNYears": "{count, plural, zero{} one{Last year} other{Last {count} years}}",
+  "@lastNYears": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "months": "{count, plural, zero{} one{month} other{months}}",
+  "@months": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "weeks": "{count, plural, zero{} one{week} other{weeks}}",
+  "@weeks": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "years": "{count, plural, zero{} one{year} other{years}}",
+  "@years": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "gotIt": "Got it!",
+  "@gotIt": {},
+  "cancel": "Cancel",
+  "@cancel": {},
+  "close": "Close",
+  "@close": {},
+  "create": "Create",
   "@create": {},
   "createdAt": "Aangemaakt op",
   "@createdAt": {},

@@ -438,6 +438,22 @@
       }
     }
   },
+  "amount": "Počet",
+  "@amount": {},
+  "relative": "Relativní",
+  "@relative": {},
+  "last": "Poslední",
+  "@last": {},
+  "timeUnit": "Časové jednotky",
+  "@timeUnit": {},
+  "selectDateRange": "Vybrat časové rozmezí",
+  "@selectDateRange": {},
+  "after": "Po",
+  "@after": {},
+  "before": "Před",
+  "@before": {},
+  "date": "Datum",
+  "@date": {},
   "days": "{count, plural, zero{dnů} one{den} few{dny} many{dnů} other{dnů}}",
   "@days": {
     "placeholders": {

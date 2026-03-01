@@ -20,9 +20,11 @@ class _ExtendedDateRangeDialogState extends State<ExtendedDateRangeDialog> {
   static const String _fkAbsoluteBefore = 'absoluteBefore';
   static const String _fkAbsoluteAfter = 'absoluteAfter';
   static const String _fkRelative = 'relative';
+  static const String _fkExact = 'exact';
 
   DateTime? _before;
   DateTime? _after;
+  DateTime? _exactDate;
 
   final _formKey = GlobalKey<FormBuilderState>();
   late DateRangeType _selectedDateRangeType;
@@ -34,10 +36,14 @@ class _ExtendedDateRangeDialogState extends State<ExtendedDateRangeDialog> {
     if (initialQuery is AbsoluteDateRangeQuery) {
       _before = initialQuery.before;
       _after = initialQuery.after;
+    } else if (initialQuery is ExactDateQuery) {
+      _exactDate = initialQuery.date;
     }
-    _selectedDateRangeType = (initialQuery is RelativeDateRangeQuery)
-        ? DateRangeType.relative
-        : DateRangeType.absolute;
+    _selectedDateRangeType = switch (initialQuery) {
+      RelativeDateRangeQuery() => DateRangeType.relative,
+      ExactDateQuery() => DateRangeType.exact,
+      _ => DateRangeType.absolute,
+    };
   }
 
   @override
@@ -72,6 +78,8 @@ class _ExtendedDateRangeDialogState extends State<ExtendedDateRangeDialog> {
                               DateRangeUnit.month,
                             ),
                     );
+                  case DateRangeType.exact:
+                    return _buildExactDateForm();
                 }
               },
             ),
@@ -113,6 +121,11 @@ class _ExtendedDateRangeDialogState extends State<ExtendedDateRangeDialog> {
           value: DateRangeType.relative,
           enabled: true,
           label: Text(S.of(context)!.relative),
+        ),
+        ButtonSegment(
+          value: DateRangeType.exact,
+          enabled: true,
+          label: Text(S.of(context)!.exact),
         ),
       ],
       selected: {_selectedDateRangeType},
@@ -182,12 +195,42 @@ class _ExtendedDateRangeDialogState extends State<ExtendedDateRangeDialog> {
     );
   }
 
+  Widget _buildExactDateForm() {
+    return FormBuilderDateTimePicker(
+      name: _fkExact,
+      initialValue: widget.initialValue is ExactDateQuery
+          ? (widget.initialValue as ExactDateQuery).date
+          : null,
+      inputType: InputType.date,
+      decoration: InputDecoration(
+        labelText: S.of(context)!.date,
+        prefixIcon: const Icon(Icons.calendar_today_outlined),
+        suffixIcon: _exactDate != null
+            ? IconButton(
+                icon: const Icon(Icons.clear),
+                onPressed: () {
+                  _formKey.currentState?.fields[_fkExact]?.didChange(null);
+                  setState(() => _exactDate = null);
+                },
+              )
+            : null,
+      ),
+      format: DateFormat.yMd(Localizations.localeOf(context).toString()),
+      lastDate: DateTime.now(),
+      onChanged: (d) => setState(() => _exactDate = d),
+    );
+  }
+
   DateRangeQuery? _buildQuery(Map<String, dynamic> values) {
     if (_selectedDateRangeType == DateRangeType.absolute) {
       return AbsoluteDateRangeQuery(
         after: values[_fkAbsoluteAfter],
         before: values[_fkAbsoluteBefore],
       );
+    } else if (_selectedDateRangeType == DateRangeType.exact) {
+      final date = values[_fkExact] as DateTime?;
+      if (date == null) return const UnsetDateRangeQuery();
+      return ExactDateQuery(date: date);
     } else {
       return values[_fkRelative] as RelativeDateRangeQuery;
     }
@@ -200,4 +243,4 @@ class _ExtendedDateRangeDialogState extends State<ExtendedDateRangeDialog> {
   }
 }
 
-enum DateRangeType { absolute, relative }
+enum DateRangeType { absolute, relative, exact }

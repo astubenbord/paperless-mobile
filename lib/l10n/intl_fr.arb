@@ -438,6 +438,22 @@
       }
     }
   },
+  "amount": "Quantité",
+  "@amount": {},
+  "relative": "Relatif",
+  "@relative": {},
+  "last": "Dernier",
+  "@last": {},
+  "timeUnit": "Unité de temps",
+  "@timeUnit": {},
+  "selectDateRange": "Choisissez un intervalle de temps",
+  "@selectDateRange": {},
+  "after": "Après",
+  "@after": {},
+  "before": "Avant",
+  "@before": {},
+  "date": "Date",
+  "@date": {},
   "days": "{count, plural, zero{jours} one{jour} other{jours}}",
   "@days": {
     "placeholders": {
