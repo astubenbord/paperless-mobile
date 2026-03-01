@@ -384,6 +384,22 @@
       }
     }
   },
+  "amount": "Miktar",
+  "@amount": {},
+  "relative": "Bağıl",
+  "@relative": {},
+  "last": "Son",
+  "@last": {},
+  "timeUnit": "Zaman birimi",
+  "@timeUnit": {},
+  "selectDateRange": "Tarih aralığı seçin",
+  "@selectDateRange": {},
+  "after": "Sonra",
+  "@after": {},
+  "before": "Önce",
+  "@before": {},
+  "date": "Tarih",
+  "@date": {},
   "days": "{count, plural, zero{} one{gün} other{günler}}",
   "@days": {
     "placeholders": {

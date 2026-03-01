@@ -384,6 +384,22 @@
       }
     }
   },
+  "amount": "Anzahl",
+  "@amount": {},
+  "relative": "Relativ",
+  "@relative": {},
+  "last": "Letzte",
+  "@last": {},
+  "timeUnit": "Zeiteinheit",
+  "@timeUnit": {},
+  "selectDateRange": "Wähle Zeitraum",
+  "@selectDateRange": {},
+  "after": "Nach",
+  "@after": {},
+  "before": "Vor",
+  "@before": {},
+  "date": "Datum",
+  "@date": {},
   "days": "{count, plural, zero{} one{Tag} other{Tage}}",
   "@days": {
     "placeholders": {

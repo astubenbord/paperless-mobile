@@ -328,6 +328,8 @@
   "@couldNotUpdateCorrespondent": {
     "description": "Message shown when a correspondent could not be updated"
   },
+  "date": "Data",
+  "@date": {},
   "couldNotUpdateCustomField": "Could not delete custom field, please try again.",
   "couldNotUpdateDocument": "No es pot actualitzar el document, prova de nou.",
   "@couldNotUpdateDocument": {},
