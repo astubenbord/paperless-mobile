@@ -348,6 +348,8 @@
   "@after": {},
   "before": "Ранее",
   "@before": {},
+  "date": "дата",
+  "@date": {},
   "days": "{count, plural, one{день} few {дней} many {дней} other{дней}}",
   "@days": {
     "placeholders": {

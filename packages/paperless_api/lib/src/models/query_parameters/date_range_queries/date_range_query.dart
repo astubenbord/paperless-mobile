@@ -142,6 +142,73 @@ class AbsoluteDateRangeQuery extends DateRangeQuery {
   }
 }
 
+@HiveType(typeId: PaperlessApiHiveTypeIds.exactDateQuery)
+class ExactDateQuery extends DateRangeQuery {
+  @LocalDateTimeJsonConverter()
+  @HiveField(0)
+  final DateTime date;
+
+  const ExactDateQuery({required this.date});
+
+  @override
+  List<Object?> get props => [date];
+
+  @override
+  Map<String, String> toQueryParameter(DateRangeQueryField field) {
+    return {
+      '${field.name}__date__gt':
+          apiDateFormat.format(date.subtract(const Duration(days: 1))),
+      '${field.name}__date__lt':
+          apiDateFormat.format(date.add(const Duration(days: 1))),
+    };
+  }
+
+  ExactDateQuery copyWith({DateTime? date}) {
+    return ExactDateQuery(date: date ?? this.date);
+  }
+
+  @override
+  bool matches(DateTime dt) {
+    return dt.year == date.year &&
+        dt.month == date.month &&
+        dt.day == date.day;
+  }
+}
+
+class ExactDateQueryAdapter extends TypeAdapter<ExactDateQuery> {
+  @override
+  final int typeId = PaperlessApiHiveTypeIds.exactDateQuery;
+
+  @override
+  ExactDateQuery read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return ExactDateQuery(
+      date: fields[0] as DateTime,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, ExactDateQuery obj) {
+    writer
+      ..writeByte(1)
+      ..writeByte(0)
+      ..write(obj.date);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ExactDateQueryAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
 class UnsetDateRangeQueryAdapter extends TypeAdapter<UnsetDateRangeQuery> {
   @override
   final int typeId = 113;

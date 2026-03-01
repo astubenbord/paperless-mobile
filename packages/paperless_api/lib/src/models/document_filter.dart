@@ -212,16 +212,19 @@ class DocumentFilter extends Equatable {
         switch (added) {
           RelativeDateRangeQuery() => 1,
           AbsoluteDateRangeQuery() => 1,
+          ExactDateQuery() => 1,
           UnsetDateRangeQuery() => 0,
         },
         switch (created) {
           RelativeDateRangeQuery() => 1,
           AbsoluteDateRangeQuery() => 1,
+          ExactDateQuery() => 1,
           UnsetDateRangeQuery() => 0,
         },
         switch (modified) {
           RelativeDateRangeQuery() => 1,
           AbsoluteDateRangeQuery() => 1,
+          ExactDateQuery() => 1,
           UnsetDateRangeQuery() => 0,
         },
         switch (asnQuery) {

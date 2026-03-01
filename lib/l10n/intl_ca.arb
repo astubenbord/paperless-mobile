@@ -348,6 +348,8 @@
   "@after": {},
   "before": "Abans",
   "@before": {},
+  "date": "Data",
+  "@date": {},
   "days": "{count, plural, one{dia} other{dies}}",
   "@days": {
     "placeholders": {

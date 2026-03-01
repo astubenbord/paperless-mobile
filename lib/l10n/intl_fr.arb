@@ -348,6 +348,8 @@
   "@after": {},
   "before": "Avant",
   "@before": {},
+  "date": "Date",
+  "@date": {},
   "days": "{count, plural, zero{jours} one{jour} other{jours}}",
   "@days": {
     "placeholders": {

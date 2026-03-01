@@ -348,6 +348,8 @@
   "@after": {},
   "before": "Prima",
   "@before": {},
+  "date": "Data",
+  "@date": {},
   "days": "{count, plural, zero{giorni} one{giorno} other{giorni}}",
   "@days": {
     "placeholders": {

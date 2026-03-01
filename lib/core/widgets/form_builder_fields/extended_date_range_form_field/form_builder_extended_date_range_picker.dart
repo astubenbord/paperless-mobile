@@ -104,6 +104,8 @@ class _FormBuilderExtendedDateRangePickerState
       if (query.after != null) {
         return '${S.of(context)!.after} ${df.format(query.after!)}';
       }
+    } else if (query is ExactDateQuery) {
+      return df.format(query.date);
     } else if (query is RelativeDateRangeQuery) {
       switch (query.unit) {
         case DateRangeUnit.day:

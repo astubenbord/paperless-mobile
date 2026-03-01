@@ -348,6 +348,8 @@
   "@after": {},
   "before": "Önce",
   "@before": {},
+  "date": "Tarih",
+  "@date": {},
   "days": "{count, plural, zero{} one{gün} other{günler}}",
   "@days": {
     "placeholders": {

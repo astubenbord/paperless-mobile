@@ -32,6 +32,7 @@ class PaperlessApiHiveTypeIds {
   static const int userModelv2 = 126;
   static const int usersAndGroupsPermissions = 127;
   static const int documentFilter = 128;
+  static const int exactDateQuery = 129;
 }
 
 void registerPaperlessApiHiveTypeAdapters() {
@@ -47,6 +48,7 @@ void registerPaperlessApiHiveTypeAdapters() {
   Hive.registerAdapter(RelativeDateRangeQueryAdapter());
   Hive.registerAdapter(DateRangeUnitAdapter());
   Hive.registerAdapter(UnsetDateRangeQueryAdapter());
+  Hive.registerAdapter(ExactDateQueryAdapter());
   Hive.registerAdapter(TextQueryAdapter());
   Hive.registerAdapter(QueryTypeAdapter());
   // IdQueryParameter
