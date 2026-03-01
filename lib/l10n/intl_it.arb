@@ -382,6 +382,22 @@
       }
     }
   },
+  "amount": "Quantità",
+  "@amount": {},
+  "relative": "Relativo",
+  "@relative": {},
+  "last": "Ultimo",
+  "@last": {},
+  "timeUnit": "Unità di tempo",
+  "@timeUnit": {},
+  "selectDateRange": "Seleziona intervallo date",
+  "@selectDateRange": {},
+  "after": "Dopo",
+  "@after": {},
+  "before": "Prima",
+  "@before": {},
+  "date": "Data",
+  "@date": {},
   "days": "{count, plural, zero{giorni} one{giorno} other{giorni}}",
   "@days": {
     "placeholders": {

@@ -349,7 +349,7 @@
   "@countSelected": {
     "description": "Displayed in the appbar when at least one document is selected.",
     "placeholders": {
-      "count": {}
+      "name": {}
     }
   },
   "create": "Crea",

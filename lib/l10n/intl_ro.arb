@@ -360,29 +360,23 @@
   "@createFromCurrentFilter": {
     "description": "Tooltip of the \"New saved view\" button"
   },
-  "createsASavedViewBasedOnTheCurrentFilterCriteria": "Creates a new view based on the current filter criteria.",
-  "@createsASavedViewBasedOnTheCurrentFilterCriteria": {},
-  "createViewsToQuicklyFilterYourDocuments": "Create views to quickly filter your documents.",
-  "@createViewsToQuicklyFilterYourDocuments": {},
-  "dark": "Întunecat",
-  "@dark": {},
-  "darkTheme": "Temă întunecată",
-  "@darkTheme": {},
-  "dateOutOfRange": "Date must be between {firstDate} and {lastDate}.",
-  "@dateOutOfRange": {
-    "description": "Error message shown when the user tries to select a date outside of the allowed range.",
-    "placeholders": {
-      "firstDate": {
-        "type": "DateTime",
-        "format": "yMd"
-      },
-      "lastDate": {
-        "type": "DateTime",
-        "format": "yMd"
-      }
-    }
-  },
-  "days": "{count, plural, zero{zile} one{zi} other{zile}}",
+  "amount": "Amount",
+  "@amount": {},
+  "relative": "Relative",
+  "@relative": {},
+  "last": "Last",
+  "@last": {},
+  "timeUnit": "Time unit",
+  "@timeUnit": {},
+  "selectDateRange": "Select date range",
+  "@selectDateRange": {},
+  "after": "After",
+  "@after": {},
+  "before": "Before",
+  "@before": {},
+  "date": "Data",
+  "@date": {},
+  "days": "{count, plural, zero{days} one{day} other{days}}",
   "@days": {
     "placeholders": {
       "count": {}
