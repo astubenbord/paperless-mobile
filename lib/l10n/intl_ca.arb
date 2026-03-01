@@ -323,112 +323,58 @@
   "@couldNotLoadUISettings": {
     "description": "Message shown when the UI settings could not be loaded"
   },
-  "couldNotLoadUser": "No es pot carregar usuari, prova de nou.",
-  "couldNotLoadUsers": "No es poden carregar usuaris, prova de nou.",
-  "couldNotOpenFilePermissionDenied": "No es pot obrir arxiu: Accés denegat.",
-  "@couldNotOpenFilePermissionDenied": {},
-  "couldNotReachYourPaperlessServer": "No es pot connectar al saervidor, està funcionant?",
-  "@couldNotReachYourPaperlessServer": {},
-  "couldNotUpdateCorrespondent": "No es pot actualitzar corresponsal, prova de nou.",
-  "@couldNotUpdateCorrespondent": {
-    "description": "Message shown when a correspondent could not be updated"
+  "amount": "Quantitat",
+  "@amount": {},
+  "relative": "Relatiu",
+  "@relative": {},
+  "last": "Últim",
+  "@last": {},
+  "timeUnit": "Unitat de temps",
+  "@timeUnit": {},
+  "selectDateRange": "Rang de dates",
+  "@selectDateRange": {},
+  "after": "Després",
+  "@after": {},
+  "before": "Abans",
+  "@before": {},
+  "date": "Data",
+  "@date": {},
+  "days": "{count, plural, one{dia} other{dies}}",
+  "@days": {
+    "placeholders": {
+      "count": {}
+    }
   },
-  "couldNotUpdateCustomField": "No es pot eliminar camp personalitzat, torna a provar.",
-  "couldNotUpdateDocument": "No es pot actualitzar el document, prova de nou.",
-  "@couldNotUpdateDocument": {},
-  "couldNotUpdateDocumentType": "No es pot actualitzar tipus de document, prova de nou.",
-  "@couldNotUpdateDocumentType": {
-    "description": "Message shown when a document type could not be updated"
+  "lastNDays": "{count, plural, one{Ahir} other{Últims {count} dies}}",
+  "@lastNDays": {
+    "placeholders": {
+      "count": {}
+    }
   },
   "couldNotUpdateSavedView": "No es poden acualitzar les vistes desades, prova de nou.",
   "@couldNotUpdateSavedView": {
     "description": "Message shown when a saved view could not be updated"
   },
-  "couldNotUpdateStoragePath": "No es pot actualitzar la ruta emmagatzematge, prova de nou.",
-  "couldNotUpdateTag": "No es pot actualitzar etiqueta, prova de nou.",
-  "@couldNotUpdateTag": {
-    "description": "Message shown when a tag could not be updated"
-  },
-  "couldNotUpdateUser": "No es pot actualitzar usuari, torna a provar.",
-  "couldNotUploadDocument": "No es pot carregar document, prova de nou.",
-  "@couldNotUploadDocument": {},
-  "countSelected": "{count} seleccionats",
-  "@countSelected": {
-    "description": "Displayed in the appbar when at least one document is selected.",
+  "lastNWeeks": "{count, plural, one{Última setmana} other{Últimes {count} setmanes}}",
+  "@lastNWeeks": {
     "placeholders": {
-      "name": {}
+      "count": {}
     }
   },
-  "create": "Crea",
-  "@create": {},
-  "createdAt": "Creat el",
-  "@createdAt": {},
-  "createFromCurrentFilter": "Crear desde filtre actual",
-  "@createFromCurrentFilter": {
-    "description": "Tooltip of the \"New saved view\" button"
-  },
-  "createInboxTag": "Create inbox tag",
-  "createsASavedViewBasedOnTheCurrentFilterCriteria": "Crea una nova vista basada en els filtres actuals.",
-  "@createsASavedViewBasedOnTheCurrentFilterCriteria": {},
-  "createViewsToQuicklyFilterYourDocuments": "Crea vistes per filtrar documents de manera ràpida.",
-  "@createViewsToQuicklyFilterYourDocuments": {},
-  "customFieldCreatedSuccessfully": "Custom field created successfully.",
-  "@customFieldCreatedSuccessfully": {},
-  "customFieldDataType": "Data Type",
-  "@customFieldDataType": {},
-  "customFieldDeletedSuccessfully": "Custom field deleted successfully.",
-  "@customFieldDeletedSuccessfully": {},
-  "customFieldMonetaryDefaultCurrencyHelperText": "Enter the default currency (e.g., USD, EUR, GBP)",
-  "@customFieldMonetaryDefaultCurrencyHelperText": {
-    "description": "Helper text for the default currency field in a custom monetary field"
-  },
-  "customFieldMonetaryDefaultCurrencyHintText": "Refer to the default ISO currency code of your region (USD, EUR, GBP, ...)",
-  "@customFieldMonetaryDefaultCurrencyHintText": {
-    "description": "Hint text for the default currency field in a custom monetary field"
-  },
-  "customFieldMonetaryDefaultCurrencyLabel": "Default Currency",
-  "@customFieldMonetaryDefaultCurrencyLabel": {
-    "description": "Label for the default currency field in a custom monetary field"
-  },
-  "customFieldName": "Field Name",
-  "@customFieldName": {},
-  "customFields": "Custom Fields",
-  "@customFields": {},
-  "customFieldSelectAddOption": "Add option",
-  "@customFieldSelectAddOption": {
-    "description": "Label for the button to add a new option to a custom field with select data type"
-  },
-  "customFieldSelectOptionHintText": "Option {index}",
-  "@customFieldSelectOptionHintText": {
-    "description": "Hint text for the text field to add or edit an option of a custom field with select data type",
+  "lastNYears": "{count, plural, one{Últim any} other{Últims {count} anys}}",
+  "@lastNYears": {
     "placeholders": {
-      "index": {
-        "type": "int"
-      }
+      "count": {}
     }
   },
-  "customFieldSelectOptions": "Options",
-  "@customFieldSelectOptions": {
-    "description": "Label shown above the options of a custom field with select data type"
+  "months": "{count, plural, one{mes} other{mesos}}",
+  "@months": {
+    "placeholders": {
+      "count": {}
+    }
   },
-  "customFieldTypeBoolean": "Boolean",
-  "customFieldTypeDate": "Date",
-  "customFieldTypeDocumentLink": "Document Link",
-  "customFieldTypeFloat": "Float",
-  "customFieldTypeInteger": "Integer",
-  "customFieldTypeMonetary": "Currency",
-  "customFieldTypeSelect": "Select",
-  "customFieldTypeText": "Text",
-  "customFieldTypeUrl": "URL",
-  "customFieldUpdatedSuccessfully": "Custom field updated successfully.",
-  "@customFieldUpdatedSuccessfully": {},
-  "dark": "Fosc",
-  "@dark": {},
-  "darkTheme": "Tema fosc",
-  "@darkTheme": {},
-  "dateOutOfRange": "Data ha d'estar entre {firstDate} i {lastDate}.",
-  "@dateOutOfRange": {
-    "description": "Error message shown when the user tries to select a date outside of the allowed range.",
+  "weeks": "{count, plural, one{setmana} other{weeks}}",
+  "@weeks": {
     "placeholders": {
       "firstDate": {
         "type": "DateTime",

@@ -323,22 +323,33 @@
   "@couldNotLoadUISettings": {
     "description": "Message shown when the UI settings could not be loaded"
   },
-  "couldNotLoadUser": "Could not load user, please try again.",
-  "couldNotLoadUsers": "Could not load users, please try again.",
-  "couldNotOpenFilePermissionDenied": "Could not open file: Permission denied.",
-  "@couldNotOpenFilePermissionDenied": {},
-  "couldNotReachYourPaperlessServer": "Paperless sunucunuza erişilemedi, çalışır durumda mı?",
-  "@couldNotReachYourPaperlessServer": {},
-  "couldNotUpdateCorrespondent": "Could not update correspondent, please try again.",
-  "@couldNotUpdateCorrespondent": {
-    "description": "Message shown when a correspondent could not be updated"
+  "amount": "Miktar",
+  "@amount": {},
+  "relative": "Bağıl",
+  "@relative": {},
+  "last": "Son",
+  "@last": {},
+  "timeUnit": "Zaman birimi",
+  "@timeUnit": {},
+  "selectDateRange": "Tarih aralığı seçin",
+  "@selectDateRange": {},
+  "after": "Sonra",
+  "@after": {},
+  "before": "Önce",
+  "@before": {},
+  "date": "Tarih",
+  "@date": {},
+  "days": "{count, plural, zero{} one{gün} other{günler}}",
+  "@days": {
+    "placeholders": {
+      "count": {}
+    }
   },
-  "couldNotUpdateCustomField": "Could not delete custom field, please try again.",
-  "couldNotUpdateDocument": "Doküman güncellenemedi, lütfen tekrar deneyin.",
-  "@couldNotUpdateDocument": {},
-  "couldNotUpdateDocumentType": "Could not update document type, please try again.",
-  "@couldNotUpdateDocumentType": {
-    "description": "Message shown when a document type could not be updated"
+  "lastNDays": "{count, plural, zero{} one{Dün} other{Geçmiş {count} gün}}",
+  "@lastNDays": {
+    "placeholders": {
+      "count": {}
+    }
   },
   "couldNotUpdateSavedView": "Could not update saved view, please try again.",
   "@couldNotUpdateSavedView": {
@@ -349,86 +360,20 @@
   "@couldNotUpdateTag": {
     "description": "Message shown when a tag could not be updated"
   },
-  "couldNotUpdateUser": "Could not update user, please try again.",
-  "couldNotUploadDocument": "Doküman yüklenemedi, lütfen tekrar deneyin.",
-  "@couldNotUploadDocument": {},
-  "countSelected": "{count} seçilmiş",
-  "@countSelected": {
-    "description": "Displayed in the appbar when at least one document is selected.",
+  "lastNYears": "{count, plural, zero{} one{Geçen yıl} other{Geçmiş {count} yıl}}",
+  "@lastNYears": {
     "placeholders": {
       "count": {}
     }
   },
-  "create": "Yarat",
-  "@create": {},
-  "createdAt": "Created at",
-  "@createdAt": {},
-  "createFromCurrentFilter": "Create from current filter",
-  "@createFromCurrentFilter": {
-    "description": "Tooltip of the \"New saved view\" button"
-  },
-  "createInboxTag": "Create inbox tag",
-  "createsASavedViewBasedOnTheCurrentFilterCriteria": "Geçerli filtre ölçütlerine göre yeni bir görünüm oluşturur.",
-  "@createsASavedViewBasedOnTheCurrentFilterCriteria": {},
-  "createViewsToQuicklyFilterYourDocuments": "Belgelerinizi hızla filtrelemek için görünümler oluşturun.",
-  "@createViewsToQuicklyFilterYourDocuments": {},
-  "customFieldCreatedSuccessfully": "Custom field created successfully.",
-  "@customFieldCreatedSuccessfully": {},
-  "customFieldDataType": "Data Type",
-  "@customFieldDataType": {},
-  "customFieldDeletedSuccessfully": "Custom field deleted successfully.",
-  "@customFieldDeletedSuccessfully": {},
-  "customFieldMonetaryDefaultCurrencyHelperText": "Enter the default currency (e.g., USD, EUR, GBP)",
-  "@customFieldMonetaryDefaultCurrencyHelperText": {
-    "description": "Helper text for the default currency field in a custom monetary field"
-  },
-  "customFieldMonetaryDefaultCurrencyHintText": "Refer to the default ISO currency code of your region (USD, EUR, GBP, ...)",
-  "@customFieldMonetaryDefaultCurrencyHintText": {
-    "description": "Hint text for the default currency field in a custom monetary field"
-  },
-  "customFieldMonetaryDefaultCurrencyLabel": "Default Currency",
-  "@customFieldMonetaryDefaultCurrencyLabel": {
-    "description": "Label for the default currency field in a custom monetary field"
-  },
-  "customFieldName": "Field Name",
-  "@customFieldName": {},
-  "customFields": "Custom Fields",
-  "@customFields": {},
-  "customFieldSelectAddOption": "Add option",
-  "@customFieldSelectAddOption": {
-    "description": "Label for the button to add a new option to a custom field with select data type"
-  },
-  "customFieldSelectOptionHintText": "Option {index}",
-  "@customFieldSelectOptionHintText": {
-    "description": "Hint text for the text field to add or edit an option of a custom field with select data type",
+  "months": "{count, plural, zero{} one{ay} other{aylar}}",
+  "@months": {
     "placeholders": {
-      "index": {
-        "type": "int"
-      }
+      "count": {}
     }
   },
-  "customFieldSelectOptions": "Options",
-  "@customFieldSelectOptions": {
-    "description": "Label shown above the options of a custom field with select data type"
-  },
-  "customFieldTypeBoolean": "Boolean",
-  "customFieldTypeDate": "Date",
-  "customFieldTypeDocumentLink": "Document Link",
-  "customFieldTypeFloat": "Float",
-  "customFieldTypeInteger": "Integer",
-  "customFieldTypeMonetary": "Currency",
-  "customFieldTypeSelect": "Select",
-  "customFieldTypeText": "Text",
-  "customFieldTypeUrl": "URL",
-  "customFieldUpdatedSuccessfully": "Custom field updated successfully.",
-  "@customFieldUpdatedSuccessfully": {},
-  "dark": "Koyu",
-  "@dark": {},
-  "darkTheme": "Koyu Tema",
-  "@darkTheme": {},
-  "dateOutOfRange": "Date must be between {firstDate} and {lastDate}.",
-  "@dateOutOfRange": {
-    "description": "Error message shown when the user tries to select a date outside of the allowed range.",
+  "weeks": "{count, plural, zero{} one{hafta} other{haftalar}}",
+  "@weeks": {
     "placeholders": {
       "firstDate": {
         "type": "DateTime",
