@@ -144,6 +144,8 @@
   "backToLogin": "Zurück zur Anmeldung",
   "before": "Vor",
   "@before": {},
+  "date": "Datum",
+  "@date": {},
   "behavior": "Verhalten",
   "@behavior": {
     "description": "Title of the settings concerning app beahvior"
