@@ -139,6 +139,8 @@
   "backToLogin": "العودة إلى تسجيل الدخول",
   "before": "قبل",
   "@before": {},
+  "date": "تاريخ",
+  "@date": {},
   "behavior": "السلوك",
   "@behavior": {
     "description": "Title of the settings concerning app beahvior"

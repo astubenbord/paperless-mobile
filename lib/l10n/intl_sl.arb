@@ -139,6 +139,8 @@
   "backToLogin": "Nazaj na prijavo",
   "before": "Pred",
   "@before": {},
+  "date": "Datum",
+  "@date": {},
   "behavior": "Vedenje",
   "@behavior": {
     "description": "Title of the settings concerning app beahvior"

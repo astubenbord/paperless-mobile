@@ -40,8 +40,10 @@ class DocumentFilterForm extends StatefulWidget {
       query:
           v[DocumentFilterForm.fkQuery] as TextQuery? ??
           DocumentFilter.initial.query,
-      created: (v[DocumentFilterForm.fkCreatedAt] as DateRangeQuery),
-      added: (v[DocumentFilterForm.fkAddedAt] as DateRangeQuery),
+      created: (v[DocumentFilterForm.fkCreatedAt] as DateRangeQuery?) ??
+          const UnsetDateRangeQuery(),
+      added: (v[DocumentFilterForm.fkAddedAt] as DateRangeQuery?) ??
+          const UnsetDateRangeQuery(),
       page: 1,
     );
   }

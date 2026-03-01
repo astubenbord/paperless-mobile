@@ -139,6 +139,8 @@
   "backToLogin": "Back to login",
   "before": "Önce",
   "@before": {},
+  "date": "Tarih",
+  "@date": {},
   "behavior": "Behavior",
   "@behavior": {
     "description": "Title of the settings concerning app beahvior"

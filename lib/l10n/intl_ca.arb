@@ -139,6 +139,8 @@
   "backToLogin": "Torna a inici de sessió",
   "before": "Abans",
   "@before": {},
+  "date": "Data",
+  "@date": {},
   "behavior": "Comportament",
   "@behavior": {
     "description": "Title of the settings concerning app beahvior"

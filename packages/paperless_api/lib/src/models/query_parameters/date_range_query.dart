@@ -26,6 +26,8 @@ sealed class DateRangeQuery {
         return RelativeDateRangeQuery.fromJson(json);
       case 'AbsoluteDateRangeQuery':
         return AbsoluteDateRangeQuery.fromJson(json);
+      case 'ExactDateQuery':
+        return ExactDateQuery.fromJson(json);
       default:
         throw UnimplementedError('Unknown DateRangeQuery type: $type');
     }
@@ -132,4 +134,35 @@ class AbsoluteDateRangeQuery extends DateRangeQuery with EquatableMixin {
   Map<String, dynamic> toJson() => _$AbsoluteDateRangeQueryToJson(this);
   factory AbsoluteDateRangeQuery.fromJson(Map<String, dynamic> json) =>
       _$AbsoluteDateRangeQueryFromJson(json);
+}
+
+@CopyWith()
+@JsonSerializable()
+class ExactDateQuery extends DateRangeQuery with EquatableMixin {
+  @JsonKey(includeToJson: true, includeFromJson: true)
+  @override
+  final type = 'ExactDateQuery';
+
+  @LocalDateTimeJsonConverter()
+  final DateTime date;
+
+  const ExactDateQuery({required this.date});
+
+  @override
+  List<Object?> get props => [date];
+
+  @override
+  Map<String, String> toQueryParameter(DateRangeQueryField field) {
+    return {
+      '${field.name}__date__gt':
+          apiDateFormat.format(date.subtract(const Duration(days: 1))),
+      '${field.name}__date__lt':
+          apiDateFormat.format(date.add(const Duration(days: 1))),
+    };
+  }
+
+  @override
+  Map<String, dynamic> toJson() => _$ExactDateQueryToJson(this);
+  factory ExactDateQuery.fromJson(Map<String, dynamic> json) =>
+      _$ExactDateQueryFromJson(json);
 }
