@@ -113,18 +113,17 @@ class AbsoluteDateRangeQuery extends DateRangeQuery with EquatableMixin {
   Map<String, String> toQueryParameter(DateRangeQueryField field) {
     final Map<String, String> params = {};
 
-    // Add/subtract one day in the following because paperless uses gt/lt not gte/lte
     if (after != null) {
       params.putIfAbsent(
-        '${field.name}__date__gt',
-        () => apiDateFormat.format(after!.subtract(const Duration(days: 1))),
+        '${field.name}__gte',
+        () => apiDateFormat.format(after!),
       );
     }
 
     if (before != null) {
       params.putIfAbsent(
-        '${field.name}__date__lt',
-        () => apiDateFormat.format(before!.add(const Duration(days: 1))),
+        '${field.name}__lte',
+        () => apiDateFormat.format(before!),
       );
     }
     return params;
@@ -154,10 +153,8 @@ class ExactDateQuery extends DateRangeQuery with EquatableMixin {
   @override
   Map<String, String> toQueryParameter(DateRangeQueryField field) {
     return {
-      '${field.name}__date__gt':
-          apiDateFormat.format(date.subtract(const Duration(days: 1))),
-      '${field.name}__date__lt':
-          apiDateFormat.format(date.add(const Duration(days: 1))),
+      '${field.name}__gte': apiDateFormat.format(date),
+      '${field.name}__lte': apiDateFormat.format(date),
     };
   }
 
