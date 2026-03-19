@@ -144,8 +144,6 @@
   "backToLogin": "Zurück zur Anmeldung",
   "before": "Vor",
   "@before": {},
-  "date": "Datum",
-  "@date": {},
   "behavior": "Verhalten",
   "@behavior": {
     "description": "Title of the settings concerning app beahvior"
@@ -333,8 +331,6 @@
   "@couldNotUpdateCorrespondent": {
     "description": "Message shown when a correspondent could not be updated"
   },
-  "date": "Datum",
-  "@date": {},
   "couldNotUpdateCustomField": "Benutzerdefiniertes Feld konnte nicht gelöscht werden, bitte versuche es erneut.",
   "couldNotUpdateDocument": "Dokument konnte nicht aktualisiert werden, bitte versuche es erneut.",
   "@couldNotUpdateDocument": {},
@@ -361,14 +357,76 @@
       "count": {}
     }
   },
-  "months": "{count, plural, zero{} one{Monat} other{Monate}}",
-  "@months": {
+  "create": "Erstellen",
+  "@create": {},
+  "createdAt": "Ausgestellt am",
+  "@createdAt": {},
+  "createFromCurrentFilter": "Vom aktuellen Filter erstellen",
+  "@createFromCurrentFilter": {
+    "description": "Tooltip of the \"New saved view\" button"
+  },
+  "createInboxTag": "Posteingangs-Tag erstellen",
+  "createsASavedViewBasedOnTheCurrentFilterCriteria": "Erstellt eine neue Ansicht basierend auf den aktuellen Filterkriterien.",
+  "@createsASavedViewBasedOnTheCurrentFilterCriteria": {},
+  "createViewsToQuicklyFilterYourDocuments": "Lege Ansichten an, um Dokumente schneller zu finden.",
+  "@createViewsToQuicklyFilterYourDocuments": {},
+  "customFieldCreatedSuccessfully": "Benutzerdefiniertes Feld erfolgreich erstellt.",
+  "@customFieldCreatedSuccessfully": {},
+  "customFieldDataType": "Datentyp",
+  "@customFieldDataType": {},
+  "customFieldDeletedSuccessfully": "Benutzerdefiniertes Feld wurde erfolgreich gelöscht.",
+  "@customFieldDeletedSuccessfully": {},
+  "customFieldMonetaryDefaultCurrencyHelperText": "Gebe optional deine Standardwährung (z. B. USD, EUR, GBP) an",
+  "@customFieldMonetaryDefaultCurrencyHelperText": {
+    "description": "Helper text for the default currency field in a custom monetary field"
+  },
+  "customFieldMonetaryDefaultCurrencyHintText": "Beziehe dich auf den Standard-ISO-Währungscode deiner Region (USD, EUR, GBP, ...)",
+  "@customFieldMonetaryDefaultCurrencyHintText": {
+    "description": "Hint text for the default currency field in a custom monetary field"
+  },
+  "customFieldMonetaryDefaultCurrencyLabel": "Standardwährung",
+  "@customFieldMonetaryDefaultCurrencyLabel": {
+    "description": "Label for the default currency field in a custom monetary field"
+  },
+  "customFieldName": "Name",
+  "@customFieldName": {},
+  "customFields": "Benutzerdefinierte Felder",
+  "@customFields": {},
+  "customFieldSelectAddOption": "Option hinzufügen",
+  "@customFieldSelectAddOption": {
+    "description": "Label for the button to add a new option to a custom field with select data type"
+  },
+  "customFieldSelectOptionHintText": "Option {index}",
+  "@customFieldSelectOptionHintText": {
+    "description": "Hint text for the text field to add or edit an option of a custom field with select data type",
     "placeholders": {
-      "count": {}
+      "index": {
+        "type": "int"
+      }
     }
   },
-  "weeks": "{count, plural, zero{} one{Woche} other{Wochen}}",
-  "@weeks": {
+  "customFieldSelectOptions": "Optionen",
+  "@customFieldSelectOptions": {
+    "description": "Label shown above the options of a custom field with select data type"
+  },
+  "customFieldTypeBoolean": "Wahrheitswert",
+  "customFieldTypeDate": "Datum",
+  "customFieldTypeDocumentLink": "Dokumentenverknüpfung",
+  "customFieldTypeFloat": "Zahl",
+  "customFieldTypeInteger": "Ganzzahl",
+  "customFieldTypeMonetary": "Währung",
+  "customFieldTypeSelect": "Auswahl",
+  "customFieldTypeText": "Text",
+  "customFieldTypeUrl": "URL",
+  "customFieldUpdatedSuccessfully": "Benutzerdefiniertes Feld erfolgreich aktualisiert.",
+  "@customFieldUpdatedSuccessfully": {},
+  "dark": "Dunkel",
+  "@dark": {},
+  "darkTheme": "Dunkler Modus",
+  "@darkTheme": {},
+  "dateOutOfRange": "Das Datum muss zwischen {firstDate} und {lastDate} liegen.",
+  "@dateOutOfRange": {
+    "description": "Error message shown when the user tries to select a date outside of the allowed range.",
     "placeholders": {
       "firstDate": {
         "type": "DateTime",
