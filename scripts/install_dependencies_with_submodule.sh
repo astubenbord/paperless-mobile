@@ -7,7 +7,7 @@ readonly __script_dir
 
 cd "$__script_dir/../"
 
-$FLUTTER_ROOT/dart pub get
-$FLUTTER_ROOT/dart run build_runner build --delete-conflicting-outputs
+$FLUTTER_ROOT/flutter pub get
+$FLUTTER_ROOT/flutter run build_runner build --delete-conflicting-outputs
 $FLUTTER_ROOT/flutter gen-l10n
 
