@@ -2,7 +2,6 @@ import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:intl/intl.dart';
 import 'package:markdown/markdown.dart' show markdownToHtml;
 import 'package:paperless_mobile/core/extensions/context_extensions.dart';
 import 'package:paperless_mobile/core/extensions/flutter_extensions.dart';
@@ -164,7 +163,7 @@ class _DocumentNotesWidgetState extends State<DocumentNotesWidget> {
                         children: [
                           if (note.created != null)
                             Text(
-                              DateFormat.yMMMd(context.dateLocale)
+                              context.displayDateFormat
                                   .addPattern('\u2014')
                                   .add_jm()
                                   .format(note.created!),

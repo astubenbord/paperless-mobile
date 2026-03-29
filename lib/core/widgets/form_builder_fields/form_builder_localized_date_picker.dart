@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:intl/intl.dart';
+import 'package:paperless_mobile/api/constants/api_date_format.dart';
 import 'package:paperless_mobile/core/extensions/context_extensions.dart';
 import 'package:paperless_mobile/core/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/features/landing/view/widgets/mime_types_pie_chart.dart';
@@ -91,9 +92,10 @@ class _FormBuilderLocalizedDatePickerState
       return;
     }
     _initialized = true;
-    final format = DateFormat.yMd(
-      context.dateLocale,
-    ).format(DateTime(1000, 11, 22));
+    final date = DateTime(1000, 11, 22);
+    final format = context.dateLocale == 'iso-8601'
+        ? apiDateFormat.format(date)
+        : DateFormat.yMd(context.dateLocale).format(date);
     _separator =
         _separatorRegex.firstMatch(format)?.namedGroup('separator') ?? '.';
     _format = format

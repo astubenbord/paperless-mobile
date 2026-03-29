@@ -1,7 +1,6 @@
 import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:paperless_mobile/api/paperless_api.dart';
 import 'package:paperless_mobile/core/extensions/context_extensions.dart';
 import 'package:paperless_mobile/core/extensions/dart_extensions.dart';
@@ -568,7 +567,7 @@ class _InboxItemState extends State<InboxItem> {
                       color: chipForegroundColor,
                     ),
                     label: Text(
-                      "${S.of(context)!.createdAt}: ${DateFormat.yMd(context.dateLocale).format(e)}",
+                      "${S.of(context)!.createdAt}: ${context.displayDateFormat.format(e)}",
                       style: TextStyle(color: chipForegroundColor),
                     ),
                     onPressed: () async {
