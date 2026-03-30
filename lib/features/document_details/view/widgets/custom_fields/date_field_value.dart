@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:paperless_mobile/core/extensions/context_extensions.dart';
 
 class DateFieldValue extends StatelessWidget {

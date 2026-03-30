@@ -90,7 +90,7 @@ class LocalNotificationService {
           : tr.notificationDownloadingDocument,
       NotificationDetails(
         android: AndroidNotificationDetails(
-          "${NotificationChannel.documentDownload.id}_$documentId",
+          NotificationChannel.documentDownload.id,
           NotificationChannel.documentDownload.name,
           progress: ((progress ?? 0) * 100).toInt(),
           maxProgress: 100,
@@ -102,9 +102,7 @@ class LocalNotificationService {
           when: DateTime.now().millisecondsSinceEpoch,
           category: AndroidNotificationCategory.progress,
           icon: finished ? 'file_download_done' : 'downloading',
-        ),
-        iOS: DarwinNotificationDetails(
-          attachments: [DarwinNotificationAttachment(filePath)],
+          channelDescription: 'Notifications for document download status',
         ),
       ),
       payload: jsonEncode(

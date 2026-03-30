@@ -39,7 +39,6 @@ abstract class UiSettingsViewSettingsUpdateChecking
 abstract class UiSettingsViewSettingsPermissions
     with _$UiSettingsViewSettingsPermissions {
   factory UiSettingsViewSettingsPermissions({
-    /// This is dynamic because the backend can return either a string or a boolean due to a deprecated setting.
     int? defaultOwner,
     @Default([]) List<int>? defaultEditUsers,
     @Default([]) List<int>? defaultViewUsers,

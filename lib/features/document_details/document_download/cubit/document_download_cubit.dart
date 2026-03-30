@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_mobile/api/paperless_api.dart';
 import 'package:paperless_mobile/core/repository/document_repository.dart';
+import 'package:paperless_mobile/core/service/file_service.dart';
 import 'package:paperless_mobile/features/logging/data/logger.dart';
 import 'package:paperless_mobile/features/notifications/services/local_notification_service.dart';
 import 'package:path/path.dart' as p;
@@ -33,6 +34,7 @@ class DocumentDownloadCubit extends Cubit<DocumentDownloadState> {
       final targetPath = await _documentRepository.generateLocalFilePath(
         documentId,
         original: downloadOriginal,
+        type: PaperlessDirectoryType.download,
       );
       if (!await File(targetPath).exists()) {
         await File(targetPath).create();
@@ -41,19 +43,11 @@ class DocumentDownloadCubit extends Cubit<DocumentDownloadState> {
           documentId: documentId,
           filename: p.basename(targetPath),
           filePath: targetPath,
-          finished: true,
+          finished: false,
           locale: locale,
           userId: userId,
         );
       }
-      // await _notificationService.notifyFileDownload(
-      //   document: state.document,
-      //   filename: p.basename(targetPath),
-      //   filePath: targetPath,
-      //   finished: false,
-      //   locale: locale,
-      //   userId: userId,
-      // );
       await _documentsApi.downloadToFile(
         documentId,
         targetPath,
@@ -64,7 +58,7 @@ class DocumentDownloadCubit extends Cubit<DocumentDownloadState> {
             documentId: documentId,
             filename: p.basename(targetPath),
             filePath: targetPath,
-            finished: true,
+            finished: false,
             locale: locale,
             userId: userId,
             progress: progress,
