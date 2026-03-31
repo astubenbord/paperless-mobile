@@ -3,8 +3,6 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:paperless_mobile/api/models/document.dart';
 import 'package:paperless_mobile/core/extensions/context_extensions.dart';
-import 'package:paperless_mobile/core/repository/document_type_repository.dart';
-import 'package:provider/provider.dart';
 
 class DateAndDocumentTypeLabelWidget extends StatelessWidget {
   const DateAndDocumentTypeLabelWidget({
@@ -18,7 +16,6 @@ class DateAndDocumentTypeLabelWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final documentTypeRepository = context.read<DocumentTypeRepository>();
     final subtitleStyle = Theme.of(
       context,
     ).textTheme.labelMedium?.apply(color: Colors.grey);
@@ -44,7 +41,7 @@ class DateAndDocumentTypeLabelWidget extends StatelessWidget {
                           ? () => onDocumentTypeSelected!(document.documentType)
                           : null,
                       child: QueryBuilder(
-                        query: documentTypeRepository.getAllQuery(),
+                        query: context.documentTypeRepository.getAllQuery(),
                         builder: (context, state) {
                           final documentType = state.data?.firstWhereOrNull(
                             (dt) => dt.id == document.documentType,

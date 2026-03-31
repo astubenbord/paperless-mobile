@@ -407,154 +407,157 @@ class _InboxItemState extends State<InboxItem> {
 
         return SliverList.list(
           children: [
-            ...suggestions.correspondents
-                .whereNot((e) => widget.document.correspondent == e)
-                .map(
-                  (e) => QueryBuilder(
-                    query: context.correspondentRepository.getAllQuery(),
-                    builder: (context, state) {
-                      final correspondents = state.data?.toIdMap();
-                      return ActionChip(
-                        backgroundColor: chipColor,
-                        avatar: Icon(
-                          Icons.person_outline,
-                          color: chipForegroundColor,
-                        ),
-                        label: Text(
-                          correspondents?[e]?.name ?? '',
-                          style: TextStyle(color: chipForegroundColor),
-                        ),
-                        onPressed: () async {
-                          await context.documentRepository
-                              .patchDocumentMutation(widget.document.id)
-                              .mutate(
-                                PatchedDocumentRequest(
-                                  correspondent: PatchedValue(e),
-                                ),
-                              );
-                          if (context.mounted) {
-                            showSnackBar(
-                              context,
-                              S.of(context)!.suggestionSuccessfullyApplied,
-                            );
-                          }
-                        },
-                      ).paddedOnly(right: 4);
-                    },
-                  ),
-                ),
-            ...suggestions.documentTypes
-                .whereNot((e) => widget.document.documentType == e)
-                .map(
-                  (e) => QueryBuilder(
-                    query: context.documentTypeRepository.getAllQuery(),
-                    builder: (context, state) {
-                      final documentTypes = state.data?.toIdMap();
-                      return ActionChip(
-                        backgroundColor: chipColor,
-                        avatar: Icon(
-                          Icons.description_outlined,
-                          color: chipForegroundColor,
-                        ),
-                        label: Text(
-                          documentTypes?[e]?.name ?? '',
-                          style: TextStyle(color: chipForegroundColor),
-                        ),
-                        onPressed: () async {
-                          await context.documentRepository
-                              .patchDocumentMutation(widget.document.id)
-                              .mutate(
-                                PatchedDocumentRequest(
-                                  documentType: PatchedValue(e),
-                                ),
-                              );
-                          if (context.mounted) {
-                            showSnackBar(
-                              context,
-                              S.of(context)!.suggestionSuccessfullyApplied,
-                            );
-                          }
-                        },
-                      ).paddedOnly(right: 4);
-                    },
-                  ),
-                ),
-            ...suggestions.tags
-                .whereNot((e) => widget.document.tags?.contains(e) ?? false)
-                .map(
-                  (e) => QueryBuilder(
-                    query: context.tagRepository.getAllQuery(),
-                    builder: (context, state) {
-                      final tags = state.data?.toIdMap();
-                      return ActionChip(
-                        backgroundColor: chipColor,
-                        avatar: Icon(
-                          Icons.label_outline,
-                          color: chipForegroundColor,
-                        ),
-                        label: Text(
-                          tags?[e]?.name ?? '',
-                          style: TextStyle(color: chipForegroundColor),
-                        ),
-                        onPressed: () async {
-                          await context.documentRepository
-                              .patchDocumentMutation(widget.document.id)
-                              .mutate(
-                                PatchedDocumentRequest(
-                                  tags: PatchedValue(
-                                    {...?widget.document.tags, e}.toList(),
-                                  ),
-                                ),
-                              );
-                          if (context.mounted) {
-                            showSnackBar(
-                              context,
-                              S.of(context)!.suggestionSuccessfullyApplied,
-                            );
-                          }
-                        },
-                      ).paddedOnly(right: 4);
-                    },
-                  ),
-                ),
-
-            ...suggestions.storagePaths
-                .whereNot((e) => widget.document.storagePath == e)
-                .map(
-                  (e) => QueryBuilder(
-                    query: context.storagePathRepository.getAllQuery(),
-                    builder: (context, state) {
-                      final storagePaths = state.data?.toIdMap();
-                      return ActionChip(
-                        avatar: Icon(
-                          Icons.label_outline,
-                          color: chipForegroundColor,
-                        ),
-                        label: Text(
-                          storagePaths?[e]?.name ?? '',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSecondary,
+            if (context.uiSettings$.canViewCorrespondents)
+              ...suggestions.correspondents
+                  .whereNot((e) => widget.document.correspondent == e)
+                  .map(
+                    (e) => QueryBuilder(
+                      query: context.correspondentRepository.getAllQuery(),
+                      builder: (context, state) {
+                        final correspondents = state.data?.toIdMap();
+                        return ActionChip(
+                          backgroundColor: chipColor,
+                          avatar: Icon(
+                            Icons.person_outline,
+                            color: chipForegroundColor,
                           ),
-                        ),
-                        onPressed: () async {
-                          await context.documentRepository
-                              .patchDocumentMutation(widget.document.id)
-                              .mutate(
-                                PatchedDocumentRequest(
-                                  storagePath: PatchedValue(e),
-                                ),
+                          label: Text(
+                            correspondents?[e]?.name ?? '',
+                            style: TextStyle(color: chipForegroundColor),
+                          ),
+                          onPressed: () async {
+                            await context.documentRepository
+                                .patchDocumentMutation(widget.document.id)
+                                .mutate(
+                                  PatchedDocumentRequest(
+                                    correspondent: PatchedValue(e),
+                                  ),
+                                );
+                            if (context.mounted) {
+                              showSnackBar(
+                                context,
+                                S.of(context)!.suggestionSuccessfullyApplied,
                               );
-                          if (context.mounted) {
-                            showSnackBar(
-                              context,
-                              S.of(context)!.suggestionSuccessfullyApplied,
-                            );
-                          }
-                        },
-                      ).paddedOnly(right: 4);
-                    },
+                            }
+                          },
+                        ).paddedOnly(right: 4);
+                      },
+                    ),
                   ),
-                ),
+            if (context.uiSettings$.canViewDocumentTypes)
+              ...suggestions.documentTypes
+                  .whereNot((e) => widget.document.documentType == e)
+                  .map(
+                    (e) => QueryBuilder(
+                      query: context.documentTypeRepository.getAllQuery(),
+                      builder: (context, state) {
+                        final documentTypes = state.data?.toIdMap();
+                        return ActionChip(
+                          backgroundColor: chipColor,
+                          avatar: Icon(
+                            Icons.description_outlined,
+                            color: chipForegroundColor,
+                          ),
+                          label: Text(
+                            documentTypes?[e]?.name ?? '',
+                            style: TextStyle(color: chipForegroundColor),
+                          ),
+                          onPressed: () async {
+                            await context.documentRepository
+                                .patchDocumentMutation(widget.document.id)
+                                .mutate(
+                                  PatchedDocumentRequest(
+                                    documentType: PatchedValue(e),
+                                  ),
+                                );
+                            if (context.mounted) {
+                              showSnackBar(
+                                context,
+                                S.of(context)!.suggestionSuccessfullyApplied,
+                              );
+                            }
+                          },
+                        ).paddedOnly(right: 4);
+                      },
+                    ),
+                  ),
+            if (context.uiSettings$.canViewTags)
+              ...suggestions.tags
+                  .whereNot((e) => widget.document.tags?.contains(e) ?? false)
+                  .map(
+                    (e) => QueryBuilder(
+                      query: context.tagRepository.getAllQuery(),
+                      builder: (context, state) {
+                        final tags = state.data?.toIdMap();
+                        return ActionChip(
+                          backgroundColor: chipColor,
+                          avatar: Icon(
+                            Icons.label_outline,
+                            color: chipForegroundColor,
+                          ),
+                          label: Text(
+                            tags?[e]?.name ?? '',
+                            style: TextStyle(color: chipForegroundColor),
+                          ),
+                          onPressed: () async {
+                            await context.documentRepository
+                                .patchDocumentMutation(widget.document.id)
+                                .mutate(
+                                  PatchedDocumentRequest(
+                                    tags: PatchedValue(
+                                      {...?widget.document.tags, e}.toList(),
+                                    ),
+                                  ),
+                                );
+                            if (context.mounted) {
+                              showSnackBar(
+                                context,
+                                S.of(context)!.suggestionSuccessfullyApplied,
+                              );
+                            }
+                          },
+                        ).paddedOnly(right: 4);
+                      },
+                    ),
+                  ),
+            if (context.uiSettings$.canViewStoragePaths)
+              ...suggestions.storagePaths
+                  .whereNot((e) => widget.document.storagePath == e)
+                  .map(
+                    (e) => QueryBuilder(
+                      query: context.storagePathRepository.getAllQuery(),
+                      builder: (context, state) {
+                        final storagePaths = state.data?.toIdMap();
+                        return ActionChip(
+                          avatar: Icon(
+                            Icons.label_outline,
+                            color: chipForegroundColor,
+                          ),
+                          label: Text(
+                            storagePaths?[e]?.name ?? '',
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSecondary,
+                            ),
+                          ),
+                          onPressed: () async {
+                            await context.documentRepository
+                                .patchDocumentMutation(widget.document.id)
+                                .mutate(
+                                  PatchedDocumentRequest(
+                                    storagePath: PatchedValue(e),
+                                  ),
+                                );
+                            if (context.mounted) {
+                              showSnackBar(
+                                context,
+                                S.of(context)!.suggestionSuccessfullyApplied,
+                              );
+                            }
+                          },
+                        ).paddedOnly(right: 4);
+                      },
+                    ),
+                  ),
             ...suggestions.dates
                 .map(DateTime.parse)
                 .whereNot(

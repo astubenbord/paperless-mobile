@@ -1,6 +1,6 @@
 import 'package:cached_query_flutter/cached_query_flutter.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:paperless_mobile/api/paperless_api.dart';
 import 'package:paperless_mobile/core/extensions/context_extensions.dart';
 import 'package:paperless_mobile/core/extensions/flutter_extensions.dart';
@@ -44,110 +44,118 @@ class DocumentOverviewWidget extends StatelessWidget {
           context: context,
           label: S.of(context)!.createdAt,
         ),
-        if (document.documentType != null && uiSettings.canViewDocumentTypes)
-          QueryBuilder(
-            query: context.documentTypeRepository.getAllQuery(),
-            builder: (context, state) {
-              if (state.isLoading && state.data == null) {
-                return DetailsItemSkeleton(label: S.of(context)!.documentType);
-              }
-              if (state.isError) {
-                return SizedBox.shrink();
-              }
-              final documentType = state.data?.firstWhere(
-                (dt) => dt.id == document.documentType,
-              );
-              return DetailsItem(
-                label: S.of(context)!.documentType,
-                content: LabelText(
-                  style: Theme.of(context).textTheme.bodyLarge,
-                  label: documentType,
-                ),
-              );
-            },
-          )
-        else
-          DetailsItem(
-            label: S.of(context)!.documentType,
-            content: LabelText(
-              style: Theme.of(context).textTheme.bodyLarge,
-              label: null,
+        if (uiSettings.canViewDocumentTypes)
+          if (document.documentType != null)
+            QueryBuilder(
+              query: context.documentTypeRepository.getAllQuery(),
+              builder: (context, state) {
+                if (state.isLoading && state.data == null) {
+                  return DetailsItemSkeleton(
+                    label: S.of(context)!.documentType,
+                  );
+                }
+                if (state.isError) {
+                  return SizedBox.shrink();
+                }
+                final documentType = state.data?.firstWhereOrNull(
+                  (dt) => dt.id == document.documentType,
+                );
+                return DetailsItem(
+                  label: S.of(context)!.documentType,
+                  content: LabelText(
+                    style: Theme.of(context).textTheme.bodyLarge,
+                    label: documentType,
+                  ),
+                );
+              },
+            )
+          else
+            DetailsItem(
+              label: S.of(context)!.documentType,
+              content: LabelText(
+                style: Theme.of(context).textTheme.bodyLarge,
+                label: null,
+              ),
             ),
-          ),
-        if (document.correspondent != null && uiSettings.canViewCorrespondents)
-          QueryBuilder(
-            query: context.correspondentRepository.getAllQuery(),
-            builder: (context, state) {
-              if (state.isLoading && state.data == null) {
-                return DetailsItemSkeleton(label: S.of(context)!.documentType);
-              }
-              if (state.isError) {
-                return SizedBox.shrink();
-              }
-              final correspondent = state.data?.firstWhere(
-                (c) => c.id == document.correspondent,
-              );
-              return DetailsItem(
-                label: S.of(context)!.correspondent,
-                content: LabelText(
-                  style: Theme.of(context).textTheme.bodyLarge,
-                  label: correspondent,
-                ),
-              );
-            },
-          )
-        else
-          DetailsItem(
-            label: S.of(context)!.correspondent,
-            content: LabelText(
-              style: Theme.of(context).textTheme.bodyLarge,
-              label: null,
+        if (uiSettings.canViewCorrespondents)
+          if (document.correspondent != null)
+            QueryBuilder(
+              query: context.correspondentRepository.getAllQuery(),
+              builder: (context, state) {
+                if (state.isLoading && state.data == null) {
+                  return DetailsItemSkeleton(
+                    label: S.of(context)!.correspondent,
+                  );
+                }
+                if (state.isError) {
+                  return SizedBox.shrink();
+                }
+                final correspondent = state.data?.firstWhereOrNull(
+                  (c) => c.id == document.correspondent,
+                );
+                return DetailsItem(
+                  label: S.of(context)!.correspondent,
+                  content: LabelText(
+                    style: Theme.of(context).textTheme.bodyLarge,
+                    label: correspondent,
+                  ),
+                );
+              },
+            )
+          else
+            DetailsItem(
+              label: S.of(context)!.correspondent,
+              content: LabelText(
+                style: Theme.of(context).textTheme.bodyLarge,
+                label: null,
+              ),
             ),
-          ),
-        if (document.storagePath != null && uiSettings.canViewStoragePaths)
-          QueryBuilder(
-            query: context.storagePathRepository.getAllQuery(),
-            builder: (context, state) {
-              if (state.isLoading && state.data == null) {
-                return DetailsItemSkeleton(label: S.of(context)!.storagePath);
-              }
-              if (state.isError) {
-                return SizedBox.shrink();
-              }
+        if (uiSettings.canViewStoragePaths)
+          if (document.storagePath != null)
+            QueryBuilder(
+              query: context.storagePathRepository.getAllQuery(),
+              builder: (context, state) {
+                if (state.isLoading && state.data == null) {
+                  return DetailsItemSkeleton(label: S.of(context)!.storagePath);
+                }
+                if (state.isError) {
+                  return SizedBox.shrink();
+                }
 
-              final storagePath = state.data?.firstWhere(
-                (s) => s.id == document.storagePath,
-              );
-              return DetailsItem(
-                label: S.of(context)!.storagePath,
-                content: LabelText(
-                  style: Theme.of(context).textTheme.bodyLarge,
-                  label: storagePath,
-                ),
-              );
-            },
-          )
-        else
-          DetailsItem(
-            label: S.of(context)!.storagePath,
-            content: LabelText(
-              style: Theme.of(context).textTheme.bodyLarge,
-              label: null,
+                final storagePath = state.data?.firstWhereOrNull(
+                  (s) => s.id == document.storagePath,
+                );
+                return DetailsItem(
+                  label: S.of(context)!.storagePath,
+                  content: LabelText(
+                    style: Theme.of(context).textTheme.bodyLarge,
+                    label: storagePath,
+                  ),
+                );
+              },
+            )
+          else
+            DetailsItem(
+              label: S.of(context)!.storagePath,
+              content: LabelText(
+                style: Theme.of(context).textTheme.bodyLarge,
+                label: null,
+              ),
             ),
-          ),
-        if ((document.tags?.isNotEmpty ?? false) && uiSettings.canViewTags)
-          DetailsItem(
-            label: S.of(context)!.tags,
-            content: TagsWidget(isClickable: false, tagIds: document.tags),
-          )
-        else
-          DetailsItem(
-            label: S.of(context)!.tags,
-            content: LabelText(
-              style: Theme.of(context).textTheme.bodyLarge,
-              label: null,
+        if (uiSettings.canViewTags)
+          if ((document.tags?.isNotEmpty ?? false))
+            DetailsItem(
+              label: S.of(context)!.tags,
+              content: TagsWidget(isClickable: false, tagIds: document.tags),
+            )
+          else
+            DetailsItem(
+              label: S.of(context)!.tags,
+              content: LabelText(
+                style: Theme.of(context).textTheme.bodyLarge,
+                label: null,
+              ),
             ),
-          ),
         if (document.customFields != null)
           ...document.customFields!.map(
             (instance) => CustomFieldWidget(instance: instance),

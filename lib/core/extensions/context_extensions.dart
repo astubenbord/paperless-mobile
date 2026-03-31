@@ -98,10 +98,21 @@ extension ContextExtensions on BuildContext {
   }
 
   void refetchLabels() {
-    tagRepository.getAllQuery().refetch();
-    correspondentRepository.getAllQuery().refetch();
-    documentTypeRepository.getAllQuery().refetch();
-    storagePathRepository.getAllQuery().refetch();
-    customFieldRepository.getAllQuery().refetch();
+    if (uiSettings.canViewCorrespondents) {
+      correspondentRepository.getAllQuery().refetch();
+    }
+    if (uiSettings.canViewDocumentTypes) {
+      documentTypeRepository.getAllQuery().refetch();
+    }
+    if (uiSettings.canViewTags) {
+      tagRepository.getAllQuery().refetch();
+    }
+
+    if (uiSettings.canViewStoragePaths) {
+      storagePathRepository.getAllQuery().refetch();
+    }
+    if (uiSettings.canViewCustomFields) {
+      customFieldRepository.getAllQuery().refetch();
+    }
   }
 }

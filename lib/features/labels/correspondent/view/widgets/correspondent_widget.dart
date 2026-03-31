@@ -1,8 +1,8 @@
 import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:paperless_mobile/api/paperless_api.dart';
+import 'package:paperless_mobile/core/extensions/context_extensions.dart';
 import 'package:paperless_mobile/core/extensions/label_list_extension.dart';
-import 'package:paperless_mobile/core/repository/correspondent_repository.dart';
-import 'package:provider/provider.dart';
 
 class CorrespondentWidget extends StatelessWidget {
   final int? id;
@@ -22,8 +22,11 @@ class CorrespondentWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (!context.uiSettings$.canViewCorrespondents) {
+      return SizedBox.shrink();
+    }
     return QueryBuilder(
-      query: context.read<CorrespondentRepository>().getAllQuery(),
+      query: context.correspondentRepository.getAllQuery(),
       builder: (context, state) => AbsorbPointer(
         absorbing: !isClickable,
         child: Material(

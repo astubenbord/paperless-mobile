@@ -3,20 +3,18 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:paperless_mobile/api/paperless_api.dart';
+import 'package:paperless_mobile/core/extensions/context_extensions.dart';
 import 'package:paperless_mobile/core/extensions/document_extensions.dart';
 import 'package:paperless_mobile/core/extensions/label_list_extension.dart';
-import 'package:paperless_mobile/core/repository/correspondent_repository.dart';
 import 'package:paperless_mobile/core/repository/document_repository.dart';
-import 'package:paperless_mobile/core/repository/document_type_repository.dart';
-import 'package:paperless_mobile/core/repository/storage_path_repository.dart';
 import 'package:paperless_mobile/features/document_bulk_action/view/widgets/fullscreen_bulk_edit_label_page.dart';
 import 'package:paperless_mobile/features/document_bulk_action/view/widgets/fullscreen_bulk_edit_tags_widget.dart';
-import 'package:paperless_mobile/features/document_details/view/pages/document_details_page.dart';
 import 'package:paperless_mobile/features/document_details/document_download/cubit/document_download_cubit.dart';
-import 'package:paperless_mobile/features/document_edit/view/document_edit_page.dart';
 import 'package:paperless_mobile/features/document_details/document_open_in_system/cubit/document_open_in_system_cubit.dart';
 import 'package:paperless_mobile/features/document_details/document_print/cubit/document_print_cubit.dart';
 import 'package:paperless_mobile/features/document_details/document_share/cubit/document_share_cubit.dart';
+import 'package:paperless_mobile/features/document_details/view/pages/document_details_page.dart';
+import 'package:paperless_mobile/features/document_edit/view/document_edit_page.dart';
 import 'package:paperless_mobile/features/documents/view/pages/document_view.dart';
 import 'package:paperless_mobile/features/documents/view/pages/documents_page.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
@@ -166,9 +164,6 @@ class BulkEditDocumentsRoute extends GoRouteData with $BulkEditDocumentsRoute {
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    final correspondentRepository = context.read<CorrespondentRepository>();
-    final documentTypeRepository = context.read<DocumentTypeRepository>();
-    final storagePathRepository = context.read<StoragePathRepository>();
     return switch ($extra.type) {
       LabelType.tag => FullscreenBulkEditTagsWidget(
         selection: $extra.selection,
@@ -178,11 +173,22 @@ class BulkEditDocumentsRoute extends GoRouteData with $BulkEditDocumentsRoute {
         hintText: S.of(context)!.startTyping,
         options: switch ($extra.type) {
           LabelType.correspondent =>
-            correspondentRepository.getAllQuery().state.data?.toIdMap() ?? {},
+            context.correspondentRepository
+                    .getAllQuery()
+                    .state
+                    .data
+                    ?.toIdMap() ??
+                {},
           LabelType.documentType =>
-            documentTypeRepository.getAllQuery().state.data?.toIdMap() ?? {},
+            context.documentTypeRepository
+                    .getAllQuery()
+                    .state
+                    .data
+                    ?.toIdMap() ??
+                {},
           LabelType.storagePath =>
-            storagePathRepository.getAllQuery().state.data?.toIdMap() ?? {},
+            context.storagePathRepository.getAllQuery().state.data?.toIdMap() ??
+                {},
           _ => throw Exception("Parameter not allowed here."),
         },
         labelMapper: (document) {

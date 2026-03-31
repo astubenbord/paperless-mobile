@@ -1,12 +1,10 @@
 import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:paperless_mobile/api/paperless_api.dart';
-import 'package:paperless_mobile/core/repository/correspondent_repository.dart';
-import 'package:paperless_mobile/core/repository/document_type_repository.dart';
-import 'package:paperless_mobile/core/translation/sort_field_localization_mapper.dart';
+import 'package:paperless_mobile/core/extensions/context_extensions.dart';
 import 'package:paperless_mobile/core/extensions/flutter_extensions.dart';
+import 'package:paperless_mobile/core/translation/sort_field_localization_mapper.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
 
 class SortFieldSelectionBottomSheet extends StatefulWidget {
@@ -68,35 +66,37 @@ class _SortFieldSelectionBottomSheetState
             Column(
               children: [
                 _buildSortOption(SortField.archiveSerialNumber),
-                QueryBuilder(
-                  query: context.read<CorrespondentRepository>().getAllQuery(),
-                  builder: (context, state) {
-                    return _buildSortOption(
-                      SortField.correspondentName,
-                      loading: state.isLoading,
-                      enabled:
-                          state.data?.any(
-                            (element) => (element.documentCount ?? 0) > 0,
-                          ) ??
-                          false,
-                    );
-                  },
-                ),
+                if (context.uiSettings.canViewCorrespondents)
+                  QueryBuilder(
+                    query: context.correspondentRepository.getAllQuery(),
+                    builder: (context, state) {
+                      return _buildSortOption(
+                        SortField.correspondentName,
+                        loading: state.isLoading,
+                        enabled:
+                            state.data?.any(
+                              (element) => (element.documentCount ?? 0) > 0,
+                            ) ??
+                            false,
+                      );
+                    },
+                  ),
                 _buildSortOption(SortField.title),
-                QueryBuilder(
-                  query: context.read<DocumentTypeRepository>().getAllQuery(),
-                  builder: (context, state) {
-                    return _buildSortOption(
-                      SortField.documentType,
-                      loading: state.isLoading,
-                      enabled:
-                          state.data?.any(
-                            (element) => (element.documentCount ?? 0) > 0,
-                          ) ??
-                          false,
-                    );
-                  },
-                ),
+                if (context.uiSettings.canViewDocumentTypes)
+                  QueryBuilder(
+                    query: context.documentTypeRepository.getAllQuery(),
+                    builder: (context, state) {
+                      return _buildSortOption(
+                        SortField.documentType,
+                        loading: state.isLoading,
+                        enabled:
+                            state.data?.any(
+                              (element) => (element.documentCount ?? 0) > 0,
+                            ) ??
+                            false,
+                      );
+                    },
+                  ),
                 _buildSortOption(SortField.created),
                 _buildSortOption(SortField.added),
                 _buildSortOption(SortField.modified),

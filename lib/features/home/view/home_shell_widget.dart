@@ -19,7 +19,9 @@ import 'package:paperless_mobile/core/service/dio_file_service.dart';
 import 'package:paperless_mobile/core/store/local_store.dart';
 import 'package:paperless_mobile/core/store/slices/local_user_account.dart';
 import 'package:paperless_mobile/features/document_scan/cubit/document_scanner_cubit.dart';
+import 'package:paperless_mobile/features/login/view/widgets/login_transition_page.dart';
 import 'package:paperless_mobile/features/tasks/model/pending_tasks_notifier.dart';
+import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 class HomeShellWidget extends StatelessWidget {
@@ -140,8 +142,8 @@ class HomeShellWidget extends StatelessWidget {
               ),
               builder: (context, state) {
                 if (state.isLoading) {
-                  return Scaffold(
-                    body: Center(child: CircularProgressIndicator()),
+                  return LoginTransitionPage(
+                    text: S.of(context)!.fetchingUserInformation,
                   );
                 } else if (state.isError) {
                   return SizedBox.shrink(); // TODO: Show actual error

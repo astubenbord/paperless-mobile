@@ -4,7 +4,6 @@ import 'package:paperless_mobile/api/paperless_api.dart';
 import 'package:paperless_mobile/core/extensions/context_extensions.dart';
 import 'package:paperless_mobile/core/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/core/widgets/form_builder_fields/extended_date_range_form_field/form_builder_extended_date_range_picker.dart';
-import 'package:paperless_mobile/core/widgets/query_builder/label_query_builder.dart';
 import 'package:paperless_mobile/features/labels/tags/view/widgets/tags_form_field.dart';
 import 'package:paperless_mobile/features/labels/view/widgets/multi_label_form_field.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
@@ -78,33 +77,25 @@ class _DocumentFilterFormState extends State<DocumentFilterForm> {
   Widget build(BuildContext context) {
     return FormBuilder(
       key: widget.formKey,
-      child: LabelQueryBuilder(
-        builder: (context, state) {
-          if (state.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (state.isError) {
-            return Center(child: Text(S.of(context)!.anUnknownErrorOccurred));
-          }
-
-          final data = state.data!;
-          return CustomScrollView(
-            controller: widget.scrollController,
-            slivers: [
-              if (widget.header != null) widget.header!,
-              SliverToBoxAdapter(child: SizedBox(height: 8)),
-              ..._buildFormFieldList(data),
-              const SliverToBoxAdapter(child: SizedBox(height: 32)),
-            ],
-          );
-        },
+      child: CustomScrollView(
+        controller: widget.scrollController,
+        slivers: [
+          if (widget.header != null) widget.header!,
+          SliverToBoxAdapter(child: SizedBox(height: 8)),
+          ..._buildFormFieldList(),
+          const SliverToBoxAdapter(child: SizedBox(height: 32)),
+        ],
       ),
     );
   }
 
-  List<Widget> _buildFormFieldList(LabelBuilderData data) {
+  List<Widget> _buildFormFieldList() {
     return [
-      _buildQueryFormField().paddedSymmetrically(horizontal: 12),
+      TextQueryFormField(
+        name: DocumentFilterForm.fkQuery,
+        onlyExtendedQueryAllowed: _allowOnlyExtendedQuery,
+        initialValue: widget.initialFilter.query,
+      ).paddedSymmetrically(horizontal: 12),
       Align(
         alignment: Alignment.centerLeft,
         child: Text(
@@ -130,18 +121,10 @@ class _DocumentFilterFormState extends State<DocumentFilterForm> {
         },
         padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
       ),
-      _buildCorrespondentFormField(
-        data.correspondents,
-      ).paddedSymmetrically(horizontal: 16, vertical: 4),
-      _buildDocumentTypeFormField(
-        data.documentTypes,
-      ).paddedSymmetrically(horizontal: 16, vertical: 4),
-      _buildStoragePathFormField(
-        data.storagePaths,
-      ).paddedSymmetrically(horizontal: 16, vertical: 4),
-      _buildTagsFormField(
-        data.tags,
-      ).paddedSymmetrically(horizontal: 16, vertical: 4),
+      _buildCorrespondentFormField(),
+      _buildDocumentTypeFormField(),
+      _buildStoragePathFormField(),
+      _buildTagsFormField(),
     ].map((e) => SliverToBoxAdapter(child: e)).toList();
   }
 
@@ -164,7 +147,7 @@ class _DocumentFilterFormState extends State<DocumentFilterForm> {
     }
   }
 
-  Widget _buildDocumentTypeFormField(Map<int, DocumentType> documentTypes) {
+  Widget _buildDocumentTypeFormField() {
     return MultiLabelFormField<DocumentType>(
       name: DocumentFilterForm.fkDocumentType,
       query: context.documentTypeRepository.getAllQuery(),
@@ -172,10 +155,13 @@ class _DocumentFilterFormState extends State<DocumentFilterForm> {
       initialValue: widget.initialFilter.documentType,
       prefixIcon: const Icon(Icons.description_outlined),
       allowExclude: true,
-    );
+    ).paddedSymmetrically(horizontal: 16, vertical: 4);
   }
 
-  Widget _buildCorrespondentFormField(Map<int, Correspondent> correspondents) {
+  Widget _buildCorrespondentFormField() {
+    if (!context.uiSettings.canViewCorrespondents) {
+      return SizedBox.shrink();
+    }
     return MultiLabelFormField<Correspondent>(
       name: DocumentFilterForm.fkCorrespondent,
       query: context.correspondentRepository.getAllQuery(),
@@ -183,10 +169,13 @@ class _DocumentFilterFormState extends State<DocumentFilterForm> {
       initialValue: widget.initialFilter.correspondent,
       prefixIcon: const Icon(Icons.person_outline),
       allowExclude: true,
-    );
+    ).paddedSymmetrically(horizontal: 16, vertical: 4);
   }
 
-  Widget _buildStoragePathFormField(Map<int, StoragePath> storagePaths) {
+  Widget _buildStoragePathFormField() {
+    if (!context.uiSettings.canViewStoragePaths) {
+      return SizedBox.shrink();
+    }
     return MultiLabelFormField<StoragePath>(
       name: DocumentFilterForm.fkStoragePath,
       query: context.storagePathRepository.getAllQuery(),
@@ -194,23 +183,18 @@ class _DocumentFilterFormState extends State<DocumentFilterForm> {
       initialValue: widget.initialFilter.storagePath,
       prefixIcon: const Icon(Icons.folder_outlined),
       allowExclude: true,
-    );
+    ).paddedSymmetrically(horizontal: 16, vertical: 4);
   }
 
-  Widget _buildQueryFormField() {
-    return TextQueryFormField(
-      name: DocumentFilterForm.fkQuery,
-      onlyExtendedQueryAllowed: _allowOnlyExtendedQuery,
-      initialValue: widget.initialFilter.query,
-    );
-  }
-
-  Widget _buildTagsFormField(Map<int, Tag> tags) {
+  Widget _buildTagsFormField() {
+    if (!context.uiSettings.canViewTags) {
+      return SizedBox.shrink();
+    }
     return TagsFormField(
       name: DocumentFilterForm.fkTags,
       initialValue: widget.initialFilter.tags,
       allowExclude: true,
       allowCreation: false,
-    );
+    ).paddedSymmetrically(horizontal: 16, vertical: 4);
   }
 }

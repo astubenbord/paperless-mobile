@@ -16,6 +16,7 @@ class LabelTabView<T extends Label> extends StatelessWidget {
   final bool canEdit;
   final void Function() onAddNew;
   final bool canAddNew;
+  final bool canView;
 
   /// Displayed as the subtitle of the [ListTile]
   final Widget Function(T)? contentBuilder;
@@ -39,10 +40,21 @@ class LabelTabView<T extends Label> extends StatelessWidget {
     required this.query,
     required this.canEdit,
     required this.canAddNew,
+    required this.canView,
   });
 
   @override
   Widget build(BuildContext context) {
+    if (!canView) {
+      return SliverToBoxAdapter(
+        child: Center(
+          child: Text(
+            S.of(context)!.unauthorizedErrorMessage,
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
     return BlocBuilder<ConnectivityCubit, ConnectivityState>(
       builder: (context, connectivityState) {
         if (!connectivityState.isConnected) {

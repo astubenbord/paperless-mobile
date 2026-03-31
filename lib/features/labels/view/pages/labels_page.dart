@@ -266,6 +266,7 @@ class _LabelsPageState extends State<LabelsPage>
           filterBuilder: (label) => DocumentFilter(
             correspondent: IdQueryParameter.include(ids: [label.id]),
           ),
+          canView: context.uiSettings$.canViewCorrespondents,
           canEdit: context.uiSettings$.canEditCorrespondents,
           canAddNew: context.uiSettings$.canCreateCorrespondents,
           onEdit: (correspondent) {
@@ -293,6 +294,7 @@ class _LabelsPageState extends State<LabelsPage>
           ),
           canEdit: context.uiSettings$.canEditDocumentTypes,
           canAddNew: context.uiSettings$.canCreateDocumentTypes,
+          canView: context.uiSettings$.canViewDocumentTypes,
           onEdit: (label) {
             EditLabelRoute(label).push(context);
           },
@@ -317,6 +319,7 @@ class _LabelsPageState extends State<LabelsPage>
               DocumentFilter(tags: IdsTagsQuery(include: [label.id])),
           canEdit: context.uiSettings$.canEditTags,
           canAddNew: context.uiSettings$.canCreateTags,
+          canView: context.uiSettings$.canViewTags,
           onEdit: (label) {
             EditLabelRoute(label).push(context);
           },
@@ -348,6 +351,7 @@ class _LabelsPageState extends State<LabelsPage>
           ),
           canEdit: context.uiSettings$.canEditStoragePaths,
           canAddNew: context.uiSettings$.canCreateStoragePaths,
+          canView: context.uiSettings$.canViewStoragePaths,
           contentBuilder: (path) => Text(path.path),
           emptyStateActionButtonLabel: S.of(context)!.addNewStoragePath,
           emptyStateDescription: S.of(context)!.noStoragePathsSetUp,
@@ -359,6 +363,16 @@ class _LabelsPageState extends State<LabelsPage>
   }
 
   Widget _buildCustomFieldsView() {
+    if (!context.uiSettings.canViewCustomFields) {
+      return SliverToBoxAdapter(
+        child: Center(
+          child: Text(
+            S.of(context)!.unauthorizedErrorMessage,
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
     return CustomScrollView(
       slivers: [
         SliverOverlapInjector(handle: searchBarHandle),

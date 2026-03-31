@@ -109,13 +109,19 @@ class _DocumentsPageState extends State<DocumentsPage> {
         context.loggedInUserData.appState.currentDocumentFilter;
     CachedQuery.instance.refetchQueries(
       keys: [
-        context.savedViewRepository.queryKey,
-        context.correspondentRepository.queryKey,
-        context.tagRepository.queryKey,
-        context.documentTypeRepository.queryKey,
-        context.storagePathRepository.queryKey,
-        context.customFieldRepository.queryKey,
-        context.documentRepository.queryKeyForFilter(currentFilter),
+        if (context.uiSettings.canViewSavedViews)
+          context.savedViewRepository.queryKey,
+        if (context.uiSettings.canViewCorrespondents)
+          context.correspondentRepository.queryKey,
+        if (context.uiSettings.canViewTags) context.tagRepository.queryKey,
+        if (context.uiSettings.canViewDocumentTypes)
+          context.documentTypeRepository.queryKey,
+        if (context.uiSettings.canViewStoragePaths)
+          context.storagePathRepository.queryKey,
+        if (context.uiSettings.canViewCustomFields)
+          context.customFieldRepository.queryKey,
+        if (context.uiSettings.canViewDocuments)
+          context.documentRepository.queryKeyForFilter(currentFilter),
       ],
     );
   }
