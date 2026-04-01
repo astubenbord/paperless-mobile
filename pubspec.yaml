@@ -58,7 +58,7 @@ dependencies:
   flutter_native_splash: ^2.2.11
   share_plus: ^12.0.0
   introduction_screen: ^4.0.0
-  listen_sharing_intent: ^1.8.1
+  listen_sharing_intent: ^1.9.2
   uuid: ^4.1.0
   flutter_typeahead: ^5.0.1
   fluttertoast: ^9.0.0
