@@ -21,8 +21,13 @@ class SessionDataRepository {
       key: 'user_profile/$localUserId',
       queryFn: () async {
         try {
-          final profile = await _userApi.getProfile();
-          final uiSettings = await _userApi.getUiSettings();
+          final [
+            profile as Profile,
+            uiSettings as UiSettingsView,
+          ] = await Future.wait([
+            _userApi.getProfile(),
+            _userApi.getUiSettings(),
+          ]);
           final serverStats = await _serverStatsApi.getServerInformation();
           return SessionData(
             apiVersion: serverStats.apiVersion,

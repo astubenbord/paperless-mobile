@@ -45,6 +45,12 @@ class ServerConnectionCubit extends Cubit<ServerConnectionState> {
           ),
         );
       } else {
+        logger.fw(
+          'Server is not reachable',
+          className: runtimeType.toString(),
+          methodName: 'checkReachability',
+          error: {'status': status.toString()},
+        );
         emit(ServerConnectionUnreachable(address: address, status: status));
       }
     } catch (error, stackTrace) {

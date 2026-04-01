@@ -103,8 +103,8 @@ class ConnectivityStatusServiceImpl implements ConnectivityStatusService {
               additionalHeaders: additionalHeaders,
             );
 
-      final response = await manager.client.get(
-        '/api/remote_version/',
+      final response = await manager.client.head(
+        '/api/schema/',
         options: Options(
           receiveTimeout: 5.seconds,
           sendTimeout: 5.seconds,
@@ -114,10 +114,28 @@ class ConnectivityStatusServiceImpl implements ConnectivityStatusService {
       if (response.statusCode == 200) {
         return ReachabilityStatus.reachable;
       }
+      logger.fw(
+        'Unexpected response status code: ${response.statusCode}',
+        className: runtimeType.toString(),
+        methodName: 'isPaperlessServerReachable',
+        error: {
+          'statusCode': response.statusCode,
+          'data': response.data.toString(),
+        },
+      );
       return ReachabilityStatus.notReachable;
     } on DioException catch (error) {
       if (error.type == DioExceptionType.unknown &&
           error.error is ReachabilityStatus) {
+        logger.fw(
+          'Could not reach server: ${error.error}',
+          className: runtimeType.toString(),
+          methodName: 'isPaperlessServerReachable',
+          error: {
+            'statusCode': error.response?.statusCode,
+            'data': error.response?.data.toString(),
+          },
+        );
         return error.error as ReachabilityStatus;
       }
     } on TlsException catch (error) {
@@ -126,6 +144,11 @@ class ConnectivityStatusServiceImpl implements ConnectivityStatusService {
         // Missing client cert passphrase
         return ReachabilityStatus.invalidClientCertificateConfiguration;
       }
+      logger.fw(
+        'Could not reach server due to an SSL/TLS issue: ${error.message}',
+        className: runtimeType.toString(),
+        methodName: 'isPaperlessServerReachable',
+      );
     }
     return ReachabilityStatus.notReachable;
   }
