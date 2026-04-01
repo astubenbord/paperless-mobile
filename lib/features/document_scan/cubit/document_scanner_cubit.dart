@@ -37,15 +37,32 @@ class DocumentScannerCubit extends Cubit<DocumentScannerState> {
     final scans = await allFiles
         .where((event) => event.path.endsWith(".jpeg"))
         .toList();
+    final validScans = <File>[];
+    for (final file in scans) {
+      final length = await file.length();
+      if (length == 0) {
+        await file.delete();
+        logger.fw(
+          'Previous scan ${file.path} was empty and has been deleted.',
+          className: runtimeType.toString(),
+          methodName: "initialize",
+        );
+        continue;
+      }
+      validScans.add(file);
+    }
     logger.fd(
-      "Restored ${scans.length} scans.",
+      "Restored ${validScans.length} scans.",
       className: runtimeType.toString(),
       methodName: "initialize",
     );
     emit(
-      scans.isEmpty
+      validScans.isEmpty
           ? const DocumentScannerState()
-          : DocumentScannerState(scans: scans, status: LoadingStatus.loaded),
+          : DocumentScannerState(
+              scans: validScans,
+              status: LoadingStatus.loaded,
+            ),
     );
   }
 
