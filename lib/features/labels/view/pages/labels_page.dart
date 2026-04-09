@@ -22,14 +22,13 @@ class LabelsPage extends StatefulWidget {
   State<LabelsPage> createState() => _LabelsPageState();
 }
 
-class _LabelsPageState extends State<LabelsPage>
-    with SingleTickerProviderStateMixin {
+class _LabelsPageState extends State<LabelsPage> with TickerProviderStateMixin {
   final SliverOverlapAbsorberHandle searchBarHandle =
       SliverOverlapAbsorberHandle();
   final SliverOverlapAbsorberHandle tabBarHandle =
       SliverOverlapAbsorberHandle();
 
-  late final TabController _tabController;
+  TabController? _tabController;
 
   int _currentIndex = 0;
 
@@ -47,18 +46,26 @@ class _LabelsPageState extends State<LabelsPage>
     context.refetchLabels();
   }
 
+  void onTabChangedListener() {
+    setState(() => _currentIndex = _tabController!.index);
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _tabController = TabController(
-      length: _calculateTabCount(context),
-      vsync: this,
-    )..addListener(() => setState(() => _currentIndex = _tabController.index));
+    final newTabCount = _calculateTabCount(context);
+    if (_tabController?.length != newTabCount) {
+      _tabController?.removeListener(onTabChangedListener);
+      _tabController?.dispose();
+      _tabController = TabController(length: newTabCount, vsync: this)
+        ..addListener(onTabChangedListener);
+    }
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
+    _tabController?.removeListener(onTabChangedListener);
+    _tabController?.dispose();
     super.dispose();
   }
 
@@ -116,7 +123,7 @@ class _LabelsPageState extends State<LabelsPage>
                     delegate: CustomizableSliverPersistentHeaderDelegate(
                       child: ColoredTabBar(
                         tabBar: TabBar(
-                          controller: _tabController,
+                          controller: _tabController!,
                           tabs: [
                             if (context.uiSettings$.canViewCorrespondents)
                               Tab(
@@ -195,7 +202,7 @@ class _LabelsPageState extends State<LabelsPage>
                   }
                   final desiredTab =
                       ((metrics.pixels / metrics.maxScrollExtent) *
-                              (_tabController.length - 1))
+                              (_tabController!.length - 1))
                           .round();
 
                   if (metrics.axis == Axis.horizontal &&
@@ -234,7 +241,7 @@ class _LabelsPageState extends State<LabelsPage>
                     }
                   },
                   child: TabBarView(
-                    controller: _tabController,
+                    controller: _tabController!,
                     children: [
                       if (context.uiSettings$.canViewCorrespondents)
                         _buildCorrespondentsView(),

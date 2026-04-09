@@ -50,7 +50,7 @@ fi
 # Run analyzer
 if [ -n "$STAGED_DART_FILES" ]; then
   echo "Running dart analyze on staged files..."
-  ANALYZE_OUTPUT=$(echo "$STAGED_DART_FILES" | xargs fvm dart analyze --no-fatal-infos 2>&1)
+  ANALYZE_OUTPUT=$(echo "$STAGED_DART_FILES" | xargs fvm dart analyze 2>&1)
   ANALYZE_EXIT=$?
   if [ $ANALYZE_EXIT -ne 0 ]; then
     echo -e "${FAIL} Dart analyzer reported issues:"
