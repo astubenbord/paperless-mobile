@@ -57,9 +57,7 @@ class _LandingPageState extends State<LandingPage> {
                   child: Text(
                     S
                         .of(context)!
-                        .welcomeUser(
-                          context.loggedInUser$.profile.profile.displayName,
-                        ),
+                        .welcomeUser(context.loggedInUser$.displayName),
                     textAlign: TextAlign.center,
                     style: Theme.of(
                       context,
