@@ -15,6 +15,7 @@ abstract class UiSettingsViewSettings with _$UiSettingsViewSettings {
     UiSettingsViewSettingsUpdateChecking? updateChecking,
     UiSettingsViewSettingsPermissions? permissions,
     UiSettingsViewSettingsDateDisplay? dateDisplay,
+    UiSettingsViewSettingsSearch? search,
     bool? auditlogEnabled,
   }) = _UiSettingsViewSettings;
 
@@ -73,4 +74,25 @@ abstract class UiSettingsViewSettingsDateDisplay
   factory UiSettingsViewSettingsDateDisplay.fromJson(
     Map<String, dynamic> json,
   ) => _$UiSettingsViewSettingsDateDisplayFromJson(json);
+}
+
+@JsonEnum(valueField: 'value')
+enum UiSettingsViewSettingsSearchMoreLink {
+  titleContent('title-content'),
+  advanced('advanced');
+
+  final String value;
+  const UiSettingsViewSettingsSearchMoreLink(this.value);
+}
+
+@Freezed(toJson: true, fromJson: true)
+abstract class UiSettingsViewSettingsSearch
+    with _$UiSettingsViewSettingsSearch {
+  factory UiSettingsViewSettingsSearch({
+    @Default(UiSettingsViewSettingsSearchMoreLink.titleContent)
+    UiSettingsViewSettingsSearchMoreLink? moreLink,
+  }) = _UiSettingsViewSettingsSearch;
+
+  factory UiSettingsViewSettingsSearch.fromJson(Map<String, dynamic> json) =>
+      _$UiSettingsViewSettingsSearchFromJson(json);
 }

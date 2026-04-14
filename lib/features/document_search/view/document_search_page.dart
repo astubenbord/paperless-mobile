@@ -269,7 +269,13 @@ class _DocumentSearchPageState extends State<DocumentSearchPage> {
   Widget _buildResultsView() {
     final normalizedQuery = _searchTerm.trim();
     final resultListQuery = context.documentRepository.getAllQuery(
-      filter: DocumentFilter(query: TextQuery.titleAndContent(normalizedQuery)),
+      filter: DocumentFilter(
+        query:
+            context.uiSettings.settings?.search?.moreLink ==
+                UiSettingsViewSettingsSearchMoreLink.advanced
+            ? TextQuery.extended(normalizedQuery)
+            : TextQuery.titleAndContent(normalizedQuery),
+      ),
     );
 
     final header = Row(
