@@ -6,6 +6,7 @@ import 'package:paperless_mobile/core/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/core/widgets/app_logs_footer_widget.dart';
 import 'package:paperless_mobile/features/login/authenticate_user/cubit/authenticate_user_cubit.dart';
 import 'package:paperless_mobile/features/login/authenticate_user/model/authentication_credentials.dart';
+import 'package:paperless_mobile/features/login/helper/guard_unsupported_api_version.dart';
 import 'package:paperless_mobile/features/login/model/client_certificate.dart';
 import 'package:paperless_mobile/features/login/server_connection/model/header_entry.dart';
 import 'package:paperless_mobile/features/login/view/widgets/form_fields/authentication_credentials_form_field.dart';
@@ -37,7 +38,7 @@ class _AuthenticateUserPageState extends State<AuthenticateUserPage> {
   @override
   Widget build(BuildContext context) {
     return BlocListener<AuthenticateUserCubit, AuthenticateUserState>(
-      listener: (context, state) {
+      listener: (context, state) async {
         switch (state) {
           case AuthenticateUserError error:
             if (error.nonFieldError != null) {
@@ -52,14 +53,20 @@ class _AuthenticateUserPageState extends State<AuthenticateUserPage> {
             :final token,
             :final additionalHeaders,
           ):
-            AddUserRoute(
-              serverUrl: serverUrl,
-              $extra: AddUserRouteExtra(
-                token: token,
-                additionalHeaders: additionalHeaders,
-                clientCertificate: clientCertificate,
-              ),
-            ).push(context);
+            final wasHandled = await guardUnsupportedApiVersion(
+              context,
+              state.apiVersion,
+            );
+            if (!wasHandled && context.mounted) {
+              AddUserRoute(
+                serverUrl: serverUrl,
+                $extra: AddUserRouteExtra(
+                  token: token,
+                  additionalHeaders: additionalHeaders,
+                  clientCertificate: clientCertificate,
+                ),
+              ).replace(context);
+            }
             break;
           case AuthenticateUserOtpRequired(
             :final serverUrl,
@@ -107,6 +114,7 @@ class _AuthenticateUserPageState extends State<AuthenticateUserPage> {
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
+                      spacing: 8,
                       children: [
                         TextButton.icon(
                           onPressed: () {

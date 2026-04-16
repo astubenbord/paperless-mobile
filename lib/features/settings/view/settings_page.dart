@@ -89,7 +89,7 @@ class SettingsPage extends StatelessWidget {
                 children: [
                   Text(
                     '${S.of(context)!.paperlessServerVersion}'
-                    ' ${serverData.version} (API v${serverData.apiVersion})',
+                    ' ${serverData.version} (API v${currentUser.apiVersion})',
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
                       color: Theme.of(context).colorScheme.secondary,
                     ),

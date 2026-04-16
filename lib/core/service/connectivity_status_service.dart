@@ -166,10 +166,7 @@ class ConnectivityStatusServiceImpl implements ConnectivityStatusService {
         additionalHeaders: additionalHeaders,
       );
 
-    final response = await manager.client.get("/api/remote_version/");
-    int apiVersion = int.parse(
-      response.headers.value('x-api-version') ?? '$latestSupportedApiVersion',
-    );
+    int apiVersion = await manager.getApiVersion();
 
     if (apiVersion > latestSupportedApiVersion) {
       logger.fw(

@@ -33,6 +33,7 @@ class AuthenticateUserFieldValidationError extends AuthenticateUserState {
 class AuthenticateUserSuccess extends AuthenticateUserState {
   final String serverUrl;
   final String token;
+  final int apiVersion;
   final ClientCertificate? clientCertificate;
   final List<HeaderEntry>? additionalHeaders;
   const AuthenticateUserSuccess({
@@ -40,6 +41,7 @@ class AuthenticateUserSuccess extends AuthenticateUserState {
     required this.token,
     this.additionalHeaders,
     this.clientCertificate,
+    required this.apiVersion,
   });
 }
 

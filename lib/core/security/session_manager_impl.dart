@@ -5,12 +5,14 @@ import 'package:dio/io.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:paperless_mobile/api/paperless_api.dart';
+import 'package:paperless_mobile/constants.dart';
 import 'package:paperless_mobile/core/interceptor/api_version_header.interceptor.dart';
 import 'package:paperless_mobile/core/interceptor/dio_offline_interceptor.dart';
 import 'package:paperless_mobile/core/interceptor/dio_unauthorized_interceptor.dart';
 import 'package:paperless_mobile/core/interceptor/persistent_logging_interceptor.dart';
 import 'package:paperless_mobile/core/interceptor/retry_on_connection_change_interceptor.dart';
 import 'package:paperless_mobile/core/security/session_manager.dart';
+import 'package:paperless_mobile/features/logging/data/logger.dart';
 import 'package:paperless_mobile/features/login/model/client_certificate.dart';
 import 'package:paperless_mobile/features/login/server_connection/model/header_entry.dart';
 
@@ -108,6 +110,39 @@ class SessionManagerImpl extends ValueNotifier<Dio> implements SessionManager {
 
     if (broadcast) {
       notifyListeners();
+    }
+  }
+
+  @override
+  Future<int> getApiVersion() async {
+    if (SessionManagerImpl._apiVersion != null) {
+      return SessionManagerImpl._apiVersion!;
+    }
+    try {
+      final response = await client.head(
+        "/api/schema/",
+        options: Options(receiveTimeout: 5.seconds, sendTimeout: 5.seconds),
+      );
+      final apiVersionHeader = response.headers.value('x-api-version');
+      if (apiVersionHeader != null) {
+        return int.parse(apiVersionHeader);
+      } else {
+        logger.fw(
+          'API version header not found in response. Defaulting to minimum supported version.',
+          className: runtimeType.toString(),
+          methodName: 'getApiVersion',
+        );
+        return minSupportedApiVersion;
+      }
+    } catch (e, stackTrace) {
+      logger.fe(
+        'Failed to retrieve API version from server. Defaulting to minimum supported version.',
+        error: e,
+        stackTrace: stackTrace,
+        className: runtimeType.toString(),
+        methodName: 'getApiVersion',
+      );
+      return minSupportedApiVersion;
     }
   }
 

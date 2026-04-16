@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:paperless_mobile/api/paperless_api.dart';
 import 'package:paperless_mobile/core/repository/correspondent_repository.dart';
@@ -114,5 +115,16 @@ extension ContextExtensions on BuildContext {
     if (uiSettings.canViewCustomFields) {
       customFieldRepository.getAllQuery().refetch();
     }
+  }
+
+  void popUntil(bool Function(GoRoute route) predicate) {
+    final delegate = GoRouter.of(this).routerDelegate;
+    var config = delegate.currentConfiguration;
+    var routes = config.routes.whereType<GoRoute>();
+    while (routes.length > 1 && !predicate(config.last.route)) {
+      config = config.remove(config.last);
+      routes = config.routes.whereType<GoRoute>();
+    }
+    delegate.setNewRoutePath(config);
   }
 }

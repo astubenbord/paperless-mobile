@@ -1,9 +1,10 @@
 import 'package:dio/dio.dart';
-import 'package:paperless_mobile/api/extensions/extensions.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:paperless_mobile/api/models/exception/exception.dart';
 import 'package:paperless_mobile/api/models/paperless_server_information_model.dart';
 import 'package:paperless_mobile/api/models/paperless_server_statistics_model.dart';
 import 'package:paperless_mobile/api/utils/request_utils.dart';
+import 'package:paperless_mobile/features/logging/data/logger.dart';
 
 ///
 /// API for retrieving information about paperless server state,
@@ -25,7 +26,11 @@ class PaperlessServerStatsApiImpl implements PaperlessServerStatsApi {
     try {
       final response = await client.get(
         "/api/remote_version/",
-        options: Options(validateStatus: (status) => status == 200),
+        options: Options(
+          validateStatus: (status) => status == 200,
+          receiveTimeout: 5.seconds,
+          sendTimeout: 5.seconds,
+        ),
       );
       final latestVersion = response.data["version"] as String;
       final version =
@@ -35,20 +40,22 @@ class PaperlessServerStatsApiImpl implements PaperlessServerStatsApi {
           _fallbackVersion;
       final updateAvailable = response.data["update_available"] as bool;
       return PaperlessServerInformationModel(
-        apiVersion: int.parse(
-          response.headers.value(
-            PaperlessServerInformationModel.apiVersionHeader,
-          )!,
-        ),
         latestVersion: latestVersion,
         version: version,
         isUpdateAvailable: updateAvailable,
       );
-    } on DioException catch (exception) {
-      throw exception.unravel(
-        orElse: const PaperlessApiException(
-          ErrorCode.serverInformationLoadFailed,
-        ),
+    } on DioException catch (exception, stackTrace) {
+      logger.fe(
+        'Could not retrieve server information via /api/remote_version/. Does your instance have access to the internet?',
+        error: exception,
+        stackTrace: stackTrace,
+        className: runtimeType.toString(),
+        methodName: 'getServerInformation',
+      );
+      return PaperlessServerInformationModel(
+        version: _fallbackVersion,
+        isUpdateAvailable: false,
+        latestVersion: _fallbackVersion,
       );
     }
   }

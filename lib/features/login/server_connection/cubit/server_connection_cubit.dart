@@ -29,17 +29,10 @@ class ServerConnectionCubit extends Cubit<ServerConnectionState> {
             clientCertificate,
             additionalHeaders,
           );
-      final apiVersion = await _connectivityStatusService
-          .getPaperlessServerApiVersion(
-            address,
-            clientCertificate,
-            additionalHeaders,
-          );
       if (status == ReachabilityStatus.reachable) {
         emit(
           ServerConnectionSuccess(
             serverUrl: address,
-            apiVersion: apiVersion,
             clientCertificate: clientCertificate,
             additionalHeaders: additionalHeaders,
           ),

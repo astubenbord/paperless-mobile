@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:paperless_mobile/constants.dart';
 import 'package:paperless_mobile/core/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/core/widgets/app_logs_footer_widget.dart';
-import 'package:paperless_mobile/core/widgets/unsupported_version_dialog.dart';
 import 'package:paperless_mobile/features/login/model/client_certificate.dart';
 import 'package:paperless_mobile/features/login/model/reachability_status.dart';
 import 'package:paperless_mobile/features/login/server_connection/cubit/server_connection_cubit.dart';
@@ -85,33 +83,13 @@ class _ServerConnectionPageState extends State<ServerConnectionPage> {
                   BlocConsumer<ServerConnectionCubit, ServerConnectionState>(
                     listener: (context, state) {
                       if (state is ServerConnectionSuccess) {
-                        if (state.apiVersion < latestSupportedApiVersion) {
-                          showDialog(
-                            context: context,
-                            barrierDismissible: false,
-                            useRootNavigator: false,
-                            builder: (context) => UnsupportedVersionDialog(
-                              apiVersion: state.apiVersion,
-                            ),
-                          ).then((_) {
-                            AuthenticateRoute(
-                              serverUrl: state.serverUrl,
-                              $extra: AuthRouteExtra(
-                                clientCertificate: state.clientCertificate,
-                                additionalHeaders: state.additionalHeaders,
-                              ),
-                              // ignore: use_build_context_synchronously
-                            ).push(context);
-                          });
-                        } else {
-                          AuthenticateRoute(
-                            serverUrl: state.serverUrl,
-                            $extra: AuthRouteExtra(
-                              clientCertificate: state.clientCertificate,
-                              additionalHeaders: state.additionalHeaders,
-                            ),
-                          ).push(context);
-                        }
+                        AuthenticateRoute(
+                          serverUrl: state.serverUrl,
+                          $extra: AuthRouteExtra(
+                            clientCertificate: state.clientCertificate,
+                            additionalHeaders: state.additionalHeaders,
+                          ),
+                        ).push(context);
                       }
                     },
                     builder: (context, state) {

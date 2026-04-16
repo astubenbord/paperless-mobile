@@ -18,7 +18,11 @@ class UnsupportedVersionDialog extends StatelessWidget {
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => Navigator.of(context).pop(true),
+          child: Text(S.of(context)!.backToLogin),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
           child: Text(S.of(context)!.continueAnyway),
         ),
       ],

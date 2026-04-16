@@ -14,4 +14,5 @@ abstract interface class SessionManager implements ChangeNotifier {
     bool broadcast = true,
   });
   void resetSettings({bool broadcast = true});
+  Future<int> getApiVersion();
 }

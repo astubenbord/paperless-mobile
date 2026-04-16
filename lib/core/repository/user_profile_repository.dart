@@ -1,5 +1,6 @@
 import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:paperless_mobile/api/paperless_api.dart';
+import 'package:paperless_mobile/core/security/session_manager.dart';
 import 'package:paperless_mobile/core/store/slices/user_profile.dart';
 import 'package:paperless_mobile/features/logging/data/logger.dart';
 
@@ -12,9 +13,9 @@ class SessionData {
 
 class SessionDataRepository {
   final PaperlessUserApi _userApi;
-  final PaperlessServerStatsApi _serverStatsApi;
+  final SessionManager _sessionManager;
 
-  SessionDataRepository(this._userApi, this._serverStatsApi);
+  SessionDataRepository(this._userApi, this._sessionManager);
 
   Query<SessionData> userProfileQuery(String localUserId) {
     return Query(
@@ -24,13 +25,14 @@ class SessionDataRepository {
           final [
             profile as Profile,
             uiSettings as UiSettingsView,
+            apiVersion as int,
           ] = await Future.wait([
             _userApi.getProfile(),
             _userApi.getUiSettings(),
+            _sessionManager.getApiVersion(),
           ]);
-          final serverStats = await _serverStatsApi.getServerInformation();
           return SessionData(
-            apiVersion: serverStats.apiVersion,
+            apiVersion: apiVersion,
             profile: UserProfile(profile: profile, uiSettings: uiSettings),
           );
         } catch (error, stackTrace) {

@@ -27,24 +27,32 @@ class AuthenticateUserCubit extends Cubit<AuthenticateUserState> {
         );
 
       final tempAuthApi = PaperlessAuthenticationApiImpl(sessionManager.client);
-      final token = switch (credentials) {
-        PasswordAuthenticationCredentials(:final username, :final password) =>
-          await tempAuthApi.token(
+      String token;
+      int apiVersion;
+      switch (credentials) {
+        case PasswordAuthenticationCredentials(
+          :final username,
+          :final password,
+        ):
+          final response = await tempAuthApi.token(
             PaperlessAuthTokenRequest(
               username: username,
               password: password,
               code: otp,
             ),
-          ),
-        ApiKeyAuthenticationCredentials(:final apiKey) =>
-          await tempAuthApi.validateToken(apiKey)
-              ? apiKey
-              : throw PaperlessApiException(ErrorCode.invalidApiKey),
-      };
-
+          );
+          token = response.value;
+          apiVersion = response.apiVersion;
+          break;
+        case ApiKeyAuthenticationCredentials(:final apiKey):
+          final response = await tempAuthApi.validateToken(apiKey);
+          token = apiKey;
+          apiVersion = response.apiVersion;
+      }
       emit(
         AuthenticateUserSuccess(
           serverUrl: serverUrl,
+          apiVersion: apiVersion,
           token: token,
           clientCertificate: clientCertificate,
           additionalHeaders: additionalHeaders,

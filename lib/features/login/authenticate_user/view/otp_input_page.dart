@@ -4,6 +4,7 @@ import 'package:paperless_mobile/core/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/core/widgets/app_logs_footer_widget.dart';
 import 'package:paperless_mobile/features/login/authenticate_user/cubit/authenticate_user_cubit.dart';
 import 'package:paperless_mobile/features/login/authenticate_user/model/authentication_credentials.dart';
+import 'package:paperless_mobile/features/login/helper/guard_unsupported_api_version.dart';
 import 'package:paperless_mobile/features/login/model/client_certificate.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
 import 'package:paperless_mobile/helpers/message_helpers.dart';
@@ -52,7 +53,7 @@ class _OtpInputPageState extends State<OtpInputPage> {
     );
 
     return BlocListener<AuthenticateUserCubit, AuthenticateUserState>(
-      listener: (context, state) {
+      listener: (context, state) async {
         switch (state) {
           case AuthenticateUserError error:
             if (error.nonFieldError != null) {
@@ -64,14 +65,20 @@ class _OtpInputPageState extends State<OtpInputPage> {
             _focusNode.requestFocus();
             break;
           case AuthenticateUserSuccess state:
-            AddUserRoute(
-              serverUrl: state.serverUrl,
-              $extra: AddUserRouteExtra(
-                token: state.token,
-                additionalHeaders: state.additionalHeaders,
-                clientCertificate: state.clientCertificate,
-              ),
-            ).go(context);
+            final wasHandled = await guardUnsupportedApiVersion(
+              context,
+              state.apiVersion,
+            );
+            if (!wasHandled && context.mounted) {
+              AddUserRoute(
+                serverUrl: state.serverUrl,
+                $extra: AddUserRouteExtra(
+                  token: state.token,
+                  additionalHeaders: state.additionalHeaders,
+                  clientCertificate: state.clientCertificate,
+                ),
+              ).go(context);
+            }
             break;
           default:
             break;
