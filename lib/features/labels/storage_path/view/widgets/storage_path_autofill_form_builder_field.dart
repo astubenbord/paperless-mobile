@@ -45,6 +45,8 @@ class _StoragePathAutofillFormBuilderFieldState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           TextFormField(
+            textInputAction: TextInputAction.newline,
+            maxLines: null,
             controller: _textEditingController,
             validator: (value) {
               if (value?.trim().isEmpty ?? true) {
