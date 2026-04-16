@@ -106,7 +106,7 @@ class _CustomFieldValue extends StatelessWidget {
         placeholder: placeholder,
       ),
       DataTypeEnum.select => SelectFieldValue(
-        value: value,
+        id: value,
         extraData: extraData,
         style: textStyle,
         placeholder: placeholder,

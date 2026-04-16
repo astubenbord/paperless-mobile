@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 class SelectFieldValue extends StatelessWidget {
-  final Object? value;
+  final Object? id;
   final Object? extraData;
   final TextStyle? style;
   final Widget placeholder;
 
   const SelectFieldValue({
     super.key,
-    required this.value,
+    required this.id,
     this.extraData,
     this.style,
     required this.placeholder,
@@ -16,25 +16,25 @@ class SelectFieldValue extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (value == null) return placeholder;
+    if (id == null) return placeholder;
 
     // extraData contains select options; try to resolve the label.
-    final label = _resolveSelectLabel(value, extraData);
-    return Text(label ?? '$value', style: style);
+    final label = _resolveSelectLabel(id, extraData);
+    return Text(label ?? '$id', style: style);
   }
 
-  String? _resolveSelectLabel(Object? value, Object? extraData) {
+  String? _resolveSelectLabel(Object? id, Object? extraData) {
     if (extraData is Map) {
       final options = extraData['select_options'];
       if (options is List) {
         for (final option in options) {
-          if (option is Map && option['value'] == value) {
+          if (option is Map && option['id'] == id) {
             return option['label']?.toString();
           }
         }
       }
     }
     // Fallback: return the raw value.
-    return value?.toString();
+    return id?.toString();
   }
 }

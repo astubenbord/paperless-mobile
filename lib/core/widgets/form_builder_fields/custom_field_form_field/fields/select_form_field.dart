@@ -28,14 +28,11 @@ class SelectFormField extends StatelessWidget {
     this.errorText,
   });
 
-  List<dynamic> _parseOptions() {
+  List<Map<String, dynamic>> _parseOptions() {
     if (extraData is Map) {
       final options = (extraData as Map)['select_options'];
       if (options is List) {
-        return options
-            .whereType<Map>()
-            .map((option) => option['label'])
-            .toList();
+        return options.whereType<Map<String, dynamic>>().toList();
       }
     }
     return [];
@@ -47,7 +44,7 @@ class SelectFormField extends StatelessWidget {
 
     return DropdownButtonFormField<Object?>(
       initialValue: _findMatchingValue(options),
-      onChanged: enabled ? (newValue) => onChanged(newValue) : null,
+      onChanged: enabled ? onChanged : null,
       decoration: InputDecoration(
         labelText: labelText,
         errorText: errorText,
@@ -57,8 +54,10 @@ class SelectFormField extends StatelessWidget {
         // Allow clearing the selection.
         const DropdownMenuItem<Object?>(value: null, child: Text('-')),
         ...options.map(
-          (option) =>
-              DropdownMenuItem<Object?>(value: option, child: Text('$option')),
+          (option) => DropdownMenuItem<Object?>(
+            value: option['id'],
+            child: Text('${option['label']}'),
+          ),
         ),
       ],
     );

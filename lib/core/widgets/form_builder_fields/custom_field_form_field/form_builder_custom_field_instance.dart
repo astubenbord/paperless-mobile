@@ -70,6 +70,7 @@ class CustomFieldValueEditor extends StatelessWidget {
   final int parentDocumentId;
 
   const CustomFieldValueEditor({
+    super.key,
     required this.labelText,
     required this.dataType,
     required this.value,
