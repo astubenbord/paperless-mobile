@@ -40,8 +40,8 @@ class DateFormField extends StatelessWidget {
               final picked = await showDatePicker(
                 context: context,
                 initialDate: date ?? DateTime.now(),
-                firstDate: DateTime(1900),
-                lastDate: DateTime(2100),
+                firstDate: DateTime(1000, 1, 1),
+                lastDate: DateTime(9999, 12, 31),
               );
               if (picked != null) {
                 // Store as ISO 8601 date string (yyyy-MM-dd).

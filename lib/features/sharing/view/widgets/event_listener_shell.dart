@@ -10,6 +10,7 @@ import 'package:paperless_mobile/constants.dart';
 import 'package:paperless_mobile/core/extensions/context_extensions.dart';
 import 'package:paperless_mobile/core/service/connectivity_status_service.dart';
 import 'package:paperless_mobile/features/document_upload/view/document_upload_preparation_page.dart';
+import 'package:paperless_mobile/features/logging/data/logger.dart';
 import 'package:paperless_mobile/features/notifications/services/local_notification_service.dart';
 import 'package:paperless_mobile/features/sharing/cubit/receive_share_cubit.dart';
 import 'package:paperless_mobile/features/sharing/view/dialog/discard_shared_file_dialog.dart';
@@ -114,6 +115,11 @@ class _EventListenerShellState extends State<EventListenerShell> {
     final files = sharedFiles.map((file) => File(file.path)).toList();
     final userId = context.loggedInAppUserId!;
     if (files.isNotEmpty) {
+      logger.fi(
+        'Received shared files: \n\t${sharedFiles.map((e) => e.path).join(',\n\t')}',
+        className: runtimeType.toString(),
+        methodName: '_onReceiveSharedFiles',
+      );
       final notifier = context.read<ConsumptionChangeNotifier>();
       final addedLocalFiles = await notifier.addFiles(
         files: files,
