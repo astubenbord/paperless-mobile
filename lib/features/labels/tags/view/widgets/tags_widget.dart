@@ -1,5 +1,6 @@
 import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:paperless_mobile/api/extensions/cached_query_extensions.dart';
 import 'package:paperless_mobile/api/paperless_api.dart';
 import 'package:paperless_mobile/core/extensions/context_extensions.dart';
 import 'package:paperless_mobile/core/repository/tag_repository.dart';
@@ -61,7 +62,7 @@ class TagsWidget extends StatelessWidget {
         }
 
         // Show skeleton while loading tag data
-        if (state.isLoading && state.data == null) {
+        if (state.isLoadingInitial) {
           return _TagsSkeletonWidget(
             skeletonCount: tagIds!.length,
             dense: dense,
@@ -123,7 +124,7 @@ class _MultiLineTagsWidget extends TagsWidget {
         }
 
         // Show skeleton while loading tag data
-        if (state.isLoading && state.data == null) {
+        if (state.isLoadingInitial) {
           return _MultiLineTagsSkeletonWidget(
             skeletonCount: tagIds!.length,
             dense: dense,
@@ -187,7 +188,7 @@ class _SliverTagsWidget extends TagsWidget {
         }
 
         // Show skeleton while loading tag data
-        if (state.isLoading && state.data == null) {
+        if (state.isLoadingInitial) {
           return _SliverTagsSkeletonWidget(
             skeletonCount: tagIds!.length,
             dense: dense,

@@ -3,6 +3,7 @@ import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:paperless_mobile/api/extensions/cached_query_extensions.dart';
 import 'package:paperless_mobile/api/paperless_api.dart';
 import 'package:paperless_mobile/core/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/core/extensions/label_list_extension.dart';
@@ -51,8 +52,7 @@ class SingleLabelFormField<T extends Label> extends StatelessWidget {
           query: query,
           builder: (context, state) {
             // Handle initial loading state
-            final isInitialLoading = state.isLoading && state.data == null;
-            if (isInitialLoading) {
+            if (state.isLoadingInitial) {
               return _buildLoadingInput(context);
             }
 

@@ -1,6 +1,7 @@
 import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:paperless_mobile/api/extensions/cached_query_extensions.dart';
 import 'package:paperless_mobile/api/paperless_api.dart';
 import 'package:paperless_mobile/core/extensions/context_extensions.dart';
 import 'package:paperless_mobile/features/document_details/view/widgets/custom_fields/boolean_field_value.dart';
@@ -24,7 +25,7 @@ class CustomFieldWidget extends StatelessWidget {
     return QueryBuilder(
       query: context.customFieldRepository.getAllQuery(),
       builder: (context, state) {
-        if (state.isLoading && state.data == null) {
+        if (state.isLoadingInitial) {
           return DetailsItemSkeleton(label: '...');
         }
         final field = state.data?.firstWhereOrNull(

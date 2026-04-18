@@ -5,6 +5,7 @@ import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:paperless_mobile/api/extensions/cached_query_extensions.dart';
 import 'package:paperless_mobile/api/paperless_api.dart';
 import 'package:paperless_mobile/core/extensions/context_extensions.dart';
 import 'package:paperless_mobile/core/extensions/flutter_extensions.dart';
@@ -192,7 +193,7 @@ class _DocumentSearchPageState extends State<DocumentSearchPage> {
                 ),
               );
             }
-            if (state.isLoading && state.data == null) {
+            if (state.isLoadingInitial) {
               return SliverFillRemaining(
                 child: Center(child: CircularProgressIndicator()),
               );

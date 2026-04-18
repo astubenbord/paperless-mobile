@@ -1,6 +1,7 @@
 import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:paperless_mobile/api/extensions/cached_query_extensions.dart';
 import 'package:paperless_mobile/api/paperless_api.dart';
 import 'package:paperless_mobile/core/repository/correspondent_repository.dart';
 import 'package:paperless_mobile/core/repository/custom_field_repository.dart';
@@ -141,7 +142,7 @@ class HomeShellWidget extends StatelessWidget {
                 appUserId,
               ),
               builder: (context, state) {
-                if (state.isLoading) {
+                if (state.isLoadingInitial) {
                   return LoginTransitionPage(
                     text: S.of(context)!.fetchingUserInformation,
                   );

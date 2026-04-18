@@ -1,6 +1,7 @@
 import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:paperless_mobile/api/extensions/cached_query_extensions.dart';
 import 'package:paperless_mobile/api/paperless_api.dart';
 import 'package:paperless_mobile/core/extensions/context_extensions.dart';
 import 'package:paperless_mobile/core/extensions/flutter_extensions.dart';
@@ -86,7 +87,7 @@ class _LandingPageState extends State<LandingPage> {
                   QueryBuilder(
                     query: context.read<SavedViewRepository>().getAllQuery(),
                     builder: (context, state) {
-                      if (state.isLoading && state.data == null) {
+                      if (state.isLoadingInitial) {
                         return const SliverToBoxAdapter(
                           child: Center(child: CircularProgressIndicator()),
                         );
@@ -154,7 +155,7 @@ class _LandingPageState extends State<LandingPage> {
       content: QueryBuilder(
         query: context.read<ServerStatisticsRepository>().serverStatisticsQuery,
         builder: (context, state) {
-          if (state.isLoading && state.data == null) {
+          if (state.isLoadingInitial) {
             return const Center(
               child: CircularProgressIndicator(),
             ).paddedOnly(top: 8, bottom: 24);

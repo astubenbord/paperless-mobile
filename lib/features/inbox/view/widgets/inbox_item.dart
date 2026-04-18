@@ -1,6 +1,7 @@
 import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:paperless_mobile/api/extensions/cached_query_extensions.dart';
 import 'package:paperless_mobile/api/paperless_api.dart';
 import 'package:paperless_mobile/core/extensions/context_extensions.dart';
 import 'package:paperless_mobile/core/extensions/dart_extensions.dart';
@@ -395,7 +396,7 @@ class _InboxItemState extends State<InboxItem> {
       ),
       enabled: _suggestionsEnabled,
       builder: (context, state) {
-        if (state.isInitial || state.isLoading && state.data == null) {
+        if (state.isInitial || state.isLoadingInitial) {
           return SliverToBoxAdapter(child: SizedBox.shrink());
         }
         if (state.isError) {

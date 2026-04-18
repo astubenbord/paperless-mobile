@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:markdown/markdown.dart' show markdownToHtml;
+import 'package:paperless_mobile/api/extensions/cached_query_extensions.dart';
 import 'package:paperless_mobile/core/extensions/context_extensions.dart';
 import 'package:paperless_mobile/core/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/core/repository/document_repository.dart';
@@ -33,7 +34,7 @@ class _DocumentNotesWidgetState extends State<DocumentNotesWidget> {
         widget.documentId,
       ),
       builder: (context, state) {
-        if (state.isLoading) {
+        if (state.isLoadingInitial) {
           return const SliverToBoxAdapter(
             child: Center(child: CircularProgressIndicator()),
           );

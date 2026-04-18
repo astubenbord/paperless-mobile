@@ -2,6 +2,7 @@ import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:paperless_mobile/api/extensions/cached_query_extensions.dart';
 import 'package:paperless_mobile/api/paperless_api.dart';
 import 'package:paperless_mobile/core/exception/server_message_exception.dart';
 import 'package:paperless_mobile/core/extensions/context_extensions.dart';
@@ -89,7 +90,7 @@ class _InboxPageState extends State<InboxPage> {
                   return const SizedBox.shrink();
                 }
 
-                if (state.isLoading && state.data == null) {
+                if (state.isLoadingInitial) {
                   return const InboxItemPlaceholder();
                 }
 
@@ -134,7 +135,7 @@ class _InboxPageState extends State<InboxPage> {
               ],
               body: Builder(
                 builder: (context) {
-                  if (inboxTagsState.isLoading && inboxTagsState.data == null) {
+                  if (inboxTagsState.isLoadingInitial) {
                     return _buildLoading();
                   }
 
@@ -145,7 +146,7 @@ class _InboxPageState extends State<InboxPage> {
                   return QueryBuilder(
                     query: context.inboxRepository.inboxDocumentsQuery,
                     builder: (context, state) {
-                      if (state.isLoading && state.data == null) {
+                      if (state.isLoadingInitial) {
                         return _buildLoading();
                       }
                       if (state.isError) {

@@ -1,5 +1,6 @@
 import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:paperless_mobile/api/extensions/cached_query_extensions.dart';
 import 'package:paperless_mobile/api/paperless_api.dart';
 import 'package:paperless_mobile/core/extensions/context_extensions.dart';
 import 'package:paperless_mobile/core/extensions/flutter_extensions.dart';
@@ -24,7 +25,7 @@ class DocumentMetaDataWidget extends StatelessWidget {
     return QueryBuilder(
       query: context.documentRepository.getMetaDataQuery(document.id),
       builder: (context, state) {
-        if (state.isLoading && state.data == null) {
+        if (state.isLoadingInitial) {
           return SliverFillRemaining(
             child: Center(child: CircularProgressIndicator()),
           );

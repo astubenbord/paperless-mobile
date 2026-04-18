@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:paperless_mobile/api/extensions/cached_query_extensions.dart';
 import 'package:paperless_mobile/core/extensions/context_extensions.dart';
 import 'package:paperless_mobile/features/documents/view/pages/viewers/image_document_viewer.dart';
 import 'package:paperless_mobile/features/documents/view/pages/viewers/pdf_document_viewer.dart';
@@ -172,10 +173,10 @@ class DocumentView extends StatelessWidget {
           original: true,
         ),
         builder: (context, state) {
-          if (state.isLoading) {
+          if (state.isLoadingInitial) {
             return _buildLoadingState();
           }
-          if (state.isError || state.data == null) {
+          if (state.isError) {
             return Center(
               child: Text(S.of(context)!.couldNotLoadDocumentPreview),
             );
