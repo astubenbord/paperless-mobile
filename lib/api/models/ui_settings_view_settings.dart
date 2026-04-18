@@ -16,6 +16,7 @@ abstract class UiSettingsViewSettings with _$UiSettingsViewSettings {
     UiSettingsViewSettingsPermissions? permissions,
     UiSettingsViewSettingsDateDisplay? dateDisplay,
     UiSettingsViewSettingsSearch? search,
+    UiSettingsViewSettingsSavedViews? savedViews,
     bool? auditlogEnabled,
   }) = _UiSettingsViewSettings;
 
@@ -95,4 +96,16 @@ abstract class UiSettingsViewSettingsSearch
 
   factory UiSettingsViewSettingsSearch.fromJson(Map<String, dynamic> json) =>
       _$UiSettingsViewSettingsSearchFromJson(json);
+}
+
+@Freezed(toJson: true, fromJson: true)
+abstract class UiSettingsViewSettingsSavedViews
+    with _$UiSettingsViewSettingsSavedViews {
+  factory UiSettingsViewSettingsSavedViews({
+    List<int>? dashboardViewsSortOrder,
+  }) = _UiSettingsViewSettingsSavedViews;
+
+  factory UiSettingsViewSettingsSavedViews.fromJson(
+    Map<String, dynamic> json,
+  ) => _$UiSettingsViewSettingsSavedViewsFromJson(json);
 }

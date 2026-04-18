@@ -1,4 +1,5 @@
 import 'package:cached_query_flutter/cached_query_flutter.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_mobile/api/extensions/cached_query_extensions.dart';
@@ -47,10 +48,13 @@ class _LandingPageState extends State<LandingPage> {
           ],
           body: RefreshIndicator(
             onRefresh: () {
-              return context
-                  .read<ServerStatisticsRepository>()
-                  .serverStatisticsQuery
-                  .refetch();
+              return Future.wait([
+                context.read<SavedViewRepository>().getAllQuery().refetch(),
+                context
+                    .read<ServerStatisticsRepository>()
+                    .serverStatisticsQuery
+                    .refetch(),
+              ]);
             },
             child: CustomScrollView(
               slivers: [
@@ -99,11 +103,11 @@ class _LandingPageState extends State<LandingPage> {
                           ).padded(16),
                         );
                       }
-                      final savedViews = state.data ?? [];
-                      final dashboardViews = savedViews
-                          .where((element) => element.showOnDashboard)
-                          .toList();
-                      if (dashboardViews.isEmpty) {
+                      final sortedViews = _getSavedDashboardViews(
+                        context,
+                        state.data,
+                      );
+                      if (sortedViews.isEmpty) {
                         return SliverToBoxAdapter(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -128,11 +132,11 @@ class _LandingPageState extends State<LandingPage> {
                       return SliverList.builder(
                         itemBuilder: (context, index) {
                           return SavedViewPreview(
-                            savedView: dashboardViews.elementAt(index),
+                            savedView: sortedViews.elementAt(index),
                             expanded: index == 0,
                           );
                         },
-                        itemCount: dashboardViews.length,
+                        itemCount: sortedViews.length,
                       );
                     },
                   ),
@@ -220,5 +224,24 @@ class _LandingPageState extends State<LandingPage> {
         },
       ),
     );
+  }
+
+  List<SavedView> _getSavedDashboardViews(
+    BuildContext context,
+    List<SavedView>? savedViews,
+  ) {
+    final savedViewsSortOrder =
+        context.uiSettings$.settings?.savedViews?.dashboardViewsSortOrder ?? [];
+
+    final dashboardViews =
+        savedViews?.where((element) => element.showOnDashboard).toList() ?? [];
+
+    return savedViewsSortOrder
+        .map((e) => dashboardViews.firstWhereOrNull((view) => view.id == e))
+        .whereType<SavedView>()
+        .toList()
+      ..addAll(
+        dashboardViews.where((view) => !savedViewsSortOrder.contains(view.id)),
+      );
   }
 }
