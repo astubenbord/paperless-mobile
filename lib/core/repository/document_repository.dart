@@ -114,8 +114,7 @@ class DocumentRepository with ChangeNotifierMixin {
   }
 
   Future<BulkDownload> bulkDownload(BulkDownloadRequest request) {
-    // TODO: implement bulkDownload
-    throw UnimplementedError();
+    return _api.bulkDownload(request);
   }
 
   Mutation<int?, AssignAsnRequest> assignAsnMutation(int documentId) {
@@ -158,7 +157,7 @@ class DocumentRepository with ChangeNotifierMixin {
   }
 
   Mutation<BulkEditDocumentsResult, BulkEditRequest>
-  bulkEditDocumentsMutation() {
+      bulkEditDocumentsMutation() {
     return Mutation<BulkEditDocumentsResult, BulkEditRequest>(
       key: 'bulk_edit_documents',
       mutationFn: (arg) {
@@ -392,8 +391,7 @@ class DocumentRepository with ChangeNotifierMixin {
     final metadata = metadataResult.data!;
     final document = documentResult.data!;
 
-    final effectiveFilePath =
-        document.archivedFileName ??
+    final effectiveFilePath = document.archivedFileName ??
         document.originalFileName ??
         metadata.mediaFilename;
     if (effectiveFilePath == null) {

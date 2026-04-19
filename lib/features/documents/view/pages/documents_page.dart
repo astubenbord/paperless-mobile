@@ -281,7 +281,9 @@ class _DocumentsPageState extends State<DocumentsPage> {
                             if (_showExtendedFab)
                               Text(
                                 "Reset (${context.currentDocumentFilter$.appliedFiltersCount})", //TODO: INTL
-                                style: Theme.of(context).textTheme.labelLarge
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelLarge
                                     ?.copyWith(
                                       color: Theme.of(
                                         context,
@@ -333,8 +335,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
         final query = context.documentRepository.getAllQuery(
           filter: context.currentDocumentFilter,
         );
-        final isLastPageLoaded =
-            query.state.data?.pages.fold(
+        final isLastPageLoaded = query.state.data?.pages.fold(
               0,
               (value, element) => value + element.results.length,
             ) ==
@@ -375,9 +376,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
                       controller: _savedViewsExpansionController,
                       onViewSelected: (view) {
                         if (userData
-                                .appState
-                                .currentDocumentFilter
-                                .selectedView ==
+                                .appState.currentDocumentFilter.selectedView ==
                             view.id) {
                           _onResetFilter();
                         } else {
@@ -441,7 +440,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
                     }
                     final documents =
                         state.data?.pages.expand((p) => p.results).toList() ??
-                        [];
+                            [];
                     final allowToggleFilter = _selection.isEmpty;
                     final viewType = userData.appState.documentsPageViewType;
 
@@ -467,18 +466,14 @@ class _DocumentsPageState extends State<DocumentsPage> {
                           });
                         }
                       },
-                      onTagSelected: allowToggleFilter
-                          ? _toggleTagInFilter
-                          : null,
-                      onCorrespondentSelected: allowToggleFilter
-                          ? _addCorrespondentToFilter
-                          : null,
-                      onDocumentTypeSelected: allowToggleFilter
-                          ? _addDocumentTypeToFilter
-                          : null,
-                      onStoragePathSelected: allowToggleFilter
-                          ? _addStoragePathToFilter
-                          : null,
+                      onTagSelected:
+                          allowToggleFilter ? _toggleTagInFilter : null,
+                      onCorrespondentSelected:
+                          allowToggleFilter ? _addCorrespondentToFilter : null,
+                      onDocumentTypeSelected:
+                          allowToggleFilter ? _addDocumentTypeToFilter : null,
+                      onStoragePathSelected:
+                          allowToggleFilter ? _addStoragePathToFilter : null,
                       documents: documents,
                       hasLoaded: state.data != null,
                       isLabelClickable: true,
@@ -501,9 +496,10 @@ class _DocumentsPageState extends State<DocumentsPage> {
       padding: const EdgeInsets.all(4),
       color: Theme.of(context).colorScheme.surface,
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           SortDocumentsButton(enabled: _selection.isEmpty),
+          const Spacer(),
+          if (_selection.isEmpty) _buildSelectAllFilteredButton(),
           CurrentUserAppDataBuilder(
             builder: (context, userData) {
               final viewType = userData.appState.documentsPageViewType;
@@ -520,6 +516,33 @@ class _DocumentsPageState extends State<DocumentsPage> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildSelectAllFilteredButton() {
+    return CurrentUserAppDataBuilder(
+      builder: (context, userData) {
+        final filter = userData.appState.currentDocumentFilter;
+        final hasFilter =
+            filter.appliedFiltersCount > 0 || filter.selectedView != null;
+        if (!hasFilter) {
+          return const SizedBox.shrink();
+        }
+        return QueryBuilder(
+          query: context.documentRepository.getAllQuery(filter: filter),
+          builder: (context, state) {
+            final hasDocuments = (state.data?.firstPage?.count ?? 0) > 0;
+            if (!hasDocuments && !state.isLoading) {
+              return const SizedBox.shrink();
+            }
+            return IconButton(
+              tooltip: S.of(context)!.select,
+              icon: const Icon(Icons.select_all),
+              onPressed: hasDocuments ? _onSelectAllFilteredDocuments : null,
+            );
+          },
+        );
+      },
     );
   }
 
@@ -603,6 +626,54 @@ class _DocumentsPageState extends State<DocumentsPage> {
     );
   }
 
+  Future<void> _onSelectAllFilteredDocuments() async {
+    final query = context.documentRepository.getAllQuery(
+      filter: context.currentDocumentFilter,
+    );
+    try {
+      var previousLoadedCount = -1;
+      while (mounted) {
+        final data = query.state.data;
+        if (data == null) {
+          return;
+        }
+        final loadedCount = data.pages.fold<int>(
+          0,
+          (count, page) => count + page.results.length,
+        );
+        final totalCount = data.firstPage?.count ?? 0;
+        if (totalCount == 0 || loadedCount >= totalCount) {
+          break;
+        }
+        if (previousLoadedCount == loadedCount) {
+          break;
+        }
+        previousLoadedCount = loadedCount;
+        await query.getNextPage();
+      }
+      if (!mounted) {
+        return;
+      }
+      final selected = query.state.data?.pages.expand((p) => p.results).toSet();
+      if ((selected?.isEmpty ?? true)) {
+        return;
+      }
+      setState(() {
+        _selection
+          ..clear()
+          ..addAll(selected!);
+      });
+    } on PaperlessApiException catch (error, stackTrace) {
+      if (mounted) {
+        showErrorMessage(context, error, stackTrace);
+      }
+    } catch (error) {
+      if (mounted) {
+        showGenericError(context, error);
+      }
+    }
+  }
+
   ///
   /// Resets the current filter and scrolls all the way to the top of the view.
   /// If a saved view is currently selected and the filter has changed,
@@ -617,13 +688,10 @@ class _DocumentsPageState extends State<DocumentsPage> {
       );
     }
 
-    final activeView = context.savedViewRepository
-        .getAllQuery()
-        .state
-        .data
-        ?.firstWhereOrNull(
-          (view) => view.id == context.currentDocumentFilter.selectedView,
-        );
+    final activeView =
+        context.savedViewRepository.getAllQuery().state.data?.firstWhereOrNull(
+              (view) => view.id == context.currentDocumentFilter.selectedView,
+            );
 
     void reset() {
       context.localStore.updateLoggedInUserAppState(
@@ -631,12 +699,10 @@ class _DocumentsPageState extends State<DocumentsPage> {
       );
     }
 
-    final viewHasChanged =
-        activeView != null &&
+    final viewHasChanged = activeView != null &&
         activeView.toDocumentFilter() != context.currentDocumentFilter;
     if (viewHasChanged) {
-      final discardChanges =
-          await showDialog<bool>(
+      final discardChanges = await showDialog<bool>(
             useRootNavigator: false,
             context: context,
             builder: (context) => const SavedViewChangedDialog(),
