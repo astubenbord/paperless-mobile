@@ -26,6 +26,8 @@ sealed class DateRangeQuery {
         return RelativeDateRangeQuery.fromJson(json);
       case 'AbsoluteDateRangeQuery':
         return AbsoluteDateRangeQuery.fromJson(json);
+      case 'ExactDateQuery':
+        return ExactDateQuery.fromJson(json);
       default:
         throw UnimplementedError('Unknown DateRangeQuery type: $type');
     }
@@ -111,18 +113,17 @@ class AbsoluteDateRangeQuery extends DateRangeQuery with EquatableMixin {
   Map<String, String> toQueryParameter(DateRangeQueryField field) {
     final Map<String, String> params = {};
 
-    // Add/subtract one day in the following because paperless uses gt/lt not gte/lte
     if (after != null) {
       params.putIfAbsent(
-        '${field.name}__date__gt',
-        () => apiDateFormat.format(after!.subtract(const Duration(days: 1))),
+        '${field.name}__gte',
+        () => apiDateFormat.format(after!),
       );
     }
 
     if (before != null) {
       params.putIfAbsent(
-        '${field.name}__date__lt',
-        () => apiDateFormat.format(before!.add(const Duration(days: 1))),
+        '${field.name}__lte',
+        () => apiDateFormat.format(before!),
       );
     }
     return params;
@@ -132,4 +133,33 @@ class AbsoluteDateRangeQuery extends DateRangeQuery with EquatableMixin {
   Map<String, dynamic> toJson() => _$AbsoluteDateRangeQueryToJson(this);
   factory AbsoluteDateRangeQuery.fromJson(Map<String, dynamic> json) =>
       _$AbsoluteDateRangeQueryFromJson(json);
+}
+
+@CopyWith()
+@JsonSerializable()
+class ExactDateQuery extends DateRangeQuery with EquatableMixin {
+  @JsonKey(includeToJson: true, includeFromJson: true)
+  @override
+  final type = 'ExactDateQuery';
+
+  @LocalDateTimeJsonConverter()
+  final DateTime date;
+
+  const ExactDateQuery({required this.date});
+
+  @override
+  List<Object?> get props => [date];
+
+  @override
+  Map<String, String> toQueryParameter(DateRangeQueryField field) {
+    return {
+      '${field.name}__gte': apiDateFormat.format(date),
+      '${field.name}__lte': apiDateFormat.format(date),
+    };
+  }
+
+  @override
+  Map<String, dynamic> toJson() => _$ExactDateQueryToJson(this);
+  factory ExactDateQuery.fromJson(Map<String, dynamic> json) =>
+      _$ExactDateQueryFromJson(json);
 }
