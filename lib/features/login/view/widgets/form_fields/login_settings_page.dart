@@ -8,13 +8,9 @@ class LoginSettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(S.of(context)!.settings),
-      ),
+      appBar: AppBar(title: Text(S.of(context)!.settings)),
       body: ListView(
-        children: [
-          ClientCertificateFormField(onChanged: (certificate) {}),
-        ],
+        children: [ClientCertificateFormField(onChanged: (certificate) {})],
       ),
     );
   }

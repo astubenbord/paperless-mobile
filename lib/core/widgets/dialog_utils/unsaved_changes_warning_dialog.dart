@@ -13,9 +13,7 @@ class UnsavedChangesWarningDialog extends StatelessWidget {
       content: Text(S.of(context)!.discardChangesWarning),
       actions: [
         const DialogCancelButton(),
-        DialogConfirmButton(
-          label: S.of(context)!.discard,
-        ),
+        DialogConfirmButton(label: S.of(context)!.discard),
       ],
     );
   }

@@ -24,10 +24,7 @@ class AppLogsStateLoaded extends AppLogsState {
 }
 
 class AppLogsStateError extends AppLogsState {
-  const AppLogsStateError({
-    required this.error,
-    required super.date,
-  });
+  const AppLogsStateError({required this.error, required super.date});
 
   final Object error;
 }

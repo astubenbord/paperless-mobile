@@ -17,12 +17,8 @@ class ReceiveShareStateLoading extends ReceiveShareState {
 class ReceiveShareStateLoaded extends ReceiveShareState {
   const ReceiveShareStateLoaded({super.files});
 
-  ReceiveShareStateLoaded copyWith({
-    List<File>? files,
-  }) {
-    return ReceiveShareStateLoaded(
-      files: files ?? this.files,
-    );
+  ReceiveShareStateLoaded copyWith({List<File>? files}) {
+    return ReceiveShareStateLoaded(files: files ?? this.files);
   }
 }
 

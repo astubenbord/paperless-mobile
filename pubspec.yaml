@@ -15,7 +15,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 4.5.0+710
+version: 5.0.0-alpha2+730
 
 environment:
   sdk: ">=3.8.0 <4.0.0"
@@ -33,10 +33,6 @@ dependencies:
     sdk: flutter
   permission_handler: ^12.0.1
   pdf: ^3.10.2
-  edge_detection:
-    git:
-      url: https://github.com/sawankumarbundelkhandi/edge_detection
-      ref: master
   path_provider: ^2.0.10
   image: ^4.0.17
   photo_view: ^0.15.0
@@ -78,11 +74,15 @@ dependencies:
   flutter_displaymode: ^0.6.0
   dynamic_color: ^1.5.4
   flutter_html: ^3.0.0-alpha.6
+  camera: ^0.12.0+1
   freezed_annotation: ^3.1.0
   animations: ^2.0.7
   hive_ce_flutter: ^2.3.2
   flutter_secure_storage: ^9.2.4
+  image_picker: ^1.2.1
+  opencv_dart: ^2.2.1+4
   sliver_tools: ^0.2.10
+  sensors_plus: ^7.0.0
   webview_flutter: ^4.2.1
   printing: ^5.11.1
   go_router: ^16.2.4
@@ -93,12 +93,11 @@ dependencies:
   flutter_animate: ^4.2.0+1
   shared_preferences: ^2.2.1
   flutter_markdown_community: ^0.7.7+2
+  vibration: ^3.1.8
   logger: ^2.0.2+1
   synchronized: ^3.1.0
   extended_masked_text: ^3.0.1
   font_awesome_flutter: ^10.6.0
-  # camerawesome: ^2.0.0-dev.1
-  pdfx: ^2.9.2
   markdown: ^7.1.1
   path: ^1.9.1
   bloc: ^9.0.1
@@ -112,6 +111,7 @@ dependencies:
   fpdart: ^1.2.0
   open_file: ^3.5.11
   jiffy: ^6.4.4
+  pdfrx: ^2.4.3
 
 dev_dependencies:
   integration_test:

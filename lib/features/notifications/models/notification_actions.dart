@@ -2,10 +2,8 @@ import 'package:json_annotation/json_annotation.dart';
 
 enum NotificationResponseButtonAction {
   openCreatedDocument,
-  acknowledgeCreatedDocument;
+  acknowledgeCreatedDocument,
 }
 
 @JsonEnum()
-enum NotificationResponseOpenAction {
-  openDirectory;
-}
+enum NotificationResponseOpenAction { openDirectory }

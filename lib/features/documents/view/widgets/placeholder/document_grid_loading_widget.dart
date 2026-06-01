@@ -44,9 +44,7 @@ class DocumentGridLoadingWidget extends StatelessWidget {
                 aspectRatio: 1,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(16),
-                  child: Container(
-                    color: Colors.white,
-                  ),
+                  child: Container(color: Colors.white),
                 ),
               ),
             ),
@@ -57,30 +55,22 @@ class DocumentGridLoadingWidget extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const TextPlaceholder(
-                        length: 70,
-                        fontSize: 16,
-                      ).padded(1),
-                      const TextPlaceholder(
-                        length: 50,
-                        fontSize: 16,
-                      ).padded(1),
+                      const TextPlaceholder(length: 70, fontSize: 16).padded(1),
+                      const TextPlaceholder(length: 50, fontSize: 16).padded(1),
                       TextPlaceholder(
                         length: 200,
                         fontSize:
                             Theme.of(context).textTheme.titleMedium?.fontSize ??
-                                10,
+                            10,
                       ).padded(1),
                       const Spacer(),
-                      const TagsPlaceholder(
-                        count: 2,
-                        dense: true,
-                      ),
+                      const TagsPlaceholder(count: 2, dense: true),
                       const Spacer(),
                       TextPlaceholder(
                         length: 100,
-                        fontSize:
-                            Theme.of(context).textTheme.bodySmall!.fontSize!,
+                        fontSize: Theme.of(
+                          context,
+                        ).textTheme.bodySmall!.fontSize!,
                       ),
                     ],
                   ),

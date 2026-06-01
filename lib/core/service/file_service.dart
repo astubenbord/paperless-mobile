@@ -20,6 +20,7 @@ class FileService {
   late Directory _downloadsDirectory;
   late Directory _uploadDirectory;
   late Directory _temporaryScansDirectory;
+  late Directory _documentScansDirectory;
 
   Directory get logDirectory => _logDirectory;
   Directory get temporaryDirectory => _temporaryDirectory;
@@ -27,15 +28,19 @@ class FileService {
   Directory get downloadsDirectory => _downloadsDirectory;
   Directory get uploadDirectory => _uploadDirectory;
   Directory get temporaryScansDirectory => _temporaryScansDirectory;
+  Directory get documentScansDirectory => _documentScansDirectory;
 
   Future<void> initialize() async {
     try {
-      await _initTemporaryDirectory();
-      await _initTemporaryScansDirectory();
-      await _initUploadDirectory();
-      await _initLogDirectory();
-      await _initDownloadsDirectory();
-      await _initializeDocumentsDirectory();
+      await Future.wait([
+        _initTemporaryDirectory(),
+        _initTemporaryScansDirectory(),
+        _initUploadDirectory(),
+        _initLogDirectory(),
+        _initDownloadsDirectory(),
+        _initializeDocumentsDirectory(),
+        _initializeDocumentScansDirectory(),
+      ]);
     } catch (error, stackTrace) {
       debugPrint("Could not initialize directories.");
       debugPrint(error.toString());
@@ -67,6 +72,7 @@ class FileService {
       PaperlessDirectoryType.download => _downloadsDirectory,
       PaperlessDirectoryType.upload => _uploadDirectory,
       PaperlessDirectoryType.logs => _logDirectory,
+      PaperlessDirectoryType.documentScans => _documentScansDirectory,
     };
   }
 
@@ -88,6 +94,42 @@ class FileService {
       await file.create(recursive: true);
     }
     return file;
+  }
+
+  Directory getDocumentScanDirectory(String documentId) {
+    return Directory(p.join(_documentScansDirectory.path, documentId));
+  }
+
+  Directory getDocumentScanOriginalDirectory(String documentId) {
+    return Directory(
+      p.join(getDocumentScanDirectory(documentId).path, 'original'),
+    );
+  }
+
+  Directory getDocumentScanEditedDirectory(String documentId) {
+    return Directory(
+      p.join(getDocumentScanDirectory(documentId).path, 'edited'),
+    );
+  }
+
+  Future<Directory> createDocumentScanDirectory({
+    required String documentId,
+  }) async {
+    final directory = await getDocumentScanDirectory(
+      documentId,
+    ).create(recursive: true);
+    await Future.wait([
+      getDocumentScanOriginalDirectory(documentId).create(recursive: true),
+      getDocumentScanEditedDirectory(documentId).create(recursive: true),
+    ]);
+    return directory;
+  }
+
+  Future<void> removeDocumentScanDirectory({required String documentId}) async {
+    final directory = getDocumentScanDirectory(documentId);
+    if (await directory.exists()) {
+      await directory.delete(recursive: true);
+    }
   }
 
   Future<Directory> getConsumptionDirectory({required String userId}) async {
@@ -271,6 +313,12 @@ class FileService {
     await dir.create(recursive: true);
     _temporaryScansDirectory = dir;
   }
+
+  Future<void> _initializeDocumentScansDirectory() async {
+    final applicationDirectory = await getApplicationDocumentsDirectory();
+    final dir = Directory(p.join(applicationDirectory.path, 'document_scans'));
+    _documentScansDirectory = await dir.create(recursive: true);
+  }
 }
 
 enum PaperlessDirectoryType {
@@ -278,6 +326,7 @@ enum PaperlessDirectoryType {
   temporary,
   scans,
   download,
+  documentScans,
   upload,
   logs,
 }

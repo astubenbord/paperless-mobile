@@ -16,10 +16,7 @@ class DioFileService extends FileService {
   }) async {
     final response = await dio.get<ResponseBody>(
       url,
-      options: Options(
-        headers: headers,
-        responseType: ResponseType.stream,
-      ),
+      options: Options(headers: headers, responseType: ResponseType.stream),
     );
     return DioGetResponse(response);
   }
@@ -37,7 +34,8 @@ class DioGetResponse implements FileServiceResponse {
 
   @override
   int? get contentLength => int.tryParse(
-      _response.headers.value(HttpHeaders.contentLengthHeader) ?? '-1');
+    _response.headers.value(HttpHeaders.contentLengthHeader) ?? '-1',
+  );
 
   @override
   String? get eTag => _response.headers.value(HttpHeaders.etagHeader);
@@ -45,8 +43,9 @@ class DioGetResponse implements FileServiceResponse {
   @override
   String get fileExtension {
     var fileExtension = '';
-    final contentTypeHeader =
-        _response.headers.value(HttpHeaders.contentTypeHeader);
+    final contentTypeHeader = _response.headers.value(
+      HttpHeaders.contentTypeHeader,
+    );
     if (contentTypeHeader != null) {
       final contentType = ContentType.parse(contentTypeHeader);
       fileExtension = contentType.fileExtension;
@@ -61,8 +60,9 @@ class DioGetResponse implements FileServiceResponse {
   DateTime get validTill {
     // Without a cache-control header we keep the file for a week
     var ageDuration = const Duration(days: 7);
-    final controlHeader =
-        _response.headers.value(HttpHeaders.cacheControlHeader);
+    final controlHeader = _response.headers.value(
+      HttpHeaders.cacheControlHeader,
+    );
     if (controlHeader != null) {
       final controlSettings = controlHeader.split(',');
       for (final setting in controlSettings) {

@@ -21,43 +21,40 @@ class ConfirmBulkModifyTagsDialog extends StatelessWidget {
       title: Text(S.of(context)!.confirmAction),
       content: RichText(
         text: TextSpan(
-          style: theme.textTheme.bodyMedium
-              ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
           text: _buildText(context),
           children: [
             const TextSpan(text: "\n\n"),
-            TextSpan(
-              text: S.of(context)!.areYouSureYouWantToContinue,
-            ),
+            TextSpan(text: S.of(context)!.areYouSureYouWantToContinue),
           ],
         ),
       ),
       actions: const [
         DialogCancelButton(),
-        DialogConfirmButton(
-          style: DialogConfirmButtonStyle.danger,
-        ),
+        DialogConfirmButton(style: DialogConfirmButtonStyle.danger),
       ],
     );
   }
 
   String _buildText(BuildContext context) {
     if (removeTags.isNotEmpty && addTags.isNotEmpty) {
-      return S.of(context)!.bulkEditTagsModifyMessage(
+      return S
+          .of(context)!
+          .bulkEditTagsModifyMessage(
             addTags.join(", "),
             selectionCount,
             removeTags.join(", "),
           );
     } else if (removeTags.isNotEmpty) {
-      return S.of(context)!.bulkEditTagsRemoveMessage(
-            selectionCount,
-            removeTags.join(", "),
-          );
+      return S
+          .of(context)!
+          .bulkEditTagsRemoveMessage(selectionCount, removeTags.join(", "));
     } else {
-      return S.of(context)!.bulkEditTagsAddMessage(
-            selectionCount,
-            addTags.join(", "),
-          );
+      return S
+          .of(context)!
+          .bulkEditTagsAddMessage(selectionCount, addTags.join(", "));
     }
   }
 }

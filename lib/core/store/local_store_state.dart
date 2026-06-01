@@ -4,7 +4,7 @@ part of 'local_store.dart';
 @JsonSerializable()
 class LocalStoreState {
   const LocalStoreState({
-    this.version = 2,
+    this.version = 3,
     this.loggedInAppUserId,
     this.readHints = const [],
     required this.globalSettings,
@@ -22,8 +22,12 @@ class LocalStoreState {
     final version = json['version'] as int? ?? 1;
     switch (version) {
       case 1:
-        return convertLocalStoreStateV1ToV2(json);
+        return convertLocalStoreStateV2ToV3(
+          convertLocalStoreStateV1ToV2(json).toJson(),
+        );
       case 2:
+        return convertLocalStoreStateV2ToV3(json);
+      case 3:
         return _$LocalStoreStateFromJson(json);
       default:
         throw Exception('Unsupported local store state version: $version');

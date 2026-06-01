@@ -109,7 +109,8 @@ class HomeShellWidget extends StatelessWidget {
             ),
             Provider(
               create: (context) =>
-                  DocumentScannerCubit(context.read())..initialize(),
+                  DocumentScannerCubit(context.read(), context.read())
+                    ..initialize(),
             ),
             Provider(create: (context) => UserRepository(context.read())),
             Provider(create: (context) => SavedViewRepository(context.read())),

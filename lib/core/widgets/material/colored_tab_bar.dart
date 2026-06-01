@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ColoredTabBar extends StatelessWidget implements PreferredSizeWidget {
-  const ColoredTabBar({
-    super.key,
-    this.color,
-    required this.tabBar,
-  });
+  const ColoredTabBar({super.key, this.color, required this.tabBar});
 
   final TabBar tabBar;
   final Color? color;

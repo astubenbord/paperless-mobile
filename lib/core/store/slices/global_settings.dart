@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:paperless_mobile/features/settings/model/color_scheme_option.dart';
 import 'package:paperless_mobile/features/settings/model/file_download_type.dart';
+import 'package:paperless_mobile/features/scanner/models/scanner_parameters.dart';
 
 part 'global_settings.g.dart';
 
@@ -22,6 +23,7 @@ class GlobalSettings {
     this.skipDocumentPreprarationOnUpload = false,
     this.disableAnimations = false,
     this.knownHosts = const [],
+    this.scannerParameters = const ScannerParameters(),
   });
 
   final String preferredLocaleSubtag;
@@ -35,6 +37,7 @@ class GlobalSettings {
   final bool skipDocumentPreprarationOnUpload;
   final bool disableAnimations;
   final List<String> knownHosts;
+  final ScannerParameters scannerParameters;
 
   Map<String, dynamic> toJson() => _$GlobalSettingsToJson(this);
   factory GlobalSettings.fromJson(Map<String, dynamic> json) =>

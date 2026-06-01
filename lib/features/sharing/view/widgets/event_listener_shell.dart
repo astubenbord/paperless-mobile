@@ -9,6 +9,10 @@ import 'package:listen_sharing_intent/listen_sharing_intent.dart';
 import 'package:paperless_mobile/constants.dart';
 import 'package:paperless_mobile/core/extensions/context_extensions.dart';
 import 'package:paperless_mobile/core/service/connectivity_status_service.dart';
+import 'package:paperless_mobile/core/widgets/dialog_utils/dialog_cancel_button.dart';
+import 'package:paperless_mobile/core/widgets/dialog_utils/dialog_confirm_button.dart';
+import 'package:paperless_mobile/features/document_upload/model/document_upload_queue.dart';
+import 'package:paperless_mobile/features/document_upload/service/document_upload_queue_coordinator.dart';
 import 'package:paperless_mobile/features/document_upload/view/document_upload_preparation_page.dart';
 import 'package:paperless_mobile/features/logging/data/logger.dart';
 import 'package:paperless_mobile/features/notifications/services/local_notification_service.dart';
@@ -19,7 +23,6 @@ import 'package:paperless_mobile/features/tasks/model/pending_tasks_notifier.dar
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
 import 'package:paperless_mobile/helpers/message_helpers.dart';
 import 'package:paperless_mobile/routing/routes/changelog_route.dart';
-import 'package:paperless_mobile/routing/routes/scanner_route.dart';
 import 'package:path/path.dart' as p;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -57,6 +60,7 @@ class _EventListenerShellState extends State<EventListenerShell> {
       final userId = context.loggedInUser.appUserId;
       final notifier = context.read<ConsumptionChangeNotifier>();
       await notifier.isInitialized;
+      if (!mounted) return;
       final pendingFiles = notifier.pendingFiles;
       if (pendingFiles.isEmpty) {
         return;
@@ -70,6 +74,7 @@ class _EventListenerShellState extends State<EventListenerShell> {
                 PendingFilesInfoDialog(pendingFiles: pendingFiles),
           ) ??
           false;
+      if (!mounted) return;
       if (shouldProcess) {
         await consumeLocalFiles(context, files: pendingFiles, userId: userId);
       }
@@ -147,82 +152,12 @@ Future<void> consumeLocalFile(
   required String userId,
   bool exitAppAfterConsumed = false,
 }) async {
-  final shouldDirectlyUpload =
-      context.localStore.state.globalSettings.skipDocumentPreprarationOnUpload;
-  final consumptionNotifier = context.read<ConsumptionChangeNotifier>();
-  final filename = p.basename(file.path);
-  final hasInternetConnection = await context
-      .read<ConnectivityStatusService>()
-      .isConnectedToInternet();
-  if (!hasInternetConnection) {
-    if (context.mounted) {
-      showSnackBar(
-        context,
-        "Could not consume $filename", //TODO: INTL
-        details: S.of(context)!.youreOffline,
-      );
-    }
-    return;
-  }
-
-  final bytes = file.readAsBytes();
-  // if () {
-  //   try {
-  //     final taskId = await documentsApi.create(
-  //       await bytes,
-  //       filename: filename,
-  //       title: p.basenameWithoutExtension(file.path),
-  //     );
-
-  //     consumptionNotifier.discardFile(file, userId: userId);
-  //     taskNotifier.listenToTaskChanges(taskId);
-  //   } catch (error) {
-  //     if (!context.mounted) return;
-  //     await Fluttertoast.showToast(msg: S.of(context)!.couldNotUploadDocument);
-  //     return;
-  //   } finally {
-  //     if (exitAppAfterConsumed) {
-  //       SystemNavigator.pop();
-  //     }
-  //   }
-  final result = await DocumentUploadRoute(
-    $extra: bytes,
-    filename: p.basenameWithoutExtension(file.path),
-    title: p.basenameWithoutExtension(file.path),
-    fileExtension: p.extension(file.path),
-    instantUpload: shouldDirectlyUpload,
-  ).push<DocumentUploadResult?>(context);
-
-  if (result?.success ?? false) {
-    if (context.mounted) {
-      await Fluttertoast.showToast(
-        msg: S.of(context)!.documentSuccessfullyUploadedProcessing,
-      );
-    }
-    await consumptionNotifier.discardFile(file, userId: userId);
-
-    // if (result.taskId != null) {
-    //   taskNotifier.listenToTaskChanges(result.taskId!);
-    // }
-    if (exitAppAfterConsumed) {
-      SystemNavigator.pop();
-    }
-  } else {
-    if (!context.mounted) return;
-    final shouldDiscard =
-        await showDialog<bool>(
-          useRootNavigator: false,
-          context: context,
-          builder: (context) => DiscardSharedFileDialog(bytes: bytes),
-        ) ??
-        false;
-    if (shouldDiscard && context.mounted) {
-      await context.read<ConsumptionChangeNotifier>().discardFile(
-        file,
-        userId: userId,
-      );
-    }
-  }
+  await consumeLocalFiles(
+    context,
+    files: [file],
+    userId: userId,
+    exitAppAfterConsumed: exitAppAfterConsumed,
+  );
 }
 
 Future<void> consumeLocalFiles(
@@ -231,13 +166,144 @@ Future<void> consumeLocalFiles(
   required String userId,
   bool exitAppAfterConsumed = false,
 }) async {
-  for (int i = 0; i < files.length; i++) {
-    final file = files[i];
-    await consumeLocalFile(
-      context,
-      file: file,
+  if (files.isEmpty) {
+    return;
+  }
+
+  final hasInternetConnection = await context
+      .read<ConnectivityStatusService>()
+      .isConnectedToInternet();
+  if (!context.mounted) {
+    return;
+  }
+  if (!hasInternetConnection) {
+    if (context.mounted) {
+      final message = files.length == 1
+          ? 'Could not consume ${p.basename(files.first.path)}' //TODO: INTL
+          : 'Could not consume shared files'; //TODO: INTL
+      showSnackBar(context, message, details: S.of(context)!.youreOffline);
+    }
+    return;
+  }
+
+  final shouldDirectlyUpload =
+      context.localStore.state.globalSettings.skipDocumentPreprarationOnUpload;
+
+  await DocumentUploadQueueCoordinator.processQueue<File>(
+    context,
+    items: [
+      for (final file in files)
+        DocumentUploadQueueItem(
+          source: file,
+          loadFileBytes: file.readAsBytes,
+          filename: p.basenameWithoutExtension(file.path),
+          title: p.basenameWithoutExtension(file.path),
+          fileExtension: p.extension(file.path),
+          instantUpload: shouldDirectlyUpload,
+        ),
+    ],
+    delegate: _SharedFileUploadQueueDelegate(
       userId: userId,
-      exitAppAfterConsumed: exitAppAfterConsumed && (i == files.length - 1),
+      exitAppAfterConsumed: exitAppAfterConsumed,
+    ),
+  );
+}
+
+class _SharedFileUploadQueueDelegate
+    implements DocumentUploadQueueDelegate<File> {
+  final String userId;
+  final bool exitAppAfterConsumed;
+
+  const _SharedFileUploadQueueDelegate({
+    required this.userId,
+    required this.exitAppAfterConsumed,
+  });
+
+  @override
+  Future<void> onQueueCompleted(BuildContext context) async {
+    if (exitAppAfterConsumed) {
+      SystemNavigator.pop();
+    }
+  }
+
+  @override
+  Future<void> onItemUploaded(
+    BuildContext context,
+    DocumentUploadQueueItem<File> item,
+    DocumentUploadResult result,
+  ) async {
+    if (context.mounted) {
+      await Fluttertoast.showToast(
+        msg: S.of(context)!.documentSuccessfullyUploadedProcessing,
+      );
+    }
+    if (!context.mounted) {
+      return;
+    }
+    await context.read<ConsumptionChangeNotifier>().discardFile(
+      item.source,
+      userId: userId,
     );
+  }
+
+  @override
+  Future<DocumentUploadQueueCancellationDisposition> onQueueCancelled(
+    BuildContext context,
+    List<DocumentUploadQueueItem<File>> remainingItems,
+  ) async {
+    if (remainingItems.isEmpty) {
+      return DocumentUploadQueueCancellationDisposition.keepRemaining;
+    }
+
+    if (remainingItems.length == 1) {
+      final shouldDiscard =
+          await showDialog<bool>(
+            useRootNavigator: false,
+            context: context,
+            builder: (context) => DiscardSharedFileDialog(
+              bytes: remainingItems.first.loadFileBytes(),
+            ),
+          ) ??
+          false;
+      return shouldDiscard
+          ? DocumentUploadQueueCancellationDisposition.discardRemaining
+          : DocumentUploadQueueCancellationDisposition.keepRemaining;
+    }
+
+    final shouldDiscardRemaining =
+        await showDialog<bool>(
+          useRootNavigator: false,
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Discard remaining shared files?'),
+            content: Text(
+              'The remaining ${remainingItems.length} shared file(s) can either stay pending or be discarded.',
+            ),
+            actions: [
+              const DialogCancelButton(),
+              DialogConfirmButton(
+                returnValue: true,
+                label: S.of(context)!.discard,
+                style: DialogConfirmButtonStyle.danger,
+              ),
+            ],
+          ),
+        ) ??
+        false;
+
+    return shouldDiscardRemaining
+        ? DocumentUploadQueueCancellationDisposition.discardRemaining
+        : DocumentUploadQueueCancellationDisposition.keepRemaining;
+  }
+
+  @override
+  Future<void> discardRemainingItems(
+    BuildContext context,
+    List<DocumentUploadQueueItem<File>> remainingItems,
+  ) async {
+    final notifier = context.read<ConsumptionChangeNotifier>();
+    for (final item in remainingItems) {
+      await notifier.discardFile(item.source, userId: userId);
+    }
   }
 }

@@ -8,5 +8,8 @@
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('Login validation error fields test', (WidgetTester tester) async {});
+  testWidgets(
+    'Login validation error fields test',
+    (WidgetTester tester) async {},
+  );
 }

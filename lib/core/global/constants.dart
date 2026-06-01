@@ -4,5 +4,5 @@ const supportedFileExtensions = [
   '.tiff',
   '.gif',
   '.jpg',
-  '.jpeg'
+  '.jpeg',
 ];

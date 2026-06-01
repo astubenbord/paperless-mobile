@@ -17,10 +17,9 @@ class AppLogsRoute extends GoRouteData with $AppLogsRoute {
     return AnnotatedRegion(
       value: buildOverlayStyle(Theme.of(context)),
       child: BlocProvider(
-        create: (context) => AppLogsCubit(
-          DateTime.now(),
-          context.read(),
-        )..loadLogs(DateTime.now()),
+        create: (context) =>
+            AppLogsCubit(DateTime.now(), context.read())
+              ..loadLogs(DateTime.now()),
         child: AppLogsPage(key: state.pageKey),
       ),
     );

@@ -5,17 +5,9 @@ class BaseState<T> {
   final T? value;
   final LoadingStatus status;
 
-  BaseState({
-    required this.error,
-    required this.value,
-    required this.status,
-  });
+  BaseState({required this.error, required this.value, required this.status});
 
-  BaseState<T> copyWith({
-    Object? error,
-    T? value,
-    LoadingStatus? status,
-  }) {
+  BaseState<T> copyWith({Object? error, T? value, LoadingStatus? status}) {
     return BaseState(
       error: error ?? this.error,
       value: value ?? this.value,

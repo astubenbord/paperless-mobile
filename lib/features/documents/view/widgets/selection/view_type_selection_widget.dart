@@ -74,10 +74,7 @@ class ViewTypeSelectionWidget extends StatelessWidget {
       child: ListTile(
         selected: selected,
         trailing: selected ? const Icon(Icons.done) : null,
-        title: Text(
-          label,
-          maxLines: 1,
-        ),
+        title: Text(label, maxLines: 1),
         iconColor: Theme.of(context).colorScheme.onSurface,
         textColor: Theme.of(context).colorScheme.onSurface,
         leading: Icon(icon),

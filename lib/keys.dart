@@ -13,7 +13,8 @@ class _LoginTestKeys {
   final passwordFormField = const Key('login-password');
   final loginButton = const Key('login-login-button');
   final clientCertificateFormField = const Key('login-client-certificate');
-  final clientCertificatePassphraseFormField =
-      const Key('login-client-certificate-passphrase');
+  final clientCertificatePassphraseFormField = const Key(
+    'login-client-certificate-passphrase',
+  );
   final loggingInScreen = const Key('login-logging-in-screen');
 }

@@ -25,16 +25,14 @@ class DialogPage<T> extends Page<T> {
 
   @override
   Route<T> createRoute(BuildContext context) => DialogRoute<T>(
-        context: context,
-        settings: this,
-        builder: (context) => Dialog(
-          child: builder(context),
-        ),
-        anchorPoint: anchorPoint,
-        barrierColor: barrierColor,
-        barrierDismissible: barrierDismissible,
-        barrierLabel: barrierLabel,
-        useSafeArea: useSafeArea,
-        themes: themes,
-      );
+    context: context,
+    settings: this,
+    builder: (context) => Dialog(child: builder(context)),
+    anchorPoint: anchorPoint,
+    barrierColor: barrierColor,
+    barrierDismissible: barrierDismissible,
+    barrierLabel: barrierLabel,
+    useSafeArea: useSafeArea,
+    themes: themes,
+  );
 }

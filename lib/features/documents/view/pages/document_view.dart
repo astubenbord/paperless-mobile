@@ -11,10 +11,6 @@ import 'package:paperless_mobile/features/documents/view/pages/viewers/text_docu
 import 'package:paperless_mobile/features/documents/view/pages/viewers/unsupported_document_viewer.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
 
-// Re-export for backward compatibility with existing LoadedPdfView usages.
-export 'package:paperless_mobile/features/documents/view/pages/viewers/pdf_document_viewer.dart'
-    show PdfDocumentPageView;
-
 /// MIME types supported by the in-app document viewer.
 const _pdfMimeTypes = {'application/pdf'};
 

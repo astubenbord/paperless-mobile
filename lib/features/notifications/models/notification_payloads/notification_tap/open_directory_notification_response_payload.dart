@@ -14,8 +14,8 @@ class OpenDirectoryNotificationResponsePayload
   });
 
   factory OpenDirectoryNotificationResponsePayload.fromJson(
-          Map<String, dynamic> json) =>
-      _$OpenDirectoryNotificationResponsePayloadFromJson(json);
+    Map<String, dynamic> json,
+  ) => _$OpenDirectoryNotificationResponsePayloadFromJson(json);
   @override
   Map<String, dynamic> toJson() =>
       _$OpenDirectoryNotificationResponsePayloadToJson(this);

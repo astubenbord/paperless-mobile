@@ -26,10 +26,7 @@ class GithubIssueService {
         ..tryPutIfAbsent('project', () => project),
     );
     debugPrint("[GitHubIssueService] Creating GitHub issue: $uri");
-    launchUrl(
-      uri,
-      mode: LaunchMode.externalApplication,
-    );
+    launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
   static void createIssueFromError(
@@ -39,9 +36,7 @@ class GithubIssueService {
     final errorDescription = await Navigator.push<GithubErrorReport>(
       context,
       MaterialPageRoute(
-        builder: (context) => ErrorReportPage(
-          stackTrace: stackTrace,
-        ),
+        builder: (context) => ErrorReportPage(stackTrace: stackTrace),
       ),
     );
     if (errorDescription == null) {

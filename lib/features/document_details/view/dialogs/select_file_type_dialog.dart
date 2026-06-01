@@ -58,8 +58,9 @@ class _SelectFileTypeDialogState extends State<SelectFileTypeDialog> {
             if (_rememberSelection) {
               widget.onRememberSelection(_downloadType);
             }
-            Navigator.of(context)
-                .pop(_downloadType == FileDownloadType.original);
+            Navigator.of(
+              context,
+            ).pop(_downloadType == FileDownloadType.original);
           },
         ),
       ],
