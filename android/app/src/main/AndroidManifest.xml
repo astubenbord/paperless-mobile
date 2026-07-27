@@ -12,6 +12,10 @@
         android:label="Paperless Mobile"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <!-- Preloads the ML Kit document scanner model on app start to avoid first-scan latency. -->
+        <meta-data
+            android:name="com.google.mlkit.vision.DEPENDENCIES"
+            android:value="docscanner" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

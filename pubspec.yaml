@@ -37,6 +37,7 @@ dependencies:
     git:
       url: https://github.com/sawankumarbundelkhandi/edge_detection
       ref: master
+  google_mlkit_document_scanner: ^0.5.0
   path_provider: ^2.0.10
   image: ^4.0.17
   photo_view: ^0.15.0
