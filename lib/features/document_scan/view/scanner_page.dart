@@ -2,7 +2,6 @@ import 'dart:developer' as dev;
 import 'dart:io';
 import 'dart:math';
 
-import 'package:edge_detection/edge_detection.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -16,11 +15,14 @@ import 'package:paperless_mobile/core/model/info_message_exception.dart';
 import 'package:paperless_mobile/core/service/file_service.dart';
 import 'package:paperless_mobile/features/app_drawer/view/app_drawer.dart';
 import 'package:paperless_mobile/features/document_scan/cubit/document_scanner_cubit.dart';
+import 'package:paperless_mobile/features/document_scan/scanner/edge_detection_engine.dart';
+import 'package:paperless_mobile/features/document_scan/scanner/mlkit_engine.dart';
 import 'package:paperless_mobile/features/document_scan/view/widgets/export_scans_dialog.dart';
 import 'package:paperless_mobile/features/document_scan/view/widgets/scanned_image_item.dart';
 import 'package:paperless_mobile/features/document_search/view/sliver_search_bar.dart';
 import 'package:paperless_mobile/features/document_upload/view/document_upload_preparation_page.dart';
 import 'package:paperless_mobile/features/documents/view/pages/document_view.dart';
+import 'package:paperless_mobile/features/settings/model/scanner_implementation.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
 import 'package:paperless_mobile/helpers/connectivity_aware_action_wrapper.dart';
 import 'package:paperless_mobile/helpers/message_helpers.dart';
@@ -48,40 +50,84 @@ class _ScannerPageState extends State<ScannerPage>
 
   final _scrollController = ScrollController();
 
+  /// True while ML Kit capture and image processing is in progress.
+  bool _isProcessing = false;
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       top: true,
-      child: Scaffold(
-        drawer: const AppDrawer(),
-        floatingActionButton: FloatingActionButton(
-          heroTag: "fab_document_edit",
-          onPressed: () => _openDocumentScanner(context),
-          child: const Icon(Icons.add_a_photo_outlined),
-        ),
-        body: NestedScrollView(
-          floatHeaderSlivers: true,
-          headerSliverBuilder: (context, innerBoxIsScrolled) => [
-            SliverOverlapAbsorber(
-              handle: searchBarHandle,
-              sliver: SliverSearchBar(titleText: S.of(context)!.scanner),
+      child: Stack(
+        children: [
+          Scaffold(
+            drawer: const AppDrawer(),
+            floatingActionButton: FloatingActionButton.extended(
+              heroTag: "fab_document_edit",
+              onPressed:
+                  _isProcessing ? null : () => _openDocumentScanner(context),
+              icon: _isProcessing
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Icon(Icons.add_a_photo_outlined),
+              label: Text(
+                _isProcessing
+                    ? S.of(context)!.processingScan
+                    : S.of(context)!.scanADocument,
+              ),
             ),
-            SliverOverlapAbsorber(
-              handle: actionsHandle,
-              sliver: SliverPinnedHeader(child: _buildActions()),
+            body: NestedScrollView(
+              floatHeaderSlivers: true,
+              headerSliverBuilder: (context, innerBoxIsScrolled) => [
+                SliverOverlapAbsorber(
+                  handle: searchBarHandle,
+                  sliver: SliverSearchBar(titleText: S.of(context)!.scanner),
+                ),
+                SliverOverlapAbsorber(
+                  handle: actionsHandle,
+                  sliver: SliverPinnedHeader(child: _buildActions()),
+                ),
+              ],
+              body: BlocBuilder<DocumentScannerCubit, DocumentScannerState>(
+                builder: (context, state) {
+                  return switch (state.status) {
+                    LoadingStatus.initial => _buildEmptyState(),
+                    LoadingStatus.loading =>
+                      Center(child: Text("Restoring...")),
+                    LoadingStatus.loaded => _buildImageGrid(state.scans),
+                    LoadingStatus.error => Placeholder(),
+                  };
+                },
+              ),
             ),
-          ],
-          body: BlocBuilder<DocumentScannerCubit, DocumentScannerState>(
-            builder: (context, state) {
-              return switch (state.status) {
-                LoadingStatus.initial => _buildEmptyState(),
-                LoadingStatus.loading => Center(child: Text("Restoring...")),
-                LoadingStatus.loaded => _buildImageGrid(state.scans),
-                LoadingStatus.error => Placeholder(),
-              };
-            },
           ),
-        ),
+          if (_isProcessing)
+            Positioned.fill(
+              child: ColoredBox(
+                color: const Color(0x88000000),
+                child: Center(
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const CircularProgressIndicator(),
+                          const SizedBox(height: 16),
+                          Text(S.of(context)!.processingScan),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -220,33 +266,83 @@ class _ScannerPageState extends State<ScannerPage>
   }
 
   void _openDocumentScanner(BuildContext context) async {
-    final isGranted = await askForPermission(Permission.camera);
-    if (!isGranted) {
-      return;
-    }
-    final file = await FileService.instance.allocateTemporaryFile(
-      PaperlessDirectoryType.scans,
-      extension: 'jpeg',
-      create: true,
-    );
-    if (kDebugMode) {
-      dev.log('[ScannerPage] Created temporary file: ${file.path}');
+    final impl = context.localStore.state.globalSettings.preferredScanner;
+
+    // ML Kit manages its own camera permission through Play Services;
+    // edge_detection still requires an explicit permission request.
+    if (impl == ScannerImplementation.edgeDetection) {
+      final isGranted = await askForPermission(Permission.camera);
+      if (!isGranted) return;
     }
 
-    final success = await EdgeDetection.detectEdge(file.path);
-    if (!success) {
+    if (kDebugMode) {
+      dev.log('[ScannerPage] Using scanner engine: $impl');
+    }
+
+    final engine = switch (impl) {
+      ScannerImplementation.edgeDetection => const EdgeDetectionEngine(),
+      ScannerImplementation.mlKit => const MlKitEngine(),
+    };
+
+    // Show a processing overlay while ML Kit capture + processing runs.
+    if (impl == ScannerImplementation.mlKit && mounted) {
+      setState(() => _isProcessing = true);
+    }
+
+    List<File> scannedFiles;
+    try {
+      scannedFiles = await engine.scan();
+    } finally {
+      if (mounted) setState(() => _isProcessing = false);
+    }
+
+    if (scannedFiles.isEmpty) {
       if (kDebugMode) {
-        dev.log(
-          '[ScannerPage] Scan either not successful or canceled by user.',
-        );
+        dev.log('[ScannerPage] Scan canceled or no images returned.');
       }
       return;
     }
-    if (kDebugMode) {
-      dev.log('[ScannerPage] Wrote image to temporary file: ${file.path}');
-    }
+
     if (!context.mounted) return;
-    context.read<DocumentScannerCubit>().addScan(file);
+
+    if (impl == ScannerImplementation.mlKit) {
+      // ML Kit flow: add pages to the cubit (grid as backup), then immediately
+      // assemble a PDF and open the upload preparation page.
+      final cubit = context.read<DocumentScannerCubit>();
+      for (final file in scannedFiles) {
+        cubit.addScan(file);
+      }
+      if (!context.mounted) return;
+      await _onPrepareDocumentUploadMlKit(context, scannedFiles);
+    } else {
+      // edge_detection flow: add the single image to the grid; the user decides
+      // when to upload.
+      context.read<DocumentScannerCubit>().addScan(scannedFiles.first);
+    }
+
+    if (kDebugMode) {
+      dev.log(
+        '[ScannerPage] Added ${scannedFiles.length} scan(s) from $impl.',
+      );
+    }
+  }
+
+  /// ML Kit variant: always assembles a PDF (regardless of page count) and
+  /// opens the upload preparation page directly.
+  Future<void> _onPrepareDocumentUploadMlKit(
+    BuildContext context,
+    List<File> scans,
+  ) async {
+    final file = await _assembleFileBytes(scans, forcePdf: true);
+    if (!context.mounted) return;
+    final uploadResult = await DocumentUploadRoute(
+      $extra: file.bytes,
+      fileExtension: file.extension,
+    ).push<DocumentUploadResult>(context);
+    if (uploadResult?.success ?? false) {
+      if (!context.mounted) return;
+      context.read<DocumentScannerCubit>().reset();
+    }
   }
 
   void _onPrepareDocumentUpload(BuildContext context, List<File> scans) async {
