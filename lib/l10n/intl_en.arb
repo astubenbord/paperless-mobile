@@ -993,6 +993,22 @@
   "@scanADocument": {},
   "scanner": "Scanner",
   "@scanner": {},
+  "scannerEngine": "Document scanner",
+  "@scannerEngine": {
+    "description": "Title for the document scanner engine selection setting."
+  },
+  "scannerEngineEdgeDetection": "Legacy (edge detection)",
+  "@scannerEngineEdgeDetection": {
+    "description": "Label for the edge_detection scanner engine option."
+  },
+  "scannerEngineMlKit": "New (ML Kit · multi-page · auto-enhance)",
+  "@scannerEngineMlKit": {
+    "description": "Label for the Google ML Kit document scanner engine option."
+  },
+  "processingScan": "Processing scan…",
+  "@processingScan": {
+    "description": "Label shown on the FAB and processing overlay while ML Kit capture and processing is running."
+  },
   "scrollToTop": "Scroll to top",
   "@scrollToTop": {},
   "search": "Search",
