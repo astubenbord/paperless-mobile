@@ -1157,6 +1157,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.5.1"
+  native_flutter_proxy:
+    dependency: "direct main"
+    description:
+      name: native_flutter_proxy
+      sha256: "35f1a3c8993ad4dfc0ed67637fb4562ee6c307b785d27abc04cd6a21abcab014"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.1"
   nested:
     dependency: transitive
     description:
