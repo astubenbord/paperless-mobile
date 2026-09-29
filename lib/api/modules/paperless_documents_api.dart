@@ -21,7 +21,10 @@ abstract class PaperlessDocumentsApi {
     int? archiveSerialNumber,
     void Function(double progress)? onProgressChanged,
   });
-  Future<PaginatedResultList<Document>> getAll([DocumentFilter? options]);
+  Future<PaginatedResultList<Document>> getAll(
+    DocumentFilter? options, {
+    bool truncateContent = true,
+  });
   Future<Document> get(int id, {List<String>? fields});
   Future<Document> put(int id, DocumentRequest document);
   Future<Document> patch(int id, PatchedDocumentRequest document);
@@ -147,11 +150,12 @@ class PaperlessDocumentsApiImpl implements PaperlessDocumentsApi {
   }
 
   @override
-  Future<PaginatedResultList<Document>> getAll([
-    DocumentFilter? options,
-  ]) async {
+  Future<PaginatedResultList<Document>> getAll(
+    DocumentFilter? options, {
+    bool truncateContent = true,
+  }) async {
     final filterParams = options?.toQueryParameters() ?? {}
-      ..putIfAbsent('truncate_content', () => "true");
+      ..['truncate_content'] = truncateContent.toString();
     try {
       final response = await client.get(
         "/api/documents/",

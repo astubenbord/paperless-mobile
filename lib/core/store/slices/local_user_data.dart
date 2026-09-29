@@ -16,6 +16,9 @@ class LocalUserData {
   final String? lastName;
   final bool isBiometricAuthenticationEnabled;
   final LocalUserAppState appState;
+  final bool searchIndexingEnabled;
+  final DateTime? searchIndexLastModified;
+  final DateTime? searchIndexLastSync;
 
   const LocalUserData({
     required this.userId,
@@ -25,6 +28,9 @@ class LocalUserData {
     this.lastName,
     this.isBiometricAuthenticationEnabled = false,
     this.appState = const LocalUserAppState(),
+    this.searchIndexingEnabled = false,
+    this.searchIndexLastModified,
+    this.searchIndexLastSync,
   });
 
   Map<String, dynamic> toJson() => _$LocalUserDataToJson(this);

@@ -28,7 +28,16 @@ part 'authenticated_route.g.dart';
 
 @TypedShellRoute<AuthenticatedRoute>(
   routes: [
-    TypedGoRoute<SettingsRoute>(path: "/settings", name: R.settings),
+    TypedGoRoute<SettingsRoute>(
+      path: "/settings",
+      name: R.settings,
+      routes: [
+        TypedGoRoute<SearchIndexingRoute>(
+          path: "indexing",
+          name: R.searchIndexing,
+        ),
+      ],
+    ),
     TypedGoRoute<UploadQueueRoute>(path: "/upload-queue", name: R.uploadQueue),
     TypedGoRoute<SavedViewsRoute>(
       path: "/saved-views",

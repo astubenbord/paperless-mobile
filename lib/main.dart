@@ -41,12 +41,14 @@ import 'package:paperless_mobile/features/logging/data/mirrored_file_output.dart
 import 'package:paperless_mobile/features/login/cubit/authentication_cubit.dart';
 import 'package:paperless_mobile/features/login/services/authentication_service.dart';
 import 'package:paperless_mobile/features/notifications/services/local_notification_service.dart';
+import 'package:paperless_mobile/features/search_index/search_index_channel.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
 import 'package:paperless_mobile/helpers/message_helpers.dart';
 import 'package:paperless_mobile/routing/navigation_keys.dart';
 import 'package:paperless_mobile/routing/routes/app_logs_route.dart';
 import 'package:paperless_mobile/routing/routes/auth_route.dart';
 import 'package:paperless_mobile/routing/routes/changelog_route.dart';
+import 'package:paperless_mobile/routing/routes/documents_route.dart';
 import 'package:paperless_mobile/routing/routes/landing_route.dart';
 import 'package:paperless_mobile/routing/routes/logging_out_route.dart';
 import 'package:paperless_mobile/routing/routes/shells/authenticated_route.dart';
@@ -161,6 +163,7 @@ void main() async {
         localNotificationService,
         localStore,
         encryptedLocalStore,
+        const SearchIndexChannel(),
       );
 
       runApp(
@@ -248,9 +251,15 @@ class GoRouterShell extends StatefulWidget {
 }
 
 class _GoRouterShellState extends State<GoRouterShell> {
+  static const _searchIndexChannel = SearchIndexChannel();
+
+  /// Document opened from the device search before the user was authenticated.
+  int? _pendingDocumentId;
+
   @override
   void initState() {
     super.initState();
+    _searchIndexChannel.setOpenDocumentHandler(_openDocument);
     if (Platform.isAndroid) {
       _setOptimalDisplayMode();
     }
@@ -259,6 +268,23 @@ class _GoRouterShellState extends State<GoRouterShell> {
       context.read<AuthenticationCubit>().restoreSession();
       FlutterNativeSplash.remove();
     });
+  }
+
+  void _openDocument(int documentId) {
+    if (context.read<AuthenticationCubit>().state is Authenticated) {
+      _router.push(DocumentDetailsRoute(documentId: documentId).location);
+    } else {
+      _pendingDocumentId = documentId;
+    }
+  }
+
+  Future<void> _openPendingDocument() async {
+    final nativePendingId = await _searchIndexChannel.takePendingDocumentId();
+    final documentId = _pendingDocumentId ?? nativePendingId;
+    _pendingDocumentId = null;
+    if (documentId != null) {
+      _router.push(DocumentDetailsRoute(documentId: documentId).location);
+    }
   }
 
   /// Activates the highest supported refresh rate on the device.
@@ -323,6 +349,9 @@ class _GoRouterShellState extends State<GoRouterShell> {
                     break;
                   case Authenticated():
                     const LandingRoute().go(context);
+                    WidgetsBinding.instance.addPostFrameCallback(
+                      (_) => _openPendingDocument(),
+                    );
                     break;
                   case LoggingOutState():
                     const LoggingOutRoute().go(context);

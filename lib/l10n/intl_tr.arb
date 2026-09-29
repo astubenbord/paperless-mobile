@@ -195,6 +195,8 @@
   "@clearCache": {
     "description": "Title of the clear cache setting"
   },
+  "clearIndex": "Clear index",
+  "@clearIndex": {},
   "clearLogs": "Clear logs from {date}",
   "clientcertificate": "İstemci Sertifikası",
   "@clientcertificate": {},
@@ -489,6 +491,10 @@
       "name": {}
     }
   },
+  "deviceSearchIndexing": "Device search indexing",
+  "@deviceSearchIndexing": {},
+  "deviceSearchIndexingDescription": "Find documents from the phone search bar",
+  "@deviceSearchIndexingDescription": {},
   "disableAnimations": "Disable animations",
   "disableAnimationsDescription": "Disables page transitions and most animations. Temporary workaround until system accessibility settings can be used.",
   "disableMatching": "Belgeleri otomatik etiketleme",
@@ -657,6 +663,14 @@
   "include": "Include",
   "incorrectOrMissingCertificatePassphrase": "Yanlış veya eksik sertifika parolası.",
   "@incorrectOrMissingCertificatePassphrase": {},
+  "indexedDocumentsCount": "Indexed documents: {count}",
+  "@indexedDocumentsCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "indexing": "Indexing",
+  "@indexing": {},
   "invalidAddress": "Geçersiz adres.",
   "@invalidAddress": {},
   "invalidApiKey": "Invalid API key.",
@@ -684,6 +698,12 @@
   "@last3Months": {},
   "last7Days": "Geçmiş 7 Gün",
   "@last7Days": {},
+  "lastError": "Last error: {error}",
+  "@lastError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
   "lastMonth": "Geçen Ay",
   "@lastMonth": {},
   "lastNDays": "{count, plural, zero{} one{Dün} other{Geçmiş {count} gün}}",
@@ -708,6 +728,12 @@
   "@lastNYears": {
     "placeholders": {
       "count": {}
+    }
+  },
+  "lastSync": "Last sync: {date}",
+  "@lastSync": {
+    "placeholders": {
+      "date": {}
     }
   },
   "lastYear": "Geçen sene",
@@ -974,6 +1000,8 @@
   "@results": {
     "description": "Label displayed above search results in document search."
   },
+  "samsungFinderSearchHint": "Samsung: open Finder > ⋮ > Choose apps to search in, and enable Paperless Mobile.",
+  "@samsungFinderSearchHint": {},
   "save": "Kaydet",
   "@save": {},
   "saveChanges": "Değişiklikleri Kaydet",
@@ -1000,6 +1028,8 @@
   "searchCustomFields": "Search custom fields",
   "searchDocuments": "Search documents",
   "@searchDocuments": {},
+  "searchIndexPrivacyWarning": "Document titles and full text are stored on this device in the app's private storage.",
+  "@searchIndexPrivacyWarning": {},
   "security": "Güvenlik",
   "@security": {},
   "select": "Seç",
@@ -1087,6 +1117,8 @@
   },
   "synchronizeTitleAndFilename": "Başlığı ve dosya adını senkronize et",
   "@synchronizeTitleAndFilename": {},
+  "syncNow": "Sync now",
+  "@syncNow": {},
   "system": "Sistem",
   "@system": {},
   "systemTheme": "Sistem temasını kullan",

@@ -195,6 +195,8 @@
   "@clearCache": {
     "description": "Title of the clear cache setting"
   },
+  "clearIndex": "Clear index",
+  "@clearIndex": {},
   "clearLogs": "Cancella log da {date}",
   "clientcertificate": "Certificato Client",
   "@clientcertificate": {},
@@ -489,6 +491,10 @@
       "name": {}
     }
   },
+  "deviceSearchIndexing": "Device search indexing",
+  "@deviceSearchIndexing": {},
+  "deviceSearchIndexingDescription": "Find documents from the phone search bar",
+  "@deviceSearchIndexingDescription": {},
   "disableAnimations": "Disable animations",
   "disableAnimationsDescription": "Disables page transitions and most animations. Temporary workaround until system accessibility settings can be used.",
   "disableMatching": "Non taggare i documenti automaticamente",
@@ -657,6 +663,14 @@
   "include": "Include",
   "incorrectOrMissingCertificatePassphrase": "Passphrase del certificato errata o mancante.",
   "@incorrectOrMissingCertificatePassphrase": {},
+  "indexedDocumentsCount": "Indexed documents: {count}",
+  "@indexedDocumentsCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "indexing": "Indexing",
+  "@indexing": {},
   "invalidAddress": "Indirizzo non valido.",
   "@invalidAddress": {},
   "invalidApiKey": "Invalid API key.",
@@ -684,6 +698,12 @@
   "@last3Months": {},
   "last7Days": "Ultimi 7 giorni",
   "@last7Days": {},
+  "lastError": "Last error: {error}",
+  "@lastError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
   "lastMonth": "Ultimo mese",
   "@lastMonth": {},
   "lastNDays": "{count, plural, zero{} one{Ieri} other{Ultimi {count} giorni}}",
@@ -708,6 +728,12 @@
   "@lastNYears": {
     "placeholders": {
       "count": {}
+    }
+  },
+  "lastSync": "Last sync: {date}",
+  "@lastSync": {
+    "placeholders": {
+      "date": {}
     }
   },
   "lastYear": "Ultimo anno",
@@ -974,6 +1000,8 @@
   "@results": {
     "description": "Label displayed above search results in document search."
   },
+  "samsungFinderSearchHint": "Samsung: open Finder > ⋮ > Choose apps to search in, and enable Paperless Mobile.",
+  "@samsungFinderSearchHint": {},
   "save": "Salva",
   "@save": {},
   "saveChanges": "Salva modifiche",
@@ -1000,6 +1028,8 @@
   "searchCustomFields": "Search custom fields",
   "searchDocuments": "Cerca documenti",
   "@searchDocuments": {},
+  "searchIndexPrivacyWarning": "Document titles and full text are stored on this device in the app's private storage.",
+  "@searchIndexPrivacyWarning": {},
   "security": "Sicurezza",
   "@security": {},
   "select": "Seleziona",
@@ -1087,6 +1117,8 @@
   },
   "synchronizeTitleAndFilename": "Sincronizza titolo e nome file",
   "@synchronizeTitleAndFilename": {},
+  "syncNow": "Sync now",
+  "@syncNow": {},
   "system": "Sistema",
   "@system": {},
   "systemTheme": "Usa tema di sistema",

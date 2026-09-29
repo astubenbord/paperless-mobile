@@ -1,5 +1,6 @@
 import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:paperless_mobile/api/extensions/cached_query_extensions.dart';
 import 'package:paperless_mobile/api/paperless_api.dart';
@@ -21,6 +22,8 @@ import 'package:paperless_mobile/core/store/local_store.dart';
 import 'package:paperless_mobile/core/store/slices/local_user_account.dart';
 import 'package:paperless_mobile/features/document_scan/cubit/document_scanner_cubit.dart';
 import 'package:paperless_mobile/features/login/view/widgets/login_transition_page.dart';
+import 'package:paperless_mobile/features/search_index/cubit/search_index_cubit.dart';
+import 'package:paperless_mobile/features/search_index/search_index_channel.dart';
 import 'package:paperless_mobile/features/tasks/model/pending_tasks_notifier.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
@@ -134,6 +137,15 @@ class HomeShellWidget extends StatelessWidget {
             ),
             ChangeNotifierProvider(
               create: (context) => PendingTasksNotifier(context.read()),
+            ),
+            BlocProvider(
+              create: (context) => SearchIndexCubit(
+                context.read(),
+                context.read(),
+                appUserId,
+                const SearchIndexChannel(),
+              )..syncIfEnabled(),
+              lazy: false,
             ),
           ],
           child: Builder(

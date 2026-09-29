@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
@@ -16,6 +18,7 @@ import 'package:paperless_mobile/features/settings/view/widgets/language_selecti
 import 'package:paperless_mobile/features/settings/view/widgets/skip_document_prepraration_on_share_setting.dart';
 import 'package:paperless_mobile/features/settings/view/widgets/theme_mode_setting.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
+import 'package:paperless_mobile/routing/routes/settings_route.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class SettingsPage extends StatelessWidget {
@@ -39,6 +42,13 @@ class SettingsPage extends StatelessWidget {
           const DefaultShareFileTypeSetting(),
           const EnforcePdfUploadSetting(),
           const SkipDocumentPreprationOnShareSetting(),
+          if (Platform.isAndroid)
+            ListTile(
+              leading: const Icon(Icons.manage_search),
+              title: Text(S.of(context)!.indexing),
+              subtitle: Text(S.of(context)!.deviceSearchIndexingDescription),
+              onTap: () => const SearchIndexingRoute().push(context),
+            ),
           _buildSectionHeader(context, S.of(context)!.storage),
           const ClearCacheSetting(),
           _buildSectionHeader(context, S.of(context)!.misc),

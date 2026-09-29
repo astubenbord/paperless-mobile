@@ -195,6 +195,8 @@
   "@clearCache": {
     "description": "Title of the clear cache setting"
   },
+  "clearIndex": "Clear index",
+  "@clearIndex": {},
   "clearLogs": "Izbriši dnevnik iz {date}",
   "clientcertificate": "Certifikat klienta",
   "@clientcertificate": {},
@@ -489,6 +491,10 @@
       "name": {}
     }
   },
+  "deviceSearchIndexing": "Device search indexing",
+  "@deviceSearchIndexing": {},
+  "deviceSearchIndexingDescription": "Find documents from the phone search bar",
+  "@deviceSearchIndexingDescription": {},
   "disableAnimations": "Onemogoči animacije",
   "disableAnimationsDescription": "Onemogoči prehode med stranmi in večino animacij. Začasna rešitev, dokler ni mogoče uporabiti sistemskih nastavitev dostopnosti.",
   "disableMatching": "Ne označuj dokumentov samodejno",
@@ -657,6 +663,14 @@
   "include": "Vključi",
   "incorrectOrMissingCertificatePassphrase": "Neveljavno ali manjkajoče geslo certifikata.",
   "@incorrectOrMissingCertificatePassphrase": {},
+  "indexedDocumentsCount": "Indexed documents: {count}",
+  "@indexedDocumentsCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "indexing": "Indexing",
+  "@indexing": {},
   "invalidAddress": "Neveljaven naslov.",
   "@invalidAddress": {},
   "invalidApiKey": "Neveljaven API ključ.",
@@ -684,6 +698,12 @@
   "@last3Months": {},
   "last7Days": "Zadnjih 7 dni",
   "@last7Days": {},
+  "lastError": "Last error: {error}",
+  "@lastError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
   "lastMonth": "Zadnji mesec",
   "@lastMonth": {},
   "lastNDays": "{count, plural, zero{} one{včeraj} other{zadnjih {count} dni}}",
@@ -708,6 +728,12 @@
   "@lastNYears": {
     "placeholders": {
       "count": {}
+    }
+  },
+  "lastSync": "Last sync: {date}",
+  "@lastSync": {
+    "placeholders": {
+      "date": {}
     }
   },
   "lastYear": "Zadnje leto",
@@ -974,6 +1000,8 @@
   "@results": {
     "description": "Label displayed above search results in document search."
   },
+  "samsungFinderSearchHint": "Samsung: open Finder > ⋮ > Choose apps to search in, and enable Paperless Mobile.",
+  "@samsungFinderSearchHint": {},
   "save": "Shrani",
   "@save": {},
   "saveChanges": "Shrani spremembe",
@@ -1000,6 +1028,8 @@
   "searchCustomFields": "Iskanje polj po meri",
   "searchDocuments": "Preišči dokumente",
   "@searchDocuments": {},
+  "searchIndexPrivacyWarning": "Document titles and full text are stored on this device in the app's private storage.",
+  "@searchIndexPrivacyWarning": {},
   "security": "Varnost",
   "@security": {},
   "select": "Izberi",
@@ -1087,6 +1117,8 @@
   },
   "synchronizeTitleAndFilename": "Sinhroniziraj naslov in ime dokumenta",
   "@synchronizeTitleAndFilename": {},
+  "syncNow": "Sync now",
+  "@syncNow": {},
   "system": "sistemska",
   "@system": {},
   "systemTheme": "Uporabi sistemsko temo",

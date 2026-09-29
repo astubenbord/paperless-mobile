@@ -195,6 +195,8 @@
   "@clearCache": {
     "description": "Title of the clear cache setting"
   },
+  "clearIndex": "Clear index",
+  "@clearIndex": {},
   "clearLogs": "Netejar registres des de {date}",
   "clientcertificate": "Certificat de client",
   "@clientcertificate": {},
@@ -489,6 +491,10 @@
       "name": {}
     }
   },
+  "deviceSearchIndexing": "Device search indexing",
+  "@deviceSearchIndexing": {},
+  "deviceSearchIndexingDescription": "Find documents from the phone search bar",
+  "@deviceSearchIndexingDescription": {},
   "disableAnimations": "Deshabilita animacions",
   "disableAnimationsDescription": "Desactiva transicions de pàgina i la majoria d'animacions. Solució temporal fins que es pugui utilitzar la configuració d'accessibilitat del sistema.",
   "disableMatching": "No etiquetar documents automaticament",
@@ -657,6 +663,14 @@
   "include": "Inclou",
   "incorrectOrMissingCertificatePassphrase": "Incorrecte o falta de contrasenya de certificat.",
   "@incorrectOrMissingCertificatePassphrase": {},
+  "indexedDocumentsCount": "Indexed documents: {count}",
+  "@indexedDocumentsCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "indexing": "Indexing",
+  "@indexing": {},
   "invalidAddress": "Adreça Invàlida.",
   "@invalidAddress": {},
   "invalidApiKey": "Clau API invàlida.",
@@ -684,6 +698,12 @@
   "@last3Months": {},
   "last7Days": "Últims 7 dies",
   "@last7Days": {},
+  "lastError": "Last error: {error}",
+  "@lastError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
   "lastMonth": "Mes passat",
   "@lastMonth": {},
   "lastNDays": "{count, plural, one{Ahir} other{Últims {count} dies}}",
@@ -708,6 +728,12 @@
   "@lastNYears": {
     "placeholders": {
       "count": {}
+    }
+  },
+  "lastSync": "Last sync: {date}",
+  "@lastSync": {
+    "placeholders": {
+      "date": {}
     }
   },
   "lastYear": "Any passat",
@@ -974,6 +1000,8 @@
   "@results": {
     "description": "Label displayed above search results in document search."
   },
+  "samsungFinderSearchHint": "Samsung: open Finder > ⋮ > Choose apps to search in, and enable Paperless Mobile.",
+  "@samsungFinderSearchHint": {},
   "save": "Desa",
   "@save": {},
   "saveChanges": "Desa canvis",
@@ -1000,6 +1028,8 @@
   "searchCustomFields": "Cerca camps personalitzats",
   "searchDocuments": "Cerca documents",
   "@searchDocuments": {},
+  "searchIndexPrivacyWarning": "Document titles and full text are stored on this device in the app's private storage.",
+  "@searchIndexPrivacyWarning": {},
   "security": "Seguretat",
   "@security": {},
   "select": "Selecciona",
@@ -1087,6 +1117,8 @@
   },
   "synchronizeTitleAndFilename": "Sincronitza títol i nom d'arxiu",
   "@synchronizeTitleAndFilename": {},
+  "syncNow": "Sync now",
+  "@syncNow": {},
   "system": "Sistema",
   "@system": {},
   "systemTheme": "Utilitza tema del sistema",

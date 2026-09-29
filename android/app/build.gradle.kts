@@ -48,6 +48,9 @@ android {
 
         // Required for flutter_local_notifications
         multiDexEnabled = true
+
+        resValue("string", "app_name", "Paperless Mobile")
+        resValue("string", "search_authority", "de.astubenbord.paperless_mobile.search")
     }
 
     signingConfigs {
@@ -70,12 +73,17 @@ android {
         }
         getByName("debug") {
             applicationIdSuffix = ".debug"
+            resValue("string", "search_authority", "de.astubenbord.paperless_mobile.debug.search")
         }
     }
 }
 
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+    implementation("androidx.appsearch:appsearch:1.1.0")
+    implementation("androidx.appsearch:appsearch-local-storage:1.1.0")
+    implementation("com.google.guava:guava:33.7.1-android")
+    testImplementation("junit:junit:4.13.2")
 }
 
 flutter {

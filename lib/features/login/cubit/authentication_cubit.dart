@@ -19,6 +19,8 @@ import 'package:paperless_mobile/features/login/model/reachability_status.dart';
 import 'package:paperless_mobile/features/login/server_connection/model/header_entry.dart';
 import 'package:paperless_mobile/features/login/services/authentication_service.dart';
 import 'package:paperless_mobile/features/notifications/services/local_notification_service.dart';
+import 'package:paperless_mobile/features/search_index/cubit/search_index_cubit.dart';
+import 'package:paperless_mobile/features/search_index/search_index_channel.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
 
 part 'authentication_state.dart';
@@ -31,6 +33,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
   final SessionManager _sessionManager;
   final ConnectivityStatusService _connectivityService;
   final LocalNotificationService _notificationService;
+  final SearchIndexChannel _searchIndexChannel;
 
   AuthenticationCubit(
     this._usersApi,
@@ -40,6 +43,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     this._notificationService,
     this._store,
     this._encryptedLocalStore,
+    this._searchIndexChannel,
   ) : super(const Unauthenticated());
 
   Future<void> addUser({
@@ -183,6 +187,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
       _store.removeUserData(userId);
       await _encryptedLocalStore.clear(userId);
       await FileService.instance.clearUserData(userId: userId);
+      await _clearSearchIndex(userId);
       if (_store.state.localUserData.keys.isEmpty) {
         emit(const Unauthenticated(redirectToAccountSelection: false));
       }
@@ -299,6 +304,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
       await _resetExternalState();
       CachedQuery.instance.deleteCache();
       await _notificationService.cancelUserNotifications(userId);
+      await _clearSearchIndex(userId);
 
       final otherAccountsExist = _store.state.localUserData.keys.length > 1;
 
@@ -324,6 +330,25 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
       // Even on error, ensure user is logged out to avoid stuck state.
       _store.setLoggedInAppUserId(null);
       emit(const Unauthenticated());
+    }
+  }
+
+  /// Never throws, so index teardown cannot break auth cleanup.
+  Future<void> _clearSearchIndex(String userId) async {
+    try {
+      // Only the logged-in user can be the active index user.
+      if (_store.state.loggedInAppUserId == userId) {
+        await _searchIndexChannel.setActiveUser(null);
+      }
+      await clearSearchIndex(_searchIndexChannel, _store, userId);
+    } catch (error, stackTrace) {
+      logger.fe(
+        "Failed to clear search index for ${redactUserId(userId)}.",
+        className: runtimeType.toString(),
+        methodName: '_clearSearchIndex',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 
