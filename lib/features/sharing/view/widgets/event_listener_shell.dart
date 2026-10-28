@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -35,11 +36,13 @@ class _EventListenerShellState extends State<EventListenerShell> {
   StreamSubscription? _subscription;
   StreamSubscription? _documentDeletedSubscription;
   Timer? _inboxTimer;
+  late final Future<List<SharedMediaFile>> _initialMedia;
 
   @override
   void initState() {
     super.initState();
-    ReceiveSharingIntent.instance.getInitialMedia().then((files) async {
+    _initialMedia = ReceiveSharingIntent.instance.getInitialMedia();
+    _initialMedia.then((files) async {
       if (files.isEmpty) {
         final shouldShowChangelog = await _shouldShowChangelog;
         if (shouldShowChangelog && mounted) {
@@ -57,6 +60,11 @@ class _EventListenerShellState extends State<EventListenerShell> {
       final userId = context.loggedInUser.appUserId;
       final notifier = context.read<ConsumptionChangeNotifier>();
       await notifier.isInitialized;
+      // The app was opened by sharing files, which are already being consumed.
+      // Otherwise they would be offered a second time as pending files.
+      if ((await _initialMedia).isNotEmpty || !mounted) {
+        return;
+      }
       final pendingFiles = notifier.pendingFiles;
       if (pendingFiles.isEmpty) {
         return;
@@ -150,6 +158,7 @@ Future<void> consumeLocalFile(
   final shouldDirectlyUpload =
       context.localStore.state.globalSettings.skipDocumentPreprarationOnUpload;
   final consumptionNotifier = context.read<ConsumptionChangeNotifier>();
+  final documentRepository = context.documentRepository;
   final filename = p.basename(file.path);
   final hasInternetConnection = await context
       .read<ConnectivityStatusService>()
@@ -166,31 +175,46 @@ Future<void> consumeLocalFile(
   }
 
   final bytes = file.readAsBytes();
-  // if () {
-  //   try {
-  //     final taskId = await documentsApi.create(
-  //       await bytes,
-  //       filename: filename,
-  //       title: p.basenameWithoutExtension(file.path),
-  //     );
-
-  //     consumptionNotifier.discardFile(file, userId: userId);
-  //     taskNotifier.listenToTaskChanges(taskId);
-  //   } catch (error) {
-  //     if (!context.mounted) return;
-  //     await Fluttertoast.showToast(msg: S.of(context)!.couldNotUploadDocument);
-  //     return;
-  //   } finally {
-  //     if (exitAppAfterConsumed) {
-  //       SystemNavigator.pop();
-  //     }
-  //   }
+  if (shouldDirectlyUpload) {
+    final mutationState = await documentRepository
+        .createDocumentMutation(
+          await bytes,
+          filename: filename,
+          title: p.basenameWithoutExtension(file.path),
+        )
+        .mutate();
+    if (mutationState case MutationError(:final error)) {
+      logger.fe(
+        'Could not directly upload $filename, falling back to upload page.',
+        className: 'EventListenerShell',
+        methodName: 'consumeLocalFile',
+        error: error,
+      );
+      if (!context.mounted) return;
+      await Fluttertoast.showToast(msg: S.of(context)!.couldNotUploadDocument);
+      if (!context.mounted) return;
+    } else {
+      if (context.mounted) {
+        final taskId = mutationState.data;
+        if (taskId != null) {
+          context.read<PendingTasksNotifier>().listenToTaskChanges(taskId);
+        }
+        await Fluttertoast.showToast(
+          msg: S.of(context)!.documentSuccessfullyUploadedProcessing,
+        );
+      }
+      await consumptionNotifier.discardFile(file, userId: userId);
+      if (exitAppAfterConsumed) {
+        SystemNavigator.pop();
+      }
+      return;
+    }
+  }
   final result = await DocumentUploadRoute(
     $extra: bytes,
     filename: p.basenameWithoutExtension(file.path),
     title: p.basenameWithoutExtension(file.path),
     fileExtension: p.extension(file.path),
-    instantUpload: shouldDirectlyUpload,
   ).push<DocumentUploadResult?>(context);
 
   if (result?.success ?? false) {
