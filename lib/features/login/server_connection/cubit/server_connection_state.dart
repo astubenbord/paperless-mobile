@@ -33,3 +33,12 @@ class ServerConnectionUnreachable extends ServerConnectionState {
     required this.status,
   });
 }
+
+class ServerConnectionTunnelError extends ServerConnectionState {
+  const ServerConnectionTunnelError({
+    required this.address,
+    required this.code,
+  });
+  final String address;
+  final String code;
+}

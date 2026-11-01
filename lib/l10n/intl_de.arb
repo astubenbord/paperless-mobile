@@ -1197,5 +1197,63 @@
   "youHaveNoViewsOnYourDashboardYet": "Du hast noch keine Ansichten zu deinem Dashboard hinzugefügt.",
   "@youHaveNoViewsOnYourDashboardYet": {},
   "youreOffline": "Du bist offline.",
-  "@youreOffline": {}
+  "@youreOffline": {},
+  "tunnelTitle": "Verbindung von unterwegs",
+  "tunnelLink": "Von unterwegs verbinden (VPN)",
+  "tunnelStep1": "1. WireGuard-Datei hinzufügen",
+  "tunnelImport": ".conf-Datei auswählen",
+  "tunnelPaste": "Konfiguration einfügen",
+  "tunnelSave": "Konfiguration speichern",
+  "tunnelStep2": "2. VPN erlauben",
+  "tunnelPermissionHelp": "Android fragt nach deiner Erlaubnis, damit diese App eine sichere Verbindung herstellen kann.",
+  "tunnelPermission": "VPN erlauben",
+  "tunnelGranted": "Erlaubnis erteilt",
+  "tunnelStep3": "3. Verbindung testen",
+  "tunnelServerUrl": "Adresse des Paperless-Servers",
+  "tunnelTest": "Verbindung testen",
+  "tunnelTestOk": "Die Verbindung funktioniert.",
+  "tunnelAuto": "Automatisch verbinden",
+  "tunnelDirect": "Nur wenn der Server nicht direkt erreichbar ist",
+  "tunnelDelay": "Nach Verlassen der App trennen",
+  "tunnelNever": "Nie",
+  "tunnelMinutes1": "1 Minute",
+  "tunnelMinutes5": "5 Minuten",
+  "tunnelMinutes15": "15 Minuten",
+  "tunnelMinutes30": "30 Minuten",
+  "tunnelDelete": "Konfiguration löschen",
+  "tunnelDeleteConfirm": "Die gespeicherte Verbindungskonfiguration löschen?",
+  "tunnelCancel": "Abbrechen",
+  "tunnelDeleteAction": "Löschen",
+  "tunnelStatusOff": "Aus",
+  "tunnelStatusConnecting": "Verbindet",
+  "tunnelStatusConnected": "Verbunden",
+  "tunnelStatusError": "Verbindungsfehler",
+  "tunnelConfigSaved": "Konfiguration gespeichert",
+  "tunnelInfo": "Server-Host: {host}\nGegenstellen: {peers}\nAdressen: {addresses}",
+  "tunnelErrorPermission": "Bitte erlaube zuerst die VPN-Verbindung.",
+  "tunnelErrorDns": "Der Servername konnte nicht aufgelöst werden.",
+  "tunnelErrorMissing": "Bitte füge zuerst eine Konfiguration hinzu.",
+  "tunnelErrorStart": "Die Verbindung konnte nicht gestartet werden.",
+  "tunnelErrorTun": "Die sichere Verbindung konnte nicht eingerichtet werden.",
+  "tunnelErrorLibrary": "Die VPN-Komponente ist auf diesem Gerät nicht verfügbar.",
+  "tunnelErrorLarge": "Die Datei ist größer als 64 KiB.",
+  "tunnelErrorInvalid": "Die Konfiguration ist ungültig.",
+  "tunnelErrorUnknown": "Die Verbindung ist fehlgeschlagen. Bitte prüfe deine Einstellungen.",
+  "tunnelErrorServer": "Der Paperless-Server konnte nicht erreicht werden.",
+  "tunnelConfigExists": "Eine Konfiguration ist gespeichert.",
+  "tunnelConfigNone": "Keine Konfiguration gespeichert.",
+  "tunnelInvalidUrl": "Gib eine gültige Serveradresse mit http:// oder https:// ein.",
+  "@tunnelInfo": {
+    "placeholders": {
+      "host": {
+        "type": "String"
+      },
+      "peers": {
+        "type": "String"
+      },
+      "addresses": {
+        "type": "String"
+      }
+    }
+  }
 }

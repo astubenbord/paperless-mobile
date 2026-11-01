@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:paperless_mobile/features/tunnel/view/tunnel_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:paperless_mobile/core/extensions/flutter_extensions.dart';
@@ -69,6 +70,24 @@ class _ServerConnectionPageState extends State<ServerConnectionPage> {
                   context.read<ServerConnectionCubit>().reset();
                 },
               ).paddedSymmetrically(horizontal: 12, vertical: 12),
+              TextButton.icon(
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => TunnelPage(
+                      initialServerUrl:
+                          _formKey
+                                  .currentState
+                                  ?.fields[ServerAddressFormField
+                                      .fkServerAddress]
+                                  ?.value
+                              as String? ??
+                          widget.initialHost,
+                    ),
+                  ),
+                ),
+                icon: const Icon(Icons.vpn_lock),
+                label: Text(S.of(context)!.tunnelLink),
+              ),
               ClientCertificateFormField(
                 initialBytes: widget.initialClientCertificate?.bytes,
                 initialPassphrase: widget.initialClientCertificate?.passphrase,
@@ -163,6 +182,13 @@ class _ServerConnectionPageState extends State<ServerConnectionPage> {
 
     return BlocBuilder<ServerConnectionCubit, ServerConnectionState>(
       builder: (context, state) {
+        if (state is ServerConnectionTunnelError) {
+          return buildIconText(
+            Icons.close,
+            tunnelErrorMessage(S.of(context)!, state.code),
+            errorColor,
+          );
+        }
         if (state is! ServerConnectionUnreachable) {
           return const SizedBox.shrink();
         }

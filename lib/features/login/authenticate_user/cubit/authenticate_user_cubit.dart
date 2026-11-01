@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:paperless_mobile/api/paperless_api.dart';
 import 'package:paperless_mobile/core/security/session_manager_impl.dart';
+import 'package:paperless_mobile/core/tunnel/tunnel_manager.dart';
 import 'package:paperless_mobile/features/login/authenticate_user/model/authentication_credentials.dart';
 import 'package:paperless_mobile/features/login/model/client_certificate.dart';
 import 'package:paperless_mobile/features/login/server_connection/model/header_entry.dart';
@@ -8,7 +9,10 @@ import 'package:paperless_mobile/features/login/server_connection/model/header_e
 part 'authenticate_user_state.dart';
 
 class AuthenticateUserCubit extends Cubit<AuthenticateUserState> {
-  AuthenticateUserCubit() : super(const AuthenticateUserInitial());
+  AuthenticateUserCubit([this.tunnelManager])
+    : super(const AuthenticateUserInitial());
+
+  final TunnelManager? tunnelManager;
 
   Future<void> login({
     required String serverUrl,
@@ -19,6 +23,7 @@ class AuthenticateUserCubit extends Cubit<AuthenticateUserState> {
   }) async {
     emit(const AuthenticateUserChecking());
     try {
+      await tunnelManager?.ensureReachable(serverUrl);
       final sessionManager = SessionManagerImpl()
         ..updateSettings(
           clientCertificate: clientCertificate,

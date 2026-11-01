@@ -34,6 +34,10 @@ import 'package:paperless_mobile/core/store/bloc/global_settings_builder.dart';
 import 'package:paperless_mobile/core/store/encrypted_local_store.dart';
 import 'package:paperless_mobile/core/store/encrypted_local_store_secure_storage_impl.dart';
 import 'package:paperless_mobile/core/store/local_store.dart';
+import 'package:paperless_mobile/core/tunnel/tunnel_channel.dart';
+import 'package:paperless_mobile/core/tunnel/tunnel_manager.dart';
+import 'package:paperless_mobile/features/tunnel/view/tunnel_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:paperless_mobile/features/error_widget/error_fallback_card.dart';
 import 'package:paperless_mobile/features/logging/data/formatted_printer.dart';
 import 'package:paperless_mobile/features/logging/data/logger.dart';
@@ -153,6 +157,10 @@ void main() async {
       await localNotificationService.initialize();
 
       final userApi = PaperlessUserApiImpl(sessionManager.client);
+      final tunnelManager = TunnelManager(
+        TunnelChannel(),
+        await SharedPreferences.getInstance(),
+      );
       final authenticationCubit = AuthenticationCubit(
         userApi,
         sessionManager,
@@ -161,11 +169,15 @@ void main() async {
         localNotificationService,
         localStore,
         encryptedLocalStore,
+        tunnelManager: tunnelManager,
       );
+
+      WidgetsBinding.instance.addObserver(tunnelManager);
 
       runApp(
         AppEntrypoint(
           sessionManager: sessionManager,
+          tunnelManager: tunnelManager,
           authenticationCubit: authenticationCubit,
           connectivityStatusService: connectivityStatusService,
           localNotificationService: localNotificationService,
@@ -198,6 +210,7 @@ void main() async {
 
 class AppEntrypoint extends StatelessWidget {
   final LocalStore localStore;
+  final TunnelManager tunnelManager;
   final EncryptedLocalStore encryptedLocalStore;
   final AuthenticationCubit authenticationCubit;
   final ConnectivityStatusService connectivityStatusService;
@@ -208,6 +221,7 @@ class AppEntrypoint extends StatelessWidget {
   const AppEntrypoint({
     super.key,
     required this.localStore,
+    required this.tunnelManager,
     required this.authenticationCubit,
     required this.connectivityStatusService,
     required this.localNotificationService,
@@ -225,6 +239,7 @@ class AppEntrypoint extends StatelessWidget {
               PaperlessAuthenticationApiImpl(sessionManager.client),
         ),
         Provider.value(value: localStore),
+        Provider.value(value: tunnelManager),
         Provider.value(value: encryptedLocalStore),
         Provider.value(value: authenticationCubit),
         Provider.value(
@@ -256,8 +271,8 @@ class _GoRouterShellState extends State<GoRouterShell> {
     }
     initializeDateFormatting();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      context.read<AuthenticationCubit>().restoreSession();
       FlutterNativeSplash.remove();
+      if (mounted) context.read<AuthenticationCubit>().restoreSession();
     });
   }
 
@@ -328,13 +343,27 @@ class _GoRouterShellState extends State<GoRouterShell> {
                     const LoggingOutRoute().go(context);
                     break;
                   case AuthenticationError error:
-                    showGenericError(context, error.error);
+                    if (error.error is TunnelException) {
+                      showSnackBar(
+                        context,
+                        tunnelErrorMessage(
+                          S.of(context)!,
+                          (error.error as TunnelException).code,
+                        ),
+                      );
+                    } else {
+                      showGenericError(context, error.error);
+                    }
                     context.pop();
                     break;
-                  case ConnectionFailure():
+                  case ConnectionFailure(:final tunnelErrorCode):
                     showSnackBar(
                       context,
-                      S.of(context)!.couldNotEstablishConnectionToTheServer,
+                      tunnelErrorCode == null
+                          ? S
+                                .of(context)!
+                                .couldNotEstablishConnectionToTheServer
+                          : tunnelErrorMessage(S.of(context)!, tunnelErrorCode),
                     );
                     LoginToExistingAccountRoute().go(context);
                   default:

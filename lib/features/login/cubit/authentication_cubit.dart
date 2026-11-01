@@ -5,6 +5,8 @@ import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:paperless_mobile/api/paperless_api.dart';
 import 'package:paperless_mobile/core/model/info_message_exception.dart';
 import 'package:paperless_mobile/core/security/session_manager.dart';
+import 'package:paperless_mobile/core/tunnel/tunnel_channel.dart';
+import 'package:paperless_mobile/core/tunnel/tunnel_manager.dart';
 import 'package:paperless_mobile/core/service/connectivity_status_service.dart';
 import 'package:paperless_mobile/core/service/file_service.dart';
 import 'package:paperless_mobile/core/store/encrypted_local_store.dart';
@@ -31,6 +33,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
   final SessionManager _sessionManager;
   final ConnectivityStatusService _connectivityService;
   final LocalNotificationService _notificationService;
+  final TunnelManager? _tunnelManager;
 
   AuthenticationCubit(
     this._usersApi,
@@ -39,8 +42,10 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     this._localAuthService,
     this._notificationService,
     this._store,
-    this._encryptedLocalStore,
-  ) : super(const Unauthenticated());
+    this._encryptedLocalStore, {
+    TunnelManager? tunnelManager,
+  }) : _tunnelManager = tunnelManager,
+       super(const Unauthenticated());
 
   Future<void> addUser({
     required String serverUrl,
@@ -50,6 +55,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
   }) async {
     emit(const Authenticating());
     try {
+      await _tunnelManager?.ensureReachable(serverUrl);
       final userProfile = await _addUser(
         serverUrl,
         token,
@@ -131,6 +137,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
       }
       final decryptedState = (await _encryptedLocalStore.read(localUserId))!;
 
+      await _tunnelManager?.ensureReachable(localUserData.serverUrl);
       await _resetExternalState();
       _sessionManager.updateSettings(
         authToken: decryptedState.credentials.token,
@@ -165,6 +172,13 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
         'Switched to user $redactedId.',
         className: runtimeType.toString(),
         methodName: 'switchAccount',
+      );
+    } on TunnelException catch (error) {
+      emit(
+        ConnectionFailure(
+          serverUrl: _store.state.localUserData[localUserId]!.serverUrl,
+          tunnelErrorCode: error.code,
+        ),
       );
     } catch (error, stackTrace) {
       logger.fe(
@@ -253,6 +267,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
         broadcast: false,
       );
 
+      await _tunnelManager?.ensureReachable(localUserData.serverUrl);
       final isPaperlessServerReachable =
           await _connectivityService.isPaperlessServerReachable(
             localUserData.serverUrl,
@@ -273,6 +288,14 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
         "Session restored for ${redactUserId(restoreSessionUserId)}.",
         className: runtimeType.toString(),
         methodName: 'restoreSession',
+      );
+    } on TunnelException catch (error) {
+      emit(
+        ConnectionFailure(
+          serverUrl:
+              _store.state.localUserData[restoreSessionUserId]!.serverUrl,
+          tunnelErrorCode: error.code,
+        ),
       );
     } catch (error, stackTrace) {
       logger.fe(

@@ -70,12 +70,17 @@ android {
         }
         getByName("debug") {
             applicationIdSuffix = ".debug"
+            // D8 cannot desugar the java.lang.Record used by the WireGuard tunnel library for
+            // debuggable builds together with core library desugaring ("global synthetics" error).
+            isDebuggable = false
         }
     }
 }
 
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+    implementation("com.wireguard.android:tunnel:1.0.20260102")
+    testImplementation("junit:junit:4.13.2")
 }
 
 flutter {

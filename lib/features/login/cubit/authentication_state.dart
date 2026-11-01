@@ -48,7 +48,9 @@ class SwitchingAccounts extends AuthenticationState {
 class ConnectionFailure extends AuthenticationState {
   final String serverUrl;
 
-  ConnectionFailure({required this.serverUrl});
+  final String? tunnelErrorCode;
+
+  ConnectionFailure({required this.serverUrl, this.tunnelErrorCode});
 }
 
 class AuthenticationError extends AuthenticationState with EquatableMixin {

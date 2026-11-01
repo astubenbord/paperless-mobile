@@ -2,6 +2,7 @@ import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:paperless_mobile/features/tunnel/view/tunnel_page.dart';
 import 'package:paperless_mobile/core/extensions/context_extensions.dart';
 import 'package:paperless_mobile/core/store/slices/local_user_account.dart';
 import 'package:paperless_mobile/features/settings/view/widgets/app_logs_tile.dart';
@@ -32,6 +33,17 @@ class SettingsPage extends StatelessWidget {
           const LanguageSelectionSetting(),
           const ThemeModeSetting(),
           const ColorSchemeOptionSetting(),
+          _buildSectionHeader(context, S.of(context)!.tunnelTitle),
+          ListTile(
+            leading: const Icon(Icons.vpn_lock),
+            title: Text(S.of(context)!.tunnelTitle),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) =>
+                    TunnelPage(initialServerUrl: currentUser.serverUrl),
+              ),
+            ),
+          ),
           _buildSectionHeader(context, S.of(context)!.security),
           const BiometricAuthenticationSetting(),
           _buildSectionHeader(context, S.of(context)!.behavior),

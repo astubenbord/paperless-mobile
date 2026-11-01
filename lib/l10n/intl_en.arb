@@ -1197,5 +1197,63 @@
   "youHaveNoViewsOnYourDashboardYet": "You have not added any views to your dashboard yet.",
   "@youHaveNoViewsOnYourDashboardYet": {},
   "youreOffline": "You're offline.",
-  "@youreOffline": {}
+  "@youreOffline": {},
+  "tunnelTitle": "Connection on the go",
+  "tunnelLink": "Connect on the go (VPN)",
+  "tunnelStep1": "1. Add your WireGuard file",
+  "tunnelImport": "Choose .conf file",
+  "tunnelPaste": "Paste configuration",
+  "tunnelSave": "Save configuration",
+  "tunnelStep2": "2. Allow VPN",
+  "tunnelPermissionHelp": "Android asks for permission so this app can create a secure connection.",
+  "tunnelPermission": "Allow VPN",
+  "tunnelGranted": "Permission granted",
+  "tunnelStep3": "3. Test connection",
+  "tunnelServerUrl": "Paperless server address",
+  "tunnelTest": "Test connection",
+  "tunnelTestOk": "Connection works.",
+  "tunnelAuto": "Connect automatically",
+  "tunnelDirect": "Only when the server is not directly reachable",
+  "tunnelDelay": "Disconnect after leaving the app",
+  "tunnelNever": "Never",
+  "tunnelMinutes1": "1 minute",
+  "tunnelMinutes5": "5 minutes",
+  "tunnelMinutes15": "15 minutes",
+  "tunnelMinutes30": "30 minutes",
+  "tunnelDelete": "Delete configuration",
+  "tunnelDeleteConfirm": "Delete the saved connection configuration?",
+  "tunnelCancel": "Cancel",
+  "tunnelDeleteAction": "Delete",
+  "tunnelStatusOff": "Off",
+  "tunnelStatusConnecting": "Connecting",
+  "tunnelStatusConnected": "Connected",
+  "tunnelStatusError": "Connection error",
+  "tunnelConfigSaved": "Configuration saved",
+  "tunnelInfo": "Server host: {host}\nPeers: {peers}\nAddresses: {addresses}",
+  "tunnelErrorPermission": "Please allow the VPN connection first.",
+  "tunnelErrorDns": "The server name could not be resolved.",
+  "tunnelErrorMissing": "Please add a configuration first.",
+  "tunnelErrorStart": "The connection could not be started.",
+  "tunnelErrorTun": "The secure connection could not be created.",
+  "tunnelErrorLibrary": "The VPN component is unavailable on this device.",
+  "tunnelErrorLarge": "The file is larger than 64 KiB.",
+  "tunnelErrorInvalid": "The configuration is invalid.",
+  "tunnelErrorUnknown": "The connection failed. Please check your settings.",
+  "tunnelErrorServer": "The Paperless server could not be reached.",
+  "tunnelConfigExists": "A configuration is saved.",
+  "tunnelConfigNone": "No configuration saved.",
+  "tunnelInvalidUrl": "Enter a valid server address beginning with http:// or https://.",
+  "@tunnelInfo": {
+    "placeholders": {
+      "host": {
+        "type": "String"
+      },
+      "peers": {
+        "type": "String"
+      },
+      "addresses": {
+        "type": "String"
+      }
+    }
+  }
 }

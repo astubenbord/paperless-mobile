@@ -1,3 +1,5 @@
+import 'package:paperless_mobile/core/tunnel/tunnel_channel.dart';
+import 'package:paperless_mobile/features/tunnel/view/tunnel_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paperless_mobile/core/extensions/flutter_extensions.dart';
@@ -59,7 +61,17 @@ class _OtpInputPageState extends State<OtpInputPage> {
             if (error.nonFieldError != null) {
               showSnackBar(context, error.nonFieldError!);
             } else {
-              showGenericError(context, error.genericError);
+              if (error.genericError is TunnelException) {
+                showSnackBar(
+                  context,
+                  tunnelErrorMessage(
+                    S.of(context)!,
+                    (error.genericError as TunnelException).code,
+                  ),
+                );
+              } else {
+                showGenericError(context, error.genericError);
+              }
             }
             _controller.clear();
             _focusNode.requestFocus();

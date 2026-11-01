@@ -1,4 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:paperless_mobile/core/tunnel/tunnel_manager.dart';
+import 'package:paperless_mobile/core/tunnel/tunnel_channel.dart';
 import 'package:paperless_mobile/core/service/connectivity_status_service.dart';
 import 'package:paperless_mobile/features/logging/data/logger.dart';
 import 'package:paperless_mobile/features/login/model/client_certificate.dart';
@@ -9,7 +11,8 @@ part 'server_connection_state.dart';
 
 class ServerConnectionCubit extends Cubit<ServerConnectionState> {
   final ConnectivityStatusService _connectivityStatusService;
-  ServerConnectionCubit(this._connectivityStatusService)
+  final TunnelManager? tunnelManager;
+  ServerConnectionCubit(this._connectivityStatusService, [this.tunnelManager])
     : super(const ServerConnectionInitial());
 
   void reset() {
@@ -23,6 +26,7 @@ class ServerConnectionCubit extends Cubit<ServerConnectionState> {
   }) async {
     emit(ServerConnectionCheckingReachability(address: address));
     try {
+      await tunnelManager?.ensureReachable(address);
       final status = await _connectivityStatusService
           .isPaperlessServerReachable(
             address,
@@ -46,6 +50,8 @@ class ServerConnectionCubit extends Cubit<ServerConnectionState> {
         );
         emit(ServerConnectionUnreachable(address: address, status: status));
       }
+    } on TunnelException catch (error) {
+      emit(ServerConnectionTunnelError(address: address, code: error.code));
     } catch (error, stackTrace) {
       logger.fe(
         'Error while checking server reachability',
