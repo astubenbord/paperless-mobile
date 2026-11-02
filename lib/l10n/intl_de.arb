@@ -1255,5 +1255,71 @@
         "type": "String"
       }
     }
-  }
+  },
+  "diagTitle": "Diagnose",
+  "diagRun": "Verbindung genau prüfen",
+  "diagCopy": "Bericht kopieren",
+  "diagCopied": "Bericht kopiert",
+  "diagDetails": "Details anzeigen",
+  "diagDnsMissing": "Es sind keine DNS-Server eingetragen.",
+  "diagDns": "DNS-Server",
+  "diagAddress": "Adresse",
+  "diagEndpoint": "Gegenstelle",
+  "diagAllowed": "Erlaubte IP-Adressen",
+  "diagOk": "In Ordnung",
+  "diagWarn": "Hinweis",
+  "diagError": "Fehler",
+  "diagSkipped": "Übersprungen",
+  "diagTunnel": "Tunnel",
+  "diagConfig": "Einstellungen",
+  "diagSystemDns": "Namenssuche des Geräts",
+  "diagVpnDns": "Namenssuche über VPN",
+  "diagTcp": "Verbindung zum Server",
+  "diagHttp": "Antwort von Paperless",
+  "diagVerdict": "Ergebnis",
+  "diagTunnelDown": "Der Tunnel ist nicht verbunden. Prüfen Sie die VPN-Verbindung.",
+  "diagDnsOutside": "Der Servername wird außerhalb des VPN gesucht. Prüfen Sie die DNS-Einstellungen.",
+  "diagPort": "Der Server ist nicht erreichbar. Prüfen Sie Adresse und Port.",
+  "diagPaperless": "Der Server antwortet nicht als Paperless. Prüfen Sie die Serveradresse.",
+  "diagTls": "Die sichere Verbindung ist fehlgeschlagen. Prüfen Sie das Zertifikat.",
+  "diagSuccess": "Die Verbindung zu Paperless funktioniert.",
+  "diagUnknown": "Die Verbindung konnte nicht geprüft werden.",
+  "diagLocation": "Die Diagnose finden Sie unter Einstellungen → Verbindung von unterwegs.",
+  "diagPortLabel": "Port",
+  "diagDuration": "Antwortzeit: {milliseconds} ms",
+  "diagHttpStatus": "HTTP-Status: {code}",
+  "homeTitle": "Heimnetz (WLAN)",
+  "homeExplanation": "Trage hier die Namen deiner WLANs zu Hause ein. In diesen Netzen braucht die App keinen Tunnel; überall sonst schaltet sie ihn automatisch ein.",
+  "homePrivacy": "Android benötigt zum Auslesen des WLAN-Namens die Standort-Berechtigung und eingeschaltete Standortdienste. Die App speichert oder sendet keinen Standort.",
+  "homeName": "WLAN-Name",
+  "homeAdd": "Hinzufügen",
+  "homeDelete": "WLAN-Name löschen",
+  "homeInvalid": "Ungültiger oder bereits eingetragener WLAN-Name.",
+  "homeUseCurrent": "Aktuelles WLAN übernehmen",
+  "homeOpenSettings": "App-Einstellungen öffnen",
+  "homeLocationOff": "Schalte die Standortdienste ein",
+  "homeNotWifi": "Du bist gerade nicht mit einem WLAN verbunden",
+  "homePermissionMissing": "Standort-Berechtigung fehlt",
+  "homeUnknown": "Unbekannt",
+  "homeNoNames": "Keine WLAN-Namen eingetragen",
+  "homeNow": "Gerade:",
+  "homeAway": "unterwegs",
+  "homeAtHome": "im Heimnetz (WLAN '{ssid}')",
+  "@homeAtHome": {
+    "placeholders": {
+      "ssid": {
+        "type": "String"
+      }
+    }
+  },
+  "homeUnrecognized": "nicht erkennbar ({reason})",
+  "@homeUnrecognized": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "homeNoTunnel": "Im Heimnetz, kein Tunnel nötig",
+  "homeDirectHint": "Wird nur genutzt, solange keine WLAN-Namen eingetragen sind oder die Erkennung nicht möglich ist."
 }

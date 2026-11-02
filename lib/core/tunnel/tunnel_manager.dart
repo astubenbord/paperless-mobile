@@ -1,17 +1,21 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/widgets.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'home_network_detector.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'tunnel_channel.dart';
+import 'tunnel_diagnostics.dart';
+import 'http_prober.dart';
 
 enum TunnelConnectionState { off, connecting, connected, error }
 
 class TunnelViewState {
-  const TunnelViewState(this.state, [this.errorCode]);
+  const TunnelViewState(this.state, [this.errorCode, this.atHome = false]);
   final TunnelConnectionState state;
   final String? errorCode;
+  final bool atHome;
 }
 
 typedef ServerProbe = Future<bool> Function(String url);
@@ -22,11 +26,32 @@ class TunnelManager with WidgetsBindingObserver {
     this.channel,
     this.preferences, {
     ServerProbe? probe,
+    HomeNetworkDetector? homeNetworkDetector,
+    Stream<List<ConnectivityResult>>? connectivityChanges,
     this.pollInterval = const Duration(milliseconds: 500),
     this.connectTimeout = const Duration(seconds: 15),
     this.delayUnit = const Duration(minutes: 1),
-  }) : probe = probe ?? probeServer;
+  }) : probe = probe ?? probeServer,
+       homeNetworkDetector =
+           homeNetworkDetector ?? HomeNetworkDetector(channel.currentSsid) {
+    _connectivitySubscription =
+        (connectivityChanges ?? Connectivity().onConnectivityChanged).listen((
+          _,
+        ) {
+          if (!_foreground) return;
+          _networkTimer?.cancel();
+          _networkTimer = Timer(const Duration(seconds: 1), () {
+            final server = _server;
+            if (server != null)
+              unawaited(ensureReachable(server).catchError((Object _) {}));
+          });
+        });
+  }
 
+  final HomeNetworkDetector homeNetworkDetector;
+  StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
+  Timer? _networkTimer;
+  bool _foreground = true;
   final TunnelChannel channel;
   final SharedPreferences preferences;
   final ServerProbe probe;
@@ -41,6 +66,32 @@ class TunnelManager with WidgetsBindingObserver {
   Timer? _timer;
   bool _started = false;
   String? _server;
+
+  TunnelDiagnostics createDiagnostics() => TunnelDiagnostics(
+    channel,
+    homeNetworkDetector: homeNetworkDetector,
+    homeSsids: () => homeSsids,
+  );
+
+  List<String> get homeSsids =>
+      preferences.getStringList('tunnel.homeSsids') ?? [];
+  Future<void> setHomeSsids(List<String> value) async =>
+      preferences.setStringList('tunnel.homeSsids', value);
+  Future<void> addHomeSsid(String ssid) async {
+    var value = ssid.trim();
+    if (value.length >= 2 && value.startsWith('"') && value.endsWith('"')) {
+      value = value.substring(1, value.length - 1).trim();
+    }
+    if (value.isEmpty ||
+        value.toLowerCase() == '<unknown ssid>' ||
+        value == '0x')
+      return;
+    final list = homeSsids;
+    if (!list.contains(value)) await setHomeSsids([...list, value]);
+  }
+
+  Future<void> removeHomeSsid(String ssid) async =>
+      setHomeSsids(homeSsids.where((s) => s != ssid).toList());
 
   bool get enabled => preferences.getBool('tunnel.enabled') ?? false;
   bool get directCheck => preferences.getBool('tunnel.directCheck') ?? true;
@@ -116,8 +167,25 @@ class TunnelManager with WidgetsBindingObserver {
 
   Future<void> _ensure(String url) async {
     try {
-      if (!enabled || !await channel.hasConfig()) return;
-      if (directCheck && await probe(url)) return;
+      if (!enabled) return;
+      final home = await homeNetworkDetector.detect(homeSsids);
+      if (home.state == HomeNetworkState.atHome) {
+        if (_started) {
+          if (await channel.status() == TunnelStatus.up) await channel.down();
+          _started = false;
+        }
+        state.value = const TunnelViewState(
+          TunnelConnectionState.off,
+          null,
+          true,
+        );
+        return;
+      }
+      if (!await channel.hasConfig()) return;
+      if (home.state != HomeNetworkState.away &&
+          directCheck &&
+          await probe(url))
+        return;
       state.value = const TunnelViewState(TunnelConnectionState.connecting);
       if (!await channel.isPermitted())
         throw const TunnelException('vpn_not_authorized');
@@ -150,6 +218,8 @@ class TunnelManager with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState lifecycle) {
+    _foreground = lifecycle == AppLifecycleState.resumed;
+    if (!_foreground) _networkTimer?.cancel();
     if (lifecycle == AppLifecycleState.paused &&
         _started &&
         delayMinutes != 0) {
@@ -176,31 +246,12 @@ class TunnelManager with WidgetsBindingObserver {
 
   void dispose() {
     _timer?.cancel();
+    _networkTimer?.cancel();
+    _connectivitySubscription?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     state.dispose();
   }
 
-  static Future<bool> probeServer(String url) async {
-    final client = HttpClient()..connectionTimeout = const Duration(seconds: 2);
-    try {
-      final request = await client
-          .headUrl(Uri.parse(url))
-          .timeout(const Duration(seconds: 2));
-      final response = await request.close().timeout(
-        const Duration(seconds: 2),
-      );
-      response.listen((_) {}).cancel();
-      return true;
-    } on HandshakeException {
-      return true;
-    } on TlsException {
-      return true;
-    } on SocketException {
-      return false;
-    } on TimeoutException {
-      return false;
-    } finally {
-      client.close(force: true);
-    }
-  }
+  static Future<bool> probeServer(String url) async =>
+      (await HttpProber().probe(url)).isPaperless;
 }

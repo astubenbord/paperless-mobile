@@ -49,4 +49,35 @@ void main() {
       ),
     );
   });
+  test('parses diagnostics and defaults missing fields', () async {
+    messenger.setMockMethodCallHandler(
+      channel,
+      (call) async => {
+        'state': 'UP',
+        'dnsServers': ['192.0.2.53'],
+        'peers': [
+          {
+            'endpointHost': 'vpn.example.com',
+            'endpointPort': 51820,
+            'allowedIps': ['192.0.2.0/24'],
+            'lastHandshakeEpochMillis': 1000,
+          },
+          {},
+        ],
+      },
+    );
+    final data = await tunnel.diagnostics();
+    expect(data.state, TunnelStatus.up);
+    expect(data.dnsServers, ['192.0.2.53']);
+    expect(data.interfaceAddresses, isEmpty);
+    expect(data.mtu, isNull);
+    expect(data.peers.first.endpointPort, 51820);
+    expect(data.peers.first.allowedIps, ['192.0.2.0/24']);
+    expect(
+      data.peers.first.lastHandshake,
+      DateTime.fromMillisecondsSinceEpoch(1000, isUtc: true),
+    );
+    expect(data.peers.last.lastHandshake, isNull);
+    expect(data.peers.last.rxBytes, 0);
+  });
 }
