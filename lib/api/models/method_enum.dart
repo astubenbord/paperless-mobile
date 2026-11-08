@@ -14,6 +14,8 @@ enum MethodEnum {
   setPermissions,
   rotate,
   merge,
+  editPdf,
+  removePassword,
   split,
   deletePages;
 

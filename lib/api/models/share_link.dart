@@ -12,6 +12,7 @@ abstract class ShareLink with _$ShareLink {
     DateTime? expiration,
     required String slug,
     int? document,
+    String? documentTitle,
     FileVersionEnum? fileVersion,
   }) = _ShareLink;
 

@@ -6,5 +6,5 @@ late final PackageInfo packageInfo;
 late final AndroidDeviceInfo? androidInfo;
 late final IosDeviceInfo? iosInfo;
 
-const minSupportedApiVersion = 6;
-const latestSupportedApiVersion = 9;
+const minSupportedApiVersion = 10;
+const latestSupportedApiVersion = 10;

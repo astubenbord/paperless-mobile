@@ -13,8 +13,11 @@ class TextQuery {
 
   const TextQuery({this.queryType = QueryType.titleAndContent, this.queryText});
   const TextQuery.title(this.queryText) : queryType = QueryType.title;
+  const TextQuery.titleSearch(this.queryText)
+    : queryType = QueryType.titleSearch;
   const TextQuery.titleAndContent(this.queryText)
     : queryType = QueryType.titleAndContent;
+  const TextQuery.simpleText(this.queryText) : queryType = QueryType.simpleText;
   const TextQuery.extended(this.queryText) : queryType = QueryType.extended;
 
   Map<String, String> toQueryParameter() {
@@ -26,14 +29,15 @@ class TextQuery {
   }
 
   String? get titleOnlyMatchString {
-    if (queryType == QueryType.title) {
+    if (queryType == QueryType.title || queryType == QueryType.titleSearch) {
       return queryText?.isEmpty ?? true ? null : queryText;
     }
     return null;
   }
 
   String? get titleAndContentMatchString {
-    if (queryType == QueryType.titleAndContent) {
+    if (queryType == QueryType.titleAndContent ||
+        queryType == QueryType.simpleText) {
       return queryText?.isEmpty ?? true ? null : queryText;
     }
     return null;
@@ -50,8 +54,10 @@ class TextQuery {
     if (queryText?.isEmpty ?? true) return true;
     switch (queryType) {
       case QueryType.title:
+      case QueryType.titleSearch:
         return title.contains(queryText!);
       case QueryType.titleAndContent:
+      case QueryType.simpleText:
         return title.contains(queryText!) ||
             (content?.contains(queryText!) ?? false);
       case QueryType.extended:

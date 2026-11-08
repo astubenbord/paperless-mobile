@@ -62,6 +62,7 @@ abstract class MailRule with _$MailRule {
     // minimum: 0.0
     // maximum: 2.147483647E9
     PdfLayoutEnum? pdfLayout,
+    bool? stopProcessing,
     int? owner,
     required bool userCanChange,
   }) = _MailRule;
