@@ -89,6 +89,8 @@ class DioHttpErrorInterceptor extends Interceptor {
       } else {
         handler.reject(err);
       }
+    } else {
+      handler.next(err);
     }
   }
 }

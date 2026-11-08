@@ -28,7 +28,7 @@ class PaperlessAuthenticationApiImpl implements PaperlessAuthenticationApi {
         data: request.toJson(),
         options: Options(
           sendTimeout: const Duration(seconds: 5),
-          receiveTimeout: const Duration(seconds: 5),
+          receiveTimeout: const Duration(seconds: 30),
           followRedirects: false,
         ),
       );
@@ -39,6 +39,8 @@ class PaperlessAuthenticationApiImpl implements PaperlessAuthenticationApi {
       final apiVersionResponse = await client.head(
         '/api/profile/',
         options: Options(
+          sendTimeout: const Duration(seconds: 5),
+          receiveTimeout: const Duration(seconds: 30),
           headers: {"Authorization": "Token $token"},
           validateStatus: (status) => status == HttpStatus.ok,
         ),
@@ -70,6 +72,8 @@ class PaperlessAuthenticationApiImpl implements PaperlessAuthenticationApi {
       final response = await client.head(
         '/api/profile/',
         options: Options(
+          sendTimeout: const Duration(seconds: 5),
+          receiveTimeout: const Duration(seconds: 30),
           headers: {"Authorization": "Token $token"},
           validateStatus: (status) => status == HttpStatus.ok,
         ),

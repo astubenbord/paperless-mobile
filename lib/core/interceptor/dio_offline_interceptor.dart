@@ -17,6 +17,8 @@ class DioOfflineInterceptor extends Interceptor {
             type: DioExceptionType.connectionTimeout,
           ),
         );
+      } else {
+        handler.next(err);
       }
     } else {
       handler.next(err);

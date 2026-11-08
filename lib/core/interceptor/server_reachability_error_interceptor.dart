@@ -19,7 +19,9 @@ class ServerReachabilityErrorInterceptor extends Interceptor {
         );
       }
     }
-    if (err.type == DioExceptionType.connectionTimeout) {
+    if (err.type == DioExceptionType.connectionTimeout ||
+        err.type == DioExceptionType.sendTimeout ||
+        err.type == DioExceptionType.receiveTimeout) {
       return _rejectWithStatus(
         ReachabilityStatus.connectionTimeout,
         err,
@@ -31,18 +33,10 @@ class ServerReachabilityErrorInterceptor extends Interceptor {
       final code = error.osError?.errorCode;
       if (code == OsErrorCodes.serverUnreachable.code ||
           code == OsErrorCodes.hostNotFound.code) {
-        return _rejectWithStatus(
-          ReachabilityStatus.unknownHost,
-          err,
-          handler,
-        );
+        return _rejectWithStatus(ReachabilityStatus.unknownHost, err, handler);
       }
     }
-    return _rejectWithStatus(
-      ReachabilityStatus.notReachable,
-      err,
-      handler,
-    );
+    return _rejectWithStatus(ReachabilityStatus.notReachable, err, handler);
   }
 }
 
@@ -51,10 +45,12 @@ void _rejectWithStatus(
   DioException err,
   ErrorInterceptorHandler handler,
 ) {
-  handler.reject(DioException(
-    error: reachabilityStatus,
-    requestOptions: err.requestOptions,
-    response: err.response,
-    type: DioExceptionType.unknown,
-  ));
+  handler.reject(
+    DioException(
+      error: reachabilityStatus,
+      requestOptions: err.requestOptions,
+      response: err.response,
+      type: DioExceptionType.unknown,
+    ),
+  );
 }
