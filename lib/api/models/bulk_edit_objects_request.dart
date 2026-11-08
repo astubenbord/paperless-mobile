@@ -8,7 +8,9 @@ part 'bulk_edit_objects_request.g.dart';
 @Freezed(toJson: true, fromJson: false)
 abstract class BulkEditObjectsRequest with _$BulkEditObjectsRequest {
   factory BulkEditObjectsRequest({
-    required List<int> objects,
+    List<int>? objects,
+    @Default(false) bool? all,
+    Map<String, Object>? filters,
     required ObjectTypeEnum objectType,
     required OperationEnum operation,
     int? owner,

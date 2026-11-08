@@ -19,6 +19,7 @@ abstract class PaperlessDocumentsApi {
     Iterable<int> customFields = const [],
     Iterable<int> tags = const [],
     int? archiveSerialNumber,
+    bool fromWebui = false,
     void Function(double progress)? onProgressChanged,
   });
   Future<PaginatedResultList<Document>> getAll([DocumentFilter? options]);
@@ -32,7 +33,7 @@ abstract class PaperlessDocumentsApi {
     int? page,
     int? pageSize,
   });
-  Future<List<Note>> getNotes(int id, {int? page, int? pageSize});
+  Future<List<Note>> getNotes(int id);
   Future<List<Note>> addNote(int documentId, String note);
   Future<List<Note>> deleteNote(int documentId, int noteId);
   String getPreviewUrl(int id);
@@ -45,12 +46,17 @@ abstract class PaperlessDocumentsApi {
   Future<int> getNextAsn();
   Future<Iterable<int>> bulkAction(BulkEditRequest action);
   Future<SelectionData> getSelectionData(Iterable<int> documentIds);
-  Future<Uint8List> downloadDocument(int id, {bool original});
+  Future<Uint8List> downloadDocument(
+    int id, {
+    bool original = false,
+    bool followFormatting = false,
+  });
 
   Future<void> downloadToFile(
     int id,
     String localFilePath, {
     bool original = false,
+    bool followFormatting = false,
     void Function(double progress)? onProgressChanged,
   });
 }
@@ -72,6 +78,7 @@ class PaperlessDocumentsApiImpl implements PaperlessDocumentsApi {
     Iterable<int> customFields = const [],
     Iterable<int> tags = const [],
     int? archiveSerialNumber,
+    bool fromWebui = false,
     void Function(double progress)? onProgressChanged,
   }) async {
     final formData = FormData();
@@ -96,6 +103,7 @@ class PaperlessDocumentsApiImpl implements PaperlessDocumentsApi {
         MapEntry('storage_path', jsonEncode(storagePath)),
       if (archiveSerialNumber != null)
         MapEntry('archive_serial_number', jsonEncode(archiveSerialNumber)),
+      if (fromWebui) MapEntry('from_webui', 'true'),
       for (final tag in tags) MapEntry('tags', tag.toString()),
       for (final field in customFields)
         MapEntry('custom_fields', field.toString()),
@@ -241,11 +249,18 @@ class PaperlessDocumentsApiImpl implements PaperlessDocumentsApi {
   }
 
   @override
-  Future<Uint8List> downloadDocument(int id, {bool original = false}) async {
+  Future<Uint8List> downloadDocument(
+    int id, {
+    bool original = false,
+    bool followFormatting = false,
+  }) async {
     try {
       final response = await client.get(
         "/api/documents/$id/download/",
-        queryParameters: {'original': original},
+        queryParameters: {
+          'original': original,
+          if (followFormatting) 'follow_formatting': true,
+        },
         options: Options(responseType: ResponseType.bytes),
       );
       return response.data;
@@ -259,6 +274,7 @@ class PaperlessDocumentsApiImpl implements PaperlessDocumentsApi {
     int id,
     String localFilePath, {
     bool original = false,
+    bool followFormatting = false,
     void Function(double)? onProgressChanged,
   }) async {
     try {
@@ -267,7 +283,10 @@ class PaperlessDocumentsApiImpl implements PaperlessDocumentsApi {
         localFilePath,
         onReceiveProgress: (count, total) =>
             onProgressChanged?.call(count.toDouble() / total.toDouble()),
-        queryParameters: {'original': original},
+        queryParameters: {
+          'original': original,
+          if (followFormatting) 'follow_formatting': true,
+        },
       );
     } on DioException catch (exception) {
       throw exception.unravel(orElse: const PaperlessApiException.unknown());
@@ -393,7 +412,7 @@ class PaperlessDocumentsApiImpl implements PaperlessDocumentsApi {
   }) async {
     try {
       final response = await client.get(
-        "/api/documents/$id/logs/",
+        "/api/documents/$id/history/",
         queryParameters: {'page': page, 'page_size': pageSize},
       );
       return PaginatedResultList.fromJson(
@@ -406,11 +425,10 @@ class PaperlessDocumentsApiImpl implements PaperlessDocumentsApi {
   }
 
   @override
-  Future<List<Note>> getNotes(int id, {int? page, int? pageSize}) async {
+  Future<List<Note>> getNotes(int id) async {
     try {
       final response = await client.get<List<dynamic>>(
         "/api/documents/$id/notes/",
-        queryParameters: {'page': page, 'page_size': pageSize},
       );
       return response.data?.map((e) => Note.fromJson(e)).toList() ?? [];
     } on DioException catch (exception) {
@@ -423,7 +441,7 @@ class PaperlessDocumentsApiImpl implements PaperlessDocumentsApi {
     try {
       final response = await client.post(
         "/api/documents/selection_data/",
-        data: {'document_ids': documentIds.toList()},
+        data: {'documents': documentIds.toList()},
       );
       return SelectionData.fromJson(response.data);
     } on DioException catch (exception) {

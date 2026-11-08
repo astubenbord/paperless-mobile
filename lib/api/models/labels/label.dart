@@ -259,6 +259,8 @@ class Tag extends Label {
   final Color? color;
 
   final bool isInboxTag;
+  final int? parent;
+  final List<Tag>? children;
 
   const Tag({
     required super.id,
@@ -271,6 +273,8 @@ class Tag extends Label {
     this.color,
     this.textColor,
     this.isInboxTag = false,
+    this.parent,
+    this.children,
     super.owner,
     super.userCanChange,
   });
@@ -290,6 +294,8 @@ class Tag extends Label {
     Color? color,
     Color? textColor,
     bool? isInboxTag,
+    int? parent,
+    List<Tag>? children,
   }) {
     return Tag(
       id: id ?? this.id,
@@ -302,6 +308,8 @@ class Tag extends Label {
       color: color ?? this.color,
       textColor: textColor ?? this.textColor,
       isInboxTag: isInboxTag ?? this.isInboxTag,
+      parent: parent ?? this.parent,
+      children: children ?? this.children,
     );
   }
 
@@ -316,6 +324,8 @@ class Tag extends Label {
     color,
     textColor,
     isInboxTag,
+    parent,
+    children,
     match,
   ];
 

@@ -66,6 +66,7 @@ class TagRequest extends LabelRequest {
     super.setPermissions,
     this.isInboxTag,
     this.color,
+    this.parent,
   });
 
   @JsonKey(name: r'color', includeIfNull: false)
@@ -74,6 +75,9 @@ class TagRequest extends LabelRequest {
   /// Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags.
   @JsonKey(name: r'is_inbox_tag', includeIfNull: false)
   final bool? isInboxTag;
+
+  @JsonKey(name: r'parent', includeIfNull: false)
+  final int? parent;
 
   @override
   Map<String, dynamic> toJson() => _$TagRequestToJson(this);

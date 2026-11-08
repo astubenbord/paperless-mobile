@@ -68,6 +68,7 @@ class PatchedMailRuleRequest {
   // minimum: 0.0
   // maximum: 2.147483647E9
   final PatchedValue<PdfLayoutEnum?>? pdfLayout;
+  final PatchedValue<bool?>? stopProcessing;
   final PatchedValue<int?>? owner;
   final PatchedValue<CorrespondentRequestSetPermissions?>? setPermissions;
 
@@ -95,6 +96,7 @@ class PatchedMailRuleRequest {
     this.attachmentType,
     this.consumptionScope,
     this.pdfLayout,
+    this.stopProcessing,
     this.owner,
     this.setPermissions,
   });

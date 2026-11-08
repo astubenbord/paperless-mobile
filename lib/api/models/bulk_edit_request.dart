@@ -7,8 +7,12 @@ part 'bulk_edit_request.g.dart';
 @Freezed(toJson: true, fromJson: false)
 abstract class BulkEditRequest with _$BulkEditRequest {
   factory BulkEditRequest({
-    required List<int> documents,
+    @Default([]) List<int> documents,
+    @Default(false) bool? all,
+    Map<String, Object>? filters,
+    List<int>? excludedDocuments,
     required MethodEnum method,
     @Default({}) Map<String, Object>? parameters,
+    @Default(false) bool? fromWebui,
   }) = _BulkEditRequest;
 }

@@ -20,14 +20,24 @@ abstract class WorkflowTriggerRequest with _$WorkflowTriggerRequest {
     /// Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive.
     String? filterFilename,
     int? filterMailrule,
+    String? filterCustomFieldQuery,
     // minimum: 0.0
     // maximum: 2.147483647E9
     WorkflowTriggerMatchingAlgorithmEnum? matchingAlgorithm,
     String? match,
     bool? isInsensitive,
     List<int>? filterHasTags,
+    List<int>? filterHasAllTags,
+    List<int>? filterHasAnyCorrespondents,
+    List<int>? filterHasAnyDocumentTypes,
+    List<int>? filterHasAnyStoragePaths,
+    List<int>? filterHasNotCorrespondents,
+    List<int>? filterHasNotDocumentTypes,
+    List<int>? filterHasNotStoragePaths,
+    List<int>? filterHasNotTags,
     int? filterHasCorrespondent,
     int? filterHasDocumentType,
+    int? filterHasStoragePath,
 
     /// The number of days to offset the schedule trigger by.
     // minimum: -2147483648

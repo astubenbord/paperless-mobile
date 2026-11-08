@@ -1,3 +1,5 @@
+// ignore_for_file: invalid_annotation_target
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:paperless_mobile/api/models/data_type_enum.dart';
 
@@ -9,7 +11,7 @@ abstract class CustomField with _$CustomField {
   factory CustomField({
     required int id,
     required String name,
-    required DataTypeEnum dataType,
+    @JsonKey(fromJson: dataTypeEnumFromJson) required DataTypeEnum dataType,
 
     /// Extra data for the custom field, such as select options
     Object? extraData,

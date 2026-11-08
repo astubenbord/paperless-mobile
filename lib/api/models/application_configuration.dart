@@ -1,7 +1,12 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:paperless_mobile/api/models/archive_file_generation_enum.dart';
 import 'package:paperless_mobile/api/models/color_conversion_strategy_enum.dart';
+import 'package:paperless_mobile/api/models/llm_backend_enum.dart';
+import 'package:paperless_mobile/api/models/llm_embedding_backend_enum.dart';
 import 'package:paperless_mobile/api/models/mode_enum.dart';
 import 'package:paperless_mobile/api/models/output_type_enum.dart';
+import 'package:paperless_mobile/api/models/remote_ocr_engine_enum.dart';
+import 'package:paperless_mobile/api/models/remote_ocr_mode_enum.dart';
 import 'package:paperless_mobile/api/models/skip_archive_file_enum.dart';
 import 'package:paperless_mobile/api/models/unpaper_clean_enum.dart';
 
@@ -49,6 +54,27 @@ abstract class ApplicationConfiguration with _$ApplicationConfiguration {
     // maximum: 2147483647
     int? barcodeMaxPages,
     bool? barcodeEnableTag,
+    bool? aiEnabled,
+    ArchiveFileGenerationEnum? archiveFileGeneration,
+    bool? barcodeStoreValues,
+    bool? barcodeTagSplit,
+    @Default([]) List<String> externallyConfiguredVariables,
+    String? llmApiKey,
+    LlmBackendEnum? llmBackend,
+    int? llmContextSize,
+    String? llmEmbeddingApiKey,
+    LlmEmbeddingBackendEnum? llmEmbeddingBackend,
+    int? llmEmbeddingChunkSize,
+    String? llmEmbeddingEndpoint,
+    String? llmEmbeddingModel,
+    String? llmEndpoint,
+    String? llmModel,
+    String? llmOutputLanguage,
+    int? llmRequestTimeout,
+    String? remoteOcrApiKey,
+    String? remoteOcrEndpoint,
+    RemoteOcrEngineEnum? remoteOcrEngine,
+    RemoteOcrModeEnum? remoteOcrMode,
   }) = _ApplicationConfiguration;
 
   factory ApplicationConfiguration.fromJson(Map<String, dynamic> json) =>
