@@ -104,14 +104,15 @@ class ConnectivityStatusServiceImpl implements ConnectivityStatusService {
             );
 
       final response = await manager.client.head(
-        '/api/remote_version/',
+        '/api/',
         options: Options(
           receiveTimeout: 5.seconds,
           sendTimeout: 5.seconds,
-          followRedirects: true,
+          followRedirects: false, 
+          validateStatus: (status) => status == HttpStatus.found,
         ),
       );
-      if (response.statusCode == 200) {
+      if (response.statusCode == HttpStatus.found) {
         return ReachabilityStatus.reachable;
       }
       logger.fw(
