@@ -19,9 +19,7 @@ class PendingFilesInfoDialog extends StatelessWidget {
       ),
       actions: [
         DialogCancelButton(),
-        DialogConfirmButton(
-          label: S.of(context)!.upload,
-        ),
+        DialogConfirmButton(label: S.of(context)!.upload),
       ],
     );
   }

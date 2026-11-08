@@ -10,8 +10,10 @@ import 'package:paperless_mobile/api/paperless_api.dart';
 import 'package:paperless_mobile/core/extensions/context_extensions.dart';
 import 'package:paperless_mobile/core/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/core/model/info_message_exception.dart';
+import 'package:paperless_mobile/core/widgets/icon_loading_widget.dart';
 import 'package:paperless_mobile/core/widgets/form_builder_fields/form_builder_localized_date_picker.dart';
 import 'package:paperless_mobile/core/widgets/future_or_builder.dart';
+import 'package:paperless_mobile/features/document_upload/model/document_upload_queue.dart';
 import 'package:paperless_mobile/features/labels/tags/view/widgets/tags_form_field.dart';
 import 'package:paperless_mobile/features/labels/view/widgets/single_label_form_field.dart';
 import 'package:paperless_mobile/features/logging/data/logger.dart';
@@ -34,6 +36,7 @@ class DocumentUploadPreparationPage extends StatefulWidget {
   final String? filename;
   final String? fileExtension;
   final bool instantUpload;
+  final DocumentUploadQueueProgress? uploadQueueProgress;
 
   const DocumentUploadPreparationPage({
     super.key,
@@ -42,6 +45,7 @@ class DocumentUploadPreparationPage extends StatefulWidget {
     this.filename,
     this.fileExtension,
     this.instantUpload = false,
+    this.uploadQueueProgress,
   });
 
   @override
@@ -60,6 +64,10 @@ class _DocumentUploadPreparationPageState
   Map<String, String> _errors = {};
   double? _uploadProgress;
   late bool _syncTitleAndFilename;
+
+  bool get _hasQueuedNextItem => widget.uploadQueueProgress?.hasNext ?? false;
+
+  bool get _showQueueProgress => widget.uploadQueueProgress?.isQueued ?? false;
 
   @override
   void initState() {
@@ -83,18 +91,15 @@ class _DocumentUploadPreparationPageState
           heroTag: "fab_document_upload",
           onPressed: _uploadProgress == null ? _onSubmit : null,
           label: _uploadProgress == null
-              ? Text(S.of(context)!.upload)
+              ? Text(
+                  _hasQueuedNextItem
+                      ? '${S.of(context)!.upload} (${S.of(context)!.continueLabel})'
+                      : S.of(context)!.upload,
+                )
               : Text(S.of(context)!.documentUploadUploading),
           icon: _uploadProgress == null
               ? const Icon(Icons.upload)
-              : SizedBox(
-                  height: 24,
-                  width: 24,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 3,
-                    value: _uploadProgress,
-                  ),
-                ).padded(4),
+              : IconLoadingWidget(progress: _uploadProgress).padded(4),
         ),
       ),
       body: FormBuilder(
@@ -158,6 +163,19 @@ class _DocumentUploadPreparationPageState
                     ),
                     SliverList.list(
                       children: [
+                        if (_showQueueProgress)
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Chip(
+                              avatar: const Icon(
+                                Icons.queue_play_next,
+                                size: 18,
+                              ),
+                              label: Text(
+                                '${widget.uploadQueueProgress!.currentItem}/${widget.uploadQueueProgress!.totalItems}',
+                              ),
+                            ),
+                          ).paddedOnly(bottom: 12),
                         // Title
                         FormBuilderTextField(
                           autovalidateMode: AutovalidateMode.always,
@@ -312,6 +330,7 @@ class _DocumentUploadPreparationPageState
     if (!(_formKey.currentState?.saveAndValidate() ?? false)) {
       return;
     }
+    setState(() => _uploadProgress = 0);
     try {
       final formValues = _formKey.currentState!.value;
 
@@ -335,6 +354,10 @@ class _DocumentUploadPreparationPageState
             tags: tags?.mapOrNull(ids: (value) => value.include) ?? [],
             createdAt: createdAt?.toDateTime(),
             archiveSerialNumber: asn,
+            onProgressChanged: (progress) {
+              if (!mounted) return;
+              setState(() => _uploadProgress = progress);
+            },
           )
           .mutate();
 
@@ -351,14 +374,23 @@ class _DocumentUploadPreparationPageState
       }
     } on PaperlessApiException catch (error) {
       if (mounted) {
+        setState(() => _uploadProgress = null);
+      }
+      if (mounted) {
         showInfoMessage(
           context,
           InfoMessageException(code: error.code, message: error.details),
         );
       }
     } on PaperlessFormValidationException catch (exception) {
-      setState(() => _errors = exception.validationMessages);
+      setState(() {
+        _uploadProgress = null;
+        _errors = exception.validationMessages;
+      });
     } catch (error, stackTrace) {
+      if (mounted) {
+        setState(() => _uploadProgress = null);
+      }
       logger.fe(
         "An unknown error occurred during document upload.",
         className: runtimeType.toString(),

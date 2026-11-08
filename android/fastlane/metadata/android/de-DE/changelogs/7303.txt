@@ -1,0 +1,3 @@
+- Neu: Wasserwaage im Scanner für einfachere Ausrichtung
+- Verbesserte Qualität des Rahmens während der Live-Erkennung
+- Verbessertes haptisches Feedback

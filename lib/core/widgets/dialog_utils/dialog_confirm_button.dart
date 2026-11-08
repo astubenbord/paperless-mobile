@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
 
-enum DialogConfirmButtonStyle {
-  normal,
-  danger;
-}
+enum DialogConfirmButtonStyle { normal, danger }
 
 class DialogConfirmButton<T> extends StatelessWidget {
   final DialogConfirmButtonStyle style;

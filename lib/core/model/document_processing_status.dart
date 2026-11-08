@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 enum ProcessingStatus { starting, working, success, error }
 
 enum ProcessingMessage {
@@ -6,7 +8,7 @@ enum ProcessingMessage {
   generating_thumbnail,
   parse_date,
   save_document,
-  finished
+  finished,
 }
 
 class DocumentProcessingStatus {

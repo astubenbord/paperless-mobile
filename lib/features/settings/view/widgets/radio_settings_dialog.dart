@@ -69,10 +69,7 @@ class _RadioSettingsDialogState<T> extends State<RadioSettingsDialog<T>> {
   }
 
   Widget _buildOptionListTile(RadioOption<T> option) {
-    return RadioListTile<T>(
-      value: option.value,
-      title: Text(option.label),
-    );
+    return RadioListTile<T>(value: option.value, title: Text(option.label));
   }
 }
 

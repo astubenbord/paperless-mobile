@@ -12,10 +12,6 @@ class TextPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      width: length,
-      height: fontSize,
-    );
+    return Container(color: Colors.white, width: length, height: fontSize);
   }
 }

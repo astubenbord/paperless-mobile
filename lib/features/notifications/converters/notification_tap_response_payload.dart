@@ -12,9 +12,7 @@ class NotificationTapResponsePayloadConverter
     final type = NotificationResponseOpenAction.values.byName(json['type']);
     switch (type) {
       case NotificationResponseOpenAction.openDirectory:
-        return OpenDirectoryNotificationResponsePayload.fromJson(
-          json,
-        );
+        return OpenDirectoryNotificationResponsePayload.fromJson(json);
     }
   }
 

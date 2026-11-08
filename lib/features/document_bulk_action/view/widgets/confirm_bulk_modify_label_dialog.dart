@@ -5,10 +5,7 @@ import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
 
 class ConfirmBulkModifyLabelDialog extends StatelessWidget {
   final String content;
-  const ConfirmBulkModifyLabelDialog({
-    super.key,
-    required this.content,
-  });
+  const ConfirmBulkModifyLabelDialog({super.key, required this.content});
 
   @override
   Widget build(BuildContext context) {
@@ -17,22 +14,19 @@ class ConfirmBulkModifyLabelDialog extends StatelessWidget {
       title: Text(S.of(context)!.confirmAction),
       content: RichText(
         text: TextSpan(
-          style: theme.textTheme.bodyMedium
-              ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
           text: content,
           children: [
             const TextSpan(text: "\n\n"),
-            TextSpan(
-              text: S.of(context)!.areYouSureYouWantToContinue,
-            ),
+            TextSpan(text: S.of(context)!.areYouSureYouWantToContinue),
           ],
         ),
       ),
       actions: const [
         DialogCancelButton(),
-        DialogConfirmButton(
-          style: DialogConfirmButtonStyle.danger,
-        ),
+        DialogConfirmButton(style: DialogConfirmButtonStyle.danger),
       ],
     );
   }

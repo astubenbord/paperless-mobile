@@ -35,7 +35,8 @@ class _FileThumbnailState extends State<FileThumbnail> {
     mimeType = widget.file != null
         ? mime.lookupMimeType(widget.file!.path)
         : mime.lookupMimeType('', headerBytes: widget.bytes);
-    _fileBytes = widget.file?.readAsBytes().then(_convertPdfToPng) ??
+    _fileBytes =
+        widget.file?.readAsBytes().then(_convertPdfToPng) ??
         _convertPdfToPng(widget.bytes!);
   }
 
@@ -43,29 +44,29 @@ class _FileThumbnailState extends State<FileThumbnail> {
   Widget build(BuildContext context) {
     return switch (mimeType) {
       "application/pdf" => SizedBox(
-          width: widget.width,
-          height: widget.height,
-          child: Center(
-            child: FutureBuilder<Uint8List?>(
-              future: _fileBytes,
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return const SizedBox.shrink();
-                }
-                return ColoredBox(
-                  color: Colors.white,
-                  child: Image.memory(
-                    snapshot.data!,
-                    alignment: Alignment.topCenter,
-                    fit: widget.fit,
-                    width: widget.width,
-                    height: widget.height,
-                  ),
-                );
-              },
-            ),
+        width: widget.width,
+        height: widget.height,
+        child: Center(
+          child: FutureBuilder<Uint8List?>(
+            future: _fileBytes,
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return const SizedBox.shrink();
+              }
+              return ColoredBox(
+                color: Colors.white,
+                child: Image.memory(
+                  snapshot.data!,
+                  alignment: Alignment.topCenter,
+                  fit: widget.fit,
+                  width: widget.width,
+                  height: widget.height,
+                ),
+              );
+            },
           ),
         ),
+      ),
       "image/png" ||
       "image/jpeg" ||
       "image/tiff" ||
@@ -84,9 +85,7 @@ class _FileThumbnailState extends State<FileThumbnail> {
                 width: widget.width,
                 height: widget.height,
               ),
-      "text/plain" => const Center(
-          child: Text(".txt"),
-        ),
+      "text/plain" => const Center(child: Text(".txt")),
       _ => const Icon(Icons.file_present_outlined),
     };
   }

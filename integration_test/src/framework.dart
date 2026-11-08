@@ -3,13 +3,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
 
-Future<TestingFrameworkVariables> initializeTestingFramework(
-    {String languageCode = 'en'}) async {
+Future<TestingFrameworkVariables> initializeTestingFramework({
+  String languageCode = 'en',
+}) async {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   final translations = await S.delegate.load(
-    Locale.fromSubtags(
-      languageCode: languageCode,
-    ),
+    Locale.fromSubtags(languageCode: languageCode),
   );
   return TestingFrameworkVariables(
     binding: binding,

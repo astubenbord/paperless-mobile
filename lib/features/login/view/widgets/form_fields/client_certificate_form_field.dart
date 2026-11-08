@@ -49,8 +49,9 @@ class _ClientCertificateFormFieldState extends State<ClientCertificateFormField>
             )
           : null,
       builder: (field) {
-        final theme =
-            Theme.of(context).copyWith(dividerColor: Colors.transparent);
+        final theme = Theme.of(
+          context,
+        ).copyWith(dividerColor: Colors.transparent);
         return Theme(
           data: theme,
           child: ExpansionTile(
@@ -82,7 +83,7 @@ class _ClientCertificateFormFieldState extends State<ClientCertificateFormField>
                             onPressed: () => setState(() {
                               field.didChange(null);
                             }),
-                          )
+                          ),
                       ],
                     ).padded(8),
                     // ListTile(
@@ -113,7 +114,7 @@ class _ClientCertificateFormFieldState extends State<ClientCertificateFormField>
                         ),
                         label: S.of(context)!.passphrase,
                       ).padded(),
-                    ]
+                    ],
                   ],
                 ),
               ),
@@ -124,12 +125,8 @@ class _ClientCertificateFormFieldState extends State<ClientCertificateFormField>
     );
   }
 
-  Future<void> _onSelectFile(
-    FormFieldState<ClientCertificate?> field,
-  ) async {
-    final result = await FilePicker.platform.pickFiles(
-      allowMultiple: false,
-    );
+  Future<void> _onSelectFile(FormFieldState<ClientCertificate?> field) async {
+    final result = await FilePicker.platform.pickFiles(allowMultiple: false);
     if (result == null || result.files.single.path == null) {
       return;
     }
@@ -154,16 +151,14 @@ class _ClientCertificateFormFieldState extends State<ClientCertificateFormField>
     if (field.value == null) {
       return Text(
         S.of(context)!.selectFile,
-        style: Theme.of(context).textTheme.labelMedium?.apply(
-              color: Theme.of(context).hintColor,
-            ),
+        style: Theme.of(
+          context,
+        ).textTheme.labelMedium?.apply(color: Theme.of(context).hintColor),
       );
     } else {
       return Text(
         p.basename(field.value!.filename),
-        style: const TextStyle(
-          overflow: TextOverflow.ellipsis,
-        ),
+        style: const TextStyle(overflow: TextOverflow.ellipsis),
       );
     }
   }

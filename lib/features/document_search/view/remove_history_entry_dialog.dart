@@ -17,7 +17,7 @@ class RemoveHistoryEntryDialog extends StatelessWidget {
         DialogConfirmButton(
           style: DialogConfirmButtonStyle.danger,
           label: S.of(context)!.remove,
-        )
+        ),
       ],
     );
   }

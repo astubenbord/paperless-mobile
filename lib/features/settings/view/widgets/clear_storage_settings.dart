@@ -17,8 +17,9 @@ class _ClearCacheSettingState extends State<ClearCacheSetting> {
     return ListTile(
       title: Text(S.of(context)!.clearCache),
       subtitle: FutureBuilder<int>(
-        future: FileService.instance
-            .getDirSizeInBytes(FileService.instance.temporaryDirectory),
+        future: FileService.instance.getDirSizeInBytes(
+          FileService.instance.temporaryDirectory,
+        ),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return Text(S.of(context)!.calculatingDots);
@@ -28,8 +29,9 @@ class _ClearCacheSettingState extends State<ClearCacheSetting> {
         },
       ),
       onTap: () async {
-        final freedBytes = await FileService.instance
-            .clearDirectoryContent(PaperlessDirectoryType.temporary);
+        final freedBytes = await FileService.instance.clearDirectoryContent(
+          PaperlessDirectoryType.temporary,
+        );
         if (!context.mounted) return;
         showSnackBar(
           context,

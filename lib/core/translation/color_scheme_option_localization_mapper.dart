@@ -3,7 +3,9 @@ import 'package:paperless_mobile/features/settings/model/color_scheme_option.dar
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
 
 String translateColorSchemeOption(
-    BuildContext context, ColorSchemeOption option) {
+  BuildContext context,
+  ColorSchemeOption option,
+) {
   switch (option) {
     case ColorSchemeOption.classic:
       return S.of(context)!.classicColorScheme;

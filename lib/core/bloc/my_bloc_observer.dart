@@ -21,9 +21,9 @@ class MyBlocObserver extends BlocObserver {
     assert(rootNavigatorKey.currentContext != null);
     final message = switch (error) {
       TransientPaperlessApiError(code: var code) => translateError(
-          rootNavigatorKey.currentContext!,
-          code,
-        ),
+        rootNavigatorKey.currentContext!,
+        code,
+      ),
       TransientMessageError(message: var message) => message,
     };
     final details = switch (error) {
@@ -31,10 +31,6 @@ class MyBlocObserver extends BlocObserver {
       _ => null,
     };
 
-    showSnackBar(
-      rootNavigatorKey.currentContext!,
-      message,
-      details: details,
-    );
+    showSnackBar(rootNavigatorKey.currentContext!, message, details: details);
   }
 }

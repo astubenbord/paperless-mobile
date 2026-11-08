@@ -31,13 +31,14 @@ class ConsumptionChangeNotifier extends ChangeNotifier {
     if (files.isEmpty) {
       return [];
     }
-    final consumptionDirectory =
-        await FileService.instance.getConsumptionDirectory(userId: userId);
+    final consumptionDirectory = await FileService.instance
+        .getConsumptionDirectory(userId: userId);
     final List<File> localFiles = [];
     for (final file in files) {
       if (!file.path.startsWith(consumptionDirectory.path)) {
-        final localFile = await file
-            .copy(p.join(consumptionDirectory.path, p.basename(file.path)));
+        final localFile = await file.copy(
+          p.join(consumptionDirectory.path, p.basename(file.path)),
+        );
         localFiles.add(localFile);
       } else {
         localFiles.add(file);
@@ -48,12 +49,9 @@ class ConsumptionChangeNotifier extends ChangeNotifier {
   }
 
   /// Marks a file as processed by removing it from the queue and deleting the local copy of the file.
-  Future<void> discardFile(
-    File file, {
-    required String userId,
-  }) async {
-    final consumptionDirectory =
-        await FileService.instance.getConsumptionDirectory(userId: userId);
+  Future<void> discardFile(File file, {required String userId}) async {
+    final consumptionDirectory = await FileService.instance
+        .getConsumptionDirectory(userId: userId);
     if (file.path.startsWith(consumptionDirectory.path)) {
       await file.delete();
     }
@@ -70,8 +68,9 @@ class ConsumptionChangeNotifier extends ChangeNotifier {
   }
 
   Future<List<File>> _getCurrentFiles(String userId) async {
-    final directory =
-        await FileService.instance.getConsumptionDirectory(userId: userId);
+    final directory = await FileService.instance.getConsumptionDirectory(
+      userId: userId,
+    );
     return await FileService.instance.getAllFiles(directory);
   }
 }

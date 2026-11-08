@@ -9,7 +9,7 @@ enum AssetImages {
 
   final String relativePath;
   const AssetImages(String relativePath)
-      : relativePath = "assets/$relativePath";
+    : relativePath = "assets/$relativePath";
 
   AssetImage get image => AssetImage(relativePath);
 

@@ -1,0 +1,3 @@
+- New: Add spirit level to scanner for easier alignment
+- Improve frame quality during live detection
+- Improve haptic feedback

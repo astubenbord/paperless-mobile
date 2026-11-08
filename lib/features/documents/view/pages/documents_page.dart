@@ -480,9 +480,9 @@ class _DocumentsPageState extends State<DocumentsPage> {
                           ? _addStoragePathToFilter
                           : null,
                       documents: documents,
-                      hasLoaded: state.data != null,
+                      hasLoaded: state.isSuccess,
                       isLabelClickable: true,
-                      isLoading: state.isLoading && state.data != null,
+                      isLoading: state.isLoading,
                       selectedDocumentIds: _selection.ids,
                     );
                   },

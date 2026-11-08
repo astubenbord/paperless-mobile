@@ -7,7 +7,8 @@
   final username = parts.first;
   final serverUrl = parts.last;
   final uri = Uri.parse(serverUrl);
-  final obscuredUrl = '${uri.host.substring(0, 2)}***'
+  final obscuredUrl =
+      '${uri.host.substring(0, 2)}***'
       '${uri.host.substring(uri.host.length - 2, uri.host.length)}';
   return (username, obscuredUrl);
 }

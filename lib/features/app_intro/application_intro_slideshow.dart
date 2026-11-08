@@ -47,9 +47,7 @@ class _ApplicationIntroSlideshowState extends State<ApplicationIntroSlideshow> {
             ),
             image: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Image(
-                image: AssetImages.organizeDocuments.image,
-              ),
+              child: Image(image: AssetImages.organizeDocuments.image),
             ),
             bodyWidget: const Column(
               crossAxisAlignment: CrossAxisAlignment.center,

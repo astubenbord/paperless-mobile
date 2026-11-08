@@ -96,8 +96,7 @@ class HighlightedText extends StatelessWidget {
           spans.add(_highlightSpan(currentHighlight));
           start += currentHighlight.length;
         } else {
-          spans
-              .add(_normalSpan(text.substring(start, currentIndex), context));
+          spans.add(_normalSpan(text.substring(start, currentIndex), context));
           spans.add(_highlightSpan(currentHighlight));
           start = currentIndex + currentHighlight.length;
         }
@@ -112,9 +111,7 @@ class HighlightedText extends StatelessWidget {
   TextSpan _highlightSpan(String value) {
     return TextSpan(
       text: value,
-      style: style?.copyWith(
-        backgroundColor: color,
-      ),
+      style: style?.copyWith(backgroundColor: color),
     );
   }
 
