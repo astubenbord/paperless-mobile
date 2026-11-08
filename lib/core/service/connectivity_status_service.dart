@@ -104,7 +104,7 @@ class ConnectivityStatusServiceImpl implements ConnectivityStatusService {
             );
 
       final response = await manager.client.head(
-        '/api/',
+        '/api/remote_version/',
         options: Options(
           receiveTimeout: 5.seconds,
           sendTimeout: 5.seconds,
