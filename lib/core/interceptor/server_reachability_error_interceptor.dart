@@ -19,7 +19,9 @@ class ServerReachabilityErrorInterceptor extends Interceptor {
         );
       }
     }
-    if (err.type == DioExceptionType.connectionTimeout) {
+    if (err.type == DioExceptionType.connectionTimeout ||
+        err.type == DioExceptionType.sendTimeout ||
+        err.type == DioExceptionType.receiveTimeout) {
       return _rejectWithStatus(
         ReachabilityStatus.connectionTimeout,
         err,

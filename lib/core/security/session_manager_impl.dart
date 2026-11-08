@@ -37,7 +37,8 @@ class SessionManagerImpl extends ValueNotifier<Dio> implements SessionManager {
       ),
     );
     dio.options
-      ..receiveTimeout = const Duration(seconds: 10)
+      ..connectTimeout = const Duration(seconds: 5)
+      ..receiveTimeout = const Duration(seconds: 15)
       ..sendTimeout = const Duration(seconds: 10)
       ..responseType = ResponseType.json;
     (dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () =>
