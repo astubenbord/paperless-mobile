@@ -1,9 +1,7 @@
 import 'dart:io';
-import 'dart:ui';
 
 import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:paperless_mobile/features/scanner/models/document_frame.dart';
 import 'package:paperless_mobile/features/scanner/models/scan_result.dart';
 import 'package:path/path.dart' as p;
 
@@ -13,7 +11,7 @@ part 'document_scan.g.dart';
 @JsonSerializable()
 class DocumentScan {
   final String id;
-  final String name;
+  final String? name;
   final String directoryPath;
   final DateTime createdAt;
   @JsonKey(defaultValue: <ScanResult>[])
@@ -21,7 +19,7 @@ class DocumentScan {
 
   const DocumentScan({
     required this.id,
-    required this.name,
+    this.name,
     required this.directoryPath,
     required this.createdAt,
     this.pages = const [],
@@ -29,23 +27,8 @@ class DocumentScan {
 
   Map<String, dynamic> toJson() => _$DocumentScanToJson(this);
 
-  factory DocumentScan.fromJson(Map<String, dynamic> json) {
-    if (json.containsKey('page_file_names') && !json.containsKey('pages')) {
-      final legacyPageFileNames =
-          (json['page_file_names'] as List<dynamic>? ?? const [])
-              .cast<String>();
-      return DocumentScan(
-        id: json['id'] as String,
-        name: json['name'] as String,
-        directoryPath: json['directory_path'] as String,
-        createdAt: DateTime.parse(json['created_at'] as String),
-        pages: [
-          for (final fileName in legacyPageFileNames) _legacyPage(fileName),
-        ],
-      );
-    }
-    return _$DocumentScanFromJson(json);
-  }
+  factory DocumentScan.fromJson(Map<String, dynamic> json) =>
+      _$DocumentScanFromJson(json);
 
   int get pageCount => pages.length;
 
@@ -71,22 +54,4 @@ class DocumentScan {
   }
 
   Directory get directory => Directory(directoryPath);
-}
-
-ScanResult _legacyPage(String fileName) {
-  return ScanResult(
-    originalFileName: fileName,
-    editedFileName: fileName,
-    originalImageSize: Size.zero,
-    cropFrame: DocumentFrame(
-      topLeft: Offset.zero,
-      topRight: Offset.zero,
-      bottomRight: Offset.zero,
-      bottomLeft: Offset.zero,
-    ),
-    quarterTurns: 0,
-    colorFilter: ScanColorFilter.none,
-    bwThreshold: 10,
-    enhanced: false,
-  );
 }

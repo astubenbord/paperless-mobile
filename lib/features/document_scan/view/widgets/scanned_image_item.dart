@@ -1,18 +1,20 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:paperless_mobile/core/store/bloc/global_settings_builder.dart';
+import 'package:paperless_mobile/features/document_scan/model/document_scan.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
 import 'package:paperless_mobile/helpers/connectivity_aware_action_wrapper.dart';
-import 'package:paperless_mobile/features/document_scan/model/document_scan.dart';
 
 typedef DocumentActionCallback = void Function();
 typedef DocumentPageTapCallback = void Function(int pageIndex);
 
 class ScannedImageItem extends StatelessWidget {
-  static const double _itemHeight = 302;
+  static const double _itemHeight = 320;
   static const double _carouselHeight = 176;
 
   final DocumentScan documentScan;
+  final String defaultTitle;
   final DocumentActionCallback onDelete;
   final DocumentActionCallback onEdit;
   final DocumentActionCallback? onPreview;
@@ -25,6 +27,7 @@ class ScannedImageItem extends StatelessWidget {
     required this.documentScan,
     required this.onDelete,
     required this.onEdit,
+    required this.defaultTitle,
     this.onPreview,
     this.onUpload,
     this.onExport,
@@ -33,7 +36,6 @@ class ScannedImageItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return SizedBox(
       height: _itemHeight,
       child: Card(
@@ -47,16 +49,24 @@ class ScannedImageItem extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      documentScan.name,
+                      documentScan.name ?? defaultTitle,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.titleMedium,
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Text(
-                    '${documentScan.pageCount} page${documentScan.pageCount == 1 ? '' : 's'}',
-                    style: theme.textTheme.bodySmall,
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: onDelete,
+                        icon: const Icon(Icons.delete),
+                        tooltip: S.of(context)!.delete,
+                      ),
+                      IconButton(
+                        onPressed: onEdit,
+                        icon: const Icon(Icons.edit),
+                        tooltip: S.of(context)!.edit,
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -140,51 +150,41 @@ class ScannedImageItem extends StatelessWidget {
   }
 
   Widget _buildActions(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          ActionChip(
-            label: Text(S.of(context)!.edit),
-            avatar: const Icon(Icons.edit_outlined),
-            onPressed: onEdit,
-          ),
-          const SizedBox(width: 8),
-          ActionChip(
-            label: Text(S.of(context)!.delete),
-            avatar: const Icon(Icons.delete_outline),
-            onPressed: onDelete,
-          ),
-          const SizedBox(width: 8),
-          ActionChip(
-            label: Text(S.of(context)!.previewScan),
-            avatar: const Icon(Icons.visibility_outlined),
-            onPressed: onPreview,
-          ),
-          const SizedBox(width: 8),
-          ConnectivityAwareActionWrapper(
-            offlineBuilder: (context, child) {
-              return ActionChip(
-                label: Text(S.of(context)!.upload),
-                avatar: const Icon(Icons.upload_outlined),
-                onPressed: null,
-              );
-            },
-            disabled: onUpload == null,
-            child: ActionChip(
-              label: Text(S.of(context)!.upload),
-              avatar: const Icon(Icons.upload_outlined),
-              onPressed: onUpload,
+    return GlobalSettingsBuilder(
+      builder: (context, settings) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            TextButton.icon(
+              label: Text(S.of(context)!.previewScan),
+              icon: Icon(Icons.visibility_outlined),
+              onPressed: onPreview,
             ),
-          ),
-          const SizedBox(width: 8),
-          ActionChip(
-            label: Text(S.of(context)!.export),
-            avatar: const Icon(Icons.save_alt_outlined),
-            onPressed: onExport,
-          ),
-        ],
-      ),
+            const SizedBox(width: 8),
+            TextButton.icon(
+              label: Text(S.of(context)!.export),
+              icon: const Icon(Icons.save_alt_outlined),
+              onPressed: onExport,
+            ),
+            const SizedBox(width: 8),
+            ConnectivityAwareActionWrapper(
+              offlineBuilder: (context, child) {
+                return FilledButton.tonalIcon(
+                  label: Text(S.of(context)!.upload),
+                  icon: const Icon(Icons.upload_outlined),
+                  onPressed: null,
+                );
+              },
+              disabled: onUpload == null,
+              child: FilledButton.tonalIcon(
+                label: Text(S.of(context)!.upload),
+                icon: const Icon(Icons.upload_outlined),
+                onPressed: onUpload,
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

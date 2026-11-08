@@ -79,7 +79,7 @@ class PaperlessMobileDocumentScanner extends StatefulWidget {
       enabled: true,
       preStableDelay: Duration(milliseconds: 300),
       stableDuration: Duration(milliseconds: 500),
-      minConsecutiveSimilarFrames: 4,
+      minConsecutiveSimilarFrames: 3,
     ),
     required this.onCancelled,
     required this.onDone,

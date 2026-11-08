@@ -12,9 +12,9 @@ class ScannerParameters {
   const ScannerParameters({
     this.resizeThreshold = 320,
     this.borderSize = 10,
-    this.medianBlurKernel = 7,
-    this.approxEpsilonFactor = 0.018,
-    this.morphologyKernel = 3,
+    this.medianBlurKernel = 9,
+    this.approxEpsilonFactor = 0.02,
+    this.morphologyKernel = 4,
     this.dilateKernel = 2,
     this.minAreaFactor = 0.03,
     this.stableDurationMs = 1000,

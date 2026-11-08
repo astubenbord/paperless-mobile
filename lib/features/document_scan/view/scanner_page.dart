@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:paperless_mobile/api/paperless_api.dart';
 import 'package:paperless_mobile/constants.dart';
 import 'package:paperless_mobile/core/bloc/loading_status.dart';
@@ -89,6 +90,12 @@ class _ScannerPageState extends State<ScannerPage>
         ),
       ),
     );
+  }
+
+  String _formatDefaultTitle(DocumentScan documentScan) {
+    final locale = context.dateLocale;
+    final formatter = DateFormat.yMMMd(locale).add_Hms();
+    return '${S.of(context)!.scan} ${formatter.format(documentScan.createdAt)}';
   }
 
   Widget _buildActions() {
@@ -266,16 +273,26 @@ class _ScannerPageState extends State<ScannerPage>
   }
 
   void _previewScans(BuildContext context, List<File> scans) {
-    Navigator.of(context, rootNavigator: true).push(
-      MaterialPageRoute(
-        builder: (context) => DocumentView(
-          bytes: _assembleFileBytes(
-            scans,
-            forcePdf: true,
-          ).then((file) => file.bytes),
+    if (scans.length == 1 &&
+        !context.localStore.state.globalSettings.enforceSinglePagePdfUpload) {
+      final scan = scans.first;
+      Navigator.of(context, rootNavigator: true).push(
+        MaterialPageRoute(
+          builder: (context) => DocumentView(bytes: scan.readAsBytes()),
         ),
-      ),
-    );
+      );
+    } else {
+      Navigator.of(context, rootNavigator: true).push(
+        MaterialPageRoute(
+          builder: (context) => DocumentView(
+            bytes: _assembleFileBytes(
+              scans,
+              forcePdf: true,
+            ).then((file) => file.bytes),
+          ),
+        ),
+      );
+    }
   }
 
   Future<void> _previewDocumentScanPage(
@@ -357,6 +374,7 @@ class _ScannerPageState extends State<ScannerPage>
 
     final forcePdf =
         context.localStore.state.globalSettings.enforceSinglePagePdfUpload;
+
     await DocumentUploadQueueCoordinator.processQueue<DocumentScan>(
       context,
       items: [
@@ -367,8 +385,10 @@ class _ScannerPageState extends State<ScannerPage>
               documentScan.pageFiles,
               forcePdf: forcePdf,
             ).then((file) => file.bytes),
-            title: documentScan.name,
-            filename: _formatUploadFileName(documentScan.name),
+            title: documentScan.name ?? _formatDefaultTitle(documentScan),
+            filename: _formatUploadFileName(
+              documentScan.name ?? _formatDefaultTitle(documentScan),
+            ),
             fileExtension: _assembledFileExtension(
               documentScan.pageFiles,
               forcePdf: forcePdf,
@@ -427,6 +447,7 @@ class _ScannerPageState extends State<ScannerPage>
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 12),
                   child: ScannedImageItem(
+                    defaultTitle: _formatDefaultTitle(documentScan),
                     documentScan: documentScan,
                     onEdit: () =>
                         _openExistingDocumentScanner(context, documentScan),

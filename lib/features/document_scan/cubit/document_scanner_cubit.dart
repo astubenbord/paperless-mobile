@@ -4,16 +4,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:intl/intl.dart';
 import 'package:paperless_mobile/api/paperless_api.dart';
 import 'package:paperless_mobile/core/bloc/loading_status.dart';
 import 'package:paperless_mobile/core/bloc/transient_error.dart';
-import 'package:paperless_mobile/core/store/local_store.dart';
-import 'package:paperless_mobile/core/store/slices/local_user_data.dart';
-import 'package:paperless_mobile/features/logging/data/logger.dart';
 import 'package:paperless_mobile/core/model/info_message_exception.dart';
 import 'package:paperless_mobile/core/service/file_service.dart';
+import 'package:paperless_mobile/core/store/local_store.dart';
+import 'package:paperless_mobile/core/store/slices/local_user_data.dart';
 import 'package:paperless_mobile/features/document_scan/model/document_scan.dart';
+import 'package:paperless_mobile/features/logging/data/logger.dart';
 import 'package:paperless_mobile/features/notifications/services/local_notification_service.dart';
 import 'package:paperless_mobile/features/scanner/models/document_frame.dart';
 import 'package:paperless_mobile/features/scanner/models/scan_result.dart';
@@ -25,7 +24,6 @@ part 'document_scanner_cubit.freezed.dart';
 part 'document_scanner_state.dart';
 
 const allowedExtensions = ['.jpeg', '.jpg', '.png'];
-final _documentScanNameDateFormat = DateFormat('yyyy_MM_ddTHH_mm_ss');
 
 class DocumentScannerCubit extends Cubit<DocumentScannerState> {
   final LocalNotificationService _notificationService;
@@ -68,7 +66,6 @@ class DocumentScannerCubit extends Cubit<DocumentScannerState> {
     final createdAt = DateTime.now();
     final documentScan = DocumentScan(
       id: documentId,
-      name: _documentScanName(createdAt),
       directoryPath: directory.path,
       createdAt: createdAt,
     );
@@ -297,7 +294,6 @@ class DocumentScannerCubit extends Cubit<DocumentScannerState> {
 
     final migratedDocument = DocumentScan(
       id: documentId,
-      name: _documentScanName(DateTime.now()),
       directoryPath: targetDirectory.path,
       createdAt: DateTime.now(),
       pages: migratedPages,
@@ -371,9 +367,5 @@ class DocumentScannerCubit extends Cubit<DocumentScannerState> {
         await originalFile.copy(editedFile.path);
       }
     }
-  }
-
-  String _documentScanName(DateTime timestamp) {
-    return 'scan_${_documentScanNameDateFormat.format(timestamp)}';
   }
 }
