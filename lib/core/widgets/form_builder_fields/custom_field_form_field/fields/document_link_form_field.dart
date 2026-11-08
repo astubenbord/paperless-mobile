@@ -75,7 +75,7 @@ class DocumentLinkFormField extends StatelessWidget {
               height: 32,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
-                separatorBuilder: (_, __) => const SizedBox(width: 4),
+                separatorBuilder: (_, _) => const SizedBox(width: 4),
                 itemBuilder: (context, index) => chips.elementAt(index),
                 itemCount: chips.length,
               ),

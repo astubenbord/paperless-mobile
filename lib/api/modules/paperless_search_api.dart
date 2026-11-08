@@ -28,7 +28,7 @@ class PaperlessSearchApiImpl implements PaperlessSearchApi {
           '/api/search/',
           queryParameters: {
             'query': query,
-            if (dbOnly != null) 'db_only': dbOnly,
+            'db_only': ?dbOnly,
           },
         )
         .then((response) => SearchResult.fromJson(response.data!));

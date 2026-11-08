@@ -47,7 +47,6 @@ class _FocusableCameraViewState extends State<FocusableCameraView>
   void dispose() {
     _focusAnimController.dispose();
     WidgetsBinding.instance.removeObserver(this);
-    _controller?.stopImageStream();
     _controller?.dispose();
     super.dispose();
   }

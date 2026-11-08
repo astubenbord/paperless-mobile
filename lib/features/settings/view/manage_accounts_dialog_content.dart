@@ -8,7 +8,6 @@ import 'package:paperless_mobile/features/login/cubit/authentication_cubit.dart'
 import 'package:paperless_mobile/features/users/view/widgets/user_account_list_tile.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
 import 'package:paperless_mobile/routing/routes/auth_route.dart';
-import 'package:provider/provider.dart';
 
 class ManageAccountsDialogContent extends StatelessWidget {
   const ManageAccountsDialogContent({super.key});
