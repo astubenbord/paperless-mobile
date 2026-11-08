@@ -74,6 +74,7 @@ class PatchedTagRequest extends PatchedLabelRequest {
     super.setPermissions,
     this.isInboxTag,
     this.color,
+    this.parent,
   });
 
   @JsonKey(name: r'color', includeIfNull: false)
@@ -82,6 +83,9 @@ class PatchedTagRequest extends PatchedLabelRequest {
   /// Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags.
   @JsonKey(name: r'is_inbox_tag', includeIfNull: false)
   final PatchedValue<bool?>? isInboxTag;
+
+  @JsonKey(name: r'parent', includeIfNull: false)
+  final PatchedValue<int?>? parent;
 
   @override
   Map<String, dynamic> toJson() =>

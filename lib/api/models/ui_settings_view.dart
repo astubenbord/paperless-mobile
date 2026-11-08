@@ -8,6 +8,7 @@ part 'ui_settings_view.g.dart';
 @Freezed(toJson: true, fromJson: true)
 abstract class UiSettingsView with _$UiSettingsView {
   factory UiSettingsView({
+    int? id,
     List<String>? permissions,
     UiSettingsViewSettings? settings,
     required UiSettingsViewUser user,

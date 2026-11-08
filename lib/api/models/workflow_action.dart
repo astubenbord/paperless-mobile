@@ -14,7 +14,7 @@ abstract class WorkflowAction with _$WorkflowAction {
     // maximum: 2.147483647E9
     WorkflowActionTypeEnum? type,
 
-    /// Assign a document title, can include some placeholders, see documentation.
+    /// Assign a document title, must be a Jinja2 template, see documentation.
     String? assignTitle,
     List<int>? assignTags,
     int? assignCorrespondent,
@@ -48,6 +48,10 @@ abstract class WorkflowAction with _$WorkflowAction {
     List<int>? removeChangeGroups,
     WorkflowActionEmail? email,
     WorkflowActionWebhook? webhook,
+    List<String>? passwords,
+    List<String>? aiSuggestionFields,
+    bool? aiCreateMissing,
+    bool? aiOverwriteExisting,
   }) = _WorkflowAction;
 
   factory WorkflowAction.fromJson(Map<String, dynamic> json) =>

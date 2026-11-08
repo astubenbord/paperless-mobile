@@ -18,7 +18,7 @@ class PatchedWorkflowActionRequest {
   // maximum: 2.147483647E9
   final PatchedValue<WorkflowActionTypeEnum?>? type;
 
-  /// Assign a document title, can include some placeholders, see documentation.
+  /// Assign a document title, must be a Jinja2 template, see documentation.
   final PatchedValue<String?>? assignTitle;
   final PatchedValue<List<int>?>? assignTags;
   final PatchedValue<int?>? assignCorrespondent;
@@ -52,6 +52,10 @@ class PatchedWorkflowActionRequest {
   final PatchedValue<List<int>?>? removeChangeGroups;
   final PatchedValue<WorkflowActionEmailRequest?>? email;
   final PatchedValue<WorkflowActionWebhookRequest?>? webhook;
+  final PatchedValue<List<String>?>? passwords;
+  final PatchedValue<List<String>?>? aiSuggestionFields;
+  final PatchedValue<bool?>? aiCreateMissing;
+  final PatchedValue<bool?>? aiOverwriteExisting;
 
   PatchedWorkflowActionRequest({
     this.id,
@@ -87,6 +91,10 @@ class PatchedWorkflowActionRequest {
     this.removeChangeGroups,
     this.email,
     this.webhook,
+    this.passwords,
+    this.aiSuggestionFields,
+    this.aiCreateMissing,
+    this.aiOverwriteExisting,
   });
 
   Map<String, dynamic> toJson() =>

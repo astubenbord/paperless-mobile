@@ -39,6 +39,7 @@ abstract class DocumentFilter with _$DocumentFilter {
     int? selectedView,
     List<String>? fields,
     List<int>? documentIds,
+    bool? hasDuplicates,
   }) = _DocumentFilter;
 
   bool get forceExtendedQuery {
@@ -72,6 +73,7 @@ abstract class DocumentFilter with _$DocumentFilter {
       if (fields?.isNotEmpty ?? false) MapEntry('fields', fields!.join(",")),
       if (documentIds?.isNotEmpty ?? false)
         MapEntry('id__in', documentIds!.join(",")),
+      if (hasDuplicates != null) MapEntry('has_duplicates', hasDuplicates),
     ];
 
     // Reverse ordering can also be encoded using &reverse=1
@@ -126,6 +128,7 @@ abstract class DocumentFilter with _$DocumentFilter {
       _ => 1,
     },
     (query.queryText?.isNotEmpty ?? false) ? 1 : 0,
+    hasDuplicates == null ? 0 : 1,
   ].fold(0, (previousValue, element) => previousValue + element);
 
   factory DocumentFilter.fromJson(Map<String, dynamic> json) =>

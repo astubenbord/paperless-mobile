@@ -1,6 +1,8 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:paperless_mobile/api/models/custom_field_instance.dart';
 import 'package:paperless_mobile/api/models/document_permissions.dart';
+import 'package:paperless_mobile/api/models/document_version_info.dart';
+import 'package:paperless_mobile/api/models/duplicate_document_summary.dart';
 import 'package:paperless_mobile/api/models/note.dart';
 
 part 'document.freezed.dart';
@@ -30,6 +32,7 @@ abstract class Document with _$Document {
     int? archiveSerialNumber,
     String? originalFileName,
     String? archivedFileName,
+    List<DuplicateDocumentSummary>? duplicateDocuments,
     int? owner,
     DocumentPermissions? permissions,
     bool? userCanChange,
@@ -38,6 +41,8 @@ abstract class Document with _$Document {
     @Default([]) List<CustomFieldInstance>? customFields,
     int? pageCount,
     String? mimeType,
+    int? rootDocument,
+    List<DocumentVersionInfo>? versions,
   }) = _Document;
 
   factory Document.fromJson(Map<String, dynamic> json) =>

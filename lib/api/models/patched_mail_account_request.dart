@@ -15,7 +15,6 @@ class PatchedMailAccountRequest {
   final PatchedValue<String?>? name;
   final PatchedValue<String?>? imapServer;
 
-  /// This is usually 143 for unencrypted and STARTTLS connections, and 993 for SSL connections.
   // minimum: -2147483648
   // maximum: 2147483647
   final PatchedValue<int?>? imapPort;
