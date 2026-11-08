@@ -120,7 +120,7 @@ class SessionManagerImpl extends ValueNotifier<Dio> implements SessionManager {
     }
     try {
       final response = await client.head(
-        "/api/schema/",
+        "/api/profile/",
         options: Options(receiveTimeout: 5.seconds, sendTimeout: 5.seconds),
       );
       final apiVersionHeader = response.headers.value('x-api-version');
@@ -151,6 +151,9 @@ class SessionManagerImpl extends ValueNotifier<Dio> implements SessionManager {
     client.httpClientAdapter = IOHttpClientAdapter();
     client.options.baseUrl = '';
     client.options.headers.clear();
-    notifyListeners();
+    SessionManagerImpl._apiVersion = null;
+    if (broadcast) {
+      notifyListeners();
+    }
   }
 }
