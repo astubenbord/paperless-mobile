@@ -10,8 +10,9 @@ abstract class SavedView with _$SavedView {
   factory SavedView({
     required int id,
     required String name,
-    required bool showOnDashboard,
-    required bool showInSidebar,
+    // Removed in API v10 (moved to ui settings)
+    @Default(false) bool showOnDashboard,
+    @Default(false) bool showInSidebar,
     String? sortField,
     bool? sortReverse,
     required List<SavedViewFilterRule> filterRules,

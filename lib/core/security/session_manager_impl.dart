@@ -20,14 +20,21 @@ import 'package:paperless_mobile/features/login/server_connection/model/header_e
 /// an underlying [Dio] client which is injected into all services
 /// requiring authenticated access to the Paperless REST API.
 class SessionManagerImpl extends ValueNotifier<Dio> implements SessionManager {
-  static int? _apiVersion;
+  int? _apiVersion;
+  Future<int?>? _pendingApiVersion;
+
   @override
   Dio get client => value;
 
   SessionManagerImpl([List<Interceptor> interceptors = const []])
-    : super(_initDio(interceptors));
+    : super(Dio()) {
+    value = _initDio(interceptors, _resolveApiVersion);
+  }
 
-  static Dio _initDio(List<Interceptor> interceptors) {
+  static Dio _initDio(
+    List<Interceptor> interceptors,
+    Future<int?> Function() getApiVersion,
+  ) {
     //en- and decoded by utf8 by default
     final Dio dio = Dio(
       BaseOptions(
@@ -47,7 +54,7 @@ class SessionManagerImpl extends ValueNotifier<Dio> implements SessionManager {
 
     dio.interceptors.addAll([
       ...interceptors,
-      ApiVersionHeaderInterceptor(() => _apiVersion),
+      ApiVersionHeaderInterceptor(getApiVersion),
       DioUnauthorizedInterceptor(),
       DioHttpErrorInterceptor(),
       DioOfflineInterceptor(),
@@ -89,6 +96,9 @@ class SessionManagerImpl extends ValueNotifier<Dio> implements SessionManager {
     }
 
     if (baseUrl != null) {
+      if (baseUrl != client.options.baseUrl) {
+        _clearApiVersion();
+      }
       client.options.baseUrl = baseUrl;
     }
 
@@ -106,7 +116,9 @@ class SessionManagerImpl extends ValueNotifier<Dio> implements SessionManager {
       ]);
     }
 
-    SessionManagerImpl._apiVersion = apiVersion;
+    if (apiVersion != null) {
+      _apiVersion = apiVersion;
+    }
 
     if (broadcast) {
       notifyListeners();
@@ -115,35 +127,67 @@ class SessionManagerImpl extends ValueNotifier<Dio> implements SessionManager {
 
   @override
   Future<int> getApiVersion() async {
-    if (SessionManagerImpl._apiVersion != null) {
-      return SessionManagerImpl._apiVersion!;
+    final apiVersion = await _resolveApiVersion();
+    if (apiVersion != null) {
+      return apiVersion;
     }
+    logger.fw(
+      'Could not determine API version. Defaulting to minimum supported version.',
+      className: runtimeType.toString(),
+      methodName: 'getApiVersion',
+    );
+    return minSupportedApiVersion;
+  }
+
+  /// Returns the cached server api version or fetches it from the server.
+  /// Returns null if the version could not be determined.
+  Future<int?> _resolveApiVersion() async {
+    if (_apiVersion != null) {
+      return _apiVersion;
+    }
+    if (client.options.baseUrl.isEmpty) {
+      return null;
+    }
+    return _pendingApiVersion ??= _fetchApiVersion().whenComplete(
+      () => _pendingApiVersion = null,
+    );
+  }
+
+  Future<int?> _fetchApiVersion() async {
     try {
       final response = await client.head(
         "/api/schema/",
-        options: Options(receiveTimeout: 5.seconds, sendTimeout: 5.seconds),
+        options: Options(
+          receiveTimeout: 5.seconds,
+          sendTimeout: 5.seconds,
+          extra: {ApiVersionHeaderInterceptor.skipApiVersionKey: true},
+        ),
       );
       final apiVersionHeader = response.headers.value('x-api-version');
-      if (apiVersionHeader != null) {
-        return int.parse(apiVersionHeader);
-      } else {
+      if (apiVersionHeader == null) {
         logger.fw(
-          'API version header not found in response. Defaulting to minimum supported version.',
+          'API version header not found in response.',
           className: runtimeType.toString(),
-          methodName: 'getApiVersion',
+          methodName: '_fetchApiVersion',
         );
-        return minSupportedApiVersion;
+        return null;
       }
+      return _apiVersion = int.parse(apiVersionHeader);
     } catch (e, stackTrace) {
       logger.fe(
-        'Failed to retrieve API version from server. Defaulting to minimum supported version.',
+        'Failed to retrieve API version from server.',
         error: e,
         stackTrace: stackTrace,
         className: runtimeType.toString(),
-        methodName: 'getApiVersion',
+        methodName: '_fetchApiVersion',
       );
-      return minSupportedApiVersion;
+      return null;
     }
+  }
+
+  void _clearApiVersion() {
+    _apiVersion = null;
+    _pendingApiVersion = null;
   }
 
   @override
@@ -151,6 +195,7 @@ class SessionManagerImpl extends ValueNotifier<Dio> implements SessionManager {
     client.httpClientAdapter = IOHttpClientAdapter();
     client.options.baseUrl = '';
     client.options.headers.clear();
+    _clearApiVersion();
     notifyListeners();
   }
 }
