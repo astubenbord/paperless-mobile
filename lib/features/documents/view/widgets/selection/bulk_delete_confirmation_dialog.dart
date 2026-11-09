@@ -7,26 +7,39 @@ import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
 class BulkDeleteConfirmationDialog extends StatelessWidget {
   const BulkDeleteConfirmationDialog({super.key, required this.selection});
   final Iterable<Document> selection;
+  static const int _maxPreviewItems = 8;
+
   @override
   Widget build(BuildContext context) {
-    assert(selection.isNotEmpty);
+    final selectedDocuments = selection.toList(growable: false);
+    assert(selectedDocuments.isNotEmpty);
+    final previewItems = selectedDocuments.take(_maxPreviewItems).toList();
+    final remainingItems = selectedDocuments.length - previewItems.length;
+
     return AlertDialog(
       title: Text(S.of(context)!.confirmDeletion),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            S
-                .of(context)!
-                .areYouSureYouWantToDeleteTheFollowingDocuments(
-                  selection.length,
-                ),
-          ),
-          const SizedBox(height: 16),
-          ...selection.map(_buildBulletPoint),
-          const SizedBox(height: 16),
-          Text(S.of(context)!.thisActionIsIrreversibleDoYouWishToProceedAnyway),
-        ],
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              S.of(context)!.areYouSureYouWantToDeleteTheFollowingDocuments(
+                    selectedDocuments.length,
+                  ),
+            ),
+            const SizedBox(height: 16),
+            ...previewItems.map(_buildBulletPoint),
+            if (remainingItems > 0)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text('+$remainingItems ${S.of(context)!.documents}'),
+              ),
+            const SizedBox(height: 16),
+            Text(
+              S.of(context)!.thisActionIsIrreversibleDoYouWishToProceedAnyway,
+            ),
+          ],
+        ),
       ),
       actions: [
         const DialogCancelButton(),
