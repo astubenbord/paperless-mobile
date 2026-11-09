@@ -355,7 +355,6 @@ class _FormBuilderLocalizedDatePickerState
             _DateInputSegment.year => fieldValue.copyWith(year: number),
           };
           field.setValue(newValue);
-          field.validate();
         }
       },
       inputFormatters: [
