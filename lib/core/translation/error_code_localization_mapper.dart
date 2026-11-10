@@ -96,5 +96,6 @@ String translateError(BuildContext context, ErrorCode code) {
       S.of(context)!.couldNotBulkEditDocuments,
     ErrorCode.profileGetError => S.of(context)!.couldNotLoadUserProfile,
     ErrorCode.invalidApiKey => S.of(context)!.invalidApiKey,
+    ErrorCode.documentChatFailed => S.of(context)!.documentChatFailed,
   };
 }

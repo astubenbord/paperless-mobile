@@ -11,6 +11,7 @@ import 'package:paperless_mobile/core/repository/saved_view_repository.dart';
 import 'package:paperless_mobile/features/sharing/cubit/receive_share_cubit.dart';
 import 'package:paperless_mobile/generated/assets.gen.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
+import 'package:paperless_mobile/routing/routes/document_chat_route.dart';
 import 'package:paperless_mobile/routing/routes/documents_route.dart';
 import 'package:paperless_mobile/routing/routes/settings_route.dart';
 import 'package:paperless_mobile/routing/routes/upload_queue_route.dart';
@@ -114,6 +115,13 @@ class AppDrawer extends StatelessWidget {
                 ],
               ).paddedSymmetrically(horizontal: 16),
               const Divider(),
+              if (uiSettings.canUseDocumentChat)
+                ListTile(
+                  dense: true,
+                  leading: const Icon(Icons.chat_outlined),
+                  title: Text(S.of(context)!.chatWithDocuments),
+                  onTap: () => const DocumentChatRoute().push(context),
+                ),
               ListTile(
                 dense: true,
                 title: Text(S.of(context)!.aboutThisApp),

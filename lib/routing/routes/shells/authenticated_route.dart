@@ -11,6 +11,7 @@ import 'package:paperless_mobile/features/sharing/view/widgets/event_listener_sh
 import 'package:paperless_mobile/routing/navigation_keys.dart';
 import 'package:paperless_mobile/routing/routes.dart';
 import 'package:paperless_mobile/routing/routes/custom_field_route.dart';
+import 'package:paperless_mobile/routing/routes/document_chat_route.dart';
 import 'package:paperless_mobile/routing/routes/documents_route.dart';
 import 'package:paperless_mobile/routing/routes/inbox_route.dart';
 import 'package:paperless_mobile/routing/routes/labels_route.dart';
@@ -30,6 +31,7 @@ part 'authenticated_route.g.dart';
   routes: [
     TypedGoRoute<SettingsRoute>(path: "/settings", name: R.settings),
     TypedGoRoute<UploadQueueRoute>(path: "/upload-queue", name: R.uploadQueue),
+    TypedGoRoute<DocumentChatRoute>(path: "/chat", name: R.documentChat),
     TypedGoRoute<SavedViewsRoute>(
       path: "/saved-views",
       routes: [

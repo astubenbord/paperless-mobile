@@ -94,4 +94,5 @@ enum ErrorCode {
   bulkEditDocumentsFailed,
   profileGetError,
   invalidApiKey,
+  documentChatFailed,
 }

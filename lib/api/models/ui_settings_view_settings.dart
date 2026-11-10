@@ -18,6 +18,7 @@ abstract class UiSettingsViewSettings with _$UiSettingsViewSettings {
     UiSettingsViewSettingsSearch? search,
     UiSettingsViewSettingsSavedViews? savedViews,
     bool? auditlogEnabled,
+    bool? aiEnabled,
   }) = _UiSettingsViewSettings;
 
   factory UiSettingsViewSettings.fromJson(Map<String, dynamic> json) =>

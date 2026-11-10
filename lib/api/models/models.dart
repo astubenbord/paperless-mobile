@@ -51,6 +51,8 @@ export 'data_type_enum.dart';
 export 'database.dart';
 export 'display_mode_enum.dart';
 export 'document.dart';
+export 'document_chat_reference.dart';
+export 'document_chat_response.dart';
 export 'document_list_request.dart';
 export 'document_permissions.dart';
 export 'document_request.dart';
