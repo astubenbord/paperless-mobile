@@ -14,10 +14,10 @@ import 'package:paperless_mobile/features/notifications/models/notification_payl
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
 
 class LocalNotificationService {
-  final FlutterLocalNotificationsPlugin _plugin =
-      FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin _plugin;
 
-  LocalNotificationService();
+  LocalNotificationService({FlutterLocalNotificationsPlugin? plugin})
+    : _plugin = plugin ?? FlutterLocalNotificationsPlugin();
 
   final Map<String, List<int>> _pendingNotifications = {};
 
@@ -41,11 +41,36 @@ class LocalNotificationService {
       onDidReceiveBackgroundNotificationResponse:
           onDidReceiveBackgroundNotificationResponse,
     );
-    await _plugin
+    final androidPlugin = _plugin
         .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin
-        >()
-        ?.requestNotificationsPermission();
+        >();
+    await androidPlugin?.requestNotificationsPermission();
+    await _deleteLegacyNotificationChannels(androidPlugin);
+  }
+
+  Future<void> _deleteLegacyNotificationChannels(
+    AndroidFlutterLocalNotificationsPlugin? androidPlugin,
+  ) async {
+    if (androidPlugin == null) return;
+    try {
+      final channels = await androidPlugin.getNotificationChannels();
+      if (channels == null) return;
+      for (final channel in channels) {
+        if (channel.id.startsWith('${NotificationChannel.task.id}_') ||
+            channel.id.startsWith('${NotificationChannel.fileDownload.id}_') ||
+            channel.id.startsWith(
+              '${NotificationChannel.documentDownload.id}_',
+            )) {
+          await androidPlugin.deleteNotificationChannel(channel.id);
+        }
+      }
+    } catch (e, stackTrace) {
+      log(
+        "[LocalNotificationService] Error deleting legacy notification channels: $e",
+        stackTrace: stackTrace,
+      );
+    }
   }
 
   Future<void> notifyFileDownload({required String filePath}) async {
@@ -55,7 +80,7 @@ class LocalNotificationService {
       "File download complete.",
       NotificationDetails(
         android: AndroidNotificationDetails(
-          "${NotificationChannel.fileDownload.id}_${filePath.hashCode}",
+          NotificationChannel.fileDownload.id,
           NotificationChannel.fileDownload.name,
           importance: Importance.max,
           priority: Priority.high,
@@ -136,7 +161,7 @@ class LocalNotificationService {
           : tr.notificationDownloadingDocument,
       NotificationDetails(
         android: AndroidNotificationDetails(
-          "${NotificationChannel.documentDownload.id}_$filename",
+          NotificationChannel.documentDownload.id,
           NotificationChannel.documentDownload.name,
           ongoing: !finished,
           indeterminate: true,
@@ -172,6 +197,7 @@ class LocalNotificationService {
         status == StatusEnum.started || status == StatusEnum.pending;
     dynamic payload;
     switch (status) {
+      case StatusEnum.received:
       case StatusEnum.started:
         title = 'Document received';
         body = task.taskFileName;
@@ -183,8 +209,14 @@ class LocalNotificationService {
         timestampMillis = task.dateCreated?.millisecondsSinceEpoch ?? 0;
         break;
       case StatusEnum.failure:
+      case StatusEnum.revoked:
         title = "Failed to process document";
         body = task.result ?? 'Rejected by the server.';
+        timestampMillis = task.dateCreated?.millisecondsSinceEpoch ?? 0;
+        break;
+      case StatusEnum.retry:
+        title = "Retrying document processing...";
+        body = task.taskFileName;
         timestampMillis = task.dateCreated?.millisecondsSinceEpoch ?? 0;
         break;
       case StatusEnum.success:
@@ -196,7 +228,7 @@ class LocalNotificationService {
         );
         break;
       default:
-        break;
+        return;
     }
     await _plugin.show(
       id,
@@ -204,7 +236,7 @@ class LocalNotificationService {
       body,
       NotificationDetails(
         android: AndroidNotificationDetails(
-          '${NotificationChannel.task.id}_${task.id}',
+          NotificationChannel.task.id,
           NotificationChannel.task.name,
           category: AndroidNotificationCategory.status,
           ongoing: showProgress,
