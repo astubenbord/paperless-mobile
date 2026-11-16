@@ -96,7 +96,15 @@ class PaperlessUserApiImpl extends PaperlessUserApi
   Future<UiSettingsView> getUiSettings() async {
     try {
       final response = await client.get('/api/ui_settings/');
-      return UiSettingsView.fromJson(response.data!);
+      final data = Map<String, dynamic>.from(response.data!);
+      if (!data.containsKey('user')) {
+        throw PaperlessApiException(
+          ErrorCode.uiSettingsLoadFailed,
+          details:
+              'The v10 UI settings response omits user identity required by the current UI.',
+        );
+      }
+      return UiSettingsView.fromJson(data);
     } on DioException catch (exception) {
       throw exception.unravel(
         orElse: const PaperlessApiException(ErrorCode.uiSettingsLoadFailed),

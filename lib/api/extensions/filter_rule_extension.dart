@@ -12,6 +12,12 @@ extension FilterRuleToDocumentFilterExtension on SavedViewFilterRule {
       switch (ruleType) {
         case RuleTypeEnum.titleContains:
           return filter.copyWith(query: TextQuery.title(value));
+        case RuleTypeEnum.simpleTitleSearch:
+          return filter.copyWith(query: TextQuery.titleSearch(value));
+        case RuleTypeEnum.simpleTextSearch:
+          return filter.copyWith(query: TextQuery.simpleText(value));
+        case RuleTypeEnum.hasDuplicates:
+          return filter.copyWith(hasDuplicates: value == 'true');
         case RuleTypeEnum.documentTypeIs:
           return filter.copyWith(
             documentType: value == null
@@ -441,17 +447,23 @@ extension ToFilterRuleExtension on DocumentFilter {
     if (query.queryText != null) {
       switch (query.queryType) {
         case QueryType.title:
+        case QueryType.titleSearch:
           filterRules.add(
             SavedViewFilterRule(
-              ruleType: RuleTypeEnum.titleContains,
+              ruleType: query.queryType == QueryType.titleSearch
+                  ? RuleTypeEnum.simpleTitleSearch
+                  : RuleTypeEnum.titleContains,
               value: query.queryText!,
             ),
           );
           break;
         case QueryType.titleAndContent:
+        case QueryType.simpleText:
           filterRules.add(
             SavedViewFilterRule(
-              ruleType: RuleTypeEnum.titleOrContentContains,
+              ruleType: query.queryType == QueryType.simpleText
+                  ? RuleTypeEnum.simpleTextSearch
+                  : RuleTypeEnum.titleOrContentContains,
               value: query.queryText!,
             ),
           );

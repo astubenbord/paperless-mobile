@@ -12,7 +12,6 @@ abstract class MailAccountRequest with _$MailAccountRequest {
     required String name,
     required String imapServer,
 
-    /// This is usually 143 for unencrypted and STARTTLS connections, and 993 for SSL connections.
     // minimum: -2147483648
     // maximum: 2147483647
     int? imapPort,

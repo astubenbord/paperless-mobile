@@ -20,7 +20,7 @@ class PaperlessTasksApiImpl implements PaperlessTasksApi {
   @override
   Future<TasksView?> find(int id) async {
     return getSingleResult(
-      '/api/tasks/$id',
+      '/api/tasks/$id/',
       TasksView.fromJson,
       ErrorCode.loadTasksError,
       client: _client,
@@ -44,17 +44,17 @@ class PaperlessTasksApiImpl implements PaperlessTasksApi {
   Stream<TasksView> listenForTaskChanges(String taskId) async* {
     bool isCompleted = false;
     while (!isCompleted) {
-      final tasks = await findAll(
-        TaskFilterOptions(taskName: TaskNameEnum.consumeFile),
-      );
+      final tasks = await findAll(TaskFilterOptions(taskId: taskId));
       if (tasks.isEmpty) {
-        throw Exception("Task with taskId $taskId does not exist.");
+        await Future.delayed(const Duration(seconds: 2));
+        continue;
       }
-      final task = tasks.firstWhere((t) => t.taskId == taskId);
+      final task = tasks.first;
       log("Found new task: ${task.taskId}, ${task.id}, ${task.status}");
       yield task;
       if (task.status == StatusEnum.success ||
-          task.status == StatusEnum.failure) {
+          task.status == StatusEnum.failure ||
+          task.status == StatusEnum.revoked) {
         isCompleted = true;
       }
       await Future.delayed(const Duration(seconds: 2));
@@ -65,7 +65,7 @@ class PaperlessTasksApiImpl implements PaperlessTasksApi {
   Future<void> acknowledgeTasks(Iterable<int> tasks) async {
     try {
       final response = await _client.post(
-        "/api/acknowledge_tasks/",
+        "/api/tasks/acknowledge/",
         data: {'tasks': tasks.toList()},
         options: Options(validateStatus: (status) => status == 200),
       );

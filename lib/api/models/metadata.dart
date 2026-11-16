@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:paperless_mobile/api/models/document_barcode.dart';
 
 part 'metadata.freezed.dart';
 part 'metadata.g.dart';
@@ -18,6 +19,7 @@ abstract class Metadata with _$Metadata {
     int? archiveSize,
     List<Object>? archiveMetadata,
     String? lang,
+    @Default([]) List<DocumentBarcode> barcodes,
   }) = _Metadata;
 
   factory Metadata.fromJson(Map<String, dynamic> json) =>

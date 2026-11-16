@@ -49,7 +49,10 @@ enum RuleTypeEnum {
   createdFrom(44),
   addedTo(45),
   addedFrom(46),
-  mimeTypeIs(47);
+  mimeTypeIs(47),
+  simpleTitleSearch(48),
+  simpleTextSearch(49),
+  hasDuplicates(50);
 
   const RuleTypeEnum(this.value);
 

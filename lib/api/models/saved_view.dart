@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:paperless_mobile/api/models/display_mode_enum.dart';
+import 'package:paperless_mobile/api/models/document_permissions.dart';
 import 'package:paperless_mobile/api/models/saved_view_filter_rule.dart';
 
 part 'saved_view.freezed.dart';
@@ -10,8 +11,9 @@ abstract class SavedView with _$SavedView {
   factory SavedView({
     required int id,
     required String name,
-    required bool showOnDashboard,
-    required bool showInSidebar,
+    @Default(false) bool showOnDashboard,
+    @Default(false) bool showInSidebar,
+    String? icon,
     String? sortField,
     bool? sortReverse,
     required List<SavedViewFilterRule> filterRules,
@@ -21,6 +23,7 @@ abstract class SavedView with _$SavedView {
     DisplayModeEnum? displayMode,
     List<String>? displayFields,
     int? owner,
+    DocumentPermissions? permissions,
     required bool? userCanChange,
   }) = _SavedView;
 

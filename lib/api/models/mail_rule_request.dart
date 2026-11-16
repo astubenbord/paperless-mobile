@@ -62,6 +62,7 @@ abstract class MailRuleRequest with _$MailRuleRequest {
     // minimum: 0.0
     // maximum: 2.147483647E9
     PdfLayoutEnum? pdfLayout,
+    bool? stopProcessing,
     int? owner,
     CorrespondentRequestSetPermissions? setPermissions,
   }) = _MailRuleRequest;
