@@ -16,7 +16,16 @@ class DioFileService extends FileService {
   }) async {
     final response = await dio.get<ResponseBody>(
       url,
-      options: Options(headers: headers, responseType: ResponseType.stream),
+      options: Options(
+        headers: headers,
+        responseType: ResponseType.stream,
+        // flutter_cache_manager revalidates with If-None-Match and handles
+        // 304 Not Modified itself; Dio would otherwise throw on it.
+        validateStatus: (status) =>
+            status != null &&
+            ((status >= 200 && status < 300) ||
+                status == HttpStatus.notModified),
+      ),
     );
     return DioGetResponse(response);
   }
