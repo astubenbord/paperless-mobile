@@ -21,6 +21,7 @@ import 'package:paperless_mobile/core/store/local_store.dart';
 import 'package:paperless_mobile/core/store/slices/local_user_account.dart';
 import 'package:paperless_mobile/features/document_scan/cubit/document_scanner_cubit.dart';
 import 'package:paperless_mobile/features/login/view/widgets/login_transition_page.dart';
+import 'package:paperless_mobile/features/login/view/widgets/session_load_error_page.dart';
 import 'package:paperless_mobile/features/tasks/model/pending_tasks_notifier.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
@@ -138,28 +139,31 @@ class HomeShellWidget extends StatelessWidget {
             ),
           ],
           child: Builder(
-            builder: (context) => QueryBuilder(
-              query: context.read<SessionDataRepository>().userProfileQuery(
-                appUserId,
-              ),
-              builder: (context, state) {
-                if (state.isLoadingInitial) {
-                  return LoginTransitionPage(
-                    text: S.of(context)!.fetchingUserInformation,
+            builder: (context) {
+              final query = context
+                  .read<SessionDataRepository>()
+                  .userProfileQuery(appUserId);
+              return QueryBuilder(
+                query: query,
+                builder: (context, state) {
+                  if (state.isLoadingInitial) {
+                    return LoginTransitionPage(
+                      text: S.of(context)!.fetchingUserInformation,
+                    );
+                  } else if (state.isError || state.data == null) {
+                    return SessionLoadErrorPage(onRetry: query.refetch);
+                  }
+                  final sessionData = state.data!;
+                  final localUserAccount = LocalUserAccount(
+                    appUserId: appUserId,
+                    serverUrl: client.options.baseUrl,
+                    apiVersion: sessionData.apiVersion,
+                    profile: sessionData.profile,
                   );
-                } else if (state.isError) {
-                  return SizedBox.shrink(); // TODO: Show actual error
-                }
-                final sessionData = state.data!;
-                final localUserAccount = LocalUserAccount(
-                  appUserId: appUserId,
-                  serverUrl: client.options.baseUrl,
-                  apiVersion: sessionData.apiVersion,
-                  profile: sessionData.profile,
-                );
-                return Provider.value(value: localUserAccount, child: child);
-              },
-            ),
+                  return Provider.value(value: localUserAccount, child: child);
+                },
+              );
+            },
           ),
         );
       },
