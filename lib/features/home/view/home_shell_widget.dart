@@ -90,6 +90,9 @@ class HomeShellWidget extends StatelessWidget {
         Provider<PaperlessUserApi>(
           create: (context) => PaperlessUserApiImpl(client),
         ),
+        Provider<PaperlessChatApi>(
+          create: (context) => PaperlessChatApiImpl(client),
+        ),
       ],
       builder: (context, _) {
         return MultiProvider(

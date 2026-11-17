@@ -92,4 +92,7 @@ extension UserPermissionExtension on UiSettingsView {
       canViewStoragePaths;
 
   bool get canViewInbox => canViewTags && canViewDocuments;
+
+  bool get canUseDocumentChat =>
+      (settings?.aiEnabled ?? false) && canViewDocuments;
 }

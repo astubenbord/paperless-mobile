@@ -24,6 +24,7 @@ import 'package:paperless_mobile/features/similar_documents/view/similar_documen
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
 import 'package:paperless_mobile/helpers/connectivity_aware_action_wrapper.dart';
 import 'package:paperless_mobile/helpers/message_helpers.dart';
+import 'package:paperless_mobile/routing/routes/document_chat_route.dart';
 import 'package:paperless_mobile/routing/routes/documents_route.dart';
 import 'package:paperless_mobile/theme.dart';
 
@@ -432,6 +433,21 @@ class _DocumentDetailsPageState extends State<DocumentDetailsPage> {
                 ),
               ),
               DocumentShareButton(),
+              if (currentUser.profile.uiSettings.canUseDocumentChat)
+                ConnectivityAwareActionWrapper(
+                  offlineBuilder: (context, child) => const IconButton(
+                    icon: Icon(Icons.chat_outlined),
+                    onPressed: null,
+                  ),
+                  child: IconButton(
+                    tooltip: S.of(context)!.chatWithDocument,
+                    icon: const Icon(Icons.chat_outlined),
+                    onPressed: () => DocumentChatRoute(
+                      documentId: widget.id,
+                      documentTitle: state.data?.title,
+                    ).push(context),
+                  ),
+                ),
             ],
           );
         },

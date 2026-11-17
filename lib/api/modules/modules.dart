@@ -3,6 +3,7 @@ export 'base_crud_api_impl_mixin.dart';
 export 'crud_api.dart';
 export 'custom_fields_api.dart';
 export 'label_apis.dart';
+export 'paperless_chat_api.dart';
 export 'paperless_documents_api.dart';
 export 'paperless_saved_views_api.dart';
 export 'paperless_search_api.dart';

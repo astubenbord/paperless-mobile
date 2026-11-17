@@ -34,4 +34,5 @@ class R {
   static const addNote = 'addNote';
   static const createCustomField = 'createCustomField';
   static const editCustomField = 'editCustomField';
+  static const documentChat = 'documentChat';
 }
