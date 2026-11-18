@@ -10,9 +10,11 @@ import 'package:paperless_mobile/routing/routes/labels_route.dart';
 
 /// A fullscreen form for selecting multiple tags.
 ///
-/// This form follows the same mechanics as [MultiLabelForm], using a single
-/// [SelectionType] and a list of selected IDs. The -1 sentinel represents
-/// the "any assigned" / "not assigned" special option.
+/// When [allowExclude] is set (filter mode), every tag has its own selection
+/// state, so included and excluded tags can be combined in one query: tapping
+/// a tag cycles through include -> exclude -> unselected. The -1 sentinel
+/// represents the "any assigned" / "not assigned" special option, which cycles
+/// the same way and cannot be combined with individual tags.
 class FullscreenTagsForm extends StatefulWidget {
   final TagsQuery? initialValue;
   final void Function({TagsQuery? returnValue}) onSubmit;
@@ -37,8 +39,13 @@ class _FullscreenTagsFormState extends State<FullscreenTagsForm> {
   bool _showClearIcon = false;
   final _textEditingController = TextEditingController();
   final _focusNode = FocusNode();
-  late SelectionType _selectionType;
-  late List<int> _selectedIds;
+
+  /// Selection state per tag id (excluding the -1 sentinel).
+  late Map<int, SelectionType> _selection;
+
+  /// Selection state of the any assigned (include) / not assigned (exclude)
+  /// option, or null if not selected.
+  SelectionType? _assignmentSelection;
 
   @override
   void initState() {
@@ -46,18 +53,18 @@ class _FullscreenTagsFormState extends State<FullscreenTagsForm> {
     _textEditingController.addListener(() {
       setState(() => _showClearIcon = _textEditingController.text.isNotEmpty);
     });
-    _selectionType = switch (widget.initialValue) {
-      IdsTagsQuery(include: final inc, exclude: final exc)
-          when inc.isEmpty && exc.isNotEmpty =>
-        SelectionType.exclude,
-      NotAssignedTagsQuery() => SelectionType.exclude,
-      _ => SelectionType.include,
+    _selection = switch (widget.initialValue) {
+      IdsTagsQuery(include: final inc, exclude: final exc) => {
+        for (final id in inc) id: SelectionType.include,
+        if (widget.allowExclude)
+          for (final id in exc) id: SelectionType.exclude,
+      },
+      _ => {},
     };
-    _selectedIds = switch (widget.initialValue) {
-      IdsTagsQuery(include: final inc, exclude: final exc) =>
-        inc.isNotEmpty ? [...inc] : [...exc],
-      AnyAssignedTagsQuery() || NotAssignedTagsQuery() => [-1],
-      _ => [],
+    _assignmentSelection = switch (widget.initialValue) {
+      AnyAssignedTagsQuery() => SelectionType.include,
+      NotAssignedTagsQuery() => SelectionType.exclude,
+      _ => null,
     };
     if (widget.autofocus) {
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
@@ -143,7 +150,13 @@ class _FullscreenTagsFormState extends State<FullscreenTagsForm> {
             builder: (context) {
               return Column(
                 children: [
-                  if (widget.allowExclude) _buildIncludeExcludeButtonGroup(),
+                  if (widget.allowExclude)
+                    Text(
+                      S.of(context)!.tagFilterSelectionHint,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ).padded(),
                   if (filteredOptions.where((id) => id != -1).isEmpty)
                     Center(
                       child: Column(
@@ -164,8 +177,7 @@ class _FullscreenTagsFormState extends State<FullscreenTagsForm> {
                       itemCount: filteredOptions.length,
                       itemBuilder: (BuildContext context, int index) {
                         final option = filteredOptions.elementAt(index);
-                        final selected = _selectedIds.contains(option);
-                        return _buildOptionWidget(option, selected, options);
+                        return _buildOptionWidget(option, options);
                       },
                     ),
                   ),
@@ -186,35 +198,50 @@ class _FullscreenTagsFormState extends State<FullscreenTagsForm> {
     _textEditingController.clear();
     if (createdTag != null) {
       setState(() {
-        _selectedIds.remove(-1);
-        _selectedIds.add(createdTag.id);
+        _assignmentSelection = null;
+        _selection[createdTag.id] = SelectionType.include;
       });
     }
   }
 
   void _onSubmitSelection() {
-    if (_selectedIds.isEmpty) {
+    switch (_assignmentSelection) {
+      case SelectionType.include:
+        widget.onSubmit(returnValue: const AnyAssignedTagsQuery());
+        return;
+      case SelectionType.exclude:
+        widget.onSubmit(returnValue: const NotAssignedTagsQuery());
+        return;
+      case null:
+        break;
+    }
+
+    if (_selection.isEmpty) {
       widget.onSubmit(returnValue: null);
       return;
     }
 
-    if (_selectedIds.contains(-1)) {
-      switch (_selectionType) {
-        case SelectionType.include:
-          widget.onSubmit(returnValue: const AnyAssignedTagsQuery());
-          return;
-        case SelectionType.exclude:
-          widget.onSubmit(returnValue: const NotAssignedTagsQuery());
-          return;
-      }
-    }
+    List<int> idsWith(SelectionType type) => [
+      for (final MapEntry(:key, :value) in _selection.entries)
+        if (value == type) key,
+    ];
 
     widget.onSubmit(
-      returnValue: switch (_selectionType) {
-        SelectionType.include => IdsTagsQuery(include: _selectedIds),
-        SelectionType.exclude => IdsTagsQuery(exclude: _selectedIds),
-      },
+      returnValue: IdsTagsQuery(
+        include: idsWith(SelectionType.include),
+        exclude: idsWith(SelectionType.exclude),
+      ),
     );
+  }
+
+  /// Cycles unselected -> include -> exclude -> unselected in filter mode,
+  /// and unselected <-> include otherwise.
+  SelectionType? _nextSelection(SelectionType? current) {
+    return switch (current) {
+      null => SelectionType.include,
+      SelectionType.include when widget.allowExclude => SelectionType.exclude,
+      _ => null,
+    };
   }
 
   /// Filters the options passed to this widget by the current [query] and
@@ -244,15 +271,17 @@ class _FullscreenTagsFormState extends State<FullscreenTagsForm> {
     };
   }
 
-  Widget _buildOptionWidget(int option, bool selected, Map<int, Tag> options) {
+  Widget _buildOptionWidget(int option, Map<int, Tag> options) {
     if (option == -1) {
+      final selection = _assignmentSelection;
       return ListTile(
-        selected: selected,
+        selected: selection != null,
         selectedTileColor: Theme.of(context).focusColor,
-        title: Text(switch (_selectionType) {
-          SelectionType.include => S.of(context)!.anyAssigned,
+        title: Text(switch (selection) {
           SelectionType.exclude => S.of(context)!.notAssigned,
+          _ => S.of(context)!.anyAssigned,
         }),
+        trailing: _SelectionIcon(selection: selection),
         onTap: () => _onOptionTap(option),
       );
     }
@@ -262,71 +291,64 @@ class _FullscreenTagsFormState extends State<FullscreenTagsForm> {
 
     return SelectableTagWidget(
       tag: tag,
-      selected: selected,
+      selection: _selection[option],
       onTap: () => _onOptionTap(option),
     );
   }
 
   void _onOptionTap(int option) {
-    if (option == -1) {
-      if (_selectedIds.contains(option)) {
-        setState(() {
-          _selectedIds.clear();
-        });
-      } else {
-        setState(() {
-          _selectedIds = [option];
-        });
+    setState(() {
+      if (option == -1) {
+        _assignmentSelection = _nextSelection(_assignmentSelection);
+        if (_assignmentSelection != null) {
+          _selection.clear();
+        }
+        return;
       }
-    } else {
-      _selectedIds.remove(-1);
-      if (_selectedIds.contains(option)) {
-        setState(() {
-          _selectedIds.remove(option);
-        });
+      _assignmentSelection = null;
+      final next = _nextSelection(_selection[option]);
+      if (next == null) {
+        _selection.remove(option);
       } else {
-        setState(() {
-          _selectedIds.add(option);
-        });
+        _selection[option] = next;
       }
-    }
+    });
   }
+}
 
-  Widget _buildIncludeExcludeButtonGroup() {
-    return Flexible(
-      child: SegmentedButton<SelectionType>(
-        showSelectedIcon: false,
-        multiSelectionEnabled: false,
-        selected: {_selectionType},
-        onSelectionChanged: (newSelection) {
-          setState(() {
-            _selectionType = newSelection.first;
-          });
-        },
-        segments: [
-          ButtonSegment(
-            value: SelectionType.include,
-            label: Text(S.of(context)!.include),
-          ),
-          ButtonSegment(
-            value: SelectionType.exclude,
-            label: Text(S.of(context)!.exclude),
-          ),
-        ],
+class _SelectionIcon extends StatelessWidget {
+  final SelectionType? selection;
+
+  const _SelectionIcon({required this.selection});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return switch (selection) {
+      SelectionType.include => Icon(
+        Icons.check_circle,
+        color: colorScheme.primary,
+        semanticLabel: S.of(context)!.include,
       ),
-    );
+      SelectionType.exclude => Icon(
+        Icons.remove_circle,
+        color: colorScheme.error,
+        semanticLabel: S.of(context)!.exclude,
+      ),
+      null => const SizedBox.shrink(),
+    };
   }
 }
 
 class SelectableTagWidget extends StatelessWidget {
   final Tag tag;
-  final bool selected;
+  final SelectionType? selection;
   final VoidCallback onTap;
 
   const SelectableTagWidget({
     super.key,
     required this.tag,
-    required this.selected,
+    required this.selection,
     required this.onTap,
   });
 
@@ -334,13 +356,22 @@ class SelectableTagWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       title: Text(tag.name),
-      trailing: Text(S.of(context)!.documentsAssigned(tag.documentCount ?? 0)),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(S.of(context)!.documentsAssigned(tag.documentCount ?? 0)),
+          if (selection != null) ...[
+            const SizedBox(width: 8),
+            _SelectionIcon(selection: selection),
+          ],
+        ],
+      ),
       leading: CircleAvatar(
         backgroundColor: tag.color,
         child: tag.isInboxTag ? Icon(Icons.inbox, color: tag.textColor) : null,
       ),
       onTap: onTap,
-      selected: selected,
+      selected: selection != null,
       selectedTileColor: Theme.of(context).focusColor,
     );
   }

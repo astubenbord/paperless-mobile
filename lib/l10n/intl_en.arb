@@ -1294,5 +1294,9 @@
   "scannerParameterMinimumAreaFactor": "Minimum Area Factor",
   "@scannerParameterMinimumAreaFactor": {},
   "scannerParameterMinimumAreaFactorDescription": "Specifies the minimum screen surface area percentage required for a document outline to be registered. Higher percentages ignore small rectangular clutter in the background, while lower percentages allow scanning small receipts or documents from further away.",
-  "@scannerParameterMinimumAreaFactorDescription": {}
+  "@scannerParameterMinimumAreaFactorDescription": {},
+  "tagFilterSelectionHint": "Tap a tag once to include it, twice to exclude it.",
+  "@tagFilterSelectionHint": {
+    "description": "Hint above the tag list when filtering documents by tags"
+  }
 }
