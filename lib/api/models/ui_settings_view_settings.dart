@@ -103,6 +103,8 @@ abstract class UiSettingsViewSettingsSavedViews
     with _$UiSettingsViewSettingsSavedViews {
   factory UiSettingsViewSettingsSavedViews({
     List<int>? dashboardViewsSortOrder,
+    @Default([]) List<int> dashboardViewsVisibleIds,
+    @Default([]) List<int> sidebarViewsVisibleIds,
   }) = _UiSettingsViewSettingsSavedViews;
 
   factory UiSettingsViewSettingsSavedViews.fromJson(

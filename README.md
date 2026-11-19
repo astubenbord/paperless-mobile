@@ -42,6 +42,18 @@
   </p>
 </div>
 
+> **Fork note**
+>
+> This fork currently contains a compatibility fix for newer Paperless-ngx versions:
+>
+> - restores saved view visibility on the dashboard
+> - reads `dashboard_views_visible_ids` and `sidebar_views_visible_ids` from `/api/ui_settings/`
+> - keeps saved views working when the old `show_on_dashboard` / `show_in_sidebar` fields are no longer returned by `/api/saved_views/`
+>
+> Upstream project:
+> https://github.com/astubenbord/paperless-mobile
+
+
 <!-- ABOUT THE PROJECT -->
 
 ## About The Project
