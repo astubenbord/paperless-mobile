@@ -28,6 +28,7 @@ import 'package:paperless_mobile/core/exception/server_message_exception.dart';
 import 'package:paperless_mobile/core/interceptor/language_header.interceptor.dart';
 import 'package:paperless_mobile/core/security/session_manager.dart';
 import 'package:paperless_mobile/core/security/session_manager_impl.dart';
+import 'package:paperless_mobile/core/security/system_http_proxy.dart';
 import 'package:paperless_mobile/core/service/connectivity_status_service.dart';
 import 'package:paperless_mobile/core/service/file_service.dart';
 import 'package:paperless_mobile/core/store/bloc/global_settings_builder.dart';
@@ -98,6 +99,7 @@ void main() async {
       final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
       final defaultLocale = defaultPreferredLocale.languageCode;
       await initializeDefaultParameters();
+      await installSystemHttpProxy();
       CachedQuery.instance.configFlutter(
         config: GlobalQueryConfig(
           refetchOnConnection: true,
