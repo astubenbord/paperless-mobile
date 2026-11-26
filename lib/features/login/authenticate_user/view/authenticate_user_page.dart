@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:go_router/go_router.dart';
+import 'package:paperless_mobile/api/paperless_api.dart';
 import 'package:paperless_mobile/core/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/core/widgets/app_logs_footer_widget.dart';
 import 'package:paperless_mobile/features/login/authenticate_user/cubit/authenticate_user_cubit.dart';
@@ -34,6 +35,17 @@ class AuthenticateUserPage extends StatefulWidget {
 
 class _AuthenticateUserPageState extends State<AuthenticateUserPage> {
   final _formKey = GlobalKey<FormBuilderState>();
+  late final Future<List<OidcProvider>> _oidcProviders;
+
+  @override
+  void initState() {
+    super.initState();
+    _oidcProviders = AuthenticateUserCubit.getOidcProviders(
+      serverUrl: widget.serverUrl,
+      clientCertificate: widget.clientCertificate,
+      additionalHeaders: widget.additionalHeaders,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,12 +84,14 @@ class _AuthenticateUserPageState extends State<AuthenticateUserPage> {
             :final serverUrl,
             :final credentials,
             :final clientCertificate,
+            :final additionalHeaders,
           ):
             OtpRoute(
               serverUrl: serverUrl,
               $extra: OtpRouteExtra(
                 credentials: credentials,
                 clientCertificate: clientCertificate,
+                additionalHeaders: additionalHeaders,
               ),
             ).push(context);
             break;
@@ -103,7 +117,7 @@ class _AuthenticateUserPageState extends State<AuthenticateUserPage> {
               ).padded(),
               SizedBox(height: 24),
               Expanded(
-                child: Column(
+                child: ListView(
                   children: [
                     AuthenticationCredentialsFormField(
                       formKey: _formKey,
@@ -126,6 +140,7 @@ class _AuthenticateUserPageState extends State<AuthenticateUserPage> {
                         _buildSubmitButton(),
                       ],
                     ).padded(),
+                    _buildOidcButtons(),
                   ],
                 ),
               ),
@@ -155,6 +170,48 @@ class _AuthenticateUserPageState extends State<AuthenticateUserPage> {
           ),
         };
       },
+    );
+  }
+
+  Widget _buildOidcButtons() {
+    return FutureBuilder<List<OidcProvider>>(
+      future: _oidcProviders,
+      builder: (context, snapshot) {
+        final providers = snapshot.data ?? [];
+        if (providers.isEmpty) {
+          return const SizedBox.shrink();
+        }
+        return BlocBuilder<AuthenticateUserCubit, AuthenticateUserState>(
+          builder: (context, state) {
+            final isChecking = state is AuthenticateUserChecking;
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              spacing: 8,
+              children: [
+                const Divider(),
+                for (final provider in providers)
+                  OutlinedButton.icon(
+                    onPressed: isChecking ? null : () => _onOidcLogin(provider),
+                    icon: const Icon(Icons.login),
+                    label: Text(
+                      S.of(context)!.signInWithProvider(provider.name),
+                    ),
+                  ),
+              ],
+            ).paddedSymmetrically(horizontal: 16);
+          },
+        );
+      },
+    );
+  }
+
+  void _onOidcLogin(OidcProvider provider) {
+    FocusScope.of(context).unfocus();
+    context.read<AuthenticateUserCubit>().loginWithOidc(
+      serverUrl: widget.serverUrl,
+      provider: provider,
+      clientCertificate: widget.clientCertificate,
+      additionalHeaders: widget.additionalHeaders,
     );
   }
 
