@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:paperless_mobile/api/paperless_api.dart';
 import 'package:paperless_mobile/core/extensions/flutter_extensions.dart';
 import 'package:paperless_mobile/core/widgets/app_logs_footer_widget.dart';
 import 'package:paperless_mobile/features/login/authenticate_user/cubit/authenticate_user_cubit.dart';
 import 'package:paperless_mobile/features/login/authenticate_user/model/authentication_credentials.dart';
 import 'package:paperless_mobile/features/login/helper/guard_unsupported_api_version.dart';
 import 'package:paperless_mobile/features/login/model/client_certificate.dart';
+import 'package:paperless_mobile/features/login/server_connection/model/header_entry.dart';
 import 'package:paperless_mobile/generated/l10n/app_localizations.dart';
 import 'package:paperless_mobile/helpers/message_helpers.dart';
 import 'package:paperless_mobile/routing/routes/auth_route.dart';
@@ -16,11 +19,13 @@ class OtpInputPage extends StatefulWidget {
   final AuthenticationCredentials credentials;
 
   final ClientCertificate? clientCertificate;
+  final List<HeaderEntry>? additionalHeaders;
   const OtpInputPage({
     super.key,
     required this.serverUrl,
     required this.credentials,
     this.clientCertificate,
+    this.additionalHeaders,
   });
 
   @override
@@ -56,6 +61,16 @@ class _OtpInputPageState extends State<OtpInputPage> {
       listener: (context, state) async {
         switch (state) {
           case AuthenticateUserError error:
+            // A pending OIDC login that has expired or was already used
+            // cannot be resumed: start over. Wrong codes and network errors
+            // can be retried with the same session.
+            if (error.genericError case PaperlessApiException(
+              code: ErrorCode.oidcSessionExpired,
+            )) {
+              showGenericError(context, error.genericError);
+              context.pop();
+              break;
+            }
             if (error.nonFieldError != null) {
               showSnackBar(context, error.nonFieldError!);
             } else {
@@ -151,6 +166,7 @@ class _OtpInputPageState extends State<OtpInputPage> {
       credentials: widget.credentials,
       otp: code,
       clientCertificate: widget.clientCertificate,
+      additionalHeaders: widget.additionalHeaders,
     );
   }
 }

@@ -96,5 +96,12 @@ String translateError(BuildContext context, ErrorCode code) {
       S.of(context)!.couldNotBulkEditDocuments,
     ErrorCode.profileGetError => S.of(context)!.couldNotLoadUserProfile,
     ErrorCode.invalidApiKey => S.of(context)!.invalidApiKey,
+    ErrorCode.invalidMfaCode => S.of(context)!.invalidMfaCode,
+    ErrorCode.oidcLoginFailed => S.of(context)!.oidcLoginFailed,
+    ErrorCode.oidcClientNotPublic => S.of(context)!.oidcClientNotPublic,
+    ErrorCode.oidcIdentityProviderUnreachable =>
+      S.of(context)!.oidcIdentityProviderUnreachable,
+    ErrorCode.oidcSessionExpired => S.of(context)!.oidcSessionExpired,
+    ErrorCode.oidcAccountNotLinked => S.of(context)!.oidcAccountNotLinked,
   };
 }

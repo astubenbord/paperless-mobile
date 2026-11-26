@@ -94,4 +94,10 @@ enum ErrorCode {
   bulkEditDocumentsFailed,
   profileGetError,
   invalidApiKey,
+  invalidMfaCode,
+  oidcLoginFailed,
+  oidcClientNotPublic,
+  oidcIdentityProviderUnreachable,
+  oidcSessionExpired,
+  oidcAccountNotLinked,
 }

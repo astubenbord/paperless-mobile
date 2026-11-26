@@ -128,8 +128,13 @@ class AuthenticateRoute extends GoRouteData with $AuthenticateRoute {
 class OtpRouteExtra {
   final AuthenticationCredentials credentials;
   final ClientCertificate? clientCertificate;
+  final List<HeaderEntry>? additionalHeaders;
 
-  const OtpRouteExtra({required this.credentials, this.clientCertificate});
+  const OtpRouteExtra({
+    required this.credentials,
+    this.clientCertificate,
+    this.additionalHeaders,
+  });
 }
 
 class OtpRoute extends GoRouteData with $OtpRoute {
@@ -147,6 +152,7 @@ class OtpRoute extends GoRouteData with $OtpRoute {
       child: OtpInputPage(
         serverUrl: serverUrl,
         clientCertificate: $extra.clientCertificate,
+        additionalHeaders: $extra.additionalHeaders,
         credentials: $extra.credentials,
       ),
     );

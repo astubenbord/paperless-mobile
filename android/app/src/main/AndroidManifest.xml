@@ -322,6 +322,19 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <!-- Return from the OIDC login in the browser (flutter_web_auth_2).
+             The scheme is PaperlessOidcApi.callbackScheme. -->
+        <activity
+            android:name="com.linusu.flutter_web_auth_2.CallbackActivity"
+            android:exported="true"
+            android:taskAffinity="">
+            <intent-filter android:label="flutter_web_auth_2">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="x-paperless" />
+            </intent-filter>
+        </activity>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

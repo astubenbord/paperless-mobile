@@ -675,6 +675,39 @@
   "@invalidApiKey": {
     "description": "Message shown when the provided API key is invalid."
   },
+  "invalidMfaCode": "Invalid authentication code.",
+  "@invalidMfaCode": {
+    "description": "Message shown when the two-factor authentication code entered after an OIDC login is rejected."
+  },
+  "oidcLoginFailed": "Sign-in with the identity provider failed.",
+  "@oidcLoginFailed": {
+    "description": "Message shown when the OIDC (single sign-on) login fails."
+  },
+  "oidcClientNotPublic": "The identity provider rejected the app. Its client for Paperless-ngx must be public (PKCE, no client secret) and allow the redirect URI x-paperless://oidc-callback.",
+  "@oidcClientNotPublic": {
+    "description": "Message shown when the identity provider refuses the OIDC login because its client is not configured for the app."
+  },
+  "oidcIdentityProviderUnreachable": "Could not reach the identity provider. Check the connection and its certificate.",
+  "@oidcIdentityProviderUnreachable": {
+    "description": "Message shown when the identity provider cannot be contacted during the OIDC login."
+  },
+  "oidcSessionExpired": "The sign-in has expired. Please sign in again.",
+  "@oidcSessionExpired": {
+    "description": "Message shown when the two-factor step of an OIDC login is no longer valid."
+  },
+  "oidcAccountNotLinked": "No Paperless-ngx account is linked to this identity yet. Sign in to the web interface and connect it from your profile.",
+  "@oidcAccountNotLinked": {
+    "description": "Message shown when the OIDC login works but Paperless-ngx has no account linked to that identity."
+  },
+  "signInWithProvider": "Sign in with {provider}",
+  "@signInWithProvider": {
+    "description": "Button that starts the OIDC (single sign-on) login with the given identity provider.",
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
   "invalidCertificateFormat": "Invalid certificate format, only .pfx is allowed",
   "@invalidCertificateFormat": {},
   "invalidCertificateOrMissingPassphrase": "Invalid certificate or missing passphrase, please try again",

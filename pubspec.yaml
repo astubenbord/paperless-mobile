@@ -104,6 +104,7 @@ dependencies:
   mime: ^2.0.0
   copy_with_extension: ^10.0.0
   crypto: ^3.0.6
+  flutter_web_auth_2: ^5.1.0
   cached_query_flutter: ^3.3.4
   skeletonizer: ^2.1.0+1
   pinput: ^6.0.0
